@@ -1,34 +1,21 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import os, sys
-
-# kepler_grids
-import grid_tools
-
-import matplotlib.pyplot as plt
-import lcdata
 import kepdump
-from contextlib import contextmanager
-import sys, os, pdb
+import sys
+import os
 from scipy import interpolate, integrate
-from scipy.stats import linregress
-import astropy.units as unit
-import astropy.constants as const
-
-import matplotlib.mlab as ml
-from matplotlib.ticker import FormatStrFormatter, LinearLocator, NullFormatter, NullLocator, MultipleLocator
-import matplotlib.ticker
-import matplotlib.colors
-from matplotlib.font_manager import FontProperties
-from matplotlib import rc, text, gridspec
-# import matrix2latex
-import subprocess
 
 # Custom modules required
 from printing import *
 import plotting
 import b_utils
+
+# kepler_grids
+from ..grids import grid_tools
+
+GRIDS_PATH = os.environ['KEPLER_GRIDS']
+MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
 def extract_burstfit_1808(batches, source, skip_bursts=1):
@@ -55,7 +42,7 @@ def extract_burstfit_1808(batches, source, skip_bursts=1):
         load_dir = f'{source}_{batch}_input/'
         load_path = os.path.join(GRIDS_PATH, 'analyser', source, load_dir)
 
-        for run in range(1, n_runs+1):
+        for run in range(1, n_runs + 1):
             sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
 
             burstfit = burstfit_1808.BurstRun(run, flat_run=True, truncate=False,
@@ -91,31 +78,24 @@ class BurstRun(object):
     """
 
     """
+
     def __init__(self,
                  run,
                  verbose=True,
                  basename='xrb',
                  re_load=False,
-                 runs_home='/home/zacpetej/archive/kepler/',
                  savelum=True,
                  load_analyser=False):
 
         self.run = run
         self.run_str = basename + str(run)
         self.verbose = verbose
-        self.runs_home = runs_home
         self.path = runs_home + self.run_str + '/'
         self.analysed = False  # Has the model been analysed yet
         self.bursts = {}  # Kepler burst properties
 
-        # ------------- LOAD KEPLER DATA AND ANALYSE -------------------
         self.load(savelum=savelum, basename=basename, re_load=re_load,
                   load_analyser=load_analyser)
-
-        if not self.flat:
-            self.load_acc()
-
-    # ========================================================================
 
     def analyse_all(self):
         """
@@ -1002,8 +982,8 @@ def plot_convergence(bfit, bprop='dt', start=1, show_values=True):
     nv = len(b_vals)
     # ax.set_ylim([0,1e5])
 
-    for i in range(start, nv+1):
-        b_slice = b_vals[start-1:i]
+    for i in range(start, nv + 1):
+        b_slice = b_vals[start - 1:i]
         mean = np.mean(b_slice)
         std = np.std(b_slice)
 
@@ -1014,7 +994,7 @@ def plot_convergence(bfit, bprop='dt', start=1, show_values=True):
 
         ax.errorbar([i], [mean], yerr=std, ls='none', marker='o', c='C0', capsize=3)
         if show_values:
-            ax.plot([i], b_vals[i-1], marker='o', c='C1')
+            ax.plot([i], b_vals[i - 1], marker='o', c='C1')
         mean_old = mean
 
     plt.show(block=False)

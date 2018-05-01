@@ -1,8 +1,3 @@
-#===============================================================
-# Various utilities for burstfit_1808.py
-# Author: Zac Johnston 2016
-# zac.johnston@monash.edu
-#===============================================================
 import numpy as np
 import subprocess
 import os, sys
@@ -14,13 +9,14 @@ import lcdata
 
 KEPLER_MODELS = os.environ['KEPLER_MODELS']
 
+
 def load(run, basename='run', path='/home/zac/kepler/runs/mdot/', re_load=False, save=True):
     """Attempts to load pre-saved lumfile, or load binary. Returns luminosity [t, lum]"""
     # run   = int  : Run number of kepler simulation
     # basename = str : base filename of runs, eg. 'run' or 'xrb'
     # path  = str  : path to kepler simulation directory (include trailing slash)
     # save  = bool : Save txt version for faster loading next time? Set False for still-running models
-    #-------------------------------------------------
+    # -------------------------------------------------
     preload_file = 'preload{run}.txt'.format(run=run)
     run_name = '{base}{run}'.format(base=basename, run=run)
     preload_filepath = os.path.join(path, run_name, preload_file)
@@ -43,15 +39,15 @@ def load(run, basename='run', path='/home/zac/kepler/runs/mdot/', re_load=False,
     except FileNotFoundError:
         print('No preload file found. Reloading binary')
         dashes()
-        lumpath = os.path.join(path, run_name, run_name+'.lc')
+        lumpath = os.path.join(path, run_name, run_name + '.lc')
 
         if os.path.exists(lumpath):
             lum_temp = lcdata.load(lumpath)
             model_exists = True
             n = len(lum_temp.time)
-            lum = np.ndarray((n,2))
-            lum[:,0] = lum_temp.time
-            lum[:,1] = lum_temp.xlum
+            lum = np.ndarray((n, 2))
+            lum[:, 0] = lum_temp.time
+            lum[:, 1] = lum_temp.xlum
 
             # ===== Save for faster loading next time (NOTE: still in Kepler reference frame) =====
             dashes()
@@ -60,7 +56,7 @@ def load(run, basename='run', path='/home/zac/kepler/runs/mdot/', re_load=False,
                 save_filepath = os.path.join(path, run_name, save_file)
 
                 print('Saving data for faster loading in: {fpath}'.format(fpath=save_filepath))
-                if lum[-1,0] < 3.e5:
+                if lum[-1, 0] < 3.e5:
                     print('WARNING! Did you mean to save? Run may not be finished')
                 head = '[time (s), luminosity (erg/s)]'
 
@@ -73,11 +69,9 @@ def load(run, basename='run', path='/home/zac/kepler/runs/mdot/', re_load=False,
             model_exists = False
             lum = np.array([np.nan])
 
-
     dashes()
 
     return lum
-
 
 
 def plot_std(runs,
@@ -100,30 +94,29 @@ def plot_std(runs,
 
         for run in runs:
             model = burstfit_1808.BurstRun(run, flat_run=True, runs_home=batch_path,
-                                        verbose=False, **kwargs)
+                                           verbose=False, **kwargs)
             model.analyse_all()
             N = len(model.bursts[var])
-            std_frac = np.zeros(N-1)    # skip first burst (zero std)
-            x = np.arange(2, N+1)
+            std_frac = np.zeros(N - 1)  # skip first burst (zero std)
+            x = np.arange(2, N + 1)
 
             # ==== iterate along burst train ====
             for b in x:
                 std = np.std(model.bursts['dt'][:b])
                 mean = np.mean(model.bursts['dt'][:b])
-                std_frac[b-2] = std/mean
+                std_frac[b - 2] = std / mean
 
             label = 'B{batch}_{run}'.format(batch=batch, run=run)
-            ax.plot(x,std_frac, label=label, ls='', marker='o')
+            ax.plot(x, std_frac, label=label, ls='', marker='o')
 
     ax.legend()
     plt.show(block=False)
 
 
-
 def multi_save(runs,
-                basename='xrb',
-                re_load=True,
-                **kwargs):
+               basename='xrb',
+               re_load=True,
+               **kwargs):
     """Loads a collection of models and saves their lightcurves"""
     # ==========================================
     # runs     = []   : list of model IDs to load/save
@@ -132,17 +125,16 @@ def multi_save(runs,
     # path     = str  : path to location of model folders
     # ==========================================
     path = kwargs.get('path', KEPLER_MODELS)
-    runs=expand_runs(runs)
+    runs = expand_runs(runs)
 
     for r in runs:
         load(run=r, basename=basename, re_load=re_load, path=path)
 
 
-
 def multi_batch_save(runs,
-                        batches,
-                        source='gs1826',
-                        **kwargs):
+                     batches,
+                     source='gs1826',
+                     **kwargs):
     """
     Loads multiple batches of models and saves lightcurves
     """
