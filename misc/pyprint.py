@@ -46,31 +46,6 @@ class Indenter:
         print('    ' * self.level + text)
 
 
-def get_mcmc_string(source, version, n_walkers=None, n_steps=None,
-                    n_threads=None, prefix=None, label=None, extension=''):
-    """Return standardised string for mcmc labelling
-    """
-
-    def get_segment(var, tag='', delimiter_front='_', delimiter_back=''):
-        """Return str segment, if provided
-        """
-        return {None: ''}.get(var, f'{delimiter_front}{tag}{var}{delimiter_back}')
-
-    # TODO: Probably a smarter/more robust way to do this
-    prefix_str = get_segment(prefix, delimiter_front='', delimiter_back='_')
-    walker_str = get_segment(n_walkers, tag='W')
-    thread_str = get_segment(n_threads, tag='T')
-    step_str = get_segment(n_steps, tag='S')
-    label_str = get_segment(label)
-
-    return (f'{prefix_str}{source}_V{version}{walker_str}'
-            + f'{thread_str}{step_str}{label_str}{extension}')
-
-
-def get_source_path(source):
-    return os.path.join(GRIDS_PATH, 'sources', source)
-
-
 def print_dashes(n=40):
     print('-' * n)
 

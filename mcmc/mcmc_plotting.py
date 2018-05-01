@@ -8,8 +8,8 @@ import chainconsumer
 from math import ceil
 
 # kepler_grids
-from pygrids.misc import pyprint
 from ..physics import gparams
+from ..grids.grid_tools import get_source_path
 from . import mcmc_versions
 from . import mcmc_tools
 
@@ -17,16 +17,16 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
 def save_plot(fig, prefix, chain, save, source, version,
-                display, label=None, extension='.png'):
+              display, label=None, extension='.png'):
     """Handles saving/displaying of a figure passed to it
     """
     if save:
         n_walkers, n_steps, n_dimensions = chain.shape
-        filename = pyprint.get_mcmc_string(source=source, version=version,
-                                           n_walkers=n_walkers, n_steps=n_steps,
-                                           prefix=prefix, label=label,
-                                           extension=extension)
-        source_path = pyprint.get_source_path(source)
+        filename = mcmc_tools.get_mcmc_string(source=source, version=version,
+                                              n_walkers=n_walkers, n_steps=n_steps,
+                                              prefix=prefix, label=label,
+                                              extension=extension)
+        source_path = get_source_path(source)
         filepath = os.path.join(source_path, 'plots',
                                 prefix, f'{filename}')
         fig.savefig(filepath)
@@ -36,23 +36,23 @@ def save_plot(fig, prefix, chain, save, source, version,
 
 
 def plot_contours(chain, discard, source, version, cap=None, means=True,
-                    display=True, save=False):
+                  display=True, save=False):
     """Plots posterior contours of mcmc chain
     """
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
-    #TODO: re-use the loaded chainconsumer here instead of reloading
+    # TODO: re-use the loaded chainconsumer here instead of reloading
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
 
     if means:
         mean = get_summary(chain, discard=discard, cap=cap,
-                            source=source, version=version)[:, 1]
+                           source=source, version=version)[:, 1]
         fig = cc.plotter.plot(truth=mean, display=display)
     else:
         fig = cc.plotter.plot(display=display)
 
     plt.tight_layout()
     save_plot(fig, prefix='contours', chain=chain, save=save, source=source,
-                    version=version, display=display)
+              version=version, display=display)
 
 
 def plot_posteriors(chain, discard, source, version, cap=None,
@@ -62,14 +62,14 @@ def plot_posteriors(chain, discard, source, version, cap=None,
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
     height = 3 * ceil(len(pkeys) / 4)
-    fig = cc.plotter.plot_distributions(display=display, figsize=[10,height])
+    fig = cc.plotter.plot_distributions(display=display, figsize=[10, height])
     plt.tight_layout()
     save_plot(fig, prefix='posteriors', chain=chain, save=save, source=source,
-                    version=version, display=display)
+              version=version, display=display)
 
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
-                        display=True, save=False):
+                     display=True, save=False):
     """Plots contours of mass versus radius
 
     See: get_mass_radius()
@@ -77,15 +77,15 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
     mass_radius_chain = get_mass_radius(chain=chain, discard=discard,
                                         source=source, version=version, cap=cap)
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(mass_radius_chain.reshape(-1,2), parameters=['Mass', 'Radius'])
-    fig = cc.plotter.plot(display=True, figsize=[6,6])
+    cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['Mass', 'Radius'])
+    fig = cc.plotter.plot(display=True, figsize=[6, 6])
 
     save_plot(fig, prefix='mass-radius', chain=chain, save=save, source=source,
-                    version=version, display=display)
+              version=version, display=display)
 
 
 def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
-                    display=True, save=False, label=''):
+                 display=True, save=False, label=''):
     """Plots walkers vs steps (i.e. "time")
 
     Parameters
@@ -105,11 +105,11 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
 
     # ===== Default to splitting all params into 2 plots  =====
     if params == None:
-        half = int(len(pkeys)/2)
+        half = int(len(pkeys) / 2)
         for i, param_split in enumerate((pkeys[:half], pkeys[half:])):
             plot_walkers(chain=chain, source=source, version=version,
-                        params=param_split, n_lines=n_lines, xlim=xlim,
-                        display=display, save=save, label=f'P{i+1}')
+                         params=param_split, n_lines=n_lines, xlim=xlim,
+                         display=display, save=save, label=f'P{i+1}')
         return
 
     n_walkers, n_steps, n_dim = chain.shape
@@ -119,13 +119,13 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
     steps = np.arange(n_steps)
     walker_idxs = np.arange(0, n_walkers, jump_size)
 
-    fig, ax = plt.subplots(n_params, 1, sharex=True, figsize=(10,12))
+    fig, ax = plt.subplots(n_params, 1, sharex=True, figsize=(10, 12))
 
     for i in range(n_params):
         p_idx = pkeys.index(params[i])
 
         for j in walker_idxs:
-            walker = chain[j,:,p_idx]
+            walker = chain[j, :, p_idx]
             ax[i].plot(steps, walker, linewidth=0.5, color='black')
             ax[i].set_ylabel(params[i])
 
@@ -154,12 +154,12 @@ def get_summary(chain, discard, source, version, cap=None):
     summary_dict = cc.analysis.get_summary()
 
     for i, key in enumerate(pkeys):
-        summary[i,:] = summary_dict[key]
+        summary[i, :] = summary_dict[key]
     return summary
 
 
 def setup_chainconsumer(chain, discard, cap=None, param_labels=None,
-                            source=None, version=None):
+                        source=None, version=None):
     """Return ChainConsumer object set up with given chain and pkeys
     """
     if type(param_labels) == type(None):
@@ -170,7 +170,7 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None,
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_dimensions = chain.shape[2]
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(chain[:,:,:].reshape(-1,n_dimensions), parameters=param_labels)
+    cc.add_chain(chain[:, :, :].reshape(-1, n_dimensions), parameters=param_labels)
     return cc
 
 
@@ -183,7 +183,7 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     mass_reference = 1.4
     radius_reference = 10
     g_reference = gparams.get_acceleration_newtonian(r=radius_reference,
-                                                    m=mass_reference)
+                                                     m=mass_reference)
     g_idx = pkeys.index('g')
     red_idx = pkeys.index('redshift')
 
@@ -191,8 +191,8 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     n_walkers, n_steps, n_dimensions = chain.shape
     chain_flat = chain.reshape((-1, n_dimensions))
 
-    redshift = chain_flat[:,red_idx]
-    g = chain_flat[:,g_idx] * g_reference
+    redshift = chain_flat[:, red_idx]
+    g = chain_flat[:, g_idx] * g_reference
     mass, radius = gparams.get_mass_radius(g=g, redshift=redshift)
 
     # reshape back into chain
@@ -215,12 +215,12 @@ def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
 
     for i in range(dt, n_steps, dt):
         print('frame  ', i)
-        subchain = chain[:, :i, :].reshape((-1,n_dimensions))
+        subchain = chain[:, :i, :].reshape((-1, n_dimensions))
         cc.add_chain(subchain, parameters=pkeys)
 
         fig = cc.plotter.plot()
-        fig.set_size_inches(6,6)
-        cnt = round(i/dt)
+        fig.set_size_inches(6, 6)
+        cnt = round(i / dt)
 
         filename = f'{cnt:04d}.png'
         filepath = os.path.join(ftarget, filename)
@@ -280,13 +280,13 @@ def animate_walkers(chain, source, version, stepsize=1, n_steps=100, bin=10, bur
     axHisty.xaxis.set_major_formatter(nullfmt)
 
     # ===== Add data to axes =====
-    for i in range(stepsize, stepsize*(n_steps+1), stepsize):
-        num = int(i/stepsize)
+    for i in range(stepsize, stepsize * (n_steps + 1), stepsize):
+        num = int(i / stepsize)
         sys.stdout.write(f'\r{num}/{n_steps}')
 
         # ===== walker scatter =====
         lines_scatter = axScatter.plot(chain[:, i, g_idx], chain[:, i, red_idx],
-                                        marker='o', ls='none', markersize=2.5, color='C0')
+                                       marker='o', ls='none', markersize=2.5, color='C0')
 
         # ===== chainconsumer distributions =====
         # width1 = 10
@@ -294,10 +294,9 @@ def animate_walkers(chain, source, version, stepsize=1, n_steps=100, bin=10, bur
         if i < bin:
             sub_chain = mcmc_tools.slice_chain(chain, discard=0, cap=i)
         elif i < burn:
-            sub_chain = mcmc_tools.slice_chain(chain, discard=i-bin, cap=i)
+            sub_chain = mcmc_tools.slice_chain(chain, discard=i - bin, cap=i)
         else:
-            sub_chain = mcmc_tools.slice_chain(chain, discard=burn-bin, cap=i)
-
+            sub_chain = mcmc_tools.slice_chain(chain, discard=burn - bin, cap=i)
 
         cc.add_chain(sub_chain[:, :, [g_idx, red_idx]].reshape(-1, 2),
                      parameters=['g', 'redshift'])
@@ -314,9 +313,8 @@ def animate_walkers(chain, source, version, stepsize=1, n_steps=100, bin=10, bur
 
         plt.close(cc_fig)
 
-        lines_x = axHistx.plot(x_x, x_y/x_ymax, color='C0')
-        lines_y = axHisty.plot(y_y/y_ymax, y_x, color='C0')
-
+        lines_x = axHistx.plot(x_x, x_y / x_ymax, color='C0')
+        lines_y = axHisty.plot(y_y / y_ymax, y_x, color='C0')
 
         filename = f'walker2_biggrid2_V25_{num:04}.png'
         filepath = os.path.join(save_path, filename)

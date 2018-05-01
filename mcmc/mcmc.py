@@ -13,7 +13,7 @@ from . import burstfit
 from . import mcmc_versions
 from . import mcmc_plotting
 from . import mcmc_tools
-from pygrids.misc.pyprint import check_params_length, get_mcmc_string
+from ..misc.pyprint import check_params_length
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -156,7 +156,7 @@ def save_sampler_state(sampler, source, version, n_steps, n_walkers):
     """Saves sampler state as dict
     """
     sampler_state = get_sampler_state(sampler=sampler)
-    chain_id = get_mcmc_string(source=source, version=version,
+    chain_id = mcmctools.get_mcmc_string(source=source, version=version,
                                 n_steps=n_steps, n_walkers=n_walkers)
 
     mcmc_path = get_mcmc_path(source)
@@ -170,7 +170,7 @@ def save_sampler_state(sampler, source, version, n_steps, n_walkers):
 def load_sampler_state(source, version, n_steps, n_walkers):
     """Loads sampler state from file
     """
-    chain_id = get_mcmc_string(source=source, version=version,
+    chain_id = mcmctools.get_mcmc_string(source=source, version=version,
                                 n_steps=n_steps, n_walkers=n_walkers)
 
     filename = f'sampler_{chain_id}.p'

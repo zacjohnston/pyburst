@@ -116,6 +116,10 @@ def source_shorthand(source):
         return source
 
 
+def get_source_path(source):
+    return os.path.join(GRIDS_PATH, 'sources', source)
+
+
 def load_modelfile(batch, source, filename='MODELS.txt', **kwargs):
     """========================================================
     Returns the modelfile of a batch
