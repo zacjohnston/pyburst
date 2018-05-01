@@ -434,11 +434,6 @@ def write_modelfile(n, params, lburn, path):
 def extend_runs(batches, source, model_table, nbursts=20, basename='xrb',
                 nsdump=1000, walltime=48):
     """Modifies existing models for resuming, to simulate more bursts
-
-    Parameters
-    ----------
-    nbursts : int
-        number of bursts desired in each model
     """
     source = grid_tools.source_shorthand(source=source)
     batches = grid_tools.ensure_np_list(batches)
@@ -482,11 +477,24 @@ def get_short_models(model_table, n_bursts):
     return short_table
 
 
+def get_table_subset(table, batches):
+    """returns subset of table with given batches
+    """
+    idxs = np.array([])
+    for batch in batches:
+        idxs = np.append(idxs, np.where(table['batch'] == batch)[0])
+
+    idxs = idxs.astype(int)
+    return table.iloc[idxs]
+
+
 def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False,
                         sync_runs=True, sync_jobscripts=True, sync_modelfiles=True,
-                        dry_run=False):
-    """
+                        dry_run=False, modelfiles=('.cmd', '.lc', 'z1')):
+    """Sync kepler models to cluster for resuming extended runs
 
+    Parameters
+    ----------
     short_model_table : pd.DataFrame
         table containing all batches/runs of models with too few n_bursts
     source : str
@@ -500,6 +508,8 @@ def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False
         sync MODELS.txt files
     dry_run : bool
         do everything but actually send the files (for sanity checking)
+    modelfiles : list
+        the model files (by extension) which will be synced
     """
     batches = np.unique(short_model_table['batch'])
     target_path = f'isync:~/kepler/runs/'
@@ -527,7 +537,7 @@ def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False
                 run_str = f'{basename}{run}'
                 run_path = os.path.join(batch_path, run_str)
 
-                for filetype in ('.cmd', '.lc', 'z1'):
+                for filetype in modelfiles:
                     filepath = os.path.join(run_path, f'{run_str}{filetype}')
                     sync_paths += [filepath]
 
