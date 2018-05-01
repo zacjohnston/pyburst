@@ -9,6 +9,6 @@ __all__ = ['grid_analyser',
            'grid_plotting',
            'grid_setup',
            'grid_tools',
-           'kepler_jobscripts',
            'kepler_files',
+           'kepler_jobscripts',
            ]
