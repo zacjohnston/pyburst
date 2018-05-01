@@ -12,11 +12,6 @@ KEPLER_MODELS = os.environ['KEPLER_MODELS']
 
 def load(run, basename='run', path='/home/zac/kepler/runs/mdot/', re_load=False, save=True):
     """Attempts to load pre-saved lumfile, or load binary. Returns luminosity [t, lum]"""
-    # run   = int  : Run number of kepler simulation
-    # basename = str : base filename of runs, eg. 'run' or 'xrb'
-    # path  = str  : path to kepler simulation directory (include trailing slash)
-    # save  = bool : Save txt version for faster loading next time? Set False for still-running models
-    # -------------------------------------------------
     preload_file = 'preload{run}.txt'.format(run=run)
     run_name = '{base}{run}'.format(base=basename, run=run)
     preload_filepath = os.path.join(path, run_name, preload_file)
@@ -72,45 +67,6 @@ def load(run, basename='run', path='/home/zac/kepler/runs/mdot/', re_load=False,
     dashes()
 
     return lum
-
-
-def plot_std(runs,
-             batches,
-             basename='xrb',
-             source='gs1826',
-             var='dt',
-             **kwargs):
-    """
-    Plots how standard deviation (STD) of recurrence times (DT) evolves
-    over a train of bursts
-    """
-    path = kwargs.get('path', KEPLER_MODELS)
-    runs = expand_runs(runs)
-    fig, ax = plt.subplots()
-
-    for batch in batches:
-        batch_str = '{source}_{batch}'.format(source=source, batch=batch)
-        batch_path = os.path.join(path, batch_str)
-
-        for run in runs:
-            model = burstfit_1808.BurstRun(run, flat_run=True, runs_home=batch_path,
-                                           verbose=False, **kwargs)
-            model.analyse_all()
-            N = len(model.bursts[var])
-            std_frac = np.zeros(N - 1)  # skip first burst (zero std)
-            x = np.arange(2, N + 1)
-
-            # ==== iterate along burst train ====
-            for b in x:
-                std = np.std(model.bursts['dt'][:b])
-                mean = np.mean(model.bursts['dt'][:b])
-                std_frac[b - 2] = std / mean
-
-            label = 'B{batch}_{run}'.format(batch=batch, run=run)
-            ax.plot(x, std_frac, label=label, ls='', marker='o')
-
-    ax.legend()
-    plt.show(block=False)
 
 
 def multi_save(runs,

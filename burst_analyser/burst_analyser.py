@@ -1007,3 +1007,42 @@ def plot_bprop(bfit, bprop):
 
     ax.plot(np.arange(nv), b_vals, ls='none', marker='o', c='C0')
     plt.show(block=False)
+
+
+def plot_std(runs,
+             batches,
+             basename='xrb',
+             source='gs1826',
+             var='dt',
+             **kwargs):
+    """
+    Plots how standard deviation (STD) of recurrence times (DT) evolves
+    over a train of bursts
+    """
+    path = kwargs.get('path', KEPLER_MODELS)
+    runs = expand_runs(runs)
+    fig, ax = plt.subplots()
+
+    for batch in batches:
+        batch_str = '{source}_{batch}'.format(source=source, batch=batch)
+        batch_path = os.path.join(path, batch_str)
+
+        for run in runs:
+            model = burstfit_1808.BurstRun(run, flat_run=True, runs_home=batch_path,
+                                           verbose=False, **kwargs)
+            model.analyse_all()
+            N = len(model.bursts[var])
+            std_frac = np.zeros(N - 1)  # skip first burst (zero std)
+            x = np.arange(2, N + 1)
+
+            # ==== iterate along burst train ====
+            for b in x:
+                std = np.std(model.bursts['dt'][:b])
+                mean = np.mean(model.bursts['dt'][:b])
+                std_frac[b - 2] = std / mean
+
+            label = 'B{batch}_{run}'.format(batch=batch, run=run)
+            ax.plot(x, std_frac, label=label, ls='', marker='o')
+
+    ax.legend()
+    plt.show(block=False)
