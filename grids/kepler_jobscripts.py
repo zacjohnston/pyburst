@@ -1,9 +1,8 @@
-import numpy as np
 import os, sys
 import subprocess
 
 # kepler_grids
-from .grid_tools import source_shorthand
+from . import grid_strings
 
 # ========================================================
 # Functions for writing job submission scripts on cluster (e.g. monarch, ICER)
@@ -27,7 +26,7 @@ def get_span_string(run0, run1, runs=None):
 
 
 def get_jobstring(batch, run0, run1, source, include_source=True):
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     span = get_span_string(run0, run1)
     source_str = ''
 
@@ -55,7 +54,7 @@ def write_individual_scripts(batches, runs, source, walltime, **kwargs):
     """
     for i, batch in enumerate(batches):
         run = runs[i]
-        batch_str = f'{source}_{batch}'
+        batch_str = grid_strings.get_batch_string(batch, source)
         path = os.path.join(MODELS_PATH, batch_str, 'logs')
 
         write_submission_script(batch, run0=run, run1=run, source=source,
@@ -79,10 +78,10 @@ def write_submission_script(batch, source, walltime, path=None,
     max_tasks : int
         max number of tasks allowed on one node
     """
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     run0, run1, runs, n_runs = check_runs(run0, run1, runs)
 
-    batch_str = f'{source}_{batch}'
+    batch_str = grid_strings.get_batch_string(batch, source)
     if path is None:
         path = os.path.join(MODELS_PATH, batch_str, 'logs')
 
@@ -122,7 +121,7 @@ def write_submission_script(batch, source, walltime, path=None,
 
 def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
                        qos, time_str, parallel, job_str, debug, restart):
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     span_str = get_span_string(run0, run1, runs=runs)
     batch_str = get_jobstring(batch=batch, run0=run0, run1=run1, source=source,
                               include_source=False)
@@ -176,7 +175,6 @@ cd /home/zacpetej/id43/kepler/runs/{source}_{batch}/{basename}$N/
 ln -sf $EXE_PATH ./k
 ./k {basename}$N {cmd_str} {debug_str}"""
 
-
     elif cluster == 'icer':
         if parallel:
             ntasks = (run1 + 1) - run0
@@ -228,7 +226,7 @@ def write_parallel_script(run0, run1, batch, path, source, restart, debug=False,
     """========================================================
     Writes a bash script to launch parallel kepler tasks
     ========================================================"""
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     print('Writing MPI script')
 
     # ===== restart things =====
@@ -238,7 +236,6 @@ def write_parallel_script(run0, run1, batch, path, source, restart, debug=False,
     execute_str = {True: f'./k $run_str z1 {debug_str}',
                    False: f'./k $run_str {gen_file}'}[restart]
 
-    job_str = get_jobstring(batch=batch, run0=run0, run1=run1, source=source)
     filename = f'parallel_{restart_str}{source}_{batch}_{run0}-{run1}.sh'
     filepath = os.path.join(path, filename)
 
@@ -275,8 +272,8 @@ def check_runs(run0, run1, runs):
         run0, run1, runs, n_runs
     """
     if (run0 is None
-        and run1 is None
-        and runs is None):
+            and run1 is None
+            and runs is None):
         raise ValueError('Must provide both run0 and run1, or runs')
 
     if runs is None:

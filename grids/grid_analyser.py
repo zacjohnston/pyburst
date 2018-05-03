@@ -13,6 +13,7 @@ import os
 
 # kepler_grids
 from . import grid_tools
+from . import grid_strings
 
 # concord
 import con_versions
@@ -38,24 +39,24 @@ default_plt_options()
 
 
 class Kgrid:
-    """=================================================
-    A large grid of Kepler models.
-    ================================================="""
+    """
+    An object for interracting with large model grids
+    """
 
     def __init__(self, source, basename='xrb', con_ver=6,
                  load_lc=False, verbose=True,
                  powerfits=True, exclude_test_batches=True,
                  load_concord_summ=True, **kwargs):
-        """=================================================
+        """
         source   =  str  : source object being modelled (e.g. gs1826)
         basename =  str  : basename of individual models (e.g. xrb)
         mass     =  flt  : mass of neutron star in M_sun (may become deprecated)
         (path    = str   : path to dir of grids)
-        ================================================="""
-        source = grid_tools.source_shorthand(source=source)
+        """
+        source = grid_strings.source_shorthand(source=source)
         self.path = kwargs.get('path', GRIDS_PATH)
         self.models_path = kwargs.get('models_path', MODELS_PATH)
-        self.source_path = os.path.join(self.path, 'sources', source)
+        self.source_path = grid_strings.get_source_path(source)
         self.source = source
         self.basename = basename
         self.con_ver = con_ver
@@ -102,30 +103,27 @@ class Kgrid:
                                 'qb': [0.075]}
 
     def printv(self, string, **kwargs):
-        """=================================================
-        Prints string if self.verbose == True
-        ================================================="""
+        """Prints string if self.verbose == True
+        """
         if self.verbose:
             print(string, **kwargs)
 
     def get_nruns(self, batch):
-        """=================================================
-        Returns number of models in a batch
-        ================================================="""
+        """Returns number of models in a batch
+        """
         return len(self.get_params(batch=batch))
 
     def get_params(self, batch={}, run={}, params={}, exclude={}):
-        """=================================================
-        Returns models with given batch/run/params
-        =================================================
+        """Returns models with given batch/run/params
+        
         params  = {}      : params that must be satisfied
         exclude = {}      : params to exclude/blacklist completely
-        =================================================
+        
         Can be used multiple ways:
             - get_params(batch=2, run=1): returns run 1 of batch 2
             - get_params(batch=2): returns all models in batch 2
             - get_params(params={'z':0.01}): returns all models with z=0.01
-        ================================================="""
+        """
         # ===== include batch/run if specified =====
         if type(batch) != dict:
             batch = {'batch': batch}
@@ -141,18 +139,17 @@ class Kgrid:
         return models
 
     def get_summ(self, batch={}, run={}, params={}, exclude={}):
-        """=================================================
-        Get summary of given batch/run/params
-        ================================================="""
+        """Get summary of given batch/run/params
+        """
         subset = self.get_params(batch=batch, run=run, params=params,
                                  exclude=exclude)
         idxs = subset.index.values
         return self.summ.iloc[idxs]
 
     def get_concord_sum(self, batch={}, run={}, params={}):
-        """=================================================
+        """
         Get concord results of given triplet/run/params
-        ================================================="""
+        """
         # TODO: move to define_sources
         base_mdot = {'gs1826': 0.0796, '4u1820': 0.226}[self.source]
         params['accrate'] = base_mdot
@@ -170,9 +167,8 @@ class Kgrid:
         return self.concord_summ.loc[idxs]
 
     def get_lhood(self, triplet, run):
-        """=================================================
-        Returns lhood value of given triplet-run
-        ================================================="""
+        """Returns lhood value of given triplet-run
+        """
         # TODO: smarter way to do this intersection?
         if triplet not in self.concord_summ['triplet'].values:
             return np.nan
@@ -184,9 +180,8 @@ class Kgrid:
         return self.concord_summ.iloc[idx]['lhood']
 
     def get_powerfits(self):
-        """=================================================
-        Calculate power-law fits to burst properties (only dt currently)
-        ================================================="""
+        """Calculate power-law fits to burst properties (only dt currently)
+        """
         qb_list = self.unique_params['qb']
         z_list = self.unique_params['z']
         x_list = self.unique_params['x']
@@ -230,11 +225,10 @@ class Kgrid:
         self.powerfits = powerfits.iloc[~nan_mask]
 
     def predict_recurrence(self, x, z, qb, mdot, mass):
-        """=================================================
-        Predict recurrence time for given params
-        =================================================
+        """Predict recurrence time for given params
+        
         mdot    =  flt : accretion rate (Edd)
-        ================================================="""
+        """
         params = {'z': z, 'x': x, 'qb': qb, 'mass': mass}
         idx = grid_tools.reduce_table_idx(table=self.powerfits, params=params)
 
@@ -261,9 +255,8 @@ class Kgrid:
         return dt
 
     def plot_mean_lc(self, batch, run, show=True):
-        """=================================================
-        Plots mean lightcurve for given batch model
-        ================================================="""
+        """Plots mean lightcurve for given batch model
+        """
         # -------------------------
         # TODO: - option to plot individual model curves (adapt from analyser_tools)
         # -------------------------
@@ -276,9 +269,8 @@ class Kgrid:
         return ax
 
     def save_mean_lc(self, params, error=True, show=False):
-        """=================================================
-        Save a series of mean lightcurve plots for given params
-        ================================================="""
+        """Save a series of mean lightcurve plots for given params
+        """
         models = self.get_params(params=params)
 
         for i, row in models.iterrows():
@@ -304,11 +296,10 @@ class Kgrid:
 
     def plot_mean_lc_param(self, params, show=True, legend=False,
                            skip=1, **kwargs):
-        """=================================================
-        Plots mean lightcurves for given param (vary by accrate)
-        =================================================
+        """Plots mean lightcurves for given param (vary by accrate)
+        
         skip  =  int  : only plot every 'skip' LC
-        ================================================="""
+        """
         accrate_unique = self.unique_params['accrate']
 
         fig, ax = plt.subplots()
@@ -340,12 +331,10 @@ class Kgrid:
         return ax
 
     def add_lc_plot(self, ax, batch, run, label='', error=True):
-        """=================================================
-        Add mean lightcurves to a provided axis
-        =================================================
+        """Add mean lightcurves to a provided axis
+        
         param  =  str  : param to label curve with (none if empty)
-        ================================================="""
-        batch_str = f'{self.source}_{batch}'
+        """
         yscale = 1e38
         # ===== Check if loaded =====
         if batch not in self.mean_lc:
@@ -366,12 +355,12 @@ class Kgrid:
         return ax
 
     def load_mean_lightcurves(self, batch):
-        """=================================================
+        """
         Loads mean lightcurve files for given batch
         --------------------------------------------------------------
         columns: [time (s), Lum (erg), u(Lum), Radius (cm), u(Radius)]
                   0         1          2       3            4
-        ================================================="""
+        """
         batch_str = f'{self.source}_{batch}'
         path = os.path.join(self.source_path, 'mean_lightcurves', batch_str)
 
@@ -379,16 +368,15 @@ class Kgrid:
         self.mean_lc[batch] = {}
 
         for run in range(1, n_runs + 1):
-            run_str = f'{self.basename}{run}'
+            run_str = grid_strings.get_run_string(run, basename=self.basename)
             filename = f'{batch_str}_{run_str}_mean.data'
             filepath = os.path.join(path, filename)
 
             self.mean_lc[batch][run] = np.loadtxt(filepath)
 
     def load_all_mean_lightcurves(self):
-        """=================================================
-        Loads all mean lightcurves
-        ================================================="""
+        """Loads all mean lightcurves
+        """
         batches = np.unique(self.params['batch'])
         last = batches[-1]
         for batch in batches:
@@ -398,13 +386,12 @@ class Kgrid:
 
     def plot_burst_property(self, bprop, var, fixed, save=False, show=True,
                             exclude_defaults=False, powerfits=False):
-        """=================================================
-        Plots given burst property against accretion rate (including xi factors)
-        =================================================
+        """Plots given burst property against accretion rate (including xi factors)
+        
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
         var     =  str   : variable to iterate over (e.g. plot all available 'Qb')
         fixed   =  dict  : variables to hold fixed (e.g. 'z':0.01)
-        ================================================="""
+        """
         var, fixed = self.check_var_fixed(var=var, fixed=fixed)
 
         accrate_unique = self.unique_params['accrate']
@@ -515,17 +502,16 @@ class Kgrid:
 
     def plot_lhood(self, var, fixed, show=True,
                    save=False, exclude_defaults=True, **kwargs):
-        """=================================================
-        Plots likelihood of best concord against gamma (and iterates over chosen var)
-        =================================================
+        """Plots likelihood of best concord against gamma (and iterates over chosen var)
+        
         fixed   =  {}  : variables to hold fixed (e.g. 'z':0.01)
-        =================================================
+        
         Notes:  two ways to use:
                 1. specify qb to plot over z, and vice versa (shortcut usage)
                 2. specify var and fixed manually
         Caution: Has not been rigorously tested against all combinations of
                     these. Has some implicit assumptions about params given
-        ================================================="""
+        """
         var, fixed = self.check_var_fixed(var=var, fixed=fixed)
 
         accrate0 = np.unique(self.params['accrate'])[-1]  # just use one accrate to pick models
@@ -598,13 +584,12 @@ class Kgrid:
         return ax
 
     def plot_grid_params(self, var, fixed, show=True):
-        """=================================================
-        Visualises the models that exist in the grid by parameter
-        =================================================
+        """Visualises the models that exist in the grid by parameter
+        
         var   = [2x str]  : list of the two parameters to plot on the axes
         fixed = {}        : specify the constant values of the remaining three
                                 paramters
-        ================================================="""
+        """
         if len(var) != 2:
             raise ValueError("'var' must specify two parameters to plot on axes")
 
@@ -640,9 +625,8 @@ class Kgrid:
 
     def save_all_plots(self, fixed=None, bprops=('tDel', 'fluence', 'peakLum'),
                        do_bprops=True, **kwargs):
-        """=================================================
-        Saves all lhood and var plots for given z,qb
-        ================================================="""
+        """Saves all lhood and var plots for given z,qb
+        """
         self.printv('Saving lhood and bprop plots:')
         if fixed == None:
             if self.source == 'gs1826':
@@ -679,9 +663,8 @@ class Kgrid:
                 plt.close('all')
 
     def plot_matched_lightcurves(self, triplet, run):
-        """=================================================
-        Plots matched lightcurves for given run of batch (triplet)
-        ================================================="""
+        """Plots matched lightcurves for given run of batch (triplet)
+        """
         self.printv(f'Plotting matched lightcurves for batch={triplet}, run={run}')
         self.print_params(batch=triplet, run=run)
         self.printv(triplet)
@@ -689,18 +672,16 @@ class Kgrid:
                                 source=self.source)
 
     def print_params(self, batch, run):
-        """=================================================
-        Prints essential params for given batch-run
-        ================================================="""
+        """Prints essential params for given batch-run
+        """
         cols = ['batch', 'run', 'z', 'x', 'qb', 'xi', 'mass']
         params = self.get_params(batch=batch, run=run)
         out_string = params.to_string(columns=cols, index=False)
         print(out_string)
 
     def best_concord_lhood(self, params={}, plot=False):
-        """=================================================
-        Returns model with highest likelihood (from given params)
-        ================================================="""
+        """Returns model with highest likelihood (from given params)
+        """
         if len(params) == 0:
             concord_summ = self.concord_summ
         else:
@@ -720,19 +701,12 @@ class Kgrid:
         return model, best_concord
 
 
-def get_unique_param(param, source, param_basename='params',
-                     **kwargs):
-    """=================================================
-    Return unique values of given parameter
-    ================================================="""
-    source = grid_tools.source_shorthand(source=source)
-    path = kwargs.get('path', GRIDS_PATH)
-    param_path = os.path.join(path, 'sources', source, 'params')
-
-    filename = f'{param_basename}_{source}.txt'
-    filepath = os.path.join(param_path, filename)
-    param_table = pd.read_table(filepath, delim_whitespace=True)
-
+def get_unique_param(param, source):
+    """Return unique values of given parameter
+    """
+    source = grid_strings.source_shorthand(source=source)
+    params_filepath = grid_strings.get_params_filepath(source)
+    param_table = pd.read_table(params_filepath, delim_whitespace=True)
     return np.unique(param_table[param])
 
 
@@ -744,8 +718,7 @@ def check_kgrid(kgrid, source):
 
 
 def printv(string, verbose):
-    """=================================================
-    Prints string if verbose == True
-    ================================================="""
+    """Prints string if verbose == True
+    """
     if verbose:
         print(string)

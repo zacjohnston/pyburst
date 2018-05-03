@@ -7,6 +7,7 @@ from . import grid_analyser
 from . import kepler_jobscripts
 from . import kepler_files
 from . import grid_tools
+from . import grid_strings
 from pygrids.misc.pyprint import print_title, print_dashes
 
 # Concord
@@ -21,13 +22,6 @@ import define_sources
 # Author: Zac Johnston (2016)
 # Email: zac.johnston@monash.edu
 # ====================================
-# Nomenclature:
-#
-# TODO (saxj1808):
-#       - Allow range of spline lengths
-#       - Check that qb matches the value in x.lum (and warn if not)
-#       - Check if grid division is higher-than-reasonable precision (eg. 0.001 for composition)
-# ---------------------------------------
 
 flt2 = '{:.2f}'.format
 flt4 = '{:.4f}'.format
@@ -40,6 +34,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 # TODO: Rewrite docstrings
 # TODO: Allow enumerating over multiple parameters, create_batches()
+
 
 def print_batch(batch, source):
     print_title()
@@ -60,7 +55,7 @@ def create_epoch_grid(batch0, dv, params, source, kgrid=None,
     qos_list = []
     n_epochs = source_object.n_epochs
 
-    if kgrid == None:
+    if kgrid is None:
         print('No kgrid provided. Loading:')
         kgrid = grid_analyser.Kgrid(load_lc=False, source=source)
 
@@ -120,10 +115,8 @@ def create_batch(batch0, dv, source,
     # TODO  - set default values for params
     # NOTE: Different mass/radius (1+z) are not yet accounted for in .acc file or accrise
 
-    source = grid_tools.source_shorthand(source=source)
-    model_path = kwargs.get('model_path', MODELS_PATH)
-    MASS_REF = 1.4  # reference NS mass (in Msun)
-
+    source = grid_strings.source_shorthand(source=source)
+    mass_ref = 1.4  # reference NS mass (in Msun)
     print_batch(batch=batch0, source=source)
 
     params = dict(params)
@@ -134,12 +127,12 @@ def create_batch(batch0, dv, source,
     print_grid_params(params_expanded)
 
     params_full = grid_tools.enumerate_params(params_expanded)
-    N = len(params_full['x'])
+    n = len(params_full['x'])
 
-    if parallel and (N % ntasks != 0):
-        raise ValueError(f'n_models ({N}) not divisible by ntasks ({ntasks})')
+    if parallel and (n % ntasks != 0):
+        raise ValueError(f'n_models ({n}) not divisible by ntasks ({ntasks})')
 
-    if kgrid == None:
+    if kgrid is None:
         print('No kgrid provided. Loading:')
         kgrid = grid_analyser.Kgrid(load_lc=False, source=source)
 
@@ -161,37 +154,35 @@ def create_batch(batch0, dv, source,
         timedep = False
 
     params_full['y'] = 1 - params_full['x'] - params_full['z']  # helium-4 values
-    params_full['geemult'] = params_full['mass'] / MASS_REF  # Gravity multiplier
+    params_full['geemult'] = params_full['mass'] / mass_ref  # Gravity multiplier
 
     # ===== Create top grid folder =====
-    batch_str = f'{source}_{batch0}'
-    gridpath = os.path.join(model_path, batch_str)
-    grid_tools.try_mkdir(gridpath)
+    batch_model_path = grid_strings.get_batch_models_path(batch0, source)
+    grid_tools.try_mkdir(batch_model_path)
 
     # Directory to keep MonARCH logs and sbatch files
-    logpath = os.path.join(gridpath, 'logs')
+    logpath = grid_strings.get_source_subdir(source, 'logs')
     grid_tools.try_mkdir(logpath)
 
     # ===== Write table of model parameters (MODELS.txt)=====
-    write_modelfile(n=N, params=params_full, lburn=lburn, path=gridpath)
+    write_modelfile(n=n, params=params_full, lburn=lburn, path=batch_model_path)
 
     # ==== Write any notes relevant to the grid, for future reference ====
-    filepath = os.path.join(gridpath, 'NOTES.txt')
+    filepath = os.path.join(batch_model_path, 'NOTES.txt')
     with open(filepath, 'w') as f:
         f.write(notes)
 
     job_runs = []
     if parallel:
-        n_jobs = int(N / ntasks)
+        n_jobs = int(n / ntasks)
         for i in range(n_jobs):
             start = i * ntasks
             job_runs += [[start + 1, start + ntasks]]
     else:
-        job_runs += [[1, N]]
+        job_runs += [[1, n]]
 
     print_dashes()
     for runs in job_runs:
-        qos_str = f'#SBATCH --qos={qos}_qos'
         for restart in [True, False]:
             kepler_jobscripts.write_submission_script(run0=runs[0], run1=runs[1],
                                                       restart=restart, batch=batch0,
@@ -200,35 +191,25 @@ def create_batch(batch0, dv, source,
                                                       parallel=parallel, debug=debug)
 
     # ===== Directories and templates for each model =====
-    for i in range(N):
+    for i in range(n):
         # ==== Create directory tree ====
         print_dashes()
         model = i + 1
-        modelname = f'{basename}{model}'
-        modelpath = os.path.join(gridpath, modelname)
-        # ============================
-        # TODO: Rerun readacc.py for given M,R (i.e. redshift)
-        #           - account for spline too
-        # =============================
-
-        # ===== Create time-dependent input files =====
-        if timedep:
-            accrise(tshift=params_full['tshift'][i])
-            base(mev=params_full['qb'][i], qb_delay=params_full['qb_delay'][i])
+        run_str = grid_strings.get_run_string(model, batch0, basename)
+        run_path = grid_strings.get_model_path(model, batch, source, basename=basename)
 
         # ==== Create task directory ====
-        grid_tools.try_mkdir(modelpath)
+        grid_tools.try_mkdir(run_path)
 
         # ==== Copy time-dependent input files ====
         if timedep:
             print('Copying time-dependent files (.acc, .lum)')
-            extension = ['acc', 'lum']
-            for ext in extension:
+            for ext in ['acc', 'lum']:
                 sourcefile = f'outburst.{ext}'
                 sourcepath = os.path.join(file_sourcepath, sourcefile)
 
-                targetfile = f'{modelname}.{ext}'
-                targetpath = os.path.join(modelpath, targetfile)
+                targetfile = f'{run_str}.{ext}'
+                targetpath = os.path.join(run_path, targetfile)
 
                 subprocess.run(['cp', sourcepath, targetpath], check=True)
 
@@ -239,7 +220,7 @@ def create_batch(batch0, dv, source,
             x0 = params_full['x'][i]
 
         z0 = params_full['z'][i]
-        kepler_files.write_rpabg(x0, z0, modelpath)
+        kepler_files.write_rpabg(x0, z0, run_path)
 
         # ==== Create model generator file ====
         if timedep:
@@ -279,7 +260,7 @@ def create_batch(batch0, dv, source,
                                    xi=params_full['xi'][i],
                                    lburn=lburn,
                                    geemult=params_full['geemult'][i],
-                                   path=modelpath,
+                                   path=run_path,
                                    t_end=t_end,
                                    header=header,
                                    accrate0=accrate0,
@@ -362,21 +343,22 @@ def find_varying(params, nvmax):
     return var
 
 
-def check_grid_params(params_full, source, precision=6, kgrid=None, **kwargs):
+def check_grid_params(params_full, source, precision=6, kgrid=None):
     """Check if any param combinations already exist in grid
+
     returns True if any model already exists
 
     params_full = dict  : dict of params for each model
     precision   = int   : number of decimal places to compare
     """
-    source = grid_tools.source_shorthand(source=source)
-    N_models = len(params_full['x'])
+    source = grid_strings.source_shorthand(source=source)
+    n_models = len(params_full['x'])
 
-    if kgrid == None:
+    if kgrid is None:
         print('No kgrid provided. Loading:')
         kgrid = grid_analyser.Kgrid(source=source, load_lc=False,
                                     powerfits=False, verbose=False)
-    for i in range(N_models):
+    for i in range(n_models):
         model_param = {}
 
         for key, vals in params_full.items():
@@ -397,7 +379,7 @@ def check_grid_params(params_full, source, precision=6, kgrid=None, **kwargs):
     return any_matches
 
 
-def write_modelfile(n, params, lburn, path):
+def write_modelfile(n, params, lburn, path, filename='MODELS.txt'):
     """Writes table of model parameters to file
 
     Parameters
@@ -409,6 +391,7 @@ def write_modelfile(n, params, lburn, path):
     lburn : int
         lburn switch (0,1)
     path : str
+    filename : str
     """
     print('Writing MODEL.txt table')
     runlist = np.arange(1, n + 1, dtype='int')
@@ -426,47 +409,49 @@ def write_modelfile(n, params, lburn, path):
     table_str = ptable.to_string(index=False, justify='left', col_space=8,
                                  formatters=FORMATTERS)
 
-    filepath = os.path.join(path, 'MODELS.txt')
+    filepath = os.path.join(path, filename)
     with open(filepath, 'w') as f:
         f.write(table_str)
 
 
 def extend_runs(batches, source, model_table, nbursts=20, basename='xrb',
-                nsdump=1000, walltime=48):
+                nsdump=1000, walltime=48, do_cmd_files=True, do_jobscripts=True):
     """Modifies existing models for resuming, to simulate more bursts
     """
-    source = grid_tools.source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source)
     batches = grid_tools.ensure_np_list(batches)
 
     for batch in batches:
         print(f'===== Batch {batch} =====')
-        batch_str, batch_path = get_batch_string_path(batch, source)
+        batch_path = grid_strings.get_batch_path(batch, source)
         batch_summ = grid_tools.reduce_table(model_table, params={'batch': batch})
         idxs = np.where(batch_summ['num'] < nbursts)[0]
 
         # ===== edit model.cmd files =====
-        for i in idxs:
-            run = batch_summ['run'].values[i]
-            num = batch_summ['num'].values[i]
-            dt = batch_summ['dt'].values[i]
-            t_end = (nbursts + 0.5) * dt
-            print(f'{run} nb={num} ({num/nbursts*100:.0f}%)')
+        print('Re-writing .cmd files:')
+        if do_cmd_files:
+            for i in idxs:
+                run = batch_summ['run'].values[i]
+                num = batch_summ['num'].values[i]
+                dt = batch_summ['dt'].values[i]
+                t_end = (nbursts + 0.75) * dt
+                print(f'{run} nb={num} ({num/nbursts*100:.0f}%)')
 
-            cmd_str = f"""p nsdump {nsdump}
+                cmd_str = f"""p nsdump {nsdump}
 @time>{t_end:.3e}
 end"""
-            run_str = f'{basename}{run}'
-            filename = f'{run_str}.cmd'
-            filepath = os.path.join(batch_path, run_str, filename)
+                run_str = grid_strings.get_run_string(run, basename)
+                filename = f'{run_str}.cmd'
+                filepath = os.path.join(batch_path, run_str, filename)
 
-            with open(filepath, 'w') as f:
-                f.write(cmd_str)
+                with open(filepath, 'w') as f:
+                    f.write(cmd_str)
 
-        # ===== write restart jobscripts =====
-        runs = np.array(batch_summ['run'].iloc[idxs])
-        kepler_jobscripts.write_submission_script(batch, run0=runs[0], run1=runs[-1],
-                                                  runs=runs, source=source,
-                                                  walltime=walltime, restart=True)
+        if do_jobscripts:
+            runs = np.array(batch_summ['run'].iloc[idxs])
+            kepler_jobscripts.write_submission_script(batch, run0=runs[0], run1=runs[-1],
+                                                      runs=runs, source=source,
+                                                      walltime=walltime, restart=True)
 
 
 def get_short_models(model_table, n_bursts):
@@ -489,7 +474,7 @@ def get_table_subset(table, batches):
 
 
 def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False,
-                        sync_runs=True, sync_jobscripts=True, sync_modelfiles=True,
+                        sync_model_files=True, sync_jobscripts=True, sync_model_tables=True,
                         dry_run=False, modelfiles=('.cmd', '.lc', 'z1')):
     """Sync kepler models to cluster for resuming extended runs
 
@@ -500,11 +485,11 @@ def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False
     source : str
     basename : str
     verbose : bool
-    sync_runs : bool
+    sync_model_files : bool
         sync model output files (.lc, .cmd, z1, rpabg)
     sync_jobscripts : bool
         sync jobscript submission files (.qsub)
-    sync_modelfiles : bool
+    sync_model_tables : bool
         sync MODELS.txt files
     dry_run : bool
         do everything but actually send the files (for sanity checking)
@@ -516,7 +501,7 @@ def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False
     sync_paths = []
 
     for batch in batches:
-        batch_str, _ = get_batch_string_path(batch, source)
+        batch_str = grid_strings.get_batch_string(batch, source)
         batch_path = os.path.join(MODELS_PATH, '.', batch_str)
 
         batch_table = grid_tools.reduce_table(short_model_table, params={'batch':batch})
@@ -528,21 +513,23 @@ def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False
             jobscript_path = os.path.join(batch_path, 'logs', jobscript)
             sync_paths += [jobscript_path]
 
-        if sync_modelfiles:
-            modelfile = os.path.join(batch_path, 'MODELS.txt')
-            sync_paths += [modelfile]
+        if sync_model_tables:
+            model_table = os.path.join(batch_path, 'MODELS.txt')
+            sync_paths += [model_table]
 
-        if sync_runs:
+        if sync_model_files:
             for run in runs:
-                run_str = f'{basename}{run}'
+                run_str = grid_strings.get_run_string(run, basename)
                 run_path = os.path.join(batch_path, run_str)
 
                 for filetype in modelfiles:
-                    filepath = os.path.join(run_path, f'{run_str}{filetype}')
-                    sync_paths += [filepath]
+                    if filetype == 'rpabg':
+                        filename = 'rpabg'
+                    else:
+                        filename = f'{run_str}{filetype}'
 
-                rpabg_path = os.path.join(run_path, 'rpabg')
-                sync_paths += [rpabg_path]
+                    filepath = os.path.join(run_path, filename)
+                    sync_paths += [filepath]
 
     command = ['rsync', '-avR'] + sync_paths + [target_path]
     if verbose:
@@ -551,9 +538,3 @@ def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False
 
     if not dry_run:
         subprocess.run(command)
-
-
-def get_batch_string_path(batch, source):
-    batch_str = f'{source}_{batch}'
-    batch_path = os.path.join(MODELS_PATH, batch_str)
-    return batch_str, batch_path

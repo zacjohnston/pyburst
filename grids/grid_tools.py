@@ -8,6 +8,7 @@ from functools import reduce
 
 # kepler_grids
 from pygrids.misc.pyprint import print_dashes
+from . import grid_strings
 
 # kepler
 import kepdump
@@ -33,12 +34,12 @@ def load_grid_table(tablename, source, con_ver=None,
     tablename  = str   : table name (e.g. 'params', 'summ')
     source     = str   : name of source object
     ================================================="""
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     path = kwargs.get('path', GRIDS_PATH)
     param_path = os.path.join(path, 'sources', source, tablename)
 
     if tablename == 'concord_summ':
-        if con_ver == None:
+        if con_ver is None:
             raise ValueError('must provide con_ver (concord version)')
         else:
             cv = f'_C{con_ver:02}'  # concord_summ needs concord version
@@ -77,20 +78,22 @@ def expand_batches(batches, source):
     if batches is arraylike: keep
     if batches is integer N: assume there a triplet batch from N to N+3
     ========================================================"""
-    source = source_shorthand(source=source)
-    N = {'gs1826': 3, '4u1820': 2}  # number of epochs
+    source = grid_strings.source_shorthand(source=source)
+    n = {'gs1826': 3, '4u1820': 2}  # number of epochs
     special = {4, 7}  # special cases (reverse order)
+    b_type = type(batches)
 
-    if type(batches) == int:  # assume batches gives first batch
+    if b_type is int \
+            or b_type is np.int64:  # assume batches gives first batch
         if batches in special and source == 'gs1826':
             batches_out = np.arange(batches, batches - 3, -1)
         else:
-            batches_out = np.arange(batches, batches + N.get(source, 1))
+            batches_out = np.arange(batches, batches + n.get(source, 1))
 
-    elif type(batches) == list or type(batches) == np.ndarray:
+    elif b_type is list or b_type is np.ndarray:
         batches_out = batches
     else:
-        raise TypeError('type(batches) ({type(batches)}) must be int, list, or nparray')
+        raise TypeError(f'type(batches) ({b_type}) must be int, list, or nparray')
 
     return batches_out
 
@@ -99,25 +102,9 @@ def get_nruns(batch, source, **kwargs):
     """========================================================
     Returns the number of runs in a batch
     ========================================================"""
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     modelfile = load_modelfile(batch=batch, source=source, **kwargs)
     return len(modelfile)
-
-
-def source_shorthand(source):
-    """========================================================
-    Expands source shorthand to full string (e.g. 4u --> 4u1820)
-    ========================================================"""
-    if source == '4u':
-        return '4u1820'
-    elif source == 'gs':
-        return 'gs1826'
-    else:
-        return source
-
-
-def get_source_path(source):
-    return os.path.join(GRIDS_PATH, 'sources', source)
 
 
 def load_modelfile(batch, source, filename='MODELS.txt', **kwargs):
@@ -127,9 +114,9 @@ def load_modelfile(batch, source, filename='MODELS.txt', **kwargs):
     batch  =  int  :
     (path  =  str  : path to location of model directories)
     ========================================================"""
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     path = kwargs.get('path', MODELS_PATH)
-    batch_str = f'{source}_{batch}'
+    batch_str = grid_strings.get_batch_string(batch, source)
     filepath = os.path.join(path, batch_str, filename)
 
     modelfile = pd.read_table(filepath, delim_whitespace=True)
@@ -238,31 +225,27 @@ def copy_paramfiles(batches, source):
     """========================================================
     Copy MODELS/param table file to grids
     ========================================================"""
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     batches = ensure_np_list(variable=batches)
 
     for batch in batches:
-        batch_str = f'{source}_{batch}'
-        param_filename = f'params_{batch_str}.txt'
-        param_filepath = os.path.join(GRIDS_PATH, 'sources', source, 'params', param_filename)
-        models_filepath = os.path.join(MODELS_PATH, batch_str, 'MODELS.txt')
-
-        subprocess.run(['cp', models_filepath, param_filepath])
+        params_filepath = grid_strings.get_params_filepath(batch, source)
+        model_table_filepath = grid_strings.get_models_table_filepath(batch, source)
+        subprocess.run(['cp', model_table_filepath, params_filepath])
 
 
 def rewrite_column(batch, source):
     """========================================================
     Replaces column header 'id' with 'run' in MODELS.txt file
     ========================================================"""
-    source = source_shorthand(source=source)
-    batch_str = f'{source}_{batch}'
-    models_filepath = os.path.join(MODELS_PATH, batch_str, 'MODELS.txt')
+    source = grid_strings.source_shorthand(source=source)
+    model_table_filepath = grid_strings.get_model_table_filepath(batch, source)
 
-    with open(models_filepath) as f:
+    with open(model_table_filepath) as f:
         lines = f.readlines()
         lines[0] = lines[0].replace('id ', 'run')
 
-    with open(models_filepath, 'w') as f:
+    with open(model_table_filepath, 'w') as f:
         for line in lines:
             f.write(line)
 
@@ -296,10 +279,10 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
     """
 
     def get_filepath(base, source, batch, table_path):
-        filename = f'{base}_{source}_{batch}.txt'
+        filename = grid_strings.get_batch_filename(batch, source, base, extension='.txt')
         return os.path.join(table_path, filename)
 
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     path = kwargs.get('path', GRIDS_PATH)
     table_path = os.path.join(path, 'sources', source, table_basename)
 
@@ -328,7 +311,7 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
     table_str = table_out.to_string(index=False, justify='left', formatters=FORMATTERS,
                                     col_space=8)
 
-    filename = f'{table_basename}_{source}.txt'
+    filename = grid_strings.get_source_filename(source, table_basename, extension='.txt')
     filepath = os.path.join(table_path, filename)
 
     with open(filepath, 'w') as f:
@@ -338,7 +321,7 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
 def check_finished_multi(batch1, batch2, source, **kwargs):
     """Iterator of check_finished()
     """
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     n_epochs = {'gs1826': 3, '4u1820': 2}
     n = n_epochs.get(source, 1)
 
@@ -381,9 +364,8 @@ def check_finished(batches, source, efficiency=True, show='all',
         else:
             return map_[string]
 
-    source = source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     show = shorthand(show)
-    path = kwargs.get('path', MODELS_PATH)
     batches = expand_batches(batches=batches, source=source)
 
     print_strings = []
@@ -393,13 +375,11 @@ def check_finished(batches, source, efficiency=True, show='all',
     for batch in batches:
         n_runs = get_nruns(batch=batch, source=source, **kwargs)
         print_strings += [f'===== Batch {batch} =====']
-
-        batch_str = f'{source}_{batch}'
-        batch_path = os.path.join(path, batch_str)
+        batch_path = grid_strings.get_batch_models_path(batch, source)
 
         for run in range(1, n_runs + 1):
-            run_str = f'{basename}{run}'
-            run_path = os.path.join(batch_path, run_str)
+            run_str = grid_strings.get_run_string(run, basename)
+            run_path = grid_strings.get_model_path(run, batch, source, basename=basename)
             string_idx = len(print_strings)
 
             filename = f'{run_str}{extension}'

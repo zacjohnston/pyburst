@@ -1,16 +1,17 @@
 import numpy as np
 import os
 
-#========================================================
+
+# ========================================================
 # Functions for writing input files for kepler models
-#========================================================
+# ========================================================
 
 
 def write_genfile(h1, he4, n14, qb, xi, lburn,
-                    geemult, path, lumdata, header,
-                    t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
-                    accmass=1.0e18, zonermax=10, zonermin=-1,
-                    accrate1_str='', nsdump=500, cnv=0):
+                  geemult, path, lumdata, header,
+                  t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
+                  accmass=1.0e18, zonermax=10, zonermin=-1,
+                  accrate1_str='', nsdump=500, cnv=0):
     """========================================================
     Creates a model generator file with the given params inserted
     ========================================================
@@ -261,7 +262,6 @@ p abunlim 0.01
 end""")
 
 
-
 def write_rpabg(x, z, path):
     """=================================================
     Writes burn generator file, rpabg. Sets initial grid structure
@@ -272,7 +272,7 @@ def write_rpabg(x, z, path):
     ================================================="""
     print('Writing rpabg file')
     filepath = os.path.join(path, 'rpabg')
-    y = 1-x-z
+    y = 1 - x - z
 
     with open(filepath, 'w') as f:
         f.write(f"""c rpa3bg -- burn generator deck for x-ray burst calculations
@@ -298,45 +298,44 @@ g   51  1  hcomp
 g   60  1  hcomp""")
 
 
-
 def base(qb=0.3, acc_file='outburst.acc', qb_delay=0,
-            save_file='outburst.lum'):
+         save_file='outburst.lum'):
     """=================================================
     Creates a base luminosity file from an accretion rate file
     =================================================
     acc_file : output from accrise()
     qb_delay: time delay added between accretion and baselum curve (hrs, observer frame)
     ================================================="""
+    # TODO: NOTE: this has not been touched/used in a long time:
     red = 1.259
     path = '/home/zacpetej/projects/codes/mdot'
     pull_path = os.path.join(path, 'tmp', acc_file)
     target = os.path.join(path, 'tmp', save_file)
 
-    xlum0  = 1.0642929e+36  # Base luminosity (erg/s) for 1MeV/nuc at Eddington
-    xlum0 *= qb          # MeV/nuc
+    xlum0 = 1.0642929e+36  # Base luminosity (erg/s) for 1MeV/nuc at Eddington
+    xlum0 *= qb  # MeV/nuc
 
     mdot_edd = 1.75e-8  # Eddington rate Msun/yr
-    mdot_edd *= Msun/(8.64e4*365.25)    # g/s
+    mdot_edd *= Msun / (8.64e4 * 365.25)  # g/s
 
     Qb = np.loadtxt(pull_path, skiprows=2)
-    Qb[:,0] += qb_delay*3600/red   # Add time delay to base luminosity
-    Qb[:,1] *= 1/mdot_edd # Fraction of eddington accretion
-    Qb[:,1] *= xlum0      # Base erg/s
+    Qb[:, 0] += qb_delay * 3600 / red  # Add time delay to base luminosity
+    Qb[:, 1] *= 1 / mdot_edd  # Fraction of eddington accretion
+    Qb[:, 1] *= xlum0  # Base erg/s
 
-    n = len(Qb[:,0])
+    n = len(Qb[:, 0])
     head = f'# Qb (erg/s) from {qb:.3f} MeV/nuc, +{qb_delay} hr delay from accretion \n{n}'
 
     print(f'Saving ({qb} MeV):  {target}')
     np.savetxt(target, Qb, fmt='%25.17E%25.17E', header=head, comments='')
 
 
-
-def accrise(tshift, plot=False, save_file ='outburst.acc', rise_file='rise_spline2.txt',
+def accrise(tshift, plot=False, save_file='outburst.acc', rise_file='rise_spline2.txt',
             pca_file='pca_GR.acc'):
     """=================================================
     Appends accretion rise curve/spline to PCA data (already redshifted)
     ================================================="""
-
+    # TODO: NOTE: this has not been touched/used in a long time:
     red = 1.259
     path = '/home/zacpetej/projects/codes/mdot'
     pull_path = os.path.join(path, 'files/', )
@@ -348,32 +347,32 @@ def accrise(tshift, plot=False, save_file ='outburst.acc', rise_file='rise_splin
     # ARRAYS: [time (s), mdot (g/s)]
     # Time zeroed to 10 days (observer frame) prior to PCA data
     start = np.array([0, 8.86e11], ndmin=2)  # First point
-    spline = np.loadtxt(pull_rise, skiprows=1) # Accretion onset/rise
+    spline = np.loadtxt(pull_rise, skiprows=1)  # Accretion onset/rise
     pca = np.loadtxt(pull_pca, skiprows=4)  # PCA accretion
 
-    dt = tshift/red  # Amount to shift onset forward (hr)
+    dt = tshift / red  # Amount to shift onset forward (hr)
     spline_old = np.array(spline)
 
     print(f'Shifting spline later by {tshift:.2f} hrs (observer frame)')
 
-    spline[:,0] += dt*3600           # apply time shift
-    keep = spline[:,0] < pca[0,0]   # Only keep points still prior to PCA data
+    spline[:, 0] += dt * 3600  # apply time shift
+    keep = spline[:, 0] < pca[0, 0]  # Only keep points still prior to PCA data
     spline = spline[keep]
-    throwaway = np.sum(np.invert(keep)) # No. of points discarded
+    throwaway = np.sum(np.invert(keep))  # No. of points discarded
 
     print('Discarding {throwaway} overlapping points from spline')
-    acc = np.concatenate((start,spline,pca))
+    acc = np.concatenate((start, spline, pca))
 
     tf = 8.64e4
 
     if plot:
         plt.figure()
-        plt.plot(acc[:,0]*red/tf, acc[:,1])
-        plt.plot(spline_old[:,0]*red/tf, spline_old[:,1])
-        plt.plot(spline_old[[0,-1],0]*red/tf, spline_old[[0,-1],1])
+        plt.plot(acc[:, 0] * red / tf, acc[:, 1])
+        plt.plot(spline_old[:, 0] * red / tf, spline_old[:, 1])
+        plt.plot(spline_old[[0, -1], 0] * red / tf, spline_old[[0, -1], 1])
         plt.show(block=False)
 
-    n = len(acc[:,0])
+    n = len(acc[:, 0])
     head = f'# Accretion rate (g/s) with spline onset, shifted by {tshift:.2f} hrs (observer frame)\n{n}'
 
     print(f'Saving:   {target}')
