@@ -35,18 +35,20 @@ def save_plot(fig, prefix, chain, save, source, version,
         plt.close(fig)
 
 
-def plot_contours(chain, discard, source, version, cap=None, means=True,
-                  display=True, save=False):
+def plot_contours(chain, discard, source, version, cap=None, truth=True,
+                  display=True, save=False, truth_values=None):
     """Plots posterior contours of mcmc chain
     """
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
     # TODO: re-use the loaded chainconsumer here instead of reloading
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
 
-    if means:
-        mean = get_summary(chain, discard=discard, cap=cap,
-                           source=source, version=version)[:, 1]
-        fig = cc.plotter.plot(truth=mean, display=display)
+    if truth:
+        if truth_values is None:
+            truth_values = get_summary(chain, discard=discard, cap=cap,
+                               source=source, version=version)[:, 1]
+
+        fig = cc.plotter.plot(truth=truth_values, display=display)
     else:
         fig = cc.plotter.plot(display=display)
 
@@ -56,13 +58,18 @@ def plot_contours(chain, discard, source, version, cap=None, means=True,
 
 
 def plot_posteriors(chain, discard, source, version, cap=None,
-                    display=True, save=False):
+                    display=True, save=False, truth=False, truth_values=None):
     """Plots posterior distributions of mcmc chain
     """
+
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
     height = 3 * ceil(len(pkeys) / 4)
-    fig = cc.plotter.plot_distributions(display=display, figsize=[10, height])
+    if truth:
+        fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
+                                            truth=truth_values)
+    else:
+        fig = cc.plotter.plot_distributions(display=display, figsize=[10, height])
     plt.tight_layout()
     save_plot(fig, prefix='posteriors', chain=chain, save=save, source=source,
               version=version, display=display)
