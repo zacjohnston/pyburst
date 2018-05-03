@@ -1,6 +1,7 @@
 import numpy as np
 import subprocess
-import os, sys
+import os
+import sys
 import matplotlib.pyplot as plt
 
 from printing import *
