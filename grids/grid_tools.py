@@ -98,16 +98,16 @@ def expand_batches(batches, source):
     return batches_out
 
 
-def get_nruns(batch, source, **kwargs):
+def get_nruns(batch, source):
     """========================================================
     Returns the number of runs in a batch
     ========================================================"""
     source = grid_strings.source_shorthand(source=source)
-    modelfile = load_modelfile(batch=batch, source=source, **kwargs)
+    modelfile = load_modelfile(batch=batch, source=source)
     return len(modelfile)
 
 
-def load_modelfile(batch, source, filename='MODELS.txt', **kwargs):
+def load_modelfile(batch, source, filename='MODELS.txt'):
     """========================================================
     Returns the modelfile of a batch
     ========================================================
@@ -115,10 +115,7 @@ def load_modelfile(batch, source, filename='MODELS.txt', **kwargs):
     (path  =  str  : path to location of model directories)
     ========================================================"""
     source = grid_strings.source_shorthand(source=source)
-    path = kwargs.get('path', MODELS_PATH)
-    batch_str = grid_strings.get_batch_string(batch, source)
-    filepath = os.path.join(path, batch_str, filename)
-
+    filepath = grid_strings.get_model_table_filepath(batch, source, filename)
     modelfile = pd.read_table(filepath, delim_whitespace=True)
     return modelfile
 
