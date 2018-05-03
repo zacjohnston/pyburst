@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import sys, os
+import sys
+import os
 import subprocess
 import multiprocessing as mp
 
@@ -34,7 +35,7 @@ def multi_setup_analyser(batches, source, multithread=True, **kwargs):
         args = []
         for batch in batches:
             args.append((batch, source))
-        with mp.Pool() as pool:
+        with mp.Pool(processes=8) as pool:
             pool.starmap(setup_analyser, args)
 
     else:
@@ -135,7 +136,7 @@ def write_modelfile(runs, x, z, accrate, cycles, basename, batch_name, path):
     # -------------------------------------------------------------------------  -
     filepath = os.path.join(path, 'MODELS.txt')
     N = len(runs)
-    M_edd = 1.75e-8  # * 1.7/(x+1)          # Eddington rate for X composition
+    M_edd = 1.75e-8  # * 1.7/(x+1)
     acc_sol = np.array(accrate) * M_edd  # accretion rate in solar masses per year
 
     print('Writing MODELS.txt file')
@@ -149,7 +150,7 @@ def write_modelfile(runs, x, z, accrate, cycles, basename, batch_name, path):
                             acc_edd=accrate[i], cycle=cycles[i], batch=batch_name))
 
 
-def extract_lightcurves(runs, path_data, path_target, basename='xrb', **kwargs):
+def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
     """========================================================
     Loads Kepler .lum binaries and saves txt file of [time, luminosity, radius] for input to kepler_analyser
     Returns No. of cycles for each run
@@ -191,7 +192,7 @@ def extract_lightcurves(runs, path_data, path_target, basename='xrb', **kwargs):
 
 
 def collect_output(runs, batches, source, basename='xrb',
-                   mean_name='mean.data', summ_name='summ.csv', **kwargs):
+                   mean_name='mean.data', **kwargs):
     """=======================================================================
     Collects output files from kepler-analyser output and organises them into batches
     =======================================================================
@@ -217,14 +218,11 @@ def collect_output(runs, batches, source, basename='xrb',
 
         print('Copying from: ', analyser_output_path)
         print('          to: ', source_path)
-        # from: /path/analyser/source/analyser_output_path/
 
         print('Copying/reformatting summ files')
-        # to: /path/source/summary/
         reformat_summ(batch=batch, source=source)
 
         print('Copying mean lightcurves')
-        # to: /path/source/mean_lightcurves/batch_str/
         final_run_str = f'{basename}{runs[-1]}'
         for run in runs:
             run_str = '{base}{run}'.format(base=basename, run=run)
