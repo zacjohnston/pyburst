@@ -1,109 +1,90 @@
 import numpy as np
 import subprocess
 import os
-import sys
-import matplotlib.pyplot as plt
 
-from printing import *
-import burstfit_1808
+# kepler
 import lcdata
 
-KEPLER_MODELS = os.environ['KEPLER_MODELS']
+# pygrids
+from ..misc import pyprint
+from ..grids.grid_tools import try_mkdir
+from ..grids import grid_strings, grid_tools
+
+MODELS_PATH = os.environ['KEPLER_MODELS']
+GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
-def load(run, basename='run', path='/home/zac/kepler/runs/mdot/', re_load=False, save=True):
-    """Attempts to load pre-saved lumfile, or load binary. Returns luminosity [t, lum]"""
-    preload_file = 'preload{run}.txt'.format(run=run)
-    run_name = '{base}{run}'.format(base=basename, run=run)
-    preload_filepath = os.path.join(path, run_name, preload_file)
+def load(run, batch, source, basename='xrb', re_load=False, save=True,
+         silent=False):
+    """Attempts to load pre-saved lumfile, or load binary. Returns luminosity [t, lum]
+    """
+    batch_str = grid_strings.get_batch_string(batch, source)
+
+    analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
+    input_path = os.path.join(analysis_path, batch_str, 'input')
+    try_mkdir(input_path, skip=True)
+
+    preloaded_file = f'{batch_str}_{run}.txt'
+    run_str = grid_strings.get_run_string(run, basename)
+    preloaded_filepath = os.path.join(input_path, preloaded_file)
 
     # ===== Force reload =====
     if re_load:
         print('Force-reloading binary file: ')
         try:
             print('Deleting old preload')
-            subprocess.run(['rm', preload_filepath], check=True)
+            subprocess.run(['rm', preloaded_filepath])
         except:
             pass
 
     # ===== Try loading pre-saved data =====
     try:
-        print('Looking for pre-loaded luminosity file: {path}'.format(path=preload_filepath))
-        lum = np.loadtxt(preload_filepath, skiprows=1)
+        print('Looking for pre-loaded luminosity file: {path}'.format(path=preloaded_filepath))
+        lum = np.loadtxt(preloaded_filepath, skiprows=1)
         print('Pre-loaded data found, loaded.')
 
     except FileNotFoundError:
         print('No preload file found. Reloading binary')
-        dashes()
-        lumpath = os.path.join(path, run_name, run_name + '.lc')
+        pyprint.print_dashes()
+        model_path = grid_strings.get_model_path(run, batch, source, basename)
+        lc_filename = f'{run_str}.lc'
+        lc_filepath = os.path.join(model_path, lc_filename)
 
-        if os.path.exists(lumpath):
-            lum_temp = lcdata.load(lumpath)
-            model_exists = True
+        if os.path.exists(lc_filepath):
+            lum_temp = lcdata.load(lc_filepath, silent=silent)
             n = len(lum_temp.time)
-            lum = np.ndarray((n, 2))
+
+            lum = np.full((n, 2), np.nan)
             lum[:, 0] = lum_temp.time
             lum[:, 1] = lum_temp.xlum
 
-            # ===== Save for faster loading next time (NOTE: still in Kepler reference frame) =====
-            dashes()
+            pyprint.print_dashes()
             if save:
-                save_file = 'preload{run}.txt'.format(run=run)
-                save_filepath = os.path.join(path, run_name, save_file)
-
-                print('Saving data for faster loading in: {fpath}'.format(fpath=save_filepath))
-                if lum[-1, 0] < 3.e5:
-                    print('WARNING! Did you mean to save? Run may not be finished')
-                head = '[time (s), luminosity (erg/s)]'
-
-                np.savetxt(save_filepath, lum, header=head)
-            else:
-                print('Saving disabled')
-
+                print(f'Saving data for faster loading in: {preloaded_filepath}')
+                header = 'time (s),             luminosity (erg/s)'
+                np.savetxt(preloaded_filepath, lum, header=header)
         else:
-            print('File not found: {file}'.format(file=lumpath))
-            model_exists = False
+            print(f'File not found: {lc_filepath}')
             lum = np.array([np.nan])
 
-    dashes()
-
+    pyprint.print_dashes()
     return lum
 
 
-def multi_save(runs,
-               basename='xrb',
-               re_load=True,
-               **kwargs):
-    """Loads a collection of models and saves their lightcurves"""
-    # ==========================================
-    # runs     = []   : list of model IDs to load/save
-    # basename = str  : base filename of models, e.g. 'xrb' for xrb3
-    # re_load  = bool : whether to force-reload binaries
-    # path     = str  : path to location of model folders
-    # ==========================================
-    path = kwargs.get('path', KEPLER_MODELS)
-    runs = expand_runs(runs)
-
-    for r in runs:
-        load(run=r, basename=basename, re_load=re_load, path=path)
-
-
-def multi_batch_save(runs,
-                     batches,
-                     source='gs1826',
-                     **kwargs):
+def batch_save(batch, source, runs=None, basename='xrb', re_load=True, **kwargs):
+    """Loads a collection of models and saves their lightcurves
     """
-    Loads multiple batches of models and saves lightcurves
+    if runs is None:
+        runs = grid_tools.get_nruns(batch, source)
+    runs = grid_tools.expand_runs(runs)
+
+    for run in runs:
+        load(run, batch, source, basename=basename, re_load=re_load, **kwargs)
+
+
+def multi_batch_save(batches, source='gs1826', **kwargs):
+    """Loads multiple batches of models and saves lightcurves
     """
-    # ==========================================
-    # batches = []  : batches to iterate over
-    #   - see multi_save()
-    # ==========================================
-    path = kwargs.get('path', KEPLER_MODELS)
-    runs = expand_runs(runs)
-    batches = expand_batches(batches, source)
+    batches = grid_tools.expand_batches(batches, source)
     for batch in batches:
-        bname = '{source}_{batch}'.format(source=source, batch=batch)
-        bpath = os.path.join(path, bname)
-
-        multi_save(runs=runs, path=bpath, **kwargs)
+        batch_save(batch, source, **kwargs)
