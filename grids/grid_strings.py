@@ -49,6 +49,12 @@ def get_batch_models_path(batch, source):
     return os.path.join(MODELS_PATH, batch_str)
 
 
+def get_model_path(run, batch, source, basename='xrb'):
+    batch_path = get_batch_models_path(batch, source)
+    run_str = get_run_string(run, basename=basename)
+    return os.path.join(batch_path, run_str)
+
+
 def get_source_subdir(source, dir_):
     source_path = get_source_path(source)
     return os.path.join(source_path, dir_)
@@ -84,3 +90,8 @@ def get_summ_filepath(source):
     params_path = get_source_subdir(source, 'summ')
     params_filename = get_summ_filename(source)
     return os.path.join(params_path, params_filename)
+
+
+def get_model_table_filepath(batch, source, filename='MODELS.txt'):
+    path = get_batch_models_path(batch, source)
+    return os.path.join(path, filename)
