@@ -445,10 +445,8 @@ def printv(string, verbose):
 
 
 def try_mkdir(path, skip=False):
-    try:
-        print(f'Creating directory  {path}')
-        subprocess.run(['mkdir', path], check=True)
-    except:
+    print(f'Creating directory  {path}')
+    if os.path.exists(path):
         if skip:
             print('Directory already exists - skipping')
         else:
@@ -460,3 +458,6 @@ def try_mkdir(path, skip=False):
                 subprocess.run(['mkdir', path])
             elif cont == 'n' or cont == 'N':
                 sys.exit()
+    else:
+        subprocess.run(['mkdir', path], check=True)
+
