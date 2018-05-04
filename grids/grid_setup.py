@@ -76,7 +76,7 @@ def create_epoch_grid(batch0, dv, params, source, kgrid=None,
                      qos=qos_list[i], kgrid=kgrid, **kwargs)
 
 
-def create_batch(batch0, dv, source,
+def create_batch(batch, dv, source,
                  params={'x': [0.4, 0.5], 'z': [0.01, 0.02],
                          'tshift': [0.0], 'accrate': [0.05],
                          'qb': [0.3], 'xi': [1.0],
@@ -92,6 +92,7 @@ def create_batch(batch0, dv, source,
 
     Parameters
     ---------
+    batch : int
     params : {}
         specifiy model parameters. If variable: give range
     dv : {}
@@ -117,7 +118,7 @@ def create_batch(batch0, dv, source,
 
     source = grid_strings.source_shorthand(source=source)
     mass_ref = 1.4  # reference NS mass (in Msun)
-    print_batch(batch=batch0, source=source)
+    print_batch(batch=batch, source=source)
 
     params = dict(params)
     params_expanded, var = expand_params(dv, params)
@@ -157,7 +158,7 @@ def create_batch(batch0, dv, source,
     params_full['geemult'] = params_full['mass'] / mass_ref  # Gravity multiplier
 
     # ===== Create top grid folder =====
-    batch_model_path = grid_strings.get_batch_models_path(batch0, source)
+    batch_model_path = grid_strings.get_batch_models_path(batch, source)
     grid_tools.try_mkdir(batch_model_path)
 
     # Directory to keep MonARCH logs and sbatch files
@@ -185,7 +186,7 @@ def create_batch(batch0, dv, source,
     for runs in job_runs:
         for restart in [True, False]:
             kepler_jobscripts.write_submission_script(run0=runs[0], run1=runs[1],
-                                                      restart=restart, batch=batch0,
+                                                      restart=restart, batch=batch,
                                                       source=source, basename=basename,
                                                       path=logpath, qos=qos, walltime=walltime,
                                                       parallel=parallel, debug=debug)
@@ -195,7 +196,7 @@ def create_batch(batch0, dv, source,
         # ==== Create directory tree ====
         print_dashes()
         model = i + 1
-        run_str = grid_strings.get_run_string(model, batch0, basename)
+        run_str = grid_strings.get_run_string(model, batch, basename)
         run_path = grid_strings.get_model_path(model, batch, source, basename=basename)
 
         # ==== Create task directory ====
@@ -245,7 +246,7 @@ def create_batch(batch0, dv, source,
 
         run = i + 1
         print(f'Writing genfile for xrb{run}')
-        header = f'This generator belongs to model: {source}_{batch0}/{basename}{run}'
+        header = f'This generator belongs to model: {source}_{batch}/{basename}{run}'
 
         accdepth = params_full['accdepth'][i]
         if (params_full['x'][i] > 0.0) and (accdepth > 1e20):
