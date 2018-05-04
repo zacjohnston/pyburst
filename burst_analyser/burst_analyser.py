@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
-import sys
 import os
 from scipy import interpolate, integrate
 import multiprocessing as mp
@@ -32,6 +31,7 @@ class BurstRun(object):
 
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
         self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
+        self.source_path = grid_strings.get_source_path(source)
 
         self.loaded = False
         self.lum = None
@@ -260,16 +260,25 @@ class BurstRun(object):
 
             np.savetxt(filepath, lightcurve, header=header)
 
-    def plot_model(self, bursts=True, display=True):
+    def plot_model(self, bursts=True, display=True, save=False, log=True):
+        """Plots overall model lightcurve, with detected bursts
+        """
         fig, ax = plt.subplots()
-
-        ax.plot(self.lum[:,0], self.lum[:,1], c='C0')
+        ax.plot(self.lum[:, 0], self.lum[:, 1], c='C0')
         ax.set_title(f'{self.model_str}')
 
+        if log:
+            ax.set_yscale('log')
+            ax.set_ylim([1e34, 1e39])
         if bursts:
             ax.plot(self.bursts['t'], self.bursts['peak'], marker='o', c='C1', ls='none')
+
         if display:
             plt.show(block=False)
+        if save:
+            filename = f'model_{self.model_str}.png'
+            filepath = os.path.join(self.source_path, 'plots', 'burst_analysis', filename)
+            fig.savefig(filepath)
         return fig
 
 
@@ -379,7 +388,6 @@ def plot_convergence(bfit, bprop='dt', start=1, show_values=True):
     fig, ax = plt.subplots()
     b_vals = bfit.bursts[bprop]
     nv = len(b_vals)
-    # ax.set_ylim([0,1e5])
 
     for i in range(start, nv + 1):
         b_slice = b_vals[start - 1:i]
