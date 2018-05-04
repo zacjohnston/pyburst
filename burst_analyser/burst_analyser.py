@@ -260,6 +260,18 @@ class BurstRun(object):
 
             np.savetxt(filepath, lightcurve, header=header)
 
+    def plot_model(self, bursts=True, display=True):
+        fig, ax = plt.subplots()
+
+        ax.plot(self.lum[:,0], self.lum[:,1], c='C0')
+        ax.set_title(f'{self.model_str}')
+
+        if bursts:
+            ax.plot(self.bursts['t'], self.bursts['peak'], marker='o', c='C1', ls='none')
+        if display:
+            plt.show(block=False)
+        return fig
+
 
 def multithread_extract(batches, source):
     args = []
