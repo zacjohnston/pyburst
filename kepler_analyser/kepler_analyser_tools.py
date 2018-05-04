@@ -107,7 +107,7 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
                                  path_data=runs_path,
                                  path_target=inpath)
 
-    write_modelfile(runs=runs,
+    write_model_table(runs=runs,
                     x=x,
                     z=z,
                     accrate=accrate,
@@ -117,7 +117,7 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
                     path=inpath)
 
 
-def write_modelfile(runs, x, z, accrate, cycles, basename, batch_name, path):
+def write_model_table(runs, x, z, accrate, cycles, basename, batch_name, path):
     """
     Writes MODELS.txt file for kepler_analyser input
     """

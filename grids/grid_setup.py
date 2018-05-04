@@ -166,7 +166,7 @@ def create_batch(batch, dv, source,
     grid_tools.try_mkdir(logpath)
 
     # ===== Write table of model parameters (MODELS.txt)=====
-    write_modelfile(n=n, params=params_full, lburn=lburn, path=batch_model_path)
+    write_model_table(n=n, params=params_full, lburn=lburn, path=batch_model_path)
 
     # ==== Write any notes relevant to the grid, for future reference ====
     filepath = os.path.join(batch_model_path, 'NOTES.txt')
@@ -380,7 +380,7 @@ def check_grid_params(params_full, source, precision=6, kgrid=None):
     return any_matches
 
 
-def write_modelfile(n, params, lburn, path, filename='MODELS.txt'):
+def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
     """Writes table of model parameters to file
 
     Parameters

@@ -28,12 +28,11 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 def load_grid_table(tablename, source, con_ver=None,
                     verbose=True, **kwargs):
-    """=================================================
-    Returns file of model parameters as pandas DataFrame
-    =================================================
+    """Returns file of model parameters as pandas DataFrame
+    
     tablename  = str   : table name (e.g. 'params', 'summ')
     source     = str   : name of source object
-    ================================================="""
+    """
     source = grid_strings.source_shorthand(source=source)
     path = kwargs.get('path', GRIDS_PATH)
     param_path = os.path.join(path, 'sources', source, tablename)
@@ -55,12 +54,11 @@ def load_grid_table(tablename, source, con_ver=None,
 
 
 def expand_runs(runs):
-    """========================================================
-    Checks format of 'runs' parameter and returns relevant array
-    ========================================================
+    """Checks format of 'runs' parameter and returns relevant array
+    
     if runs is arraylike: keep
     if runs is integer N: assume there are N runs from 1 to N
-    ========================================================"""
+    """
     if type(runs) == int:  # assume runs = n_runs
         runs_out = np.arange(1, runs + 1)
     elif type(runs) == list or type(runs) == np.ndarray:
@@ -72,12 +70,11 @@ def expand_runs(runs):
 
 
 def expand_batches(batches, source):
-    """========================================================
-    Checks format of 'batches' parameter and returns relevant array
-    ========================================================
+    """Checks format of 'batches' parameter and returns relevant array
+    
     if batches is arraylike: keep
     if batches is integer N: assume there a triplet batch from N to N+3
-    ========================================================"""
+    """
     source = grid_strings.source_shorthand(source=source)
     n = {'gs1826': 3, '4u1820': 2}  # number of epochs
     special = {4, 7}  # special cases (reverse order)
@@ -99,48 +96,41 @@ def expand_batches(batches, source):
 
 
 def get_nruns(batch, source):
-    """========================================================
-    Returns the number of runs in a batch
-    ========================================================"""
+    """Returns the number of runs in a batch
+    """
     source = grid_strings.source_shorthand(source=source)
-    modelfile = load_modelfile(batch=batch, source=source)
-    return len(modelfile)
+    model_table = load_model_table(batch=batch, source=source)
+    return len(model_table)
 
 
-def load_modelfile(batch, source, filename='MODELS.txt'):
-    """========================================================
-    Returns the modelfile of a batch
-    ========================================================
-    batch  =  int  :
-    (path  =  str  : path to location of model directories)
-    ========================================================"""
+def load_model_table(batch, source, filename='MODELS.txt'):
+    """Returns the model_table of a batch
+    """
     source = grid_strings.source_shorthand(source=source)
     filepath = grid_strings.get_model_table_filepath(batch, source, filename)
-    modelfile = pd.read_table(filepath, delim_whitespace=True)
-    return modelfile
+    model_table = pd.read_table(filepath, delim_whitespace=True)
+    return model_table
 
 
 def reduce_table(table, params, exclude={}, verbose=True):
-    """=================================================
-    Returns the subset of a table that satisfy the specified variables
-    =================================================
+    """Returns the subset of a table that satisfy the specified variables
+    
     table   =  pd.DataFrame  : table to reduce (pandas object)
     params  =  {}            : params that must be satisfied
     exclude = {}             : params to exclude/blacklist completely
-    ================================================="""
+    """
     subset_idxs = reduce_table_idx(table=table, params=params,
                                    exclude=exclude, verbose=verbose)
     return table.iloc[subset_idxs]
 
 
 def reduce_table_idx(table, params, exclude={}, verbose=True):
-    """=================================================
-    Returns the subset of table indices that satisfy the specified variables
-    =================================================
+    """Returns the subset of table indices that satisfy the specified variables
+    
     table   =  pd.DataFrame  : table to reduce (pandas object)
     params  =  {}            : params that must be satisfied
     exclude =  {}            : params to exclude/blacklist completely
-    ================================================="""
+    """
     subset_idxs = get_rows(table=table, params=params, verbose=verbose)
 
     exclude = ensure_np_list(exclude)
@@ -156,9 +146,8 @@ def reduce_table_idx(table, params, exclude={}, verbose=True):
 
 
 def get_rows(table, params, verbose):
-    """=================================================
-    Returns indices of table rows that satify all given params
-    ================================================="""
+    """Returns indices of table rows that satify all given params
+    """
     idxs = {}
     for key, val in params.items():
         idxs[key] = np.where(table[key] == val)[0]
@@ -170,23 +159,23 @@ def get_rows(table, params, verbose):
 
 
 def exclude_rows(table, idxs):
-    """=================================================
+    """
     Returns table with specified rows removed
         NOTE: uses pandas.dataframe indices, not raw indices
-    =================================================
+    
     idxs = [] : list of row indexes to exclude/remove from table
-    ================================================="""
+    """
     mask = table.index.isin(idxs)
     return table[~mask]
 
 
 def exclude_params(table, params):
-    """=================================================
+    """
     Returns table with blacklisted parameters removed
         NOTE: only one excluded parameter must be satisfied to be removed
-    =================================================
+    
     params = {} : dict of parameter values to exclude/remove from table
-    ================================================="""
+    """
     params = ensure_np_list(params)
     idxs_exclude = []
     for key, vals in params.items():
@@ -197,11 +186,10 @@ def exclude_params(table, params):
 
 
 def enumerate_params(params_full):
-    """=================================================
-    Enumerates parameters into a set of all models
-    =================================================
+    """Enumerates parameters into a set of all models
+    
     params_full = {}   : specifies all unique values each param will take
-    ================================================="""
+    """
     params = dict(params_full)
     all_models = dict.fromkeys(params)
 
@@ -219,9 +207,8 @@ def enumerate_params(params_full):
 
 
 def copy_paramfiles(batches, source):
-    """========================================================
-    Copy MODELS/param table file to grids
-    ========================================================"""
+    """Copy MODELS/param table file to grids
+    """
     source = grid_strings.source_shorthand(source=source)
     batches = ensure_np_list(variable=batches)
 
@@ -232,9 +219,8 @@ def copy_paramfiles(batches, source):
 
 
 def rewrite_column(batch, source):
-    """========================================================
-    Replaces column header 'id' with 'run' in MODELS.txt file
-    ========================================================"""
+    """Replaces column header 'id' with 'run' in MODELS.txt file
+    """
     source = grid_strings.source_shorthand(source=source)
     model_table_filepath = grid_strings.get_model_table_filepath(batch, source)
 
