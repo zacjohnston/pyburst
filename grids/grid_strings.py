@@ -22,12 +22,16 @@ def source_shorthand(source):
 # ======================================================
 # Basic strings
 # ======================================================
-def get_batch_string(batch, source):
-    return f'{source}_{batch}'
+def get_batch_string(batch, source, b_tag=''):
+    return f'{source}_{b_tag}{batch}'
 
 
 def get_run_string(run, basename='xrb'):
     return f'{basename}{run}'
+
+
+def get_model_string(run, batch, source, b_tag='', r_tag=''):
+    return f'{source}_{b_tag}{batch}_{r_tag}{run}'
 
 
 # ======================================================
