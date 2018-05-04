@@ -162,7 +162,7 @@ def create_batch(batch, dv, source,
     grid_tools.try_mkdir(batch_model_path)
 
     # Directory to keep MonARCH logs and sbatch files
-    logpath = grid_strings.get_source_subdir(source, 'logs')
+    logpath = grid_strings.get_source_subdir(batch_model_path, 'logs')
     grid_tools.try_mkdir(logpath)
 
     # ===== Write table of model parameters (MODELS.txt)=====
