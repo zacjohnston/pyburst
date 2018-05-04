@@ -414,3 +414,23 @@ def plot_bprop(bfit, bprop):
 
     ax.plot(np.arange(nv), b_vals, ls='none', marker='o', c='C0')
     plt.show(block=False)
+
+
+def multi_batch_plot(batches, source, multithread=True):
+    if multithread:
+        args = []
+        for batch in batches:
+            args.append((batch, source))
+        with mp.Pool(processes=8) as pool:
+            pool.starmap(save_batch_plots, args)
+    else:
+        for batch in batches:
+            save_batch_plots(batch, source)
+
+
+def save_batch_plots(batch, source, **kwargs):
+    runs = grid_tools.get_nruns(batch, source)
+    runs = grid_tools.expand_runs(runs)
+    for run in runs:
+        model = BurstRun(run, batch, source, analyse=True)
+        model.plot_model(display=False, save=True, **kwargs)
