@@ -196,7 +196,7 @@ def create_batch(batch, dv, source,
         # ==== Create directory tree ====
         print_dashes()
         model = i + 1
-        run_str = grid_strings.get_run_string(model, batch, basename)
+        run_str = grid_strings.get_run_string(model, basename)
         run_path = grid_strings.get_model_path(model, batch, source, basename=basename)
 
         # ==== Create task directory ====
