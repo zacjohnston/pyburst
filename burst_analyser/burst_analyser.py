@@ -20,13 +20,14 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
-                 re_load=False, savelum=True, load_analyser=False):
+                 re_load=False, savelum=True, analyse=True):
         self.run = run
         self.batch = batch
         self.source = source
         self.basename = basename
         self.run_str = grid_strings.get_run_string(run, basename)
         self.batch_str = grid_strings.get_batch_string(batch, source)
+        self.model_str = grid_strings.get_model_string(run, batch, source)
         self.verbose = verbose
 
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
@@ -37,10 +38,24 @@ class BurstRun(object):
         self.lumf = None
         self.load(savelum=savelum, re_load=re_load)
 
-        self.analysed = False  # Has the model been analysed yet
-        self.bursts = {}  # Kepler burst properties
+        self.analysed = False
+        self.bursts = {}
 
-    def analyse_all(self):
+        if analyse:
+            self.analyse()
+
+    def load(self, savelum=True, re_load=False):
+        """Load luminosity data from kepler simulation
+        """
+        self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
+                                    basename=self.basename, save=savelum, re_load=re_load)
+        # if len(self.lum) == 1:
+        #     sys.exit()
+
+        self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
+        self.loaded = True
+
+    def analyse(self):
         """Analyses all quantities of the model.
         """
         self.ensure_analysed_is(False)
@@ -48,28 +63,14 @@ class BurstRun(object):
         self.find_fluence()
         self.analysed = True
 
-    def load(self, savelum=True, re_load=False):
-        """Load luminosity data from kepler simulation
-        """
-        self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
-                                    basename=self.basename, save=savelum, re_load=re_load)
-        if len(self.lum) == 1:
-            sys.exit()
-
-        self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
-        self.loaded = True
-
     def ensure_analysed_is(self, analysed):
         """Checks that model has (or hasn't) been analysed
         """
-        words = {True: "hasn't yet been", False: 'has already been'}
-        line2 = {True: 'run self.analyse_all() first', False: 'reload model first'}
+        strings = {True: 'Model not yet analysed. Run self.analyse() first',
+                   False: 'Model has already been analysed. Reload model first'}
 
         if self.analysed != analysed:
-            # TODO: raise error instead
-            print(f'ERROR: model {words[analysed]} analysed')
-            print(line2[analysed])
-            sys.exit()
+            raise AttributeError(strings[analysed])
 
     def remove_zeros(self):
         """During shocks, kepler can also give zero luminosity (for some reason...)
