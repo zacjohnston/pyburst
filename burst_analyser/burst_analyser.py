@@ -1,16 +1,18 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import kepdump
+import sys
 import sys
 import os
 from scipy import interpolate, integrate
-
-# Custom modules required
-from . import b_utils
+import multiprocessing as mp
 
 # kepler_grids
-from ..grids import grid_tools
+from . import burst_tools
+from ..grids import grid_tools, grid_strings
+
+# mdot
+import burstfit_1808
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -22,22 +24,21 @@ class BurstRun(object):
         self.run = run
         self.batch = batch
         self.source = source
-        self.run_str = basename + str(run)
-        self.batch_str = f'{source}_{batch}'
+        self.basename = basename
+        self.run_str = grid_strings.get_run_string(run, basename)
+        self.batch_str = grid_strings.get_batch_string(batch, source)
         self.verbose = verbose
 
-        self.analyser_input_path = os.path.join(GRIDS_PATH, 'analyser', source,
-                                                f'{self.batch_str}_input')
-        self.batch_model_path = os.path.join(MODELS_PATH, self.batch_str)
-
-        self.bursts = {}  # Kepler burst properties
-        self.load(savelum=savelum, basename=basename, re_load=re_load,
-                  load_analyser=load_analyser)
+        self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
+        self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
 
         self.loaded = False
-        self.analysed = False  # Has the model been analysed yet
         self.lum = None
         self.lumf = None
+        self.load(savelum=savelum, re_load=re_load)
+
+        self.analysed = False  # Has the model been analysed yet
+        self.bursts = {}  # Kepler burst properties
 
     def analyse_all(self):
         """Analyses all quantities of the model.
@@ -47,17 +48,11 @@ class BurstRun(object):
         self.find_fluence()
         self.analysed = True
 
-    def load(self, savelum=True, basename='run', re_load=False, load_analyser=False):
+    def load(self, savelum=True, re_load=False):
         """Load luminosity data from kepler simulation
         """
-        if load_analyser:
-            filename = f'{self.run_str}.data'
-            filepath = os.path.join(self.analyser_input_path, filename)
-            self.lum = np.loadtxt(filepath, skiprows=2)
-        else:
-            self.lum = b_utils.load(run=self.run, basename=basename,
-                                    path=self.batch_model_path,
-                                    save=savelum, re_load=re_load)
+        self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
+                                    basename=self.basename, save=savelum, re_load=re_load)
         if len(self.lum) == 1:
             sys.exit()
 
@@ -242,7 +237,7 @@ class BurstRun(object):
         """Saves burst lightcurves to txt files. Excludes 'pre' bursts
         """
         if path is None:  # default to model directory
-            path = self.batch_model_path
+            path = self.batch_models_path
 
         n = self.bursts['num']
         for i in range(n):
@@ -265,23 +260,41 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
 
+def multithread_extract(batches, source):
+    args = []
+    for batch in batches:
+        args.append([batch, source])
+
+    with mp.Pool(processes=8) as pool:
+        pool.starmap(extract_burstfit_1808, args)
+
+
 def extract_burstfit_1808(batches, source, skip_bursts=1):
-    source_path = grid_tools.get_source_path(source)
-    data = {}
+    source_path = grid_strings.get_source_path(source)
+    batches = grid_tools.expand_batches(batches, source)
+
     b_ints = ('batch', 'run', 'num')
     bprops = ('dt', 'fluence', 'length', 'peak')
     col_order = ['batch', 'run', 'num', 'dt', 'u_dt', 'fluence', 'u_fluence',
                  'length', 'u_length', 'peak', 'u_peak']
 
-    for bp in bprops:
-        u_bp = f'u_{bp}'
-        data[bp] = []
-        data[u_bp] = []
-
-    for b in b_ints:
-        data[b] = []
-
     for batch in batches:
+        batch_str = f'{source}_{batch}'
+        analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
+        grid_tools.try_mkdir(analysis_path, skip=True)
+
+        filename = f'summary_{batch_str}.txt'
+        filepath = os.path.join(analysis_path, filename)
+
+        data = {}
+        for bp in bprops:
+            u_bp = f'u_{bp}'
+            data[bp] = []
+            data[u_bp] = []
+
+        for b in b_ints:
+            data[b] = []
+
         n_runs = grid_tools.get_nruns(batch, source)
 
         load_dir = f'{source}_{batch}_input/'
@@ -290,9 +303,13 @@ def extract_burstfit_1808(batches, source, skip_bursts=1):
         for run in range(1, n_runs + 1):
             sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
 
-            burstfit = BurstRun(run, batch, source,
-                                verbose=False, load_analyser=True)
+            # burstfit = BurstRun(run, batch, source,
+            #                     verbose=False, load_analyser=True)
+            burstfit = burstfit_1808.BurstRun(run, flat_run=True, truncate=False,
+                                              runs_home=load_path, extra_b=0, pre_t=0,
+                                              verbose=False, load_analyser=True)
             burstfit.analyse_all()
+            burstfit.ensure_observer_frame_is(False)
 
             data['batch'] += [batch]
             data['run'] += [run]
@@ -306,15 +323,37 @@ def extract_burstfit_1808(batches, source, skip_bursts=1):
                 data[bp] += [mean]
                 data[u_bp] += [std]
 
-    table = pd.DataFrame(data)
-    table = table[col_order]
+        table = pd.DataFrame(data)
+        table = table[col_order]
+        table_str = table.to_string(index=False, justify='left', col_space=12)
 
-    table_str = table.to_string(index=False, justify='left', col_space=12)
+        with open(filepath, 'w') as f:
+            f.write(table_str)
 
-    filename = f'burstfit_V2_extract_{batches[0]}-{batches[-1]}.txt'
-    filepath = os.path.join(source_path, filename)
+
+def combine_extracts(batches, source):
+    source_path = grid_strings.get_source_path(source)
+    big_table = pd.DataFrame()
+
+    for batch in batches:
+        batch_str = f'{source}_{batch}'
+        analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
+
+        filename = f'summary_{batch_str}.txt'
+        filepath = os.path.join(analysis_path, filename)
+        batch_table = pd.read_csv(filepath, delim_whitespace=True)
+
+        big_table = pd.concat((big_table, batch_table), ignore_index=True)
+
+    table_str = big_table.to_string(index=False, justify='left', col_space=12)
+
+    filename = f'summary_{batches[0]}-{batches[-1]}.txt'
+    filepath = os.path.join(source_path, 'burst_analysis', filename)
+
     with open(filepath, 'w') as f:
         f.write(table_str)
+
+    return big_table
 
 
 def check_n_bursts(batches, source, kgrid):
@@ -379,37 +418,4 @@ def plot_bprop(bfit, bprop):
     nv = len(b_vals)
 
     ax.plot(np.arange(nv), b_vals, ls='none', marker='o', c='C0')
-    plt.show(block=False)
-
-
-def plot_std(runs, batches, basename='xrb', source='gs1826', var='dt', **kwargs):
-    """
-    Plots how standard deviation (STD) of recurrence times (DT) evolves
-    over a train of bursts
-    """
-    path = kwargs.get('path', MODELS_PATH)
-    # runs = expand_runs(runs)
-    fig, ax = plt.subplots()
-
-    for batch in batches:
-        batch_str = f'{source}_{batch}'
-        batch_path = os.path.join(path, batch_str)
-
-        for run in runs:
-            model = BurstRun(run, batch, source, verbose=False, **kwargs)
-            model.analyse_all()
-            N = len(model.bursts[var])
-            std_frac = np.zeros(N - 1)  # skip first burst (zero std)
-            x = np.arange(2, N + 1)
-
-            # ==== iterate along burst train ====
-            for b in x:
-                std = np.std(model.bursts['dt'][:b])
-                mean = np.mean(model.bursts['dt'][:b])
-                std_frac[b - 2] = std / mean
-
-            label = f'B{batch}_{run}'
-            ax.plot(x, std_frac, label=label, ls='', marker='o')
-
-    ax.legend()
     plt.show(block=False)
