@@ -344,31 +344,6 @@ def extract_burstfit_1808(batches, source, skip_bursts=1):
             f.write(table_str)
 
 
-def combine_extracts(batches, source):
-    source_path = grid_strings.get_source_path(source)
-    big_table = pd.DataFrame()
-
-    for batch in batches:
-        batch_str = f'{source}_{batch}'
-        analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
-
-        filename = f'summary_{batch_str}.txt'
-        filepath = os.path.join(analysis_path, filename)
-        batch_table = pd.read_csv(filepath, delim_whitespace=True)
-
-        big_table = pd.concat((big_table, batch_table), ignore_index=True)
-
-    table_str = big_table.to_string(index=False, justify='left', col_space=12)
-
-    filename = f'summary_{batches[0]}-{batches[-1]}.txt'
-    filepath = os.path.join(source_path, 'burst_analysis', filename)
-
-    with open(filepath, 'w') as f:
-        f.write(table_str)
-
-    return big_table
-
-
 def check_n_bursts(batches, source, kgrid):
     """Compares n_bursts detected with kepler_analyser against burstfit_1808
     """
@@ -397,7 +372,6 @@ def check_n_bursts(batches, source, kgrid):
                 mismatch = np.vstack((mismatch, m_new))
 
         np.savetxt(filepath, mismatch)
-
     return mismatch
 
 

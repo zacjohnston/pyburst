@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import subprocess
 import os
 
@@ -89,3 +90,30 @@ def multi_batch_save(batches, source='gs1826', **kwargs):
     batches = grid_tools.expand_batches(batches, source)
     for batch in batches:
         batch_save(batch, source, **kwargs)
+
+
+def combine_extracts(batches, source):
+    """Combines extracted burst property summary tables
+    """
+    source_path = grid_strings.get_source_path(source)
+    big_table = pd.DataFrame()
+
+    for batch in batches:
+        batch_str = f'{source}_{batch}'
+        analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
+
+        filename = f'summary_{batch_str}.txt'
+        filepath = os.path.join(analysis_path, filename)
+        batch_table = pd.read_csv(filepath, delim_whitespace=True)
+
+        big_table = pd.concat((big_table, batch_table), ignore_index=True)
+
+    table_str = big_table.to_string(index=False, justify='left', col_space=12)
+
+    filename = f'summary_{batches[0]}-{batches[-1]}.txt'
+    filepath = os.path.join(source_path, 'burst_analysis', filename)
+
+    with open(filepath, 'w') as f:
+        f.write(table_str)
+
+    return big_table
