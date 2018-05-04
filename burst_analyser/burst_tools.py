@@ -83,7 +83,7 @@ def batch_save(batch, source, runs=None, basename='xrb', re_load=True, **kwargs)
         load(run, batch, source, basename=basename, re_load=re_load, **kwargs)
 
 
-def multi_batch_save(batches, source='gs1826', **kwargs):
+def multi_batch_save(batches, source, **kwargs):
     """Loads multiple batches of models and saves lightcurves
     """
     # TODO: parallelise loading
