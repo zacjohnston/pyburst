@@ -10,7 +10,7 @@ import multiprocessing as mp
 import lcdata
 
 # kepler_grids
-from ..grids import grid_tools
+from ..grids import grid_tools, grid_strings
 from pygrids.misc.pyprint import print_title, print_dashes
 
 # ============================================
@@ -54,13 +54,12 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
      NOTE: If any of the above lists contain only a single entry,
            it will be assumed that all runs have the same value.
     """
-    source = grid_tools.source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     path = kwargs.get('path', GRIDS_PATH)
-    models_path = kwargs.get('models_path', MODELS_PATH)
     analyser_path = os.path.join(path, 'analyser', source)
 
-    batch_name = f'{source}_{batch}'
-    runs_path = os.path.join(models_path, batch_name)
+    batch_name = grid_strings.get_batch_string(batch, source)
+    runs_path = grid_strings.get_batch_models_path(batch, source)
 
     if runs is None:
         runs = grid_tools.get_nruns(batch, source)
@@ -106,8 +105,7 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
     cycles = extract_lightcurves(runs,
                                  basename=basename,
                                  path_data=runs_path,
-                                 path_target=inpath,
-                                 **kwargs)
+                                 path_target=inpath)
 
     write_modelfile(runs=runs,
                     x=x,
@@ -135,19 +133,18 @@ def write_modelfile(runs, x, z, accrate, cycles, basename, batch_name, path):
     # path   = str : path to input directory
     # -------------------------------------------------------------------------  -
     filepath = os.path.join(path, 'MODELS.txt')
-    N = len(runs)
-    M_edd = 1.75e-8  # * 1.7/(x+1)
-    acc_sol = np.array(accrate) * M_edd  # accretion rate in solar masses per year
+    n = len(runs)
+    m_edd = 1.75e-8  # * 1.7/(x+1)
+    acc_sol = np.array(accrate) * m_edd  # accretion rate in solar masses per year
 
     print('Writing MODELS.txt file')
     print_dashes()
 
     with open(filepath, 'w') as f:
         f.write('#mod     acc rate        Z         H       Lacc/Ledd   #pul   #cycle   Comment\n')
-        for i in range(N):
-            f.write('{base}{run}   {acc:.6e}    {z:.4f}    {x:.4f}  {acc_edd:.6f}      {run}    {cycle}    {batch}\n' \
-                    .format(base=basename, run=runs[i], acc=acc_sol[i], z=z[i], x=x[i],
-                            acc_edd=accrate[i], cycle=cycles[i], batch=batch_name))
+        for i in range(n):
+            f.write(f'{basename}{runs[i]}   {acc_sol[i]:.6e}    {z[i]:.4f}    {x[i]:.4f}'
+                    + f'  {accrate[i]:.6f}      {runs[i]}    {cycles[i]}    {batch_name}\n')
 
 
 def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
@@ -165,18 +162,18 @@ def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
     ========================================================"""
 
     print_title()
-    print('Loading binaries from {}'.format(path_data))
-    print('Writing txt files to {}'.format(path_target))
+    print(f'Loading binaries from {path_data}')
+    print(f'Writing txt files to {path_target}')
     print_title()
 
     cycles = np.zeros(len(runs), dtype=int)
 
     for i, run in enumerate(runs):
-        rname = '{base}{r}'.format(base=basename, r=run)
-        lcfile = '{}.lc'.format(rname)
-        savefile = '{}.data'.format(rname)
+        rname = grid_strings.get_run_string(run, basename)
+        lcfile = f'{rname}.lc'
+        savefile = f'{rname}.data'
 
-        print('Loading kepler binary for {rname}'.format(rname=rname))
+        print(f'Loading kepler binary for {rname}')
         lcpath = os.path.join(path_data, rname, lcfile)
         data = lcdata.load(lcpath)
 
@@ -201,7 +198,7 @@ def collect_output(runs, batches, source, basename='xrb',
     basename    = str        : basename of kepler models
     path        = str        : path to location of all collected batches
     ======================================================================="""
-    source = grid_tools.source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     print_title('Collecting mean lightcurve and summ.csv files')
 
     batches = grid_tools.expand_batches(batches, source)
@@ -210,9 +207,9 @@ def collect_output(runs, batches, source, basename='xrb',
     analyser_path = os.path.join(path, 'analyser', source)
 
     for batch in batches:
-        batch_str = '{source}_{batch}'.format(source=source, batch=batch)
+        batch_str = grid_strings.get_batch_string(batch, source)
         analyser_output_path = os.path.join(analyser_path, batch_str + OUTPUT_SUFFIX)
-        source_path = os.path.join(path, 'sources', source)
+        source_path = grid_strings.get_source_path(source)
         save_path = os.path.join(source_path, 'mean_lightcurves', batch_str)
         grid_tools.try_mkdir(save_path, skip=True)
 
@@ -223,13 +220,13 @@ def collect_output(runs, batches, source, basename='xrb',
         reformat_summ(batch=batch, source=source)
 
         print('Copying mean lightcurves')
-        final_run_str = f'{basename}{runs[-1]}'
+        final_run_str = grid_strings.get_run_string(runs[-1], basename)
         for run in runs:
-            run_str = '{base}{run}'.format(base=basename, run=run)
+            run_str = grid_strings.get_run_string(run, basename)
             sys.stdout.write(f'\r{run_str}/{final_run_str}')
 
             mean_filepath = os.path.join(analyser_output_path, run_str, mean_name)
-            save_file = '{batch}_{run}_{mean}'.format(batch=batch_str, run=run_str, mean=mean_name)
+            save_file = f'{batch_str}_{run_str}_{mean_name}'
             save_filepath = os.path.join(save_path, save_file)
 
             subprocess.run(['cp', mean_filepath, save_filepath])
@@ -241,15 +238,15 @@ def print_summary(runs, batches, source, basename='xrb', skip=1, redshift=1.259,
     """
     prints summary analyser output of model
     """
-    source = grid_tools.source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     batches = grid_tools.expand_batches(batches, source)
     path = kwargs.get('path', GRIDS_PATH)
     analyser_path = os.path.join(path, 'analyser', source)
     runs = grid_tools.expand_runs(runs)
 
     for batch in batches:
-        batch_name = '{source}_{batch}'.format(source=source, batch=batch)
-        output_str = '{batch}{output}'.format(batch=batch_name, output=OUTPUT_SUFFIX)
+        batch_name = grid_strings.get_batch_string(batch, source)
+        output_str = f'{batch_name}{OUTPUT_SUFFIX}'
 
         print_title(f'Batch {batch}')
 
@@ -258,8 +255,8 @@ def print_summary(runs, batches, source, basename='xrb', skip=1, redshift=1.259,
         summ_names = np.genfromtxt(summ_filepath, delimiter="'", usecols=[1], dtype='str')
 
         for run in runs:
-            idx = np.where(summ_names == '{base}{run}'.format(base=basename, run=run))[0][
-                0]  # index of row for this run
+            run_str = grid_strings.get_run_string(run, basename)
+            idx = np.where(summ_names == run_str)[0][0]  # index of row for this run
             N = int(summ['num'][idx])  # Number of bursts
 
             dt = summ['tDel'][idx] * redshift / 3600
@@ -342,13 +339,13 @@ def plot_analyser(runs,
     else:
         red = 1.0
 
-    batch_name = '{source}_{batch}'.format(source=source, batch=batch)
+    batch_name = grid_strings.get_batch_string(batch, source)
     fig, ax = plt.subplots()
 
     for run in runs:
-        run_str = '{base}{run}'.format(base=basename, run=run)
+        run_str = grid_strings.get_run_string(run, basename)
         # ===== Auto-find the number of bursts in this run (and print recurrence time) =====
-        output_str = '{batch}{output}'.format(batch=batch_name, output=OUTPUT_SUFFIX)
+        output_str = f'{batch_name}{OUTPUT_SUFFIX}'
 
         N = print_summary(runs=[run], batches=[batch], source=source,
                           **kwargs)['N']
@@ -358,7 +355,7 @@ def plot_analyser(runs,
 
         # ===== Load each burst lightcurve for plotting =====
         for i in range(skip, N):
-            burst_file = '{i}.data'.format(i=i)
+            burst_file = f'{i}.data'
             burst_filepath = os.path.join(analyser_path, output_str, run_str, burst_file)
             data = np.loadtxt(burst_filepath)
 

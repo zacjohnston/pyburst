@@ -9,7 +9,7 @@ from math import ceil
 
 # kepler_grids
 from ..physics import gparams
-from ..grids.grid_tools import get_source_path
+from ..grids.grid_strings import get_source_path
 from . import mcmc_versions
 from . import mcmc_tools
 
