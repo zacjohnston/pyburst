@@ -24,27 +24,27 @@ def load(run, batch, source, basename='xrb', re_load=False, save=True,
     input_path = os.path.join(analysis_path, batch_str, 'input')
     try_mkdir(input_path, skip=True)
 
-    preloaded_file = f'{batch_str}_{run}.txt'
+    presaved_file = f'{batch_str}_{run}.txt'
     run_str = grid_strings.get_run_string(run, basename)
-    preloaded_filepath = os.path.join(input_path, preloaded_file)
+    presaved_filepath = os.path.join(input_path, presaved_file)
 
     # ===== Force reload =====
     if re_load:
         print('Force-reloading binary file: ')
         try:
-            print('Deleting old preload')
-            subprocess.run(['rm', preloaded_filepath])
+            print('Deleting old presaved file')
+            subprocess.run(['rm', presaved_filepath])
         except:
             pass
 
     # ===== Try loading pre-saved data =====
     try:
-        print('Looking for pre-loaded luminosity file: {path}'.format(path=preloaded_filepath))
-        lum = np.loadtxt(preloaded_filepath, skiprows=1)
-        print('Pre-loaded data found, loaded.')
+        print(f'Looking for pre-saved luminosity file: {presaved_filepath}')
+        lum = np.loadtxt(presaved_filepath, skiprows=1)
+        print('Pre-saved data found, loaded.')
 
     except FileNotFoundError:
-        print('No preload file found. Reloading binary')
+        print('No presaved file found. Reloading binary')
         pyprint.print_dashes()
         model_path = grid_strings.get_model_path(run, batch, source, basename)
         lc_filename = f'{run_str}.lc'
@@ -60,9 +60,9 @@ def load(run, batch, source, basename='xrb', re_load=False, save=True,
 
             pyprint.print_dashes()
             if save:
-                print(f'Saving data for faster loading in: {preloaded_filepath}')
+                print(f'Saving data for faster loading in: {presaved_filepath}')
                 header = 'time (s),             luminosity (erg/s)'
-                np.savetxt(preloaded_filepath, lum, header=header)
+                np.savetxt(presaved_filepath, lum, header=header)
         else:
             print(f'File not found: {lc_filepath}')
             lum = np.array([np.nan])
@@ -85,6 +85,7 @@ def batch_save(batch, source, runs=None, basename='xrb', re_load=True, **kwargs)
 def multi_batch_save(batches, source='gs1826', **kwargs):
     """Loads multiple batches of models and saves lightcurves
     """
+    # TODO: parallelise loading
     batches = grid_tools.expand_batches(batches, source)
     for batch in batches:
         batch_save(batch, source, **kwargs)
