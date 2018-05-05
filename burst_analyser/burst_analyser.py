@@ -122,6 +122,7 @@ class BurstRun(object):
     def identify_bursts(self):
         """Extracts times, separations, and mean separation of bursts
         """
+        # TODO: break into functions
         self.printv('Identifying burst times and peaks in KEPLER model')
 
         lum_thresh = 1e36  # min threshold luminosity for bursts
@@ -159,18 +160,19 @@ class BurstRun(object):
 
         if n_bursts > 1:
             dt = np.diff(burst_peaks[:, 0])
+            short_wait = (dt < min_dt)
+
+            if True in short_wait:
+                self.printv('Short waiting-time burst detected. Discarding.')
+                idx = np.where(short_wait)[0] + 1
+                burst_peaks = np.delete(burst_peaks, idx, axis=0)
+                burst_peak_idxs = np.delete(burst_peak_idxs, idx)
+                n_bursts -= len(idx)
         else:
             dt = [np.nan]
             if n_bursts == 0:
                 print('\nWARNING: No bursts in this model!\n')
 
-        short_wait = (dt < min_dt)
-        if True in short_wait:
-            self.printv('Short waiting-time burst detected. Discarding.')
-            idx = np.where(short_wait)[0] + 1
-            burst_peaks = np.delete(burst_peaks, idx, axis=0)
-            burst_peak_idxs = np.delete(burst_peak_idxs, idx)
-            n_bursts -= len(idx)
 
         # ====== get burst stages ======
         t_pre = burst_peaks[:, 0] - pre_time
@@ -203,8 +205,6 @@ class BurstRun(object):
 
             t_end[i] = self.lum[j, 0]
             t_end_idx[i] = j
-
-
 
         self.bursts['candidates'] = candidates
         self.bursts['t_pre'] = t_pre  # pre_time before burst peak (s)
@@ -368,23 +368,13 @@ def extract_burstfit_1808(batches, source, skip_bursts=1):
             data[b] = []
 
         n_runs = grid_tools.get_nruns(batch, source)
-
-        load_dir = f'{source}_{batch}_input/'
-        load_path = os.path.join(GRIDS_PATH, 'analyser', source, load_dir)
-
         for run in range(1, n_runs + 1):
             sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
-
             burstfit = BurstRun(run, batch, source)
-            # burstfit = burstfit_1808.BurstRun(run, flat_run=True, truncate=False,
-            #                                   runs_home=load_path, extra_b=0, pre_t=0,
-            #                                   verbose=False, load_analyser=True)
-            # burstfit.analyse_all()
-            # burstfit.ensure_observer_frame_is(False)
 
             data['batch'] += [batch]
             data['run'] += [run]
-            data['num'] += [burstfit.bursts['num']]
+            data['num'] += [burstfit.n_bursts]
 
             for bp in bprops:
                 u_bp = f'u_{bp}'
