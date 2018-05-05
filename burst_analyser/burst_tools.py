@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import subprocess
 import os
+import multiprocessing as mp
 
 # kepler
 import lcdata
@@ -83,13 +84,21 @@ def batch_save(batch, source, runs=None, basename='xrb', re_load=True, **kwargs)
         load(run, batch, source, basename=basename, re_load=re_load, **kwargs)
 
 
-def multi_batch_save(batches, source, **kwargs):
+def multi_batch_save(batches, source, multithread=True, **kwargs):
     """Loads multiple batches of models and saves lightcurves
     """
-    # TODO: parallelise loading
     batches = grid_tools.expand_batches(batches, source)
-    for batch in batches:
-        batch_save(batch, source, **kwargs)
+
+    if multithread:
+        args = []
+        for batch in batches:
+            args.append((batch, source))
+
+        with mp.Pool(processes=8) as pool:
+            pool.starmap(batch_save, args)
+    else:
+        for batch in batches:
+            batch_save(batch, source, **kwargs)
 
 
 def combine_extracts(batches, source):
