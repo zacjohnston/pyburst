@@ -269,6 +269,7 @@ version_definitions = {
                  27: 8,
                  28: 8,
                  29: 8,
+                 30: 9,
                  },
             'sim_test':
                 {1: 5,
@@ -322,6 +323,7 @@ version_definitions = {
                     27: prior_versions[15],
                     28: prior_versions[15],
                     29: prior_versions[15],
+                    30: prior_versions[15],
                 },
             'sim_test':
                 {
@@ -419,6 +421,7 @@ class McmcVersion:
                 + f'\ninterpolator: {self.interpolator}'
                 + f'\nprior bounds: \n{self.prior_bounds}'
                 )
+
 
 # ===== Convenience functions =====
 def get_disc_model(source, version):
