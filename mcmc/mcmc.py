@@ -20,13 +20,13 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
 def setup_sampler(source, version, pos=None, n_walkers=None, n_threads=1,
-                    **kwargs):
+                  **kwargs):
     """Initialises and returns EnsembleSampler object
 
     NOTE: Only uses pos to get n_walkers and n_dimensions
     """
-    if type(pos) == type(None):
-        if type(n_walkers) == type(None):
+    if type(pos) is type(None):
+        if type(n_walkers) is type(None):
             print('ERROR: must provide either pos or n_walkers')
         pos = setup_positions(source=source, version=version, n_walkers=n_walkers)
 
@@ -34,10 +34,10 @@ def setup_sampler(source, version, pos=None, n_walkers=None, n_threads=1,
     n_dimensions = len(pos[0])
 
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
-                                **kwargs)
+                             **kwargs)
 
     sampler = emcee.EnsembleSampler(n_walkers, n_dimensions, bfit.lhood,
-                                        threads=n_threads)
+                                    threads=n_threads)
     return sampler
 
 
@@ -66,17 +66,17 @@ def run_sampler(sampler, pos, n_steps, verbose=True):
 
     for i, result in enumerate(sampler.sample(pos, iterations=n_steps)):
         if verbose:
-            progress = (float(i+1) / n_steps) * 100
+            progress = (float(i + 1) / n_steps) * 100
             sys.stdout.write(f"\r{progress:.1f}%")
     sys.stdout.write("\n")
 
     t1 = time.time()
-    dtime = t1-t0
-    time_per_step = dtime/n_steps
+    dtime = t1 - t0
+    time_per_step = dtime / n_steps
 
     n_walkers = pos.shape[0]
     n_samples = n_walkers * n_steps
-    time_per_sample = dtime/n_samples
+    time_per_sample = dtime / n_samples
 
     if verbose:
         print(f'Compute time: {dtime:.1f} s')
@@ -86,31 +86,31 @@ def run_sampler(sampler, pos, n_steps, verbose=True):
 
 
 def get_acceptance_fraction(source=None, version=None, n_walkers=None,
-                                n_steps=None, sampler=None):
+                            n_steps=None, sampler=None):
     """Returns acceptance fraction averaged over all walkers for all steps
 
     Must provide either:
         1. a sampler object (as returned from load_sampler_state)
         2. source, version, n_walkers, and n_steps
     """
-    if sampler == None:
+    if sampler is None:
         if None in (source, version, n_walkers, n_steps):
             raise ValueError('Must provide source, version, n_steps, '
-                        + 'and n_walkers (or directly provide sampler object)')
+                             + 'and n_walkers (or directly provide sampler object)')
         sampler = load_sampler_state(source=source, version=version,
-                                        n_steps=n_steps, n_walkers=n_walkers)
+                                     n_steps=n_steps, n_walkers=n_walkers)
     else:
         n_steps = sampler['iterations']
 
-    return np.average(sampler['naccepted']/n_steps)
+    return np.average(sampler['naccepted'] / n_steps)
 
 
 def get_max_lhood(source, version, n_walkers, n_steps,
-                    verbose=True, plot=True):
+                  verbose=True, plot=True):
     """Returns the point with the highest likelihood
     """
     sampler_state = load_sampler_state(source=source, version=version,
-                                        n_steps=n_steps, n_walkers=n_walkers)
+                                       n_steps=n_steps, n_walkers=n_walkers)
 
     chain = sampler_state['_chain']
     lnprob = sampler_state['_lnprob']
@@ -119,7 +119,7 @@ def get_max_lhood(source, version, n_walkers, n_steps,
     max_lhood = lnprob.flatten()[max_idx]
 
     n_dimensions = chain.shape[2]
-    flat_chain = chain.reshape((-1,n_dimensions))
+    flat_chain = chain.reshape((-1, n_dimensions))
     max_params = flat_chain[max_idx]
 
     if plot:
@@ -128,7 +128,7 @@ def get_max_lhood(source, version, n_walkers, n_steps,
 
     if verbose:
         print(f'max_lhood = {max_lhood:.2f}')
-        print('-'*30)
+        print('-' * 30)
         print('Best params:')
         print_params(max_params, source=source, version=version)
 
@@ -145,9 +145,9 @@ def optimise(source, version, params0):
         Initial guess of parameters
     """
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
-                                lhood_factor=-1)
+                             lhood_factor=-1)
     bnds = ((0.09, 0.23), (0.61, 0.79), (0.00251, 0.0174), (0.0251, 0.124),
-                (0.81/1.4, 3.19/1.4), (1.01, 2.), (0.1, None), (0.1, 89.9))
+            (0.81 / 1.4, 3.19 / 1.4), (1.01, 2.), (0.1, None), (0.1, 89.9))
 
     return minimize(bfit.lhood, x0=params0, bounds=bnds)
 
@@ -156,8 +156,8 @@ def save_sampler_state(sampler, source, version, n_steps, n_walkers):
     """Saves sampler state as dict
     """
     sampler_state = get_sampler_state(sampler=sampler)
-    chain_id = mcmctools.get_mcmc_string(source=source, version=version,
-                                n_steps=n_steps, n_walkers=n_walkers)
+    chain_id = mcmc_tools.get_mcmc_string(source=source, version=version,
+                                          n_steps=n_steps, n_walkers=n_walkers)
 
     mcmc_path = get_mcmc_path(source)
     filename = f'sampler_{chain_id}.p'
@@ -170,13 +170,13 @@ def save_sampler_state(sampler, source, version, n_steps, n_walkers):
 def load_sampler_state(source, version, n_steps, n_walkers):
     """Loads sampler state from file
     """
-    chain_id = mcmctools.get_mcmc_string(source=source, version=version,
-                                n_steps=n_steps, n_walkers=n_walkers)
+    chain_id = mcmc_tools.get_mcmc_string(source=source, version=version,
+                                          n_steps=n_steps, n_walkers=n_walkers)
 
     filename = f'sampler_{chain_id}.p'
     mcmc_path = get_mcmc_path(source)
     filepath = os.path.join(mcmc_path, filename)
-    sampler_state = pickle.load( open(filepath, 'rb') )
+    sampler_state = pickle.load(open(filepath, 'rb'))
 
     return sampler_state
 
@@ -190,7 +190,7 @@ def get_sampler_state(sampler):
 
 
 def get_mcmc_path(source):
-    return  os.path.join(GRIDS_PATH, 'sources', source, 'mcmc')
+    return os.path.join(GRIDS_PATH, 'sources', source, 'mcmc')
 
 
 def print_params(params, source, version):
@@ -234,7 +234,7 @@ def save_all_plots(source, versions, n_steps, n_walkers,
         pkeys = mcmc_versions.get_param_keys(source=source, version=version)
 
         chain = mcmc_tools.load_chain(source, version=version, n_steps=n_steps,
-                                        n_walkers=n_walkers)
+                                      n_walkers=n_walkers)
 
         mcmc_plotting.plot_posteriors(chain, source=source, version=version,
                                       discard=discard, cap=cap, save=True, display=display)
@@ -243,4 +243,4 @@ def save_all_plots(source, versions, n_steps, n_walkers,
                                        discard=discard, cap=cap, save=True, display=display)
 
         mcmc_plotting.plot_walkers(chain, source=source, version=version,
-                                params=pkeys[:5], save=True, display=display)
+                                   params=pkeys[:5], save=True, display=display)

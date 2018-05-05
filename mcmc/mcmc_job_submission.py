@@ -4,7 +4,7 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
 def write_submission_script(source, version, n_walkers, n_steps, dump_step,
-                                walltime=20, n_threads=8, cluster='icer'):
+                            walltime=20, n_threads=8, cluster='icer'):
     """Writes a script for submitting a job on a cluster
 
     Parameter:
@@ -14,19 +14,19 @@ def write_submission_script(source, version, n_walkers, n_steps, dump_step,
     walltime: int
         job time limit (hr)
     """
-    extensions = {'monarch':'.sh', 'icer':'.qsub'}
+    extensions = {'monarch': '.sh', 'icer': '.qsub'}
 
     job_str = get_jobstring(source=source, version=version, n_walkers=n_walkers,
-                                n_threads=n_threads, n_steps=n_steps)
+                            n_threads=n_threads, n_steps=n_steps)
     time_str = f'{walltime:02}:00:00'
 
     print(f'Writing submission script for cluster: {cluster}')
     ext = extensions[cluster]
     script_str = get_submission_str(source=source, version=version,
-                            n_walkers=n_walkers, n_threads=n_threads,
-                            n_steps=n_steps, time_str=time_str,
-                            job_str=job_str, cluster=cluster,
-                            dump_step=dump_step)
+                                    n_walkers=n_walkers, n_threads=n_threads,
+                                    n_steps=n_steps, time_str=time_str,
+                                    job_str=job_str, cluster=cluster,
+                                    dump_step=dump_step)
 
     # prepend_str = {True:'restart_', False:''}[restart]
     path = os.path.join(GRIDS_PATH, 'sources', source, 'logs')
@@ -37,13 +37,13 @@ def write_submission_script(source, version, n_walkers, n_steps, dump_step,
         f.write(script_str)
 
 
-def get_jobstring(source, version , n_walkers, n_steps, n_threads):
+def get_jobstring(source, version, n_walkers, n_steps, n_threads):
     return f'{source}_V{version}_T{n_threads}_W{n_walkers}_S{n_steps}'
 
 
 def get_submission_str(source, version, n_walkers, n_threads, n_steps,
-                        cluster, time_str, job_str, dump_step,
-                        disksize=8000, memory=16000,):
+                       cluster, time_str, job_str, dump_step,
+                       disksize=8000, memory=16000, ):
     """Returns a script string for submitting a job on a cluster
 
     Parameter:
