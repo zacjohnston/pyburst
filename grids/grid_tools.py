@@ -445,5 +445,5 @@ def try_mkdir(path, skip=False):
             elif cont == 'n' or cont == 'N':
                 sys.exit()
     else:
-        subprocess.run(['mkdir', path], check=True)
+        subprocess.run(['mkdir', '-p', path], check=True)
 
