@@ -235,6 +235,8 @@ class BurstRun(object):
 
         self.bursts['fluence'] = fluences  # Burst fluence (ergs)
 
+    # def identify_outliers(self):
+
     def save_bursts(self, path=None):
         """Saves burst lightcurves to txt files. Excludes 'pre' bursts
         """
@@ -287,6 +289,49 @@ class BurstRun(object):
             filepath = os.path.join(self.source_path, 'plots', 'burst_analysis', filename)
             fig.savefig(filepath)
         return fig
+
+    def plot_lightcurve(self, burst, save=False, display=True, log=False,
+                        zero_time=True):
+        """Plot individual burst lightcurve
+        """
+        if burst > self.n_bursts - 1\
+                or burst < 0:
+            raise ValueError(f'Burst index ({burst}) out of bounds '
+                             f'(n_bursts={self.n_bursts})')
+
+        fig, ax = plt.subplots()
+        ax.set_title(f'Burst {burst}')
+        ax.set_ylabel('Lum (erg/s)')
+        ax.set_xlabel('Time (s)')
+
+        if log:
+            ax.set_yscale('log')
+            ax.set_ylim([1e34, 1e39])
+
+        i_start = self.bursts['tpre_idx'][burst]
+        i_end = self.bursts['tend_idx'][burst]
+        x = self.lum[i_start:i_end, 0]
+        y = self.lum[i_start:i_end, 1]
+
+        if zero_time:
+            x -= self.bursts['tstart'][burst]
+        ax.plot(x, y, c='C0')
+
+        if display:
+            plt.show(block=False)
+        if save:
+            filename = f'burst_{self.model_str}_{burst:02}.png'
+            plot_dir = os.path.join(self.plots_path, 'lightcurves', self.batch_str)
+            filepath = os.path.join(plot_dir, filename)
+
+            grid_tools.try_mkdir(plot_dir, skip=True)
+            fig.savefig(filepath)
+        return fig
+
+    def save_all_lightcurves(self, **kwargs):
+        for burst in range(self.n_bursts):
+            fig = self.plot_lightcurve(burst, save=True, display=False, **kwargs)
+            plt.close(fig)
 
 
 def multithread_extract(batches, source):
