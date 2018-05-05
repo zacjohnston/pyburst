@@ -167,12 +167,12 @@ class BurstRun(object):
                 idx = np.where(short_wait)[0] + 1
                 burst_peaks = np.delete(burst_peaks, idx, axis=0)
                 burst_peak_idxs = np.delete(burst_peak_idxs, idx)
+                dt = np.delete(dt, idx-1)
                 n_bursts -= len(idx)
         else:
             dt = [np.nan]
             if n_bursts == 0:
                 print('\nWARNING: No bursts in this model!\n')
-
 
         # ====== get burst stages ======
         t_pre = burst_peaks[:, 0] - pre_time
