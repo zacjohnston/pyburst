@@ -46,7 +46,7 @@ class Kgrid:
     def __init__(self, source, basename='xrb', con_ver=6,
                  load_lc=False, verbose=True,
                  powerfits=True, exclude_test_batches=True,
-                 load_concord_summ=True, **kwargs):
+                 load_concord_summ=True, burst_analyser=False, **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
         basename =  str  : basename of individual models (e.g. xrb)
@@ -67,7 +67,7 @@ class Kgrid:
         self.params = grid_tools.load_grid_table(tablename='params',
                                                  source=source, verbose=verbose)
         self.summ = grid_tools.load_grid_table(tablename='summ', source=source,
-                                               verbose=verbose)
+                                               verbose=verbose, burst_analyser=burst_analyser)
 
         # ===== extract the unique parameters =====
         self.unique_params = {}

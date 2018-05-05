@@ -6,7 +6,7 @@ import time
 import pickle
 
 # kepler_grids
-from ..grids import grid_tools
+from ..grids import grid_tools, grid_strings
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -25,6 +25,7 @@ params_exclude = {'gs1826': {'qb': [0.5, 0.7, 0.9],
                   'biggrid2': {'qb': [.075],
                                'x': [0.5],
                                'accrate': np.arange(5, 24, 2)/100,
+                               'z': [0.001],
                                },
                   }
 
@@ -44,15 +45,17 @@ class Kemulator:
     ========================================================"""
 
     def __init__(self, source, version, verbose=True, exclude_tests=True,
-                 recalculate_interpolators=False,
+                 recalculate_interpolators=False, burst_analyser=False,
                  bprops=('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak')):
         self.verbose = verbose
-        source = grid_tools.source_shorthand(source)
+        source = grid_strings.source_shorthand(source)
         self.source = source
         self.bprops = bprops
         self.version = version
+        self.burst_analyser = burst_analyser
+        self.interpolator = None
 
-        summ = grid_tools.load_grid_table('summ', source=source)
+        summ = grid_tools.load_grid_table('summ', source=source, burst_analyser=burst_analyser)
         params = grid_tools.load_grid_table('params', source=source)
 
         if exclude_tests:
@@ -135,8 +138,12 @@ class Kemulator:
         t0 = time.time()
         self.printv(f'Creating interpolator:')
         for i, bp in enumerate(bprops):
-            key_old = key_map[bp]
-            values[:, i] = self.summ[key_old]
+            if not self.burst_analyser:
+                key = key_map[bp]
+            else:
+                key = bp
+
+            values[:, i] = self.summ[key]
         self.interpolator = LinearNDInterpolator(points, values)
         # self.interpolator = RegularGridInterpolator(points, values)
         t1 = time.time()

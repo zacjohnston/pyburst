@@ -359,7 +359,7 @@ def extract_burstfit_1808(batches, source, skip_bursts=1):
         analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
         grid_tools.try_mkdir(analysis_path, skip=True)
 
-        filename = f'summary_{batch_str}.txt'
+        filename = f'burst_analysis_{batch_str}.txt'
         filepath = os.path.join(analysis_path, filename)
 
         data = {}

@@ -119,7 +119,7 @@ def combine_extracts(batches, source):
 
     table_str = big_table.to_string(index=False, justify='left', col_space=12)
 
-    filename = f'summary_{batches[0]}-{batches[-1]}.txt'
+    filename = f'burst_analysis_{source}.txt'
     filepath = os.path.join(source_path, 'burst_analysis', filename)
 
     with open(filepath, 'w') as f:

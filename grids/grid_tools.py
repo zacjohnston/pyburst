@@ -27,15 +27,13 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
 def load_grid_table(tablename, source, con_ver=None,
-                    verbose=True, **kwargs):
+                    verbose=True, burst_analyser=False):
     """Returns file of model parameters as pandas DataFrame
     
     tablename  = str   : table name (e.g. 'params', 'summ')
     source     = str   : name of source object
     """
-    source = grid_strings.source_shorthand(source=source)
-    path = kwargs.get('path', GRIDS_PATH)
-    param_path = os.path.join(path, 'sources', source, tablename)
+    source = grid_strings.source_shorthand(source)
 
     if tablename == 'concord_summ':
         if con_ver is None:
@@ -45,8 +43,14 @@ def load_grid_table(tablename, source, con_ver=None,
     else:
         cv = ''
 
-    filename = f'{tablename}_{source}{cv}.txt'
-    filepath = os.path.join(param_path, filename)
+    if burst_analyser and tablename == 'summ':
+        param_path = grid_strings.get_source_subdir(source, 'burst_analysis')
+        filename = f'burst_analysis_{source}{cv}.txt'
+        filepath = os.path.join(param_path, filename)
+    else:
+        param_path = grid_strings.get_source_subdir(source, tablename)
+        filename = f'{tablename}_{source}{cv}.txt'
+        filepath = os.path.join(param_path, filename)
 
     printv(f'Loading {tablename} table: {filepath}', verbose)
     params = pd.read_table(filepath, delim_whitespace=True)
