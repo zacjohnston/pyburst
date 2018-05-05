@@ -81,17 +81,17 @@ class BurstRun(object):
     def remove_zeros(self):
         """During shocks, kepler can also give zero luminosity (for some reason...)
         """
-        replace_with = 1e34
+        replace_with = 1e35
         zeros = np.where(self.lum[:, 1] == 0.0)
         n_zeros = len(zeros)
         self.printv(f'Removed {n_zeros} zeros from luminosity')
         self.lum[zeros, 1] = replace_with
 
-    def remove_shocks(self, maxima_idx):
+    def remove_shocks(self, maxima):
         """Cut out convective shocks (extreme spikes in luminosity).
         Identifies spikes, and replaces them with interpolation from neighbours.
-        maxima_idx : []
-            list of indices of local maxima to check
+        maxima : nparray(n,2)
+            local maxima to check (t, lum)
         """
         radius = 5  # radius of neighbour zones to compare against
         tolerance = 5e2  # maxima should not be more than this factor larger than neighbours
@@ -99,25 +99,29 @@ class BurstRun(object):
 
         # ----- Discard if maxima more than [tolerance] larger than mean of neighbours -----
         shocks = False
-        for i in maxima_idx:
-            left = self.lum[i - radius:i, 1]  # left neighbours
-            right = self.lum[i + 1:i + radius + 1, 1]  # right neighbours
+        for max_i in maxima:
+            t, lum = max_i
+            idx = np.searchsorted(self.lum[:, 0], t)
+
+            left = self.lum[idx-radius: idx, 1]  # left neighbours
+            right = self.lum[idx+1: idx+radius+1, 1]  # right neighbours
             mean = np.mean(np.concatenate([left, right]))
 
-            l = self.lum[i, 1]
-            if l > tolerance * mean:
+            if lum > tolerance*mean:
                 if self.verbose:
                     if not shocks:
                         print('SHOCKS DETECTED AND REMOVED: Consider verifying')
                         print('    Time(hr)    Lum(erg)   Factor')
                         shocks = True
 
-                    time = self.lum[i, 0] / 3600
-                    factor = l / mean
-                    self.printv(f'    {time:.2f}      {l:.2e}   {factor:.2f}')
+                    time = self.lum[idx, 0] / 3600
+                    factor = lum / mean
+                    print(f'    {time:.2f}      {lum:.2e}   {factor:.2f}')
 
                 # --- replace with mean of two neighbours ---
-                self.lum[i, 1] = 0.5 * (left[-1] + right[0])
+                new_lum = 0.5 * (left[-1] + right[0])
+                self.lum[idx, 1] = new_lum
+                max_i[1] = new_lum
 
     def identify_bursts(self):
         """Extracts times, separations, and mean separation of bursts
@@ -139,7 +143,7 @@ class BurstRun(object):
 
         maxima_idxs = argrelextrema(lum_cut[:, 1], np.greater)[0]
         candidates = lum_cut[maxima_idxs]
-        # self.remove_shocks(candidates.astype('int'))
+        self.remove_shocks(candidates)
 
         # ===== burst peak if largest maxima within t_radius (s) =====
         burst_peaks = []
@@ -402,18 +406,15 @@ def check_n_bursts(batches, source, kgrid):
     for batch in batches:
         summ = kgrid.get_summ(batch)
         n_runs = len(summ)
-        load_dir = f'{source}_{batch}_input/'
-        load_path = os.path.join(GRIDS_PATH, 'analyser', source, load_dir)
 
         for i in range(n_runs):
             run = i + 1
             n_bursts1 = summ.iloc[i]['num']
             sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
 
-            burstfit = BurstRun(run, batch, source,
-                                verbose=False, load_analyser=True)
-            burstfit.analyse_all()
-            n_bursts2 = burstfit.bursts['num']
+            burstfit = BurstRun(run, batch, source, verbose=False)
+            burstfit.analyse()
+            n_bursts2 = burstfit.n_bursts
 
             if n_bursts1 != n_bursts2:
                 m_new = np.array((batch, run, n_bursts1, n_bursts2))
