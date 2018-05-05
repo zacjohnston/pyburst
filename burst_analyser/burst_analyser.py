@@ -32,6 +32,7 @@ class BurstRun(object):
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
         self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
         self.source_path = grid_strings.get_source_path(source)
+        self.plots_path = grid_strings.get_source_subdir(source, 'plots')
 
         self.loaded = False
         self.lum = None
@@ -40,6 +41,9 @@ class BurstRun(object):
 
         self.analysed = False
         self.bursts = {}
+        self.n_bursts = None
+        self.outliers = np.array(())
+        self.secondary_bursts = np.array(())
 
         if analyse:
             self.analyse()
@@ -53,9 +57,6 @@ class BurstRun(object):
         """
         self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
                                     basename=self.basename, save=savelum, re_load=re_load)
-        # if len(self.lum) == 1:
-        #     sys.exit()
-
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
         self.loaded = True
 
@@ -88,10 +89,9 @@ class BurstRun(object):
     def remove_shocks(self, maxima_idx):
         """Cut out convective shocks (extreme spikes in luminosity).
         Identifies spikes, and replaces them with interpolation from neighbours.
+        maxima_idx : []
+            list of indices of local maxima to check
         """
-        # ---------------------------
-        # maxima_idx = []   : list of indices of local maxima to check
-        # ---------------------------
         radius = 5  # radius of neighbour zones to compare against
         tolerance = 5e2  # maxima should not be more than this factor larger than neighbours
         self.remove_zeros()
@@ -128,7 +128,7 @@ class BurstRun(object):
 
         cnum = 0  # candidate counter
         tol = 1  # No. of neighbour zones to consider for maxima
-        maxl = 1e38  # Chosen typical max peak
+        maxl = 1e38  # typical max peak
         lum_thresh = 0.02  # cut-off luminosity for finding bursts, as fraction of maxl
         t_radius = 30  # minimum time (s) that each burst should be separated by
         pre_time = 30  # time (s) before burst peak to start integrating fluence from
@@ -142,8 +142,9 @@ class BurstRun(object):
 
         # ===== pick local maxima (larger than +/- tol neighbours) =====
         for i in b_idx[:-1]:
-            l = self.lum[i, 1]
-            if l > self.lum[i - tol, 1] and l > self.lum[i + tol, 1]:
+            lum_i = self.lum[i, 1]
+            if lum_i > self.lum[i-tol, 1] \
+                    and lum_i > self.lum[i+tol, 1]:
                 candidates[cnum] = i
                 cnum += 1
 
@@ -154,8 +155,8 @@ class BurstRun(object):
         bnum = 0
         for j, i in enumerate(candidates):
             t = self.lum[int(i), 0]
-            t0 = np.searchsorted(self.lum[:, 0], t - t_radius)
-            t1 = np.searchsorted(self.lum[:, 0], t + t_radius)
+            t0 = np.searchsorted(self.lum[:, 0], t-t_radius)
+            t1 = np.searchsorted(self.lum[:, 0], t+t_radius)
             lum_can = self.lum[int(i), 1]
 
             if lum_can == np.max(self.lum[t0:t1, 1]):
@@ -185,7 +186,7 @@ class BurstRun(object):
             t_start_idx[i] = j
 
             # End must be min_length seconds after peak (avoid spikes)
-            while self.lum[j, 1] > end_frac * peak \
+            while self.lum[j, 1] > end_frac*peak \
                     or (self.lum[j, 0] - t_start[i]) < min_length:
                 if j + 1 == n:
                     if self.verbose:
@@ -215,6 +216,7 @@ class BurstRun(object):
 
         self.bursts['peak'] = self.lum[candidates, 1]  # Peak luminosities (erg/s)
         self.bursts['num'] = len(btimes)  # Number of bursts
+        self.n_bursts = len(btimes)
         self.bursts['dt'] = dt  # Recurrence times (s)
 
         if self.bursts['num'] == 0:
@@ -330,13 +332,12 @@ def extract_burstfit_1808(batches, source, skip_bursts=1):
         for run in range(1, n_runs + 1):
             sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
 
-            # burstfit = BurstRun(run, batch, source,
-            #                     verbose=False, load_analyser=True)
-            burstfit = burstfit_1808.BurstRun(run, flat_run=True, truncate=False,
-                                              runs_home=load_path, extra_b=0, pre_t=0,
-                                              verbose=False, load_analyser=True)
-            burstfit.analyse_all()
-            burstfit.ensure_observer_frame_is(False)
+            burstfit = BurstRun(run, batch, source)
+            # burstfit = burstfit_1808.BurstRun(run, flat_run=True, truncate=False,
+            #                                   runs_home=load_path, extra_b=0, pre_t=0,
+            #                                   verbose=False, load_analyser=True)
+            # burstfit.analyse_all()
+            # burstfit.ensure_observer_frame_is(False)
 
             data['batch'] += [batch]
             data['run'] += [run]
@@ -438,4 +439,5 @@ def save_batch_plots(batch, source, **kwargs):
     runs = grid_tools.expand_runs(runs)
     for run in runs:
         model = BurstRun(run, batch, source, analyse=True)
-        model.plot_model(display=False, save=True, **kwargs)
+        fig = model.plot_model(display=False, save=True, **kwargs)
+        plt.close(fig)
