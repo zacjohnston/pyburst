@@ -46,7 +46,7 @@ def load_grid_table(tablename, source, con_ver=None,
 
     if burst_analyser and tablename == 'summ':
         param_path = grid_strings.get_source_subdir(source, 'burst_analysis')
-        filename = f'burst_analysis_{source}{cv}.txt'
+        filename = f'burst_analysis_{source}.txt'
         filepath = os.path.join(param_path, filename)
     else:
         param_path = grid_strings.get_source_subdir(source, tablename)
