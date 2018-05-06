@@ -79,7 +79,7 @@ def print_list(list_in, delim='  ', fmt='f', decimal=5):
 
 
 def print_labelled_list(var, title='str', decimal=5, fmt='f'):
-    dashes()
+    print_dashes()
     print(title)
     print_list(var, decimal=decimal, fmt=fmt)
 
