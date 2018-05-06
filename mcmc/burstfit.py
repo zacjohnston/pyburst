@@ -11,7 +11,7 @@ from matplotlib.ticker import NullFormatter
 from ..interpolator import kepler_emulator
 from .mcmc_versions import McmcVersion
 from pygrids.misc import pyprint
-from .mcmc_tools import print_params
+from pygrids.mcmc.mcmc_tools import print_params
 
 # concord
 import ctools
