@@ -286,6 +286,9 @@ version_definitions = {
                  29: 8,
                  30: 9,
                  31: 9,
+                 32: 10,
+                 33: 11,
+                 34: 12,
                  },
             'sim_test':
                 {1: 5,
@@ -341,6 +344,9 @@ version_definitions = {
                     29: prior_versions[15],
                     30: prior_versions[15],
                     31: prior_versions[17],
+                    32: prior_versions[15],
+                    33: prior_versions[15],
+                    34: prior_versions[15],
                 },
             'sim_test':
                 {

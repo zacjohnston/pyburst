@@ -24,8 +24,11 @@ params_exclude = {'gs1826': {'qb': [0.5, 0.7, 0.9],
                   'biggrid1': {},
                   'biggrid2': {'qb': [.075],
                                'x': [0.5],
-                               'accrate': np.arange(5, 24, 2)/100,
-                               'z': [0.001],
+                               # 'accrate': np.arange(5, 24, 2)/100,
+                               'accrate': np.append(np.arange(5, 9)/100,
+                                                    np.arange(9, 24, 2)/100),
+                               'z': [0.001, 0.0015],
+                               'mass': [1.4, 2.6]
                                },
                   }
 
