@@ -130,7 +130,7 @@ def get_max_lhood(source, version, n_walkers, n_steps,
         print(f'max_lhood = {max_lhood:.2f}')
         print('-' * 30)
         print('Best params:')
-        print_params(max_params, source=source, version=version)
+        mcmc_tools.print_params(max_params, source=source, version=version)
 
     return max_params
 
@@ -191,14 +191,6 @@ def get_sampler_state(sampler):
 
 def get_mcmc_path(source):
     return os.path.join(GRIDS_PATH, 'sources', source, 'mcmc')
-
-
-def print_params(params, source, version):
-    """Pretty print parameters
-    """
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
-    for i, p in enumerate(params):
-        print(f'{pkeys[i]:8}    {p:.3f}')
 
 
 def convert_params(params, source, version):

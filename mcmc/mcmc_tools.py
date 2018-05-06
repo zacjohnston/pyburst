@@ -3,6 +3,7 @@ import os
 
 # kepler_grids
 from pygrids.misc import pyprint
+from . import mcmc_versions
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
@@ -63,3 +64,11 @@ def get_mcmc_string(source, version, n_walkers=None, n_steps=None,
 
     return (f'{prefix_str}{source}_V{version}{walker_str}'
             + f'{thread_str}{step_str}{label_str}{extension}')
+
+
+def print_params(params, source, version):
+    """Pretty print parameters
+    """
+    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    for i, p in enumerate(params):
+        print(f'{pkeys[i]:8}    {p:.3f}')

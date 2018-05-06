@@ -11,6 +11,7 @@ from matplotlib.ticker import NullFormatter
 from ..interpolator import kepler_emulator
 from .mcmc_versions import McmcVersion
 from pygrids.misc import pyprint
+from .mcmc_tools import print_params
 
 # concord
 import ctools
@@ -138,7 +139,7 @@ class BurstFit:
         """
         self.debug.start_function('lhood')
         if self.debug.debug:
-            pyprint.print_params(params, source=self.source, version=self.version)
+            print_params(params, source=self.source, version=self.version)
 
         self._mdots = params[self.param_idxs['mdot1']: self.n_epochs]
         self.debug.variable('mdots', self._mdots, '')
