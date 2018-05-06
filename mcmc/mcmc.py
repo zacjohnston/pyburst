@@ -46,6 +46,8 @@ def setup_positions(source, version, n_walkers, params0=None, mag=1e-3):
 
     Parameters
     ----------
+    source : str
+    version : int
     n_walkers: int, number of mcmc walkers to use
     params0: array, initial guess (mdot1, x, z, qb, g, redshift, d, inc)
     mag: flt, magnitude of random seeds to use for initial mcmc 'ball'
@@ -209,6 +211,8 @@ def convert_params(params, source, version):
         params_out = {}
         for i, key in enumerate(pkeys):
             params_out[key] = params[i]
+    else:
+        raise TypeError('type(params) must be dict or array-like')
 
     return params_out
 
