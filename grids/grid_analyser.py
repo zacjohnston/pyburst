@@ -1,8 +1,6 @@
 # ========================
-# Utilities for grids* of kepler models
-#   *(eg. a group of models that vary one or more parameters)
-# Author: Zac Johnston
-# zac.johnston@monash.edu
+# Utilities for grids of kepler models
+# Author: Zac Johnston (zac.johnston@monash.edu)
 # ========================
 
 # standard

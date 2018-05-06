@@ -198,11 +198,11 @@ def collect_output(runs, batches, source, basename='xrb',
     basename    = str        : basename of kepler models
     path        = str        : path to location of all collected batches
     ======================================================================="""
-    source = grid_strings.source_shorthand(source=source)
     print_title('Collecting mean lightcurve and summ.csv files')
-
+    source = grid_strings.source_shorthand(source=source)
     batches = grid_tools.expand_batches(batches, source)
     runs = grid_tools.expand_runs(runs)
+
     path = kwargs.get('path', GRIDS_PATH)
     analyser_path = os.path.join(path, 'analyser', source)
 

@@ -285,7 +285,7 @@ class BurstRun(object):
                 t = self.bursts[stage]
                 y = self.lumf(t)
                 label = {'t_pre': 'stages'}.get(stage, None)
-                
+
                 ax.plot(t, y, marker='o', c='C2', ls='none', label=label)
 
         if candidates:

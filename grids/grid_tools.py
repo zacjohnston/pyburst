@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-import sys, os
+import sys
+import os
 import itertools
 import subprocess
 from astropy.io import ascii
