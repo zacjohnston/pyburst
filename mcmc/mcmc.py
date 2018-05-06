@@ -25,8 +25,8 @@ def setup_sampler(source, version, pos=None, n_walkers=None, n_threads=1,
 
     NOTE: Only uses pos to get n_walkers and n_dimensions
     """
-    if type(pos) is type(None):
-        if type(n_walkers) is type(None):
+    if pos is None:
+        if n_walkers is None:
             print('ERROR: must provide either pos or n_walkers')
         pos = setup_positions(source=source, version=version, n_walkers=n_walkers)
 
