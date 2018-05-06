@@ -36,6 +36,7 @@ class BurstFit:
     def __init__(self, source, version,
                  bprops=('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
                  verbose=True, lhood_factor=1, debug=False, **kwargs):
+
         self.source = source
         self.version = version
         self.verbose = verbose
@@ -43,6 +44,7 @@ class BurstFit:
         self.mcmc_version = McmcVersion(source=source, version=version)
         self.param_idxs = {}
         self.get_param_indexes()
+        self.has_inc = 'inc' in self.mcmc_version.param_keys
 
         if self.source == 'sim_test':
             source = 'biggrid2'  # from here on effectively treat as biggrid2
@@ -169,7 +171,7 @@ class BurstFit:
 
         for i, bprop in enumerate(['dt', 'fluence', 'peak']):
             u_bprop = f'u_{bprop}'
-            bprop_col = 2 * i
+            bprop_col = 2*i
             u_bprop_col = bprop_col + 1
 
             # ===== shift values to observer frame and units =====
@@ -211,15 +213,20 @@ class BurstFit:
 
         redshift = params[self.param_idxs['redshift']]
         d = params[self.param_idxs['d']]
-        inc = params[self.param_idxs['inc']]
 
         if bprop in ('dt', 'u_dt'):
             shifted = values * redshift / 3600
         else:
+            if self.has_inc:
+                inc = params[self.param_idxs['inc']]
+                xi_b, xi_p = anisotropy.anisotropy(inclination=inc*u.deg,
+                                                   model=self.mcmc_version.disc_model)
+            else:
+                xi_b = params[self.param_idxs['xi_b']]
+                xi_p = params[self.param_idxs['xi_p']]
+
             d *= u.kpc.to(u.cm)
-            area = (4 * np.pi * d ** 2)
-            xi_b, xi_p = anisotropy.anisotropy(inclination=inc * u.deg,
-                                               model=self.mcmc_version.disc_model)
+            area = 4*np.pi * d**2
 
             if bprop in ('fluence', 'u_fluence'):  # (erg) --> (erg / cm^2)
                 shifted = values / (xi_b * area)
@@ -286,17 +293,20 @@ class BurstFit:
 
         mdot_ratios = self._mdots / self._mdots[0]
         z = params[self.param_idxs['z']]
-        inc = params[self.param_idxs['inc']]
 
         mdot_prior = 0
         for i in range(1, self.n_epochs):
             mdot_prior += np.log(self.mdot_ratio_priors[i](mdot_ratios[i]))
 
         z_sun = 0.015
-        prior_lhood = (np.log(np.sin(inc * u.deg)).value
-                       + np.log(self.z_prior(np.log10(z / z_sun)))
+        prior_lhood = (np.log(self.z_prior(np.log10(z / z_sun)))
                        + mdot_prior
                        )
+
+        if self.has_inc:
+            inc = params[self.param_idxs['inc']]
+            prior_lhood += np.log(np.sin(inc * u.deg)).value
+
         self.debug.variable('prior_lhood', prior_lhood, 'f')
         self.debug.end_function()
         return prior_lhood
