@@ -266,24 +266,35 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_model(self, bursts=True, display=True, save=False, log=True,
-                   burst_stages=False):
+                   burst_stages=False, candidates=False, legend=False):
         """Plots overall model lightcurve, with detected bursts
         """
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(8, 5))
         ax.plot(self.lum[:, 0], self.lum[:, 1], c='C0')
         ax.set_title(f'{self.model_str}')
 
         if log:
             ax.set_yscale('log')
             ax.set_ylim([1e34, 1e39])
+
         if bursts:
-            ax.plot(self.bursts['t'], self.bursts['peak'], marker='o', c='C1', ls='none')
+            ax.plot(self.bursts['t'], self.bursts['peak'], marker='o', c='C1', ls='none',
+                    label='peaks')
         if burst_stages:
             for stage in ('t_pre', 't_start', 't_end'):
                 t = self.bursts[stage]
                 y = self.lumf(t)
-                ax.plot(t, y, marker='o', c='C2', ls='none')
+                label = {'t_pre': 'stages'}.get(stage, None)
+                
+                ax.plot(t, y, marker='o', c='C2', ls='none', label=label)
 
+        if candidates:
+            t = self.bursts['candidates'][:, 0]
+            y = self.bursts['candidates'][:, 1]
+            ax.plot(t, y, marker='o', c='C3', ls='none', label='candidates')
+
+        if legend:
+            ax.legend(loc=4)
         if display:
             plt.show(block=False)
         if save:
