@@ -211,14 +211,14 @@ def enumerate_params(params_full):
 
 
 def copy_paramfiles(batches, source):
-    """Copy MODELS/param table file to grids
+    """Copy MODELS/param table file from kepler to grids
     """
     source = grid_strings.source_shorthand(source=source)
     batches = ensure_np_list(variable=batches)
 
     for batch in batches:
-        params_filepath = grid_strings.get_params_filepath(batch, source)
-        model_table_filepath = grid_strings.get_models_table_filepath(batch, source)
+        params_filepath = grid_strings.get_table_filepath(source, 'params', batch=batch)
+        model_table_filepath = grid_strings.get_model_table_filepath(batch, source)
         subprocess.run(['cp', model_table_filepath, params_filepath])
 
 

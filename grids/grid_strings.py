@@ -76,24 +76,19 @@ def get_source_filename(source, prefix, extension=''):
     return f'{prefix}_{source}{extension}'
 
 
-def get_params_filename(source):
-    return get_source_filename(source, prefix='params', extension='.txt')
+def get_table_filepath(source, table, batch=None):
+    """Return filepath of source (and/or batch) table (summ, params)
 
+    Optional: provide batch, for batch-specific table
+    """
+    if batch is None:
+        extension = '.txt'
+    else:
+        extension = f'_{batch}.txt'
 
-def get_summ_filename(source):
-    return get_source_filename(source, prefix='summ', extension='.txt')
-
-
-def get_params_filepath(source):
-    params_path = get_source_subdir(source, 'params')
-    params_filename = get_params_filename(source)
-    return os.path.join(params_path, params_filename)
-
-
-def get_summ_filepath(source):
-    params_path = get_source_subdir(source, 'summ')
-    params_filename = get_summ_filename(source)
-    return os.path.join(params_path, params_filename)
+    table_path = get_source_subdir(source, table)
+    table_filename = get_source_filename(source, prefix=table, extension=extension)
+    return os.path.join(table_path, table_filename)
 
 
 def get_model_table_filepath(batch, source, filename='MODELS.txt'):
