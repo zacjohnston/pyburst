@@ -111,7 +111,7 @@ def combine_extracts(batches, source):
         batch_str = f'{source}_{batch}'
         analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
 
-        filename = f'summary_{batch_str}.txt'
+        filename = f'burst_analysis_{batch_str}.txt'
         filepath = os.path.join(analysis_path, filename)
         batch_table = pd.read_csv(filepath, delim_whitespace=True)
 
