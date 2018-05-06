@@ -46,7 +46,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=True,
     if truth:
         if truth_values is None:
             truth_values = get_summary(chain, discard=discard, cap=cap,
-                               source=source, version=version)[:, 1]
+                                       source=source, version=version)[:, 1]
 
         fig = cc.plotter.plot(truth=truth_values, display=display)
     else:
@@ -97,6 +97,8 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
 
     Parameters
     ----------
+    source : str
+    version : int
     chain : np.array
         chain as returned by load_chain()
     params : [str]
@@ -107,11 +109,13 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
         x-axis limit to plot (n_steps), i.e. ax.set_xlim((0, xlim))
     label : str
         optional label to add to filename when saving
+    display : bool
+    save : bool
     """
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
 
     # ===== Default to splitting all params into 2 plots  =====
-    if params == None:
+    if params is None:
         half = int(len(pkeys) / 2)
         for i, param_split in enumerate((pkeys[:half], pkeys[half:])):
             plot_walkers(chain=chain, source=source, version=version,
@@ -126,6 +130,7 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
     steps = np.arange(n_steps)
     walker_idxs = np.arange(0, n_walkers, jump_size)
 
+    # noinspection PyTypeChecker
     fig, ax = plt.subplots(n_params, 1, sharex=True, figsize=(10, 12))
 
     for i in range(n_params):
