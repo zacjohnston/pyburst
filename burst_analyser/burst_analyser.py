@@ -45,6 +45,7 @@ class BurstRun(object):
         self.n_bursts = None
         self.outliers = np.array(())
         self.secondary_bursts = np.array(())
+        self.short_waits = False
 
         if analyse:
             self.analyse()
@@ -123,8 +124,8 @@ class BurstRun(object):
         self.printv('Identifying bursts')
 
         lum_thresh = 1e36  # min threshold luminosity for bursts
-        t_radius = 60  # minimum time (s) that each burst should be separated by
-        pre_time = 30  # time (s) before burst peak to start integrating fluence from
+        t_radius = 60  # burst peak must be largest maxima within t_radius (s)
+        pre_time = 30  # time (s) before burst peak that should always contain burst rise
         min_dt_frac = 0.5  # minimum recurrence time (as fraction of mean)
 
         # ===== get all maxima above threshold =====
@@ -135,7 +136,7 @@ class BurstRun(object):
         candidates = lum_cut[maxima_idxs]
         self.remove_shocks(candidates)
 
-        # ===== burst peak if largest maxima within t_radius (s) =====
+        # ===== identify which candidates are burst peaks =====
         peaks = []
         peak_idxs = []
         for can in candidates:
@@ -152,18 +153,22 @@ class BurstRun(object):
         peaks = np.array(peaks)  # Each entry contains (t, lum)
         n_bursts = len(peaks)
 
+        # ===== get dt, and discard short-wait bursts =====
         if n_bursts > 1:
             dt = np.diff(peaks[:, 0])
             mean_dt = np.mean(dt)
             short_wait = (dt < min_dt_frac * mean_dt)
 
             if True in short_wait:
-                idx = np.where(short_wait)[0] + 1
-                n_short = len(idx)
+                short_idxs = np.where(short_wait)[0] + 1
+                n_short = len(short_idxs)
                 self.printv(f'{n_short} short waiting-time burst detected. Discarding')
-                peaks = np.delete(peaks, idx, axis=0)
-                peak_idxs = np.delete(peak_idxs, idx)
-                dt = np.delete(dt, idx-1)
+                self.bursts['short_wait_peaks'] = peaks[short_idxs]
+                self.short_waits = True
+
+                peaks = np.delete(peaks, short_idxs, axis=0)
+                peak_idxs = np.delete(peak_idxs, short_idxs)
+                dt = np.delete(dt, short_idxs-1)
                 n_bursts -= n_short
         else:
             dt = [np.nan]
@@ -172,7 +177,7 @@ class BurstRun(object):
             else:
                 self.printv('Only one burst detected')
 
-        # ====== get burst stages (scan through burst steps) ======
+        # ===== find burst start and end =====
         t_pre = peaks[:, 0] - pre_time
         t_pre_idx = np.searchsorted(self.lum[:, 0], t_pre)
         t_start = []
@@ -294,7 +299,8 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_model(self, bursts=True, display=True, save=False, log=True,
-                   burst_stages=False, candidates=False, legend=False, time='s'):
+                   burst_stages=False, candidates=False, legend=False, time='s',
+                   short_wait=False):
         """Plots overall model lightcurve, with detected bursts
         """
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time, 1)
@@ -316,6 +322,13 @@ class BurstRun(object):
             t = self.bursts['candidates'][:, 0] / timescale
             y = self.bursts['candidates'][:, 1] / yscale
             ax.plot(t, y, marker='o', c='C3', ls='none', label='candidates')
+
+        if short_wait:
+            if self.short_waits:
+                t = self.bursts['short_wait_peaks'][:, 0] / timescale
+                y = self.bursts['short_wait_peaks'][:, 1] / yscale
+                ax.plot(t, y, marker='o', c='C4', ls='none', label='short-wait')
+
         if burst_stages:
             for stage in ('t_pre', 't_start', 't_end'):
                 t = self.bursts[stage] / timescale
@@ -323,6 +336,7 @@ class BurstRun(object):
                 label = {'t_pre': 'stages'}.get(stage, None)
 
                 ax.plot(t, y, marker='o', c='C2', ls='none', label=label)
+
         if bursts:
             ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
                     label='peaks')
