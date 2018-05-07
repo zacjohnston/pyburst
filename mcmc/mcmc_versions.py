@@ -314,6 +314,7 @@ version_definitions = {
                  34: 12,
                  35: 13,
                  36: 13,
+                 37: 12,
                  },
             'sim_test':
                 {1: 5,
@@ -374,6 +375,7 @@ version_definitions = {
                     34: prior_versions[15],
                     35: prior_versions[18],
                     36: prior_versions[19],
+                    37: prior_versions[17],
                 },
             'sim_test':
                 {
@@ -407,6 +409,7 @@ version_definitions = {
                 29: initial_position[6],
                 31: initial_position[7],
                 36: initial_position[7],
+                37: initial_position[7],
             },
             'sim_test': {
 
@@ -440,6 +443,7 @@ version_definitions = {
                     12: param_keys[1],
                     31: param_keys[3],
                     36: param_keys[3],
+                    37: param_keys[3],
                 },
             'sim_test':
                 {
