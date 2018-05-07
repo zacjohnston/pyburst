@@ -353,16 +353,16 @@ class BurstRun(object):
             plt.close(fig)
 
 
-def multithread_extract(batches, source):
+def multithread_extract(batches, source, plot=True):
     args = []
     for batch in batches:
-        args.append([batch, source])
+        args.append([batch, source, plot])
 
     with mp.Pool(processes=8) as pool:
         pool.starmap(extract_burstfit_1808, args)
 
 
-def extract_burstfit_1808(batches, source, skip_bursts=1):
+def extract_burstfit_1808(batches, source, plot=True, skip_bursts=1):
     source_path = grid_strings.get_source_path(source)
     batches = grid_tools.expand_batches(batches, source)
 
@@ -404,6 +404,10 @@ def extract_burstfit_1808(batches, source, skip_bursts=1):
 
                 data[bp] += [mean]
                 data[u_bp] += [std]
+
+            if plot:
+                fig = burstfit.plot_model(display=False, save=True)
+                plt.close(fig)
 
         table = pd.DataFrame(data)
         table = table[col_order]
