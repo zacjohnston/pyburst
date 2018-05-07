@@ -135,7 +135,7 @@ class BurstRun(object):
         start_frac = 0.25  # Burst start as fraction of peak lum
         end_frac = 0.005  # end of burst defined when luminosity falls to this fraction of peak
         min_length = 5  # minimum length of burst after peak (s)
-        min_dt = 30*60  # minimum recurrence time (to classify secondary bursts)
+        min_dt_frac = 0.5  # minimum recurrence time (as fraction of mean)
 
         # ===== get all maxima above threshold =====
         thresh_idxs = np.where(self.lum[:, 1] > lum_thresh)[0]
@@ -164,15 +164,16 @@ class BurstRun(object):
 
         if n_bursts > 1:
             dt = np.diff(burst_peaks[:, 0])
-            short_wait = (dt < min_dt)
+            short_wait = (dt < min_dt_frac*np.mean(dt))
 
             if True in short_wait:
-                self.printv('Short waiting-time burst detected. Discarding.')
                 idx = np.where(short_wait)[0] + 1
+                n_short = len(idx)
+                self.printv(f'{n_short} short waiting-time burst detected. Discarding')
                 burst_peaks = np.delete(burst_peaks, idx, axis=0)
                 burst_peak_idxs = np.delete(burst_peak_idxs, idx)
                 dt = np.delete(dt, idx-1)
-                n_bursts -= len(idx)
+                n_bursts -= n_short
         else:
             dt = [np.nan]
             if n_bursts == 0:
