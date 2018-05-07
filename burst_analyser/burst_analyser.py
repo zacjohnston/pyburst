@@ -110,16 +110,9 @@ class BurstRun(object):
             if lum > tolerance*mean:
                 if self.verbose:
                     if not shocks:
-                        print('SHOCKS DETECTED AND REMOVED: Consider verifying')
-                        print('    Time(hr)    Lum(erg)   Factor')
-                        shocks = True
+                        print('Shock detected and removed: consider verifying')
 
-                    time = self.lum[idx, 0] / 3600
-                    factor = lum / mean
-                    print(f'    {time:.2f}      {lum:.2e}   {factor:.2f}')
-
-                # --- replace with mean of two neighbours ---
-                new_lum = 0.5 * (left[-1] + right[0])
+                new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
                 self.lum[idx, 1] = new_lum
                 max_i[1] = new_lum
 
@@ -127,14 +120,11 @@ class BurstRun(object):
         """Extracts times, separations, and mean separation of bursts
         """
         # TODO: break up into functions
-        self.printv('Identifying burst times and peaks in KEPLER model')
+        self.printv('Identifying bursts')
 
         lum_thresh = 1e36  # min threshold luminosity for bursts
         t_radius = 60  # minimum time (s) that each burst should be separated by
         pre_time = 30  # time (s) before burst peak to start integrating fluence from
-        start_frac = 0.25  # Burst start as fraction of peak lum
-        end_frac = 0.005  # end of burst defined when luminosity falls to this fraction of peak
-        min_length = 5  # minimum length of burst after peak (s)
         min_dt_frac = 0.5  # minimum recurrence time (as fraction of mean)
 
         # ===== get all maxima above threshold =====
@@ -146,8 +136,8 @@ class BurstRun(object):
         self.remove_shocks(candidates)
 
         # ===== burst peak if largest maxima within t_radius (s) =====
-        burst_peaks = []
-        burst_peak_idxs = []
+        peaks = []
+        peak_idxs = []
         for can in candidates:
             t, lum = can
             i_left = np.searchsorted(self.lum[:, 0], t-t_radius)
@@ -156,76 +146,113 @@ class BurstRun(object):
             maxx = np.max(self.lum[i_left:i_right, 1])
             if maxx == lum:
                 idx = np.searchsorted(self.lum[:, 0], t)
-                burst_peaks.append(can)
-                burst_peak_idxs.append(idx)
+                peaks.append(can)
+                peak_idxs.append(idx)
 
-        burst_peaks = np.array(burst_peaks)
-        n_bursts = len(burst_peaks)
+        peaks = np.array(peaks)  # Each entry contains (t, lum)
+        n_bursts = len(peaks)
 
         if n_bursts > 1:
-            dt = np.diff(burst_peaks[:, 0])
-            short_wait = (dt < min_dt_frac*np.mean(dt))
+            dt = np.diff(peaks[:, 0])
+            mean_dt = np.mean(dt)
+            short_wait = (dt < min_dt_frac * mean_dt)
 
             if True in short_wait:
                 idx = np.where(short_wait)[0] + 1
                 n_short = len(idx)
                 self.printv(f'{n_short} short waiting-time burst detected. Discarding')
-                burst_peaks = np.delete(burst_peaks, idx, axis=0)
-                burst_peak_idxs = np.delete(burst_peak_idxs, idx)
+                peaks = np.delete(peaks, idx, axis=0)
+                peak_idxs = np.delete(peak_idxs, idx)
                 dt = np.delete(dt, idx-1)
                 n_bursts -= n_short
         else:
             dt = [np.nan]
             if n_bursts == 0:
                 print('\nWARNING: No bursts in this model!\n')
+            else:
+                self.printv('Only one burst detected')
 
-        # ====== get burst stages ======
-        t_pre = burst_peaks[:, 0] - pre_time
+        # ====== get burst stages (scan through burst steps) ======
+        t_pre = peaks[:, 0] - pre_time
         t_pre_idx = np.searchsorted(self.lum[:, 0], t_pre)
+        t_start = []
+        t_start_idx = []
+        t_end = []
+        t_end_idx = []
 
-        t_start = np.zeros(n_bursts)
-        t_start_idx = np.zeros(n_bursts, dtype=int)
-        t_end = np.zeros(n_bursts)
-        t_end_idx = np.zeros(n_bursts, dtype=int)
-
-        last_step = len(self.lum[:, 0])
         for i, pre_idx in enumerate(t_pre_idx):
-            j = pre_idx
-            peak_lum = burst_peaks[i, 1]
+            start_idx = self.get_burst_start_idx(pre_idx, peak_idxs[i])
+            end_idx = self.get_burst_end_idx(peak_idxs[i])
 
-            while self.lum[j, 1] < start_frac*peak_lum:
-                j += 1
+            if end_idx is None:
+                self.printv('Discarding final burst')
+                dt = np.delete(dt, -1)
+                peaks = np.delete(peaks, -1, axis=0)
+                peak_idxs = np.delete(peak_idxs, -1)
+                t_pre_idx = np.delete(t_pre_idx, -1)
+                t_pre = np.delete(t_pre, -1)
+                n_bursts -= 1
+            else:
+                t_start_idx.append(start_idx)
+                t_start.append(self.lum[start_idx, 0])
+                t_end.append(self.lum[end_idx, 0])
+                t_end_idx.append(end_idx)
 
-            t_start[i] = self.lum[j, 0]
-            t_start_idx[i] = j
-
-            # End must be min_length seconds after peak (avoid spikes)
-            while (self.lum[j, 1] > end_frac*peak_lum
-                    or (self.lum[j, 0] - t_start[i]) < min_length):
-                if j + 1 == last_step:
-                    self.printv('WARNING: File ends during burst tail'
-                                '\nLength/Fluence of last burst may be invalid')
-                    break
-                j += 1
-
-            t_end[i] = self.lum[j, 0]
-            t_end_idx[i] = j
+        t_start = np.array(t_start)
+        t_start_idx = np.array(t_start_idx, dtype=int)
+        t_end = np.array(t_end)
+        t_end_idx = np.array(t_end_idx, dtype=int)
 
         self.bursts['candidates'] = candidates
         self.bursts['t_pre'] = t_pre  # pre_time before burst peak (s)
         self.bursts['t_start'] = t_start  # time of reaching start_frac of burst peak
-        self.bursts['t'] = burst_peaks[:, 0]  # times of burst peaks (s)
+        self.bursts['t_peak'] = peaks[:, 0]  # times of burst peaks (s)
         self.bursts['t_end'] = t_end  # Time of burst end (end_frac of peak) (s)
         self.bursts['length'] = t_end - t_start  # Burst lengths (s)
 
         self.bursts['t_pre_idx'] = t_pre_idx
         self.bursts['t_start_idx'] = t_start_idx
-        self.bursts['idx'] = burst_peak_idxs
+        self.bursts['peak_idx'] = peak_idxs
         self.bursts['t_end_idx'] = t_end_idx
 
-        self.bursts['peak'] = burst_peaks[:, 1]  # Peak luminosities (erg/s)
+        self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
         self.bursts['dt'] = dt  # Recurrence times (s)
         self.n_bursts = n_bursts
+
+    def get_burst_start_idx(self, pre_idx, peak_idx):
+        """Finds first point in lightcurve that reaches a given fraction of the peak
+        """
+        start_frac = 0.25  # Burst start as fraction of peak lum
+
+        lum_slice = self.lum[pre_idx:peak_idx]
+        peak_lum = self.lum[peak_idx, 1]
+
+        start_i = np.where(lum_slice[:, 1] > start_frac*peak_lum)[0][0]
+        start_t = lum_slice[start_i, 0]
+        return np.searchsorted(self.lum[:, 0], start_t)
+
+    def get_burst_end_idx(self, peak_idx):
+        """Finds first point in lightcurve > min_length after peak that falls
+        to a given fraction of luminosity
+        """
+        end_frac = 0.005  # end of burst defined when luminosity falls to this fraction of peak
+        min_length = 5  # minimum length of burst after peak (s)
+
+        peak_t = self.lum[peak_idx, 0]
+        peak_lum = self.lum[peak_idx, 1]
+        lum_slice = self.lum[peak_idx:]
+
+        time_from_peak = lum_slice[:, 0] - peak_t
+        thresh_idx = np.where(lum_slice[:, 1] < end_frac*peak_lum)[0]
+        min_length_idx = np.where(time_from_peak > min_length)[0]
+        intersection = list(set(thresh_idx).intersection(min_length_idx))
+
+        if len(intersection) == 0:
+            self.printv('File ends during burst')
+            return None
+        else:
+            end_t = lum_slice[intersection[0], 0]
+            return np.searchsorted(self.lum[:, 0], end_t)
 
     def find_fluence(self):
         """Calculates burst fluences by integrating over burst luminosity
@@ -297,7 +324,7 @@ class BurstRun(object):
 
                 ax.plot(t, y, marker='o', c='C2', ls='none', label=label)
         if bursts:
-            ax.plot(self.bursts['t']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
+            ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
                     label='peaks')
 
         if legend:
