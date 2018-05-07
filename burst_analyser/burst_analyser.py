@@ -126,7 +126,7 @@ class BurstRun(object):
     def identify_bursts(self):
         """Extracts times, separations, and mean separation of bursts
         """
-        # TODO: break into functions
+        # TODO: break up into functions
         self.printv('Identifying burst times and peaks in KEPLER model')
 
         lum_thresh = 1e36  # min threshold luminosity for bursts
@@ -266,32 +266,38 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_model(self, bursts=True, display=True, save=False, log=True,
-                   burst_stages=False, candidates=False, legend=False):
+                   burst_stages=False, candidates=False, legend=False, time='s'):
         """Plots overall model lightcurve, with detected bursts
         """
+        timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time, 1)
+        time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time, 's')
+        yscale = 1e38
+
         fig, ax = plt.subplots(figsize=(8, 5))
-        ax.plot(self.lum[:, 0], self.lum[:, 1], c='C0')
         ax.set_title(f'{self.model_str}')
+        ax.set_xlabel(f'Time ({time_label})')
+        ax.set_ylabel(f'Luminosity ( {yscale} erg/s)')
+
+        ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='C0')
 
         if log:
             ax.set_yscale('log')
-            ax.set_ylim([1e34, 1e39])
+            ax.set_ylim([1e-4, 1e1])
 
-        if bursts:
-            ax.plot(self.bursts['t'], self.bursts['peak'], marker='o', c='C1', ls='none',
-                    label='peaks')
+        if candidates:
+            t = self.bursts['candidates'][:, 0] / timescale
+            y = self.bursts['candidates'][:, 1] / yscale
+            ax.plot(t, y, marker='o', c='C3', ls='none', label='candidates')
         if burst_stages:
             for stage in ('t_pre', 't_start', 't_end'):
-                t = self.bursts[stage]
-                y = self.lumf(t)
+                t = self.bursts[stage] / timescale
+                y = self.lumf(t) / yscale
                 label = {'t_pre': 'stages'}.get(stage, None)
 
                 ax.plot(t, y, marker='o', c='C2', ls='none', label=label)
-
-        if candidates:
-            t = self.bursts['candidates'][:, 0]
-            y = self.bursts['candidates'][:, 1]
-            ax.plot(t, y, marker='o', c='C3', ls='none', label='candidates')
+        if bursts:
+            ax.plot(self.bursts['t']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
+                    label='peaks')
 
         if legend:
             ax.legend(loc=4)
