@@ -122,6 +122,9 @@ class Kgrid:
             - get_params(batch=2): returns all models in batch 2
             - get_params(params={'z':0.01}): returns all models with z=0.01
         """
+        if all(x is None for x in (batch, run, params, exclude)):
+            raise ValueError('Must specify at least one argument')
+
         params_full = {}
 
         if batch is not None:
