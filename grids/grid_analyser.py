@@ -194,6 +194,10 @@ class Kgrid:
     def get_powerfits(self):
         """Calculate power-law fits to burst properties (only dt currently)
         """
+        dt_label = {False: {'var': 'tDel', 'u_var': 'uTDel'},
+                    True: {'var': 'dt', 'u_var': 'u_dt'},
+                    }.get(self.burst_analyser)
+
         qb_list = self.unique_params['qb']
         z_list = self.unique_params['z']
         x_list = self.unique_params['x']
@@ -226,8 +230,8 @@ class Kgrid:
                 sub_summ = self.summ.iloc[idxs]
 
                 mdot = sub_params['accrate'].values * sub_params['xi'].values
-                tdel = sub_summ['tDel'].values
-                u_tdel = sub_summ['uTDel'].values
+                tdel = sub_summ[dt_label['var']].values
+                u_tdel = sub_summ[dt_label['u_var']].values
 
                 # noinspection PyTupleAssignmentBalance
                 m, y0 = np.polyfit(x=np.log(mdot), y=np.log(tdel), w=np.log(1 / u_tdel), deg=1)
