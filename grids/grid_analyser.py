@@ -410,11 +410,15 @@ class Kgrid:
         var_unique = self.unique_params[var]
         params = dict(fixed)
 
-        uncertainty_keys = {'tDel': 'uTDel', 'fluence': 'uFluence', 'peakLum': 'uPeakLum'}
-        ylims = {'fluence': [0.3e40, 1.e40],
-                 'tDel': [0, 20],
-                 'peakLum': [1e38, 5e38]}
+        uncertainty_keys = {False: {'tDel': 'uTDel', 'fluence': 'uFluence',
+                                    'peakLum': 'uPeakLum'},
+                            True: {'dt': 'u_dt', 'fluence': 'u_fluence',
+                                   'peak': 'u_peak'},
+                            }[self.burst_analyser]
 
+        # ylims = {'fluence': [0.3e40, 1.e40],
+        #          'tDel': [0, 20],
+        #          'peakLum': [1e38, 5e38]}
         # ylim = ylims[bprop]
         u_prop = uncertainty_keys[bprop]
 
