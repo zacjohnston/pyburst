@@ -120,31 +120,17 @@ class BurstRun(object):
     def identify_bursts(self):
         """Extracts times, separations, and mean separation of bursts
         """
-        # TODO: break up into functions
-        self.printv('Identifying bursts')
-
-        t_radius = 60  # burst peak must be largest maxima within t_radius (s)
         pre_time = 30  # time (s) before burst peak that should always contain burst rise
         min_dt_frac = 0.5  # minimum recurrence time (as fraction of mean)
+        self.printv('Identifying bursts')
 
+        # ===== get maxima in luminosity curve =====
         candidates = self.get_lum_maxima()
         self.remove_shocks(candidates)
 
-        # ===== identify which candidates are burst peaks =====
-        peaks = []
-        peak_idxs = []
-        for can in candidates:
-            t, lum = can
-            i_left = np.searchsorted(self.lum[:, 0], t-t_radius)
-            i_right = np.searchsorted(self.lum[:, 0], t+t_radius)
-
-            maxx = np.max(self.lum[i_left:i_right, 1])
-            if maxx == lum:
-                idx = np.searchsorted(self.lum[:, 0], t)
-                peaks.append(can)
-                peak_idxs.append(idx)
-
-        peaks = np.array(peaks)  # Each entry contains (t, lum)
+        # ===== determine bursts from maxima =====
+        peaks = self.get_burst_peaks(candidates)
+        peak_idxs = self.get_peak_idxs(peaks)
         n_bursts = len(peaks)
 
         # ===== get dt, and discard short-wait bursts =====
@@ -227,6 +213,34 @@ class BurstRun(object):
 
         maxima_idxs = argrelextrema(lum_cut[:, 1], np.greater)[0]
         return lum_cut[maxima_idxs]
+
+    def get_burst_peaks(self, maxima):
+        """Identify which maxima are burst peaks
+        """
+        t_radius = 60  # burst peak must be largest maxima within t_radius (s)
+        peaks = []
+
+        for maxi in maxima:
+            t, lum = maxi
+            i_left = np.searchsorted(self.lum[:, 0], t - t_radius)
+            i_right = np.searchsorted(self.lum[:, 0], t + t_radius)
+
+            maxx = np.max(self.lum[i_left:i_right, 1])
+            if maxx == lum:
+                peaks.append(maxi)
+
+        return np.array(peaks)  # Each entry contains (t, lum)
+
+    def get_peak_idxs(self, peaks):
+        """Returns array of indexes from self.lum corresponding to given peaks
+        """
+        idxs = []
+        for peak in peaks:
+            t = peak[0]
+            idx = np.searchsorted(self.lum[:, 0], t)
+            idxs.append(idx)
+
+        return np.array(idxs, dtype=int)
 
     def get_burst_start_idx(self, pre_idx, peak_idx):
         """Finds first point in lightcurve that reaches a given fraction of the peak
