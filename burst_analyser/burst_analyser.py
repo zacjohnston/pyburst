@@ -11,9 +11,6 @@ import multiprocessing as mp
 from . import burst_tools
 from ..grids import grid_tools, grid_strings
 
-# mdot
-import burstfit_1808
-
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
@@ -274,7 +271,8 @@ class BurstRun(object):
             self.printv('File ends during burst')
             return None
         else:
-            end_t = lum_slice[intersection[0], 0]
+            end_idx = np.min(intersection)   # this is index fro lum_slice
+            end_t = lum_slice[end_idx, 0]   # need to get idx for full self.lum array
             return np.searchsorted(self.lum[:, 0], end_t)
 
     def find_fluence(self):
