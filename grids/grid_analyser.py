@@ -83,6 +83,7 @@ class Kgrid:
         self.printv(f'Models in grid: {self.n_models}')
         self.printv(f'Concord config: {con_ver}')
 
+        self.powerfits = None
         if powerfits:
             self.get_powerfits()
 
@@ -227,6 +228,7 @@ class Kgrid:
                 tdel = sub_summ['tDel'].values
                 u_tdel = sub_summ['uTDel'].values
 
+                # noinspection PyTupleAssignmentBalance
                 m, y0 = np.polyfit(x=np.log(mdot), y=np.log(tdel), w=np.log(1 / u_tdel), deg=1)
                 powerfits['m'][i] = m
                 powerfits['y0'][i] = y0
@@ -316,12 +318,11 @@ class Kgrid:
         ax.set_ylabel(r'Lum ($10^{38}$ erg)')
         ax.set_xlabel('Time (s)')
         ax.set_xlim([-10, 80])
-        ax.set_title(fr'z={z:.3f}, Qb={qb:.1f} (Legend: $\dot{{M}}_\mathrm{{Edd}}$)')
+        # ax.set_title(fr'z={z:.3f}, Qb={qb:.1f} (Legend: $\dot{{M}}_\mathrm{{Edd}}$)')
 
         for accrate in accrate_unique:
             params['accrate'] = accrate
             subset = self.get_params(params=params)
-            idxs = subset.index
             n_models = len(subset)
 
             if n_models == 0:
