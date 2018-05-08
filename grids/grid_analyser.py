@@ -26,6 +26,11 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 #       - plot mean lightcurve for given params
 #       -
 # -----------------------------------
+params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
+                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5]},
+                  }
+
+
 def default_plt_options():
     """Initialise default plot parameters"""
     params = {'mathtext.default': 'regular',
@@ -43,7 +48,7 @@ class Kgrid:
 
     def __init__(self, source, basename='xrb', con_ver=6,
                  load_lc=False, verbose=True,
-                 powerfits=True, exclude_test_batches=True,
+                 powerfits=True, exclude_defaults=True,
                  load_concord_summ=True, burst_analyser=False, **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
@@ -59,6 +64,7 @@ class Kgrid:
         self.basename = basename
         self.con_ver = con_ver
         self.verbose = verbose
+        self.burst_analyser = burst_analyser
 
         # ==== Load tables of models attributes ====
         self.printv('Loading kgrid')
@@ -93,13 +99,8 @@ class Kgrid:
             self.load_all_mean_lightcurves()
 
         # ===== exclude misc params from plotting, etc. =====
-        self.default_exclude = {'qb': [0.3, 0.5, 0.7, 0.9],
-                                'z': [0.001, 0.003]}
-        self.exclude_test_batches = exclude_test_batches
-        self.batches_exclude = {
-                                # 'batch': [255, 256, 257, 258, 259, 260, 471, 472,
-                                #           473, 618, 619, 620],
-                                'qb': [0.075]}
+        self.exclude_defaults = exclude_defaults
+        self.params_exclude = params_exclude.get(source, {})
 
     def printv(self, string, **kwargs):
         """Prints string if self.verbose == True
@@ -137,10 +138,10 @@ class Kgrid:
         if params is not None:
             params_full = {**params_full, **params}
 
-        if self.exclude_test_batches:
+        if self.exclude_defaults:
             if exclude is None:
                 exclude = {}
-            exclude = {**exclude, **self.batches_exclude}
+            exclude = {**exclude, **self.params_exclude}
 
         models = grid_tools.reduce_table(table=self.params, params=params_full,
                                          exclude=exclude, verbose=self.verbose)
@@ -440,12 +441,11 @@ class Kgrid:
             # ===== check if any models exist =====
             params[var] = v
             subset = self.get_params(params=params)
-            N_models = len(subset)
-            if N_models == 0:
-                continue
 
-            if (exclude_defaults) and (v in self.default_exclude[var]):
+            if len(subset) == 0:
                 continue
+            # if exclude_defaults and (v in self.params_exclude[var]):
+            #     continue
 
             mdot_x = []
             prop_y = []
@@ -549,12 +549,12 @@ class Kgrid:
             # ===== Check if any models exist =====
             params[var] = v
             subset = self.get_params(params=params)
-            N_models = len(subset)
-            if N_models == 0:
+            n_models = len(subset)
+            if n_models == 0:
                 continue
 
-            if (exclude_defaults) and (v in self.default_exclude[var]):
-                continue
+            # if exclude_defaults and (v in self.default_exclude[var]):
+            #     continue
 
             xi_unique = np.unique(subset['xi'])
             x = []
@@ -582,7 +582,7 @@ class Kgrid:
         if show:
             plt.show(block=False)
         if save:
-            not_var = self.get_not_var(var)
+            not_var = self.get_not_vars(var)
             val = fixed[not_var]
 
             save_dir = os.path.join(self.source_path, 'plots', 'lhood')
