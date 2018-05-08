@@ -123,17 +123,11 @@ class BurstRun(object):
         # TODO: break up into functions
         self.printv('Identifying bursts')
 
-        lum_thresh = 1e36  # min threshold luminosity for bursts
         t_radius = 60  # burst peak must be largest maxima within t_radius (s)
         pre_time = 30  # time (s) before burst peak that should always contain burst rise
         min_dt_frac = 0.5  # minimum recurrence time (as fraction of mean)
 
-        # ===== get all maxima above threshold =====
-        thresh_idxs = np.where(self.lum[:, 1] > lum_thresh)[0]
-        lum_cut = self.lum[thresh_idxs]
-
-        maxima_idxs = argrelextrema(lum_cut[:, 1], np.greater)[0]
-        candidates = lum_cut[maxima_idxs]
+        candidates = self.get_lum_maxima()
         self.remove_shocks(candidates)
 
         # ===== identify which candidates are burst peaks =====
@@ -223,6 +217,16 @@ class BurstRun(object):
         self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
         self.bursts['dt'] = dt  # Recurrence times (s)
         self.n_bursts = n_bursts
+
+    def get_lum_maxima(self):
+        """Returns all maxima in luminosity above lum_thresh
+        """
+        lum_thresh = 1e36  # minimum threshold luminosity
+        thresh_idxs = np.where(self.lum[:, 1] > lum_thresh)[0]
+        lum_cut = self.lum[thresh_idxs]
+
+        maxima_idxs = argrelextrema(lum_cut[:, 1], np.greater)[0]
+        return lum_cut[maxima_idxs]
 
     def get_burst_start_idx(self, pre_idx, peak_idx):
         """Finds first point in lightcurve that reaches a given fraction of the peak
