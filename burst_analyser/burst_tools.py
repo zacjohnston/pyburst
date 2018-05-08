@@ -3,6 +3,7 @@ import pandas as pd
 import subprocess
 import os
 import multiprocessing as mp
+import time
 
 # kepler
 import lcdata
@@ -88,7 +89,7 @@ def multi_batch_save(batches, source, multithread=True, **kwargs):
     """Loads multiple batches of models and saves lightcurves
     """
     batches = grid_tools.expand_batches(batches, source)
-
+    t0 = time.time()
     if multithread:
         args = []
         for batch in batches:
@@ -99,6 +100,10 @@ def multi_batch_save(batches, source, multithread=True, **kwargs):
     else:
         for batch in batches:
             batch_save(batch, source, **kwargs)
+
+    t1 = time.time()
+    dt = t1 - t0
+    print(f'Time taken: {dt:.1f} s')
 
 
 def combine_extracts(batches, source):

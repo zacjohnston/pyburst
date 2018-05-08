@@ -6,6 +6,7 @@ import os
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
 import multiprocessing as mp
+import time
 
 # kepler_grids
 from . import burst_tools
@@ -332,7 +333,7 @@ class BurstRun(object):
 
         if log:
             ax.set_yscale('log')
-            ax.set_ylim([1e-4, 1e1])
+            ax.set_ylim([1e-4, 1e2])
 
         if candidates:
             t = self.bursts['candidates'][:, 0] / timescale
@@ -416,8 +417,12 @@ def multithread_extract(batches, source, plot=True):
     for batch in batches:
         args.append([batch, source, plot])
 
+    t0 = time.time()
     with mp.Pool(processes=8) as pool:
         pool.starmap(extract_burstfit_1808, args)
+    t1 = time.time()
+    dt = t1 - t0
+    print(f'Time taken: {dt:.1f} s')
 
 
 def extract_burstfit_1808(batches, source, plot=True, skip_bursts=1):
