@@ -104,8 +104,8 @@ def inverse_acceleration(g, m=None, r=None):
 def plot_g():
     """Plots g=constant curves against R, M
     """
-    # g_list = [1.0, 1.5, 2.0, 3.0]
-    g_list = [1.858, 3.72, 4.83]
+    # g_li3.2/st = [1.0, 1.5, 2.0, 3.0]
+    g_list = [1.06, 1.33, 21.858, 2.66, 3.45, 4.25]
     m_list = np.linspace(1, 2, 50)
     r_list = np.zeros(50)
 
