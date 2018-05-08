@@ -208,7 +208,9 @@ initial_position = {
     6: (0.17, 0.146, 0.106,
         0.77, 0.0026, 0.026, 1.45, 1.18, 8.0, 63.),
     7: (0.204, 0.174, 0.128,
-        0.72, 0.003, 0.026, 1.45, 1.25, 5.0, 1., 1.)
+        0.72, 0.003, 0.026, 1.45, 1.25, 5.0, 1., 1.),
+    8: (0.204, 0.174, 0.128,
+        0.72, 0.003, 0.026, 1.45, 1.25, 5.0, 63.),
 }
 
 # ===== Defines order/number of params provided to BurstFit =====
@@ -261,6 +263,7 @@ version_definitions = {
                     25: 'he16_b',
                     26: 'he16_a',
                     27: 'he16_b',
+                    38: 'he16_d',
                 },
             'sim_test':
                 {
@@ -315,6 +318,7 @@ version_definitions = {
                  35: 13,
                  36: 13,
                  37: 12,
+                 38: 13,
                  },
             'sim_test':
                 {1: 5,
@@ -376,6 +380,7 @@ version_definitions = {
                     35: prior_versions[18],
                     36: prior_versions[19],
                     37: prior_versions[17],
+                    38: prior_versions[18],
                 },
             'sim_test':
                 {
@@ -410,6 +415,7 @@ version_definitions = {
                 31: initial_position[7],
                 36: initial_position[7],
                 37: initial_position[7],
+                38: initial_position[8],
             },
             'sim_test': {
 
