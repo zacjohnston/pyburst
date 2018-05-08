@@ -642,25 +642,34 @@ class Kgrid:
                        do_bprops=True, **kwargs):
         """Saves all lhood and var plots for given z,qb
         """
+        def use_unique():
+            print("Defaulting to unique params")
+            fix = {}
+            for p in ('x', 'z', 'qb', 'mass'):
+                fix[p] = self.unique_params[p]
+            return fix
+
         self.printv('Saving lhood and bprop plots:')
         if fixed is None:
-            if self.source == 'gs1826':
-                fixed = {'z': [0.005, 0.0075, 0.01, 0.0125, 0.015, 0.02],
-                         'qb': [0.05, 0.1, 0.15, 0.2]}
-            elif self.source == '4u1820':
-                fixed = {'z': [0.005, 0.01, 0.015, 0.02],
-                         'qb': [0.1, 0.2],
-                         'x': [0.0, 0.05, 0.1]}
-            else:
-                print("Defaulting to unique params")
-                fixed = {}
-                for p in ('x', 'z', 'qb', 'mass'):
-                    fixed[p] = self.unique_params[p]
+            default_fixed = {'gs1826': {'z': [0.005, 0.0075, 0.01, 0.0125, 0.015, 0.02],
+                                        'qb': [0.05, 0.1, 0.15, 0.2]},
+
+                             '4u1820': {'z': [0.005, 0.01, 0.015, 0.02],
+                                        'qb': [0.1, 0.2],
+                                        'x': [0.0, 0.05, 0.1]},
+
+                             'biggrid2': {'z': [0.0015, 0.0025, 0.0075, 0.0125, 0.0175],
+                                          'qb': [0.025, 0.125],
+                                          'mass': [0.8, 1.4, 2.0, 2.6, 3.2],
+                                          'x': [0.6, 0.7, 0.8]},
+                            }
+            fixed = default_fixed.get(self.source, use_unique())
 
         for var in fixed:
             self.printv(f'Saving plot var={var}')
             not_vars = self.get_not_vars(var)
             sub_fixed = {v: fixed[v] for v in not_vars}
+
             full_fixed = grid_tools.enumerate_params(sub_fixed)
             n_fixed = len(full_fixed[not_vars[0]])
 
