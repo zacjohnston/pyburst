@@ -145,7 +145,7 @@ class Kgrid:
                                          exclude=exclude, verbose=self.verbose)
         return models
 
-    def get_summ(self, batch={}, run={}, params={}, exclude={}):
+    def get_summ(self, batch=None, run=None, params=None, exclude=None):
         """Get summary of given batch/run/params
         """
         subset = self.get_params(batch=batch, run=run, params=params,
@@ -153,13 +153,16 @@ class Kgrid:
         idxs = subset.index.values
         return self.summ.iloc[idxs]
 
-    def get_concord_sum(self, batch={}, run={}, params={}):
+    def get_concord_sum(self, batch=None, run=None, params=None):
         """
         Get concord results of given triplet/run/params
         """
         # TODO: move to define_sources
         base_mdot = {'gs1826': 0.0796, '4u1820': 0.226}[self.source]
+        if params is None:
+            params = dict()
         params['accrate'] = base_mdot
+
         subset = self.get_params(batch=batch, run=run, params=params)
         idxs = np.array([])
         for i in subset.index:
