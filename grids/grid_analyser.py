@@ -111,7 +111,7 @@ class Kgrid:
         """
         return len(self.get_params(batch=batch))
 
-    def get_params(self, batch={}, run={}, params={}, exclude={}):
+    def get_params(self, batch=None, run=None, params=None, exclude=None):
         """Returns models with given batch/run/params
         
         params  = {}      : params that must be satisfied
@@ -122,16 +122,22 @@ class Kgrid:
             - get_params(batch=2): returns all models in batch 2
             - get_params(params={'z':0.01}): returns all models with z=0.01
         """
-        # ===== include batch/run if specified =====
-        if type(batch) != dict:
-            batch = {'batch': batch}
-        if type(run) != dict:
-            run = {'run': run}
+        params_full = {}
+
+        if batch is not None:
+            params_full['batch'] = batch
+
+        if run is not None:
+            params_full['run'] = run
+
+        if params is not None:
+            params_full = {**params_full, **params}
 
         if self.exclude_test_batches:
+            if exclude is None:
+                exclude = {}
             exclude = {**exclude, **self.batches_exclude}
 
-        params_full = {**batch, **run, **params}
         models = grid_tools.reduce_table(table=self.params, params=params_full,
                                          exclude=exclude, verbose=self.verbose)
         return models
@@ -626,7 +632,7 @@ class Kgrid:
         """Saves all lhood and var plots for given z,qb
         """
         self.printv('Saving lhood and bprop plots:')
-        if fixed == None:
+        if fixed is None:
             if self.source == 'gs1826':
                 fixed = {'z': [0.005, 0.0075, 0.01, 0.0125, 0.015, 0.02],
                          'qb': [0.05, 0.1, 0.15, 0.2]}

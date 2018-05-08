@@ -117,7 +117,7 @@ def load_model_table(batch, source, filename='MODELS.txt'):
     return model_table
 
 
-def reduce_table(table, params, exclude={}, verbose=True):
+def reduce_table(table, params, exclude=None, verbose=True):
     """Returns the subset of a table that satisfy the specified variables
     
     table   =  pd.DataFrame  : table to reduce (pandas object)
@@ -129,7 +129,7 @@ def reduce_table(table, params, exclude={}, verbose=True):
     return table.iloc[subset_idxs]
 
 
-def reduce_table_idx(table, params, exclude={}, verbose=True):
+def reduce_table_idx(table, params, exclude=None, verbose=True):
     """Returns the subset of table indices that satisfy the specified variables
     
     table   =  pd.DataFrame  : table to reduce (pandas object)
@@ -138,14 +138,15 @@ def reduce_table_idx(table, params, exclude={}, verbose=True):
     """
     subset_idxs = get_rows(table=table, params=params, verbose=verbose)
 
-    exclude = ensure_np_list(exclude)
-    for key, vals in exclude.items():
-        for val in vals:
-            idxs_exclude = np.where(table[key] == val)[0]
-            to_delete = np.intersect1d(idxs_exclude, subset_idxs)
+    if exclude is not None:
+        exclude = ensure_np_list(exclude)
+        for key, vals in exclude.items():
+            for val in vals:
+                idxs_exclude = np.where(table[key] == val)[0]
+                to_delete = np.intersect1d(idxs_exclude, subset_idxs)
 
-            for i_del in to_delete:
-                subset_idxs = np.delete(subset_idxs, np.where(subset_idxs == i_del))
+                for i_del in to_delete:
+                    subset_idxs = np.delete(subset_idxs, np.where(subset_idxs == i_del))
 
     return subset_idxs
 
