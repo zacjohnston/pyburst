@@ -401,7 +401,7 @@ class Kgrid:
         self.printv('')
 
     def plot_burst_property(self, bprop, var, fixed, save=False, show=True,
-                            exclude_defaults=False, powerfits=False):
+                            powerfits=False):
         """Plots given burst property against accretion rate (including xi factors)
         
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
@@ -418,7 +418,7 @@ class Kgrid:
                                     'peakLum': 'uPeakLum'},
                             True: {'dt': 'u_dt', 'fluence': 'u_fluence',
                                    'peak': 'u_peak'},
-                            }[self.burst_analyser]
+                            }.get(self.burst_analyser)
 
         # ylims = {'fluence': [0.3e40, 1.e40],
         #          'tDel': [0, 20],
@@ -426,7 +426,7 @@ class Kgrid:
         # ylim = ylims[bprop]
         u_prop = uncertainty_keys[bprop]
 
-        unit_factors = {'tDel': 3600}  # unit factors
+        unit_factors = {'tDel': 3600, 'dt': 3600}  # unit factors
         if bprop in unit_factors:
             unit_f = unit_factors[bprop]
         else:
@@ -488,7 +488,6 @@ class Kgrid:
         # return params, var_unique
         # TODO: only plot powerfits for plotted vars (e.g. X)
         if powerfits:
-
             ax.set_prop_cycle(None)  # reset color cycle
             x = np.linspace(0.01, 1.0, 100)
             n = len(self.powerfits)
@@ -501,7 +500,7 @@ class Kgrid:
                 ax.plot(x, y, label=label)
 
         ax.legend()
-
+        plt.tight_layout()
         if show:
             plt.show(block=False)
 
