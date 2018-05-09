@@ -316,7 +316,7 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_model(self, bursts=True, display=True, save=False, log=True,
-                   burst_stages=False, candidates=False, legend=False, time_unit='s',
+                   burst_stages=False, candidates=False, legend=False, time_unit='h',
                    short_wait=False):
         """Plots overall model lightcurve, with detected bursts
         """
