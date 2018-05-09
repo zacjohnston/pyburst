@@ -45,6 +45,7 @@ class BurstFit:
         self.param_idxs = {}
         self.get_param_indexes()
         self.has_inc = 'inc' in self.mcmc_version.param_keys
+        self.has_f = 'f_b' in self.mcmc_version.param_keys
 
         if self.source == 'sim_test':
             source = 'biggrid2'  # from here on effectively treat as biggrid2
@@ -212,31 +213,36 @@ class BurstFit:
         self.debug.start_function('shift_to_observer')
 
         redshift = params[self.param_idxs['redshift']]
-        d = params[self.param_idxs['d']]
 
         if bprop in ('dt', 'u_dt'):
             shifted = values * redshift / 3600
         else:
-            if self.has_inc:
-                inc = params[self.param_idxs['inc']]
-                xi_b, xi_p = anisotropy.anisotropy(inclination=inc*u.deg,
-                                                   model=self.mcmc_version.disc_model)
+            if self.has_f:
+                flux_factor_b = params[self.param_idxs['f_b']]
+                flux_factor_p = params[self.param_idxs['f_p']]
             else:
-                xi_b = params[self.param_idxs['xi_b']]
-                xi_p = params[self.param_idxs['xi_p']]
+                if self.has_inc:
+                    inc = params[self.param_idxs['inc']]
+                    xi_b, xi_p = anisotropy.anisotropy(inclination=inc*u.deg,
+                                                       model=self.mcmc_version.disc_model)
+                else:
+                    xi_b = params[self.param_idxs['xi_b']]
+                    xi_p = params[self.param_idxs['xi_p']]
 
-            d *= u.kpc.to(u.cm)
-            area = 4*np.pi * d**2
+                d = params[self.param_idxs['d']]
+                d *= u.kpc.to(u.cm)
+                flux_factor_p = xi_p * d**2
+                flux_factor_b = xi_b * d**2
 
             if bprop in ('fluence', 'u_fluence'):  # (erg) --> (erg / cm^2)
-                shifted = values / (xi_b * area)
+                shifted = values / (4*np.pi * flux_factor_b)
 
             elif bprop in ('peak', 'u_peak'):  # (erg/s) --> (erg / cm^2 / s)
-                shifted = values / (redshift * xi_b * area)
+                shifted = values / (redshift * 4*np.pi * flux_factor_b)
 
             elif bprop in 'fper':  # mdot --> (erg / cm^2 / s)
                 phi = (redshift - 1) * c.value ** 2 / redshift  # gravitational potential
-                shifted = (values * mdot_edd * phi) / (redshift * xi_p * area)
+                shifted = (values * mdot_edd * phi) / (redshift * 4*np.pi * flux_factor_p)
             else:
                 raise ValueError('bprop must be one of (dt, u_dt, fluence, u_fluence, '
                                  + 'peak, u_peak, fper)')
