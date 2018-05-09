@@ -201,6 +201,16 @@ prior_versions = {
          (0.0, np.inf),  # d
          (0, 80)  # inc
          ),
+    21: ((0.08, 0.24),  # mdot1
+         (0.08, 0.24),  # mdot2
+         (0.08, 0.24),  # mdot3
+         (0.0015, 0.0175),  # z
+         (0.025, 0.125),  # qb
+         (1., 2.6 / 1.4),  # g      ***
+         (1.2, 1.5),  # redshift
+         (0.0, np.inf),  # d
+         (0, 80)  # inc
+         ),
 }
 
 # ===== initial position of walkers =====
@@ -333,6 +343,7 @@ version_definitions = {
                  37: 12,
                  38: 13,
                  39: 14,
+                 40: 14,
                  },
             'sim_test':
                 {1: 5,
@@ -396,6 +407,7 @@ version_definitions = {
                     37: prior_versions[17],
                     38: prior_versions[18],
                     39: prior_versions[20],
+                    40: prior_versions[21],
                 },
             'sim_test':
                 {
@@ -432,6 +444,7 @@ version_definitions = {
                 37: initial_position[7],
                 38: initial_position[8],
                 39: initial_position[9],
+                40: initial_position[9],
             },
             'sim_test': {
 
@@ -467,6 +480,7 @@ version_definitions = {
                     36: param_keys[3],
                     37: param_keys[3],
                     39: param_keys[4],
+                    40: param_keys[4],
                 },
             'sim_test':
                 {
