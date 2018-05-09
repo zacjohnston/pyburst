@@ -191,6 +191,16 @@ prior_versions = {
          (0.4, np.inf),  # xi_b
          (0.4, np.inf),  # xi_p
          ),
+    20: ((0.08, 0.24),  # mdot1
+         (0.08, 0.24),  # mdot2
+         (0.08, 0.24),  # mdot3
+         (0.0015, 0.0175),  # z
+         (0.025, 0.125),  # qb
+         (1., 2.6/1.4),  # g      ***
+         (1.0, 2.0),  # redshift
+         (0.0, np.inf),  # d
+         (0, 80)  # inc
+         ),
 }
 
 # ===== initial position of walkers =====
@@ -211,6 +221,8 @@ initial_position = {
         0.72, 0.003, 0.026, 1.45, 1.25, 5.0, 1., 1.),
     8: (0.204, 0.174, 0.128,
         0.72, 0.003, 0.026, 1.45, 1.25, 5.0, 63.),
+    9: (0.204, 0.174, 0.128,
+        0.003, 0.026, 1.45, 1.25, 6.0, 63.),
 }
 
 # ===== Defines order/number of params provided to BurstFit =====
@@ -218,6 +230,7 @@ param_keys = {
     1: ['mdot1', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
     2: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
     3: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'xi_b', 'xi_p'],
+    4: ['mdot1', 'mdot2', 'mdot3', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -319,6 +332,7 @@ version_definitions = {
                  36: 13,
                  37: 12,
                  38: 13,
+                 39: 14,
                  },
             'sim_test':
                 {1: 5,
@@ -381,6 +395,7 @@ version_definitions = {
                     36: prior_versions[19],
                     37: prior_versions[17],
                     38: prior_versions[18],
+                    39: prior_versions[20],
                 },
             'sim_test':
                 {
@@ -416,6 +431,7 @@ version_definitions = {
                 36: initial_position[7],
                 37: initial_position[7],
                 38: initial_position[8],
+                39: initial_position[9],
             },
             'sim_test': {
 
@@ -450,6 +466,7 @@ version_definitions = {
                     31: param_keys[3],
                     36: param_keys[3],
                     37: param_keys[3],
+                    39: param_keys[4],
                 },
             'sim_test':
                 {
