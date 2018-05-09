@@ -316,12 +316,12 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_model(self, bursts=True, display=True, save=False, log=True,
-                   burst_stages=False, candidates=False, legend=False, time='s',
+                   burst_stages=False, candidates=False, legend=False, time_unit='s',
                    short_wait=False):
         """Plots overall model lightcurve, with detected bursts
         """
-        timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time, 1)
-        time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time, 's')
+        timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
+        time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
         yscale = 1e38
 
         fig, ax = plt.subplots(figsize=(8, 5))
