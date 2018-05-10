@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import pickle
 
 # kepler_grids
 from pygrids.misc import pyprint
@@ -64,6 +65,47 @@ def get_mcmc_string(source, version, n_walkers=None, n_steps=None,
 
     return (f'{prefix_str}{source}_V{version}{walker_str}'
             + f'{thread_str}{step_str}{label_str}{extension}')
+
+
+def save_sampler_state(sampler, source, version, n_steps, n_walkers):
+    """Saves sampler state as dict
+    """
+    sampler_state = get_sampler_state(sampler=sampler)
+    chain_id = get_mcmc_string(source=source, version=version,
+                               n_steps=n_steps, n_walkers=n_walkers)
+
+    mcmc_path = get_mcmc_path(source)
+    filename = f'sampler_{chain_id}.p'
+    filepath = os.path.join(mcmc_path, filename)
+
+    print(f'Saving: {filepath}')
+    pickle.dump(sampler_state, open(filepath, 'wb'))
+
+
+def load_sampler_state(source, version, n_steps, n_walkers):
+    """Loads sampler state from file
+    """
+    chain_id = get_mcmc_string(source=source, version=version,
+                               n_steps=n_steps, n_walkers=n_walkers)
+
+    filename = f'sampler_{chain_id}.p'
+    mcmc_path = get_mcmc_path(source)
+    filepath = os.path.join(mcmc_path, filename)
+    sampler_state = pickle.load(open(filepath, 'rb'))
+
+    return sampler_state
+
+
+def get_sampler_state(sampler):
+    """Returns sampler as a dictionary so its properties can be saved
+    """
+    sampler_dict = sampler.__dict__.copy()
+    del sampler_dict['pool']
+    return sampler_dict
+
+
+def get_mcmc_path(source):
+    return os.path.join(GRIDS_PATH, 'sources', source, 'mcmc')
 
 
 def print_params(params, source, version):

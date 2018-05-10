@@ -2,7 +2,6 @@
 import numpy as np
 import os
 import sys
-import pickle
 import time
 import emcee
 from scipy.optimize import minimize
@@ -65,6 +64,7 @@ def run_sampler(sampler, pos, n_steps, verbose=True):
     """Runs emcee chain for n_steps
     """
     t0 = time.time()
+    result = None
 
     for i, result in enumerate(sampler.sample(pos, iterations=n_steps)):
         if verbose:
@@ -99,7 +99,7 @@ def get_acceptance_fraction(source=None, version=None, n_walkers=None,
         if None in (source, version, n_walkers, n_steps):
             raise ValueError('Must provide source, version, n_steps, '
                              + 'and n_walkers (or directly provide sampler object)')
-        sampler = load_sampler_state(source=source, version=version,
+        sampler = mcmc_tools.load_sampler_state(source=source, version=version,
                                      n_steps=n_steps, n_walkers=n_walkers)
     else:
         n_steps = sampler['iterations']
@@ -111,7 +111,7 @@ def get_max_lhood(source, version, n_walkers, n_steps,
                   verbose=True, plot=True):
     """Returns the point with the highest likelihood
     """
-    sampler_state = load_sampler_state(source=source, version=version,
+    sampler_state = mcmc_tools.load_sampler_state(source=source, version=version,
                                        n_steps=n_steps, n_walkers=n_walkers)
 
     chain = sampler_state['_chain']
@@ -152,47 +152,6 @@ def optimise(source, version, params0):
             (0.81 / 1.4, 3.19 / 1.4), (1.01, 2.), (0.1, None), (0.1, 89.9))
 
     return minimize(bfit.lhood, x0=params0, bounds=bnds)
-
-
-def save_sampler_state(sampler, source, version, n_steps, n_walkers):
-    """Saves sampler state as dict
-    """
-    sampler_state = get_sampler_state(sampler=sampler)
-    chain_id = mcmc_tools.get_mcmc_string(source=source, version=version,
-                                          n_steps=n_steps, n_walkers=n_walkers)
-
-    mcmc_path = get_mcmc_path(source)
-    filename = f'sampler_{chain_id}.p'
-    filepath = os.path.join(mcmc_path, filename)
-
-    print(f'Saving: {filepath}')
-    pickle.dump(sampler_state, open(filepath, 'wb'))
-
-
-def load_sampler_state(source, version, n_steps, n_walkers):
-    """Loads sampler state from file
-    """
-    chain_id = mcmc_tools.get_mcmc_string(source=source, version=version,
-                                          n_steps=n_steps, n_walkers=n_walkers)
-
-    filename = f'sampler_{chain_id}.p'
-    mcmc_path = get_mcmc_path(source)
-    filepath = os.path.join(mcmc_path, filename)
-    sampler_state = pickle.load(open(filepath, 'rb'))
-
-    return sampler_state
-
-
-def get_sampler_state(sampler):
-    """Returns sampler as a dictionary so its properties can be saved
-    """
-    sampler_dict = sampler.__dict__.copy()
-    del sampler_dict['pool']
-    return sampler_dict
-
-
-def get_mcmc_path(source):
-    return os.path.join(GRIDS_PATH, 'sources', source, 'mcmc')
 
 
 def convert_params(params, source, version):
