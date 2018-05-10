@@ -53,6 +53,7 @@ class BurstRun(object):
         self.n_bursts = None
         self.outliers = np.array(())
         self.secondary_bursts = np.array(())
+        self.shocks = []
         self.short_waits = False
 
         if analyse:
@@ -106,10 +107,10 @@ class BurstRun(object):
             local maxima to check (t, lum)
         """
         radius = 1  # radius of neighbour zones to compare against
-        tolerance = 1e2  # maxima should not be more than this factor larger than neighbours
+        tolerance = 2.0  # maxima should not be more than this factor larger than neighbours
         self.remove_zeros()
 
-        # ----- Discard if maxima more than [tolerance] larger than mean of neighbours -----
+        # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
         shocks = False
         for max_i in maxima:
             t, lum = max_i
@@ -117,16 +118,20 @@ class BurstRun(object):
 
             left = self.lum[idx-radius: idx, 1]  # left neighbours
             right = self.lum[idx+1: idx+radius+1, 1]  # right neighbours
-            mean = np.mean(np.concatenate([left, right]))
+            neighbours = np.concatenate([left, right])
 
-            if lum > tolerance*mean:
+            if True in (lum > tolerance*neighbours):
                 if self.verbose:
                     if not shocks:
-                        print('Shock detected and removed: consider verifying')
+                        print('Shocks detected and removed: consider verifying')
 
                 new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
                 self.lum[idx, 1] = new_lum
                 max_i[1] = new_lum
+                self.shocks.append([idx, t, lum])
+                shocks = True
+
+        self.shocks = np.array(self.shocks)
 
     def identify_bursts(self):
         """Extracts times, separations, and mean separation of bursts
