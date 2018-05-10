@@ -107,36 +107,6 @@ def get_acceptance_fraction(source=None, version=None, n_walkers=None,
     return np.average(sampler['naccepted'] / n_steps)
 
 
-def get_max_lhood(source, version, n_walkers, n_steps,
-                  verbose=True, plot=True):
-    """Returns the point with the highest likelihood
-    """
-    sampler_state = mcmc_tools.load_sampler_state(source=source, version=version,
-                                       n_steps=n_steps, n_walkers=n_walkers)
-
-    chain = sampler_state['_chain']
-    lnprob = sampler_state['_lnprob']
-
-    max_idx = np.argmax(lnprob)
-    max_lhood = lnprob.flatten()[max_idx]
-
-    n_dimensions = chain.shape[2]
-    flat_chain = chain.reshape((-1, n_dimensions))
-    max_params = flat_chain[max_idx]
-
-    if plot:
-        bfit = burstfit.BurstFit(source=source, version=version, verbose=False)
-        bfit.lhood(max_params, plot=True)
-
-    if verbose:
-        print(f'max_lhood = {max_lhood:.2f}')
-        print('-' * 30)
-        print('Best params:')
-        mcmc_tools.print_params(max_params, source=source, version=version)
-
-    return max_params
-
-
 def optimise(source, version, params0):
     """Optimise the starting position of the mcmc walkers using standard
         minimisation methods
