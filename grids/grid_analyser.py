@@ -20,21 +20,22 @@ import ctools
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
-
 # -----------------------------------
 # TODO:
 #       - plot mean lightcurve for given params
 #       -
 # -----------------------------------
 params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
-                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5]},
+                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
+                  # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8, 0.65, 0.77],
+                  #            'mass': [0.8, 3.2]}
                   }
 
 
 def default_plt_options():
     """Initialise default plot parameters"""
     params = {'mathtext.default': 'regular',
-              'font.family': 'serif'}
+              'font.family': 'serif', 'text.usetex': False}
     plt.rcParams.update(params)
 
 
@@ -408,6 +409,7 @@ class Kgrid:
         var     =  str   : variable to iterate over (e.g. plot all available 'Qb')
         fixed   =  dict  : variables to hold fixed (e.g. 'z':0.01)
         """
+        precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = self.check_var_fixed(var=var, fixed=fixed)
 
         accrate_unique = self.unique_params['accrate']
@@ -436,7 +438,8 @@ class Kgrid:
         fig, ax = plt.subplots()
         title = ''
         for p, pv in fixed.items():
-            title += f'{p}={pv:.3f}, '
+            precision = precisions.get(p, 3)
+            title += f'{p}={pv:.{precision}f}, '
 
         # ax.set_ylim(ylim)
         ax.set_xlim([0.02, 0.25])
@@ -478,7 +481,8 @@ class Kgrid:
                 prop_y = np.concatenate([prop_y, prop_tmp])
                 u_y = np.concatenate([u_y, u_tmp])
 
-            label = f'{var}={v:.4f}'
+            precision = precisions.get(var, 3)
+            label = f'{var}={v:.{precision}f}'
             ax.errorbar(x=mdot_x, y=prop_y, yerr=u_y, ls='', marker='o',
                         label=label, capsize=3)
 
@@ -507,10 +511,11 @@ class Kgrid:
         if save:
             fixed_str = ''
             for p, v in fixed.items():
-                fixed_str += f'_{p}={v:.4f}'
+                precision = precisions.get(p, 3)
+                fixed_str += f'_{p}={v:.{precision}f}'
 
             save_dir = os.path.join(self.source_path, 'plots', bprop)
-            filename = f'bprop_{bprop}_{self.source}_C{self.con_ver:02}{fixed_str}.png'
+            filename = f'bprop_{bprop}_{self.source}_{fixed_str}.png'
             filepath = os.path.join(save_dir, filename)
 
             self.printv(f'Saving {filepath}')
@@ -645,6 +650,7 @@ class Kgrid:
                        do_bprops=True, **kwargs):
         """Saves all lhood and var plots for given z,qb
         """
+
         def use_unique():
             print("Defaulting to unique params")
             fix = {}
@@ -663,9 +669,11 @@ class Kgrid:
 
                              'biggrid2': {'z': [0.0015, 0.0025, 0.0075, 0.0125, 0.0175],
                                           'qb': [0.025, 0.125],
-                                          'mass': [0.8, 1.4, 2.0, 2.6, 3.2],
-                                          'x': [0.6, 0.7, 0.8]},
-                            }
+                                          # 'mass': [0.8, 1.4, 2.0, 2.6, 3.2],
+                                          'mass': [1.4, 2.0, 2.6],
+                                          # 'x': [0.6, 0.7, 0.8]},
+                                          'x': [0.7]},
+                             }
             fixed = default_fixed.get(self.source, use_unique())
 
         for var in fixed:
