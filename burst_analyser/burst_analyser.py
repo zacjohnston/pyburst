@@ -123,7 +123,8 @@ class BurstRun(object):
             if True in (lum > tolerance*neighbours):
                 if self.verbose:
                     if not shocks:
-                        print('Shocks detected and removed: consider verifying')
+                        print('Shocks detected and removed: consider verifying'
+                              ' with self.plot_model(shocks=True)')
 
                 new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
                 self.lum[idx, 1] = new_lum
@@ -335,7 +336,7 @@ class BurstRun(object):
 
     def plot_model(self, bursts=True, display=True, save=False, log=True,
                    burst_stages=False, candidates=False, legend=False, time_unit='h',
-                   short_wait=False):
+                   short_wait=False, shocks=False):
         """Plots overall model lightcurve, with detected bursts
         """
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
@@ -347,16 +348,16 @@ class BurstRun(object):
         ax.set_xlabel(f'Time ({time_label})')
         ax.set_ylabel(f'Luminosity ( {yscale} erg/s)')
 
-        ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='C0')
+        ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='black')
 
         if log:
             ax.set_yscale('log')
             ax.set_ylim([1e-4, 1e2])
 
-        if candidates:
+        if candidates:  # NOTE: candidates may be modified if a shock was removed
             t = self.bursts['candidates'][:, 0] / timescale
             y = self.bursts['candidates'][:, 1] / yscale
-            ax.plot(t, y, marker='o', c='C3', ls='none', label='candidates')
+            ax.plot(t, y, marker='o', c='C0', ls='none', label='candidates')
 
         if short_wait:
             if self.short_waits:
@@ -372,6 +373,17 @@ class BurstRun(object):
 
                 ax.plot(t, y, marker='o', c='C2', ls='none', label=label)
 
+        if shocks:  # plot shocks that were removed
+            first_shock = True
+            for shock in self.shocks:
+                idx = int(shock[0])
+                shock_lum = shock[2]
+
+                shock_slice = self.lum[idx-1:idx+2, :]
+                shock_slice[1, 1] = shock_lum
+                ax.plot(shock_slice[:, 0]/timescale, shock_slice[:, 1]/yscale, c='C3',
+                        label='shocks' if first_shock else '_nolegend_')
+                first_shock = False
         if bursts:
             ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
                     label='peaks')
