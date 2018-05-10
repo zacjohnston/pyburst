@@ -17,6 +17,16 @@ from . import burstfit
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
+def default_plt_options():
+    """Initialise default plot parameters"""
+    params = {'mathtext.default': 'regular',
+              'font.family': 'serif', 'text.usetex': False}
+    plt.rcParams.update(params)
+
+
+default_plt_options()
+
+
 def save_plot(fig, prefix, chain, save, source, version,
               display, label=None, extension='.png'):
     """Handles saving/displaying of a figure passed to it
@@ -36,15 +46,20 @@ def save_plot(fig, prefix, chain, save, source, version,
         plt.close(fig)
 
 
-def plot_contours(chain, discard, source, version, cap=None, truth=True,
-                  display=True, save=False, truth_values=None):
+def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lhood=False,
+                  display=True, save=False, truth_values=None, verbose=True):
     """Plots posterior contours of mcmc chain
     """
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
     # TODO: re-use the loaded chainconsumer here instead of reloading
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
 
-    if truth:
+    if max_lhood:
+        n_walkers, n_steps = chain[:, :, 0].shape
+        max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
+                                              n_steps=n_steps, verbose=verbose)
+        fig = cc.plotter.plot(truth=max_params, display=display)
+    elif truth:
         if truth_values is None:
             truth_values = get_summary(chain, discard=discard, cap=cap,
                                        source=source, version=version)[:, 1]
