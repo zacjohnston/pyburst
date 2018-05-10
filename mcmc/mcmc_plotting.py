@@ -58,9 +58,17 @@ def plot_contours(chain, discard, source, version, cap=None, truth=True,
               version=version, display=display)
 
 
-def plot_posteriors(chain, discard, source, version, cap=None,
-                    display=True, save=False, truth=False, truth_values=None):
+def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
+                    display=True, save=False, truth=False, truth_values=None,
+                    n_walkers=None, n_steps=None, verbose=True):
     """Plots posterior distributions of mcmc chain
+
+    max_lhood : bool
+        plot location of the maximum likelihood point. If True, must also specify
+        n_walkers and n_steps of sampler dump. Overrides truth_values if True.
+    truth_values : list|dict
+        Specify parameters of point (e.g. the true value) to draw on the distributions.
+        Will be overidden if max_lhood=True
     """
 
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
@@ -69,8 +77,17 @@ def plot_posteriors(chain, discard, source, version, cap=None,
     if truth:
         fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
                                             truth=truth_values)
+    elif max_lhood:
+        if None in (n_walkers, n_steps):
+            raise ValueError('Must provide n_walkers and n_steps if max_lhood=True')
+
+        max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
+                                              n_steps=n_steps, verbose=verbose)
+        fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
+                                            truth=max_params)
     else:
         fig = cc.plotter.plot_distributions(display=display, figsize=[10, height])
+
     plt.tight_layout()
     save_plot(fig, prefix='posteriors', chain=chain, save=save, source=source,
               version=version, display=display)
@@ -218,7 +235,7 @@ def get_mass_radius(chain, discard, source, version, cap=None):
 
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True):
     max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
-                                         n_steps=n_steps, verbose=verbose)
+                                          n_steps=n_steps, verbose=verbose)
 
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False)
     bfit.lhood(max_params, plot=True)
