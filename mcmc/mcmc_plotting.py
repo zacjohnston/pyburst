@@ -74,7 +74,8 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
 
 
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
-                    display=True, save=False, truth=False, truth_values=None):
+                    display=True, save=False, truth=False, truth_values=None,
+                    verbose=True):
     """Plots posterior distributions of mcmc chain
 
     max_lhood : bool
