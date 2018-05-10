@@ -16,9 +16,19 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
+def default_plt_options():
+    """Initialise default plot parameters"""
+    params = {'mathtext.default': 'regular',
+              'font.family': 'serif', 'text.usetex': False}
+    plt.rcParams.update(params)
+
+
+default_plt_options()
+
+
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
-                 re_load=False, savelum=True, analyse=True):
+                 re_load=False, savelum=True, analyse=True, plot=False):
         self.run = run
         self.batch = batch
         self.source = source
@@ -47,6 +57,9 @@ class BurstRun(object):
 
         if analyse:
             self.analyse()
+
+        if plot:
+            self.plot_model()
 
     def printv(self, string):
         if self.verbose:
@@ -92,8 +105,8 @@ class BurstRun(object):
         maxima : nparray(n,2)
             local maxima to check (t, lum)
         """
-        radius = 5  # radius of neighbour zones to compare against
-        tolerance = 5e2  # maxima should not be more than this factor larger than neighbours
+        radius = 1  # radius of neighbour zones to compare against
+        tolerance = 1e2  # maxima should not be more than this factor larger than neighbours
         self.remove_zeros()
 
         # ----- Discard if maxima more than [tolerance] larger than mean of neighbours -----
