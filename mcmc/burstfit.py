@@ -10,8 +10,8 @@ from matplotlib.ticker import NullFormatter
 # kepler_grids
 from ..interpolator import kepler_emulator
 from .mcmc_versions import McmcVersion
-from pygrids.misc import pyprint
 from pygrids.mcmc.mcmc_tools import print_params
+from pygrids.misc import pyprint
 
 # concord
 import ctools

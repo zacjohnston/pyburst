@@ -12,6 +12,7 @@ from ..physics import gparams
 from ..grids.grid_strings import get_source_path
 from . import mcmc_versions
 from . import mcmc_tools
+from . import burstfit
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
@@ -213,6 +214,14 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     radius_reshape = radius.value.reshape(new_shape)
 
     return np.dstack((mass_reshape, radius_reshape))
+
+
+def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True):
+    max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
+                                         n_steps=n_steps, verbose=verbose)
+
+    bfit = burstfit.BurstFit(source=source, version=version, verbose=False)
+    bfit.lhood(max_params, plot=True)
 
 
 def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
