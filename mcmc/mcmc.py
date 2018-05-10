@@ -81,7 +81,7 @@ def run_sampler(sampler, pos, n_steps, verbose=True):
     time_per_sample = dtime / n_samples
 
     if verbose:
-        print(f'Compute time: {dtime:.1f} s')
+        print(f'Compute time: {dtime:.1f} s ({dtime/3600:.2f} hr)')
         print(f'Time per step: {time_per_step:.1f} s')
         print(f'Time per sample: {time_per_sample:.4f} s')
     return result
