@@ -209,20 +209,17 @@ def get_mass_radius(chain, discard, source, version, cap=None):
 
     Returns ndarray of equivalent form to input chain (after slicing discard/cap)
     """
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
     mass_reference = 1.4
     radius_reference = 10
-    g_reference = gparams.get_acceleration_newtonian(r=radius_reference,
-                                                     m=mass_reference)
-    g_idx = pkeys.index('g')
-    red_idx = pkeys.index('redshift')
+    g_reference = gparams.get_acceleration_newtonian(r=radius_reference, m=mass_reference)
 
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_walkers, n_steps, n_dimensions = chain.shape
     chain_flat = chain.reshape((-1, n_dimensions))
 
-    redshift = chain_flat[:, red_idx]
-    g = chain_flat[:, g_idx] * g_reference
+    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    redshift = chain_flat[:, pkeys.index('redshift')]
+    g = chain_flat[:, pkeys.index('g')] * g_reference
     mass, radius = gparams.get_mass_radius(g=g, redshift=redshift)
 
     # reshape back into chain
@@ -231,6 +228,20 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     radius_reshape = radius.value.reshape(new_shape)
 
     return np.dstack((mass_reshape, radius_reshape))
+
+
+def get_mass_radius_point(params, source, version):
+    """Returns the mass, radius for a single walker point
+    """
+    mass_reference = 1.4
+    radius_reference = 10
+    g_reference = gparams.get_acceleration_newtonian(r=radius_reference, m=mass_reference)
+
+    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    redshift = params[pkeys.index('redshift')]
+    g = params[pkeys.index('g')] * g_reference
+    mass, radius = gparams.get_mass_radius(g=g, redshift=redshift)
+    return mass.value, radius.value
 
 
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True):
