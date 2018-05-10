@@ -59,13 +59,11 @@ def plot_contours(chain, discard, source, version, cap=None, truth=True,
 
 
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
-                    display=True, save=False, truth=False, truth_values=None,
-                    n_walkers=None, n_steps=None, verbose=True):
+                    display=True, save=False, truth=False, truth_values=None):
     """Plots posterior distributions of mcmc chain
 
     max_lhood : bool
-        plot location of the maximum likelihood point. If True, must also specify
-        n_walkers and n_steps of sampler dump. Overrides truth_values if True.
+        plot location of the maximum likelihood point. Overrides truth_values if True.
     truth_values : list|dict
         Specify parameters of point (e.g. the true value) to draw on the distributions.
         Will be overidden if max_lhood=True
@@ -78,9 +76,7 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
         fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
                                             truth=truth_values)
     elif max_lhood:
-        if None in (n_walkers, n_steps):
-            raise ValueError('Must provide n_walkers and n_steps if max_lhood=True')
-
+        n_walkers, n_steps = chain[:, :, 0].shape
         max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
                                               n_steps=n_steps, verbose=verbose)
         fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
@@ -94,16 +90,25 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
 
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
-                     display=True, save=False):
+                     display=True, save=False, max_lhood=False, verbose=True):
     """Plots contours of mass versus radius
 
     See: get_mass_radius()
     """
     mass_radius_chain = get_mass_radius(chain=chain, discard=discard,
                                         source=source, version=version, cap=cap)
+
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['Mass', 'Radius'])
-    fig = cc.plotter.plot(display=True, figsize=[6, 6])
+
+    if max_lhood:
+        n_walkers, n_steps = chain[:, :, 0].shape
+        max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
+                                              n_steps=n_steps, verbose=verbose)
+        mass, radius = get_mass_radius_point(max_params, source=source, version=version)
+        fig = cc.plotter.plot(display=True, figsize=[6, 6], truth=[mass, radius])
+    else:
+        fig = cc.plotter.plot(display=True, figsize=[6, 6])
 
     save_plot(fig, prefix='mass-radius', chain=chain, save=save, source=source,
               version=version, display=display)
