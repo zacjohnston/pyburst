@@ -131,3 +131,20 @@ def combine_extracts(batches, source):
         f.write(table_str)
 
     return big_table
+
+
+def copy_sample_plots(batches, source):
+    """Collect the last plot of each batch into a folder, for quick examination
+    """
+    source_path = grid_strings.get_source_path(source)
+    target_path = os.path.join(source_path, 'plots', 'quickview')
+
+    for batch in batches:
+        n_runs = grid_tools.get_nruns(batch, source)
+        model_str = grid_strings.get_model_string(n_runs, batch, source)
+
+        filename = f'model_{model_str}.png'
+        filepath = os.path.join(source_path, 'plots', 'burst_analysis', filename)
+        target_filepath = os.path.join(target_path, filename)
+        # print(filepath, '==>', target_filepath)
+        subprocess.run(['cp', filepath, target_filepath])
