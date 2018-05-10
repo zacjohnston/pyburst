@@ -217,15 +217,15 @@ class BurstFit:
         if bprop in ('dt', 'u_dt'):
             shifted = values * redshift / 3600
         else:
-            if self.has_f:
-                flux_factor_b = params[self.param_idxs['f_b']]
-                flux_factor_p = params[self.param_idxs['f_p']]
+            if self.has_f:  # model uses generalised flux_factors xi*d^2 (x10^45)
+                flux_factor_b = 1e45 * params[self.param_idxs['f_b']]
+                flux_factor_p = 1e45 * params[self.param_idxs['f_p']]
             else:
-                if self.has_inc:
+                if self.has_inc:  # model explicitly uses inclination
                     inc = params[self.param_idxs['inc']]
                     xi_b, xi_p = anisotropy.anisotropy(inclination=inc*u.deg,
                                                        model=self.mcmc_version.disc_model)
-                else:
+                else:   # model explicitly uses xi
                     xi_b = params[self.param_idxs['xi_b']]
                     xi_p = params[self.param_idxs['xi_p']]
 
