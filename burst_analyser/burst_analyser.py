@@ -538,25 +538,25 @@ def check_n_bursts(batches, source, kgrid):
     return mismatch
 
 
-def plot_convergence(bfit, bprop='dt', start=1, show_values=True):
+def plot_convergence(bfit, bprop='dt', discard=1, show_values=True):
     fig, ax = plt.subplots()
     b_vals = bfit.bursts[bprop]
     nv = len(b_vals)
 
-    for i in range(start, nv + 1):
-        b_slice = b_vals[start - 1:i]
+    for i in range(discard, nv):
+        b_slice = b_vals[discard:i+1]
         mean = np.mean(b_slice)
         std = np.std(b_slice)
 
-        print(f'mean: {mean:.3e}, std={std:.3e}')
+        print(f'mean: {mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
         # if i != 1:
         #     change = (mean - mean_old) / mean
         #     print(f'Change: {change:.3e}')
 
         ax.errorbar([i], [mean], yerr=std, ls='none', marker='o', c='C0', capsize=3)
-        if show_values:
-            ax.plot([i], b_vals[i - 1], marker='o', c='C1')
-        mean_old = mean
+        # mean_old = mean
+    if show_values:
+        ax.plot(np.arange(nv), b_vals, marker='o', c='C1', ls='none')
 
     plt.show(block=False)
 

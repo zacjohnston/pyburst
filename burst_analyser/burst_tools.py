@@ -146,5 +146,4 @@ def copy_sample_plots(batches, source):
         filename = f'model_{model_str}.png'
         filepath = os.path.join(source_path, 'plots', 'burst_analysis', filename)
         target_filepath = os.path.join(target_path, filename)
-        # print(filepath, '==>', target_filepath)
         subprocess.run(['cp', filepath, target_filepath])
