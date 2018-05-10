@@ -26,9 +26,9 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 #       -
 # -----------------------------------
 params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
-                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
-                  # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8, 0.65, 0.77],
-                  #            'mass': [0.8, 3.2]}
+                  # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
+                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8, 0.65, 0.77],
+                             'mass': [0.8, 3.2]}
                   }
 
 
@@ -515,7 +515,7 @@ class Kgrid:
                 fixed_str += f'_{p}={v:.{precision}f}'
 
             save_dir = os.path.join(self.source_path, 'plots', bprop)
-            filename = f'bprop_{bprop}_{self.source}_{fixed_str}.png'
+            filename = f'bprop_{bprop}_{self.source}{fixed_str}.png'
             filepath = os.path.join(save_dir, filename)
 
             self.printv(f'Saving {filepath}')
