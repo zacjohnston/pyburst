@@ -29,6 +29,16 @@ msunyer_to_gramsec = (u.M_sun / u.year).to(u.g / u.s)
 mdot_edd = 1.75e-8 * msunyer_to_gramsec
 
 
+def default_plt_options():
+    """Initialise default plot parameters"""
+    params = {'mathtext.default': 'regular',
+              'font.family': 'serif', 'text.usetex': False}
+    plt.rcParams.update(params)
+
+
+default_plt_options()
+
+
 class BurstFit:
     """Class for comparing modelled bursts to observed bursts
     """
