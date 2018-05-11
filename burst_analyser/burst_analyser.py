@@ -339,6 +339,7 @@ class BurstRun(object):
                    short_wait=False, shocks=False):
         """Plots overall model lightcurve, with detected bursts
         """
+        self.ensure_analysed_is(True)
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
         time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
         yscale = 1e38
