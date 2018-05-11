@@ -27,6 +27,15 @@ def default_plt_options():
 default_plt_options()
 
 
+def disable_smoothing(cc):
+    """Disable smoothing in chainconsumer
+
+    cc : ChainConsumer object
+        chain must already be added before calling
+    """
+    cc.configure(kde=False, smooth=0)
+
+
 def save_plot(fig, prefix, chain, save, source, version,
               display, label=None, extension='.png'):
     """Handles saving/displaying of a figure passed to it
