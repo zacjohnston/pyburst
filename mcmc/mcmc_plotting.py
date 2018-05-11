@@ -27,15 +27,6 @@ def default_plt_options():
 default_plt_options()
 
 
-def disable_smoothing(cc):
-    """Disable smoothing in chainconsumer
-
-    cc : ChainConsumer object
-        chain must already be added before calling
-    """
-    cc.configure(kde=False, smooth=0)
-
-
 def save_plot(fig, prefix, chain, save, source, version,
               display, label=None, extension='.png'):
     """Handles saving/displaying of a figure passed to it
@@ -56,12 +47,14 @@ def save_plot(fig, prefix, chain, save, source, version,
 
 
 def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lhood=False,
-                  display=True, save=False, truth_values=None, verbose=True):
+                  display=True, save=False, truth_values=None, verbose=True,
+                  smoothing=False):
     """Plots posterior contours of mcmc chain
     """
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
     # TODO: re-use the loaded chainconsumer here instead of reloading
-    cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
+    cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap,
+                             smoothing=smoothing)
 
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
@@ -84,7 +77,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
 
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
                     display=True, save=False, truth=False, truth_values=None,
-                    verbose=True):
+                    verbose=True, smoothing=False):
     """Plots posterior distributions of mcmc chain
 
     max_lhood : bool
@@ -95,7 +88,8 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
     """
 
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
-    cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
+    cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap,
+                             smoothing=smoothing)
     height = 3 * ceil(len(pkeys) / 4)
     if truth:
         fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
@@ -115,7 +109,8 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
 
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
-                     display=True, save=False, max_lhood=False, verbose=True):
+                     display=True, save=False, max_lhood=False, verbose=True,
+                     smoothing=False):
     """Plots contours of mass versus radius
 
     See: get_mass_radius()
@@ -125,7 +120,9 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['Mass', 'Radius'])
-
+    if not smoothing:
+        cc.configure(kde=False, smooth=0)
+        
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
         max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
@@ -219,7 +216,7 @@ def get_summary(chain, discard, source, version, cap=None):
 
 
 def setup_chainconsumer(chain, discard, cap=None, param_labels=None,
-                        source=None, version=None):
+                        source=None, version=None, smoothing=False):
     """Return ChainConsumer object set up with given chain and pkeys
     """
     if type(param_labels) == type(None):
@@ -231,6 +228,9 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None,
     n_dimensions = chain.shape[2]
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(chain[:, :, :].reshape(-1, n_dimensions), parameters=param_labels)
+
+    if not smoothing:
+        cc.configure(kde=False, smooth=0)
     return cc
 
 
