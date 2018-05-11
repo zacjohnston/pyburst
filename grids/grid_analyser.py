@@ -26,9 +26,9 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 #       -
 # -----------------------------------
 params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
-                  # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
-                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8, 0.65, 0.77],
-                             'mass': [0.8, 3.2]}
+                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
+                  # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8, 0.65, 0.77],
+                  #            'mass': [0.8, 3.2]}
                   }
 
 
@@ -422,17 +422,12 @@ class Kgrid:
                                    'peak': 'u_peak'},
                             }.get(self.burst_analyser)
 
-        # ylims = {'fluence': [0.3e40, 1.e40],
-        #          'tDel': [0, 20],
-        #          'peakLum': [1e38, 5e38]}
-        # ylim = ylims[bprop]
-        u_prop = uncertainty_keys[bprop]
+        y_unit = {'dt': 'hr', 'fluence': '10^39 erg',
+                  'peak': '10^38 erg/s'}.get(bprop)
+        unit_f = {'tDel': 3600, 'dt': 3600,
+                  'fluence': 1e39, 'peak': 1e38}.get(bprop, 1.0)
 
-        unit_factors = {'tDel': 3600, 'dt': 3600}  # unit factors
-        if bprop in unit_factors:
-            unit_f = unit_factors[bprop]
-        else:
-            unit_f = 1.0
+        u_prop = uncertainty_keys.get(bprop)
 
         # ===== Axis properties =====
         fig, ax = plt.subplots()
@@ -444,7 +439,7 @@ class Kgrid:
         # ax.set_ylim(ylim)
         ax.set_xlim([0.02, 0.25])
         ax.set_xlabel(r'$\dot{M} \; (\dot{M}_\mathrm{Edd})$ ')
-        ax.set_ylabel(bprop)
+        ax.set_ylabel(f'{bprop} ({y_unit})')
         ax.set_title(title)
         plt.tight_layout()
 
