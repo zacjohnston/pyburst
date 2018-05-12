@@ -302,15 +302,13 @@ class BurstRun(object):
         for i in range(self.n_bursts):
             t0 = self.bursts['t_pre_idx'][i]
             t1 = self.bursts['t_end_idx'][i]
-            fluences[i] = integrate.trapz(y=self.lum[t0:t1 + 1, 1], x=self.lum[t0:t1 + 1, 0])
+            fluences[i] = integrate.trapz(y=self.lum[t0:t1 + 1, 1],
+                                          x=self.lum[t0:t1 + 1, 0])
 
         self.bursts['fluence'] = fluences  # Burst fluence (ergs)
 
-    def get_save_filename(self, plot_name, extension='png'):
-        return f'{plot_name}_{self.model_str}.{extension}'
-
     def show_save_fig(self, fig, display, save, plot_name,
-                      path=None, extension='png'):
+                      path=None, extra='', extension='png'):
         """Displays and/or Saves given figure
 
         parameters
@@ -324,15 +322,17 @@ class BurstRun(object):
         path : str (optional)
             path of diretcory to save to.
             If not provided, assumes there exists a folder [source]/plots/[plot_name]
+        extra : str (optional)
+            optional string to attach to filename
         extension : str (optional)
         """
         if save:
-            filename = self.get_save_filename(plot_name, extension=extension)
+            filename = f'{plot_name}_{self.model_str}{extra}.{extension}'
             if path is None:
                 filepath = os.path.join(self.source_path, 'plots', plot_name, filename)
             else:
                 filepath = os.path.join(path, filename)
-                
+
             self.printv(f'Saving figure: {filepath}')
             fig.savefig(filepath)
 
@@ -502,20 +502,14 @@ class BurstRun(object):
             x -= self.bursts['t_start'][burst]
         ax.plot(x, y, c='C0')
 
-        if display:
-            plt.show(block=False)
-        if save:
-            filename = f'burst_{self.model_str}_{burst:02}.png'
-            plot_dir = os.path.join(self.plots_path, 'lightcurves', self.batch_str)
-            filepath = os.path.join(plot_dir, filename)
+        plot_path = os.path.join(self.plots_path, 'lightcurves', self.batch_str)
+        grid_tools.try_mkdir(plot_path, skip=True)
 
-            grid_tools.try_mkdir(plot_dir, skip=True)
-            fig.savefig(filepath)
-        return fig
+        self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
+                           path=plot_path, extra=f'_{burst:02}')
 
     def save_all_lightcurves(self, **kwargs):
         for burst in range(self.n_bursts):
-            fig = self.plot_lightcurve(burst, save=True, display=False, **kwargs)
-            plt.close(fig)
+            self.plot_lightcurve(burst, save=True, display=False, **kwargs)
 
 
