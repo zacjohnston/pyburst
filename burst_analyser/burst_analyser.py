@@ -410,13 +410,15 @@ class BurstRun(object):
         b_start = {True: 1, False: 2}.get(show_first)
 
         fig, ax = plt.subplots(3, 1, figsize=(6, 8))
-        ax[0].set_title(self.model_str)
 
         for i, bprop in enumerate(bprops):
             y_unit = y_units.get(bprop)
             y_scale = y_scales.get(bprop, 1.0)
             ax[i].set_ylabel(f'{bprop} ({y_unit})')
             ax[i].set_xticks(np.arange(b_start, self.n_bursts+1))
+
+            if i != len(bprops)-1:
+                ax[i].set_xticklabels([])
 
             b_vals = self.bursts[bprop]
             nv = len(b_vals)
@@ -430,15 +432,15 @@ class BurstRun(object):
                                marker='o', c='C0', capsize=3,
                                label='cumulative mean' if j == discard+1 else '_nolegend_')
 
-            self.printv(f'mean: {mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
+            self.printv(f'{bprop}: mean={mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
             if show_values:
                 ax[i].plot(np.arange(b_start, nv+1), b_vals[b_start-1:]/y_scale,
                            marker='o', c='C1', ls='none', label='bursts')
-
-        ax[-1].set_xlabel('Burst number')
         if legend:
-            ax[0].legend()
+            ax[0].legend(loc=1)
 
+        ax[0].set_title(self.model_str)
+        ax[-1].set_xlabel('Burst number')
         plt.tight_layout()
         plt.show(block=False)
 
