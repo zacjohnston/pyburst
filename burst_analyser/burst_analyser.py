@@ -306,11 +306,10 @@ class BurstRun(object):
 
         self.bursts['fluence'] = fluences  # Burst fluence (ergs)
 
-    # def identify_outliers(self):
-
     def save_bursts(self, path=None):
         """Saves burst lightcurves to txt files. Excludes 'pre' bursts
         """
+        self.ensure_analysed_is(True)
         if path is None:  # default to model directory
             path = self.batch_models_path
 
@@ -399,10 +398,36 @@ class BurstRun(object):
             fig.savefig(filepath)
         return fig
 
+    def plot_convergence(self, bprop='dt', discard=1, show_values=True):
+        """Plots individual and average burst properties along the burst sequence
+        """
+        self.ensure_analysed_is(True)
+        fig, ax = plt.subplots()
+        b_vals = self.bursts[bprop]
+        nv = len(b_vals)
+
+        for i in range(discard, nv):
+            b_slice = b_vals[discard:i+1]
+            mean = np.mean(b_slice)
+            std = np.std(b_slice)
+
+            print(f'mean: {mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
+            # if i != 1:
+            #     change = (mean - mean_old) / mean
+            #     print(f'Change: {change:.3e}')
+
+            ax.errorbar([i], [mean], yerr=std, ls='none', marker='o', c='C0', capsize=3)
+            # mean_old = mean
+        if show_values:
+            ax.plot(np.arange(nv), b_vals, marker='o', c='C1', ls='none')
+
+        plt.show(block=False)
+
     def plot_lightcurve(self, burst, save=False, display=True, log=False,
                         zero_time=True):
         """Plot individual burst lightcurve
         """
+        self.ensure_analysed_is(True)
         if burst > self.n_bursts - 1\
                 or burst < 0:
             raise ValueError(f'Burst index ({burst}) out of bounds '
@@ -443,24 +468,3 @@ class BurstRun(object):
             plt.close(fig)
 
 
-def plot_convergence(bfit, bprop='dt', discard=1, show_values=True):
-    fig, ax = plt.subplots()
-    b_vals = bfit.bursts[bprop]
-    nv = len(b_vals)
-
-    for i in range(discard, nv):
-        b_slice = b_vals[discard:i+1]
-        mean = np.mean(b_slice)
-        std = np.std(b_slice)
-
-        print(f'mean: {mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
-        # if i != 1:
-        #     change = (mean - mean_old) / mean
-        #     print(f'Change: {change:.3e}')
-
-        ax.errorbar([i], [mean], yerr=std, ls='none', marker='o', c='C0', capsize=3)
-        # mean_old = mean
-    if show_values:
-        ax.plot(np.arange(nv), b_vals, marker='o', c='C1', ls='none')
-
-    plt.show(block=False)
