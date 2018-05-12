@@ -456,7 +456,7 @@ def multithread_extract(batches, source, plot=True):
     print(f'Time taken: {dt:.1f} s')
 
 
-def extract_burstfit_1808(batches, source, plot=True, skip_bursts=1):
+def extract_bursts(batches, source, plot=True, skip_bursts=1):
     source_path = grid_strings.get_source_path(source)
     batches = grid_tools.expand_batches(batches, source)
 
