@@ -103,7 +103,7 @@ def multi_batch_save(batches, source, multithread=True, **kwargs):
 
     t1 = time.time()
     dt = t1 - t0
-    print(f'Time taken: {dt:.1f} s')
+    print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
 def combine_extracts(batches, source):
