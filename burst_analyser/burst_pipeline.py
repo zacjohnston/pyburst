@@ -109,8 +109,7 @@ def extract_bursts(batches, source, plot=True, skip_bursts=1):
                 data[u_bp] += [std]
 
             if plot:
-                fig = burstfit.plot_model(display=False, save=True)
-                plt.close(fig)
+                burstfit.plot_model(display=False, save=True)
 
         table = pd.DataFrame(data)
         table = table[col_order]
