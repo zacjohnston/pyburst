@@ -246,11 +246,22 @@ prior_bounds = {
     25: ((0.08, 0.24),  # mdot1
          (0.08, 0.24),  # mdot2
          (0.08, 0.24),  # mdot3
-         (0.65, 0.77),  # x         ***
-         (0.0015, 0.0075),  # z     ***
+         (0.65, 0.77),  # x
+         (0.0015, 0.0075),  # z
          (0.025, 0.125),  # qb
          (1., 2.6 / 1.4),  # g
-         (1.2, 1.6),  # redshift
+         (1.2, 1.6),  # redshift     ***
+         (0.01, np.inf),  # f1
+         (0.01, np.inf),  # f2
+         ),
+    26: ((0.08, 0.24),  # mdot1
+         (0.08, 0.24),  # mdot2
+         (0.08, 0.24),  # mdot3
+         (0.65, 0.77),  # x
+         (0.0015, 0.0175),  # z     ***
+         (0.025, 0.125),  # qb
+         (1., 2.6 / 1.4),  # g
+         (1.2, 1.5),  # redshift    ***
          (0.01, np.inf),  # f1
          (0.01, np.inf),  # f2
          ),
@@ -291,7 +302,7 @@ initial_position = {
     11: (0.23, 0.197, 0.145,
          0.004, 0.026, 1.45, 1.45, 0.7, 1.75),
     12: (0.193, 0.164, 0.120,
-         0.7, 0.004, 0.026, 1.4, 1.5, 0.64, 1.7),
+         0.7, 0.004, 0.026, 1.4, 1.45, 0.64, 1.7),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -399,6 +410,7 @@ version_definitions = {
                  42: 14,
                  43: 15,
                  44: 15,
+                 45: 15,
                  },
             'sim_test':
                 {1: 5,
@@ -466,7 +478,8 @@ version_definitions = {
                     41: prior_bounds[22],
                     42: prior_bounds[23],
                     43: prior_bounds[24],
-                    44: prior_bounds[24],
+                    44: prior_bounds[25],
+                    45: prior_bounds[26],
                 },
             'sim_test':
                 {
@@ -508,6 +521,7 @@ version_definitions = {
                 42: initial_position[11],
                 43: initial_position[12],
                 44: initial_position[12],
+                45: initial_position[12],
             },
             'sim_test': {
 
@@ -548,6 +562,7 @@ version_definitions = {
                     42: param_keys[5],
                     43: param_keys[6],
                     44: param_keys[6],
+                    45: param_keys[6],
                 },
             'sim_test':
                 {
