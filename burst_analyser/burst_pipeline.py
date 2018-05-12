@@ -7,6 +7,7 @@ Wrapper for sequential burst analysis routines, such as:
 """
 import numpy as np
 import os
+import sys
 
 # kepler_grids
 from . import burst_analyser
@@ -45,3 +46,31 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
         printv('Collecting results', verbose)
         last_batch = batches[-1]
         burst_tools.combine_extracts(np.arange(1, last_batch+1), source)
+
+
+def check_n_bursts(batches, source, kgrid):
+    """Compares n_bursts detected with kepler_analyser against burstfit_1808
+    """
+    mismatch = np.zeros(4)
+    filename = f'mismatch_{source}_{batches[0]}-{batches[-1]}.txt'
+    filepath = os.path.join(GRIDS_PATH, filename)
+
+    for batch in batches:
+        summ = kgrid.get_summ(batch)
+        n_runs = len(summ)
+
+        for i in range(n_runs):
+            run = i + 1
+            n_bursts1 = summ.iloc[i]['num']
+            sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
+
+            burstfit = burst_analyser.BurstRun(run, batch, source, verbose=False)
+            burstfit.analyse()
+            n_bursts2 = burstfit.n_bursts
+
+            if n_bursts1 != n_bursts2:
+                m_new = np.array((batch, run, n_bursts1, n_bursts2))
+                mismatch = np.vstack((mismatch, m_new))
+
+        np.savetxt(filepath, mismatch)
+    return mismatch

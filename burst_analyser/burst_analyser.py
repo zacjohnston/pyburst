@@ -511,34 +511,6 @@ def extract_bursts(batches, source, plot=True, skip_bursts=1):
             f.write(table_str)
 
 
-def check_n_bursts(batches, source, kgrid):
-    """Compares n_bursts detected with kepler_analyser against burstfit_1808
-    """
-    mismatch = np.zeros(4)
-    filename = f'mismatch_{source}_{batches[0]}-{batches[-1]}.txt'
-    filepath = os.path.join(GRIDS_PATH, filename)
-
-    for batch in batches:
-        summ = kgrid.get_summ(batch)
-        n_runs = len(summ)
-
-        for i in range(n_runs):
-            run = i + 1
-            n_bursts1 = summ.iloc[i]['num']
-            sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
-
-            burstfit = BurstRun(run, batch, source, verbose=False)
-            burstfit.analyse()
-            n_bursts2 = burstfit.n_bursts
-
-            if n_bursts1 != n_bursts2:
-                m_new = np.array((batch, run, n_bursts1, n_bursts2))
-                mismatch = np.vstack((mismatch, m_new))
-
-        np.savetxt(filepath, mismatch)
-    return mismatch
-
-
 def plot_convergence(bfit, bprop='dt', discard=1, show_values=True):
     fig, ax = plt.subplots()
     b_vals = bfit.bursts[bprop]
