@@ -348,12 +348,12 @@ class BurstRun(object):
             i_zero = self.bursts['t_start_idx'][i]
             i_end = self.bursts['t_end_idx'][i]
 
-            time = self.lum[i_start:i_end, 0] - self.lum[i_zero, 0]
+            t = self.lum[i_start:i_end, 0] - self.lum[i_zero, 0]
             lum = self.lum[i_start:i_end, 1]
             uncertainty = 0.02
             u_lum = lum * uncertainty
 
-            lightcurve = np.array([time, lum, u_lum]).transpose()
+            lightcurve = np.array([t, lum, u_lum]).transpose()
             header = 'time luminosity u_luminosity'
             b_file = f'b{bnum}.txt'
             filepath = os.path.join(path, b_file)
