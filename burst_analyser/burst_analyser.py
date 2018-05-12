@@ -344,7 +344,7 @@ class BurstRun(object):
         yscale = 1e38
 
         fig, ax = plt.subplots(figsize=(8, 5))
-        ax.set_title(f'{self.model_str}')
+        ax.set_title(self.model_str)
         ax.set_xlabel(f'Time ({time_label})')
         ax.set_ylabel(f'Luminosity ( {yscale} erg/s)')
 
@@ -398,29 +398,48 @@ class BurstRun(object):
             fig.savefig(filepath)
         return fig
 
-    def plot_convergence(self, bprop='dt', discard=1, show_values=True):
+    def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=1,
+                         show_values=True, legend=True, show_first=True):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
-        fig, ax = plt.subplots()
-        b_vals = self.bursts[bprop]
-        nv = len(b_vals)
+        y_units = {'tDel': 'hr', 'dt': 'hr', 'fluence': '10^39 erg',
+                   'peak': '10^38 erg/s'}
+        y_scales = {'tDel': 3600, 'dt': 3600,
+                    'fluence': 1e39, 'peak': 1e38}
 
-        for i in range(discard, nv):
-            b_slice = b_vals[discard:i+1]
-            mean = np.mean(b_slice)
-            std = np.std(b_slice)
+        fig, ax = plt.subplots(3, 1, figsize=(6, 8))
+        ax[0].set_title(self.model_str)
 
-            print(f'mean: {mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
-            # if i != 1:
-            #     change = (mean - mean_old) / mean
-            #     print(f'Change: {change:.3e}')
+        for i, bprop in enumerate(bprops):
+            y_unit = y_units.get(bprop)
+            y_scale = y_scales.get(bprop, 1.0)
+            ax[i].set_ylabel(f'{bprop} ({y_unit})')
 
-            ax.errorbar([i], [mean], yerr=std, ls='none', marker='o', c='C0', capsize=3)
-            # mean_old = mean
-        if show_values:
-            ax.plot(np.arange(nv), b_vals, marker='o', c='C1', ls='none')
+            b_vals = self.bursts[bprop]
+            nv = len(b_vals)
 
+            for j in range(discard+1, nv+1):
+                b_slice = b_vals[discard:j]
+                mean = np.mean(b_slice)
+                std = np.std(b_slice)
+
+                ax[i].errorbar(j, mean/y_scale, yerr=std/y_scale, ls='none',
+                               marker='o', c='C0', capsize=3,
+                               label='cumulative mean' if j == discard+1 else '_nolegend_')
+
+            self.printv(f'mean: {mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
+            if show_values:
+                b_start = {True: 1, False: 2}.get(show_first)
+
+                ax[i].plot(np.arange(b_start, nv+1), b_vals[b_start-1:]/y_scale,
+                           marker='o', c='C1', ls='none', label='bursts')
+
+        ax[-1].set_xlabel('Burst number')
+        if legend:
+            ax[0].legend()
+
+        plt.tight_layout()
         plt.show(block=False)
 
     def plot_lightcurve(self, burst, save=False, display=True, log=False,
