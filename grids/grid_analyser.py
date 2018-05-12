@@ -25,10 +25,13 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 #       - plot mean lightcurve for given params
 #       -
 # -----------------------------------
+# Parameters which have been discontinued from the grid
 params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
-                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
-                  # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8, 0.65, 0.77],
-                  #            'mass': [0.8, 3.2]}
+                  # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
+                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8],
+                               'mass': [0.8, 3.2],
+                               'accrate': np.concatenate(([0.05, 0.06, 0.07],
+                                                         np.arange(9, 24, 2)))}
                   }
 
 
@@ -412,7 +415,11 @@ class Kgrid:
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = self.check_var_fixed(var=var, fixed=fixed)
 
-        accrate_unique = self.unique_params['accrate']
+        if self.source == 'biggrid2':
+            accrate_unique = np.arange(8, 25, 2)/100
+        else:
+            accrate_unique = self.unique_params['accrate']
+
         var_unique = self.unique_params[var]
         params = dict(fixed)
 
@@ -436,8 +443,7 @@ class Kgrid:
             precision = precisions.get(p, 3)
             title += f'{p}={pv:.{precision}f}, '
 
-        # ax.set_ylim(ylim)
-        ax.set_xlim([0.02, 0.25])
+        ax.set_xlim([0.07, 0.25])
         ax.set_xlabel(r'$\dot{M} \; (\dot{M}_\mathrm{Edd})$ ')
         ax.set_ylabel(f'{bprop} ({y_unit})')
         ax.set_title(title)
@@ -667,7 +673,7 @@ class Kgrid:
                                           # 'mass': [0.8, 1.4, 2.0, 2.6, 3.2],
                                           'mass': [1.4, 2.0, 2.6],
                                           # 'x': [0.6, 0.7, 0.8]},
-                                          'x': [0.7]},
+                                          'x': [0.65, 0.7, 0.77]},
                              }
             fixed = default_fixed.get(self.source, use_unique())
 
