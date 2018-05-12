@@ -442,4 +442,5 @@ def plot_obs(bfit, obs=0):
                        yerr=bfit.obs_data[u_bprop][obs] / y_scale,
                        marker='o', capsize=3, color='C0')
         ax[i].xaxis.set_major_formatter(nullfmt)
+    plt.tight_layout()
     plt.show(block=False)
