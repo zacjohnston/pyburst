@@ -108,7 +108,7 @@ def extract_bursts(batches, source, plot=True, skip_bursts=1):
                 data[u_bp] += [std]
 
             if plot:
-                burstfit.plot_model(display=False, save=True)
+                # burstfit.plot_model(display=False, save=True)
                 burstfit.plot_convergence(display=False, save=True)
 
         table = pd.DataFrame(data)
