@@ -424,7 +424,7 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='burst_analysis')
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=1,
-                         show_values=True, legend=True, show_first=True,
+                         show_values=True, legend=True, show_first=False,
                          display=True, save=False):
         """Plots individual and average burst properties along the burst sequence
         """
