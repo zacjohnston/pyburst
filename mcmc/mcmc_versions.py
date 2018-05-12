@@ -465,6 +465,7 @@ version_definitions = {
                     40: prior_bounds[21],
                     41: prior_bounds[22],
                     42: prior_bounds[23],
+                    43: prior_bounds[24],
                     44: prior_bounds[24],
                 },
             'sim_test':
