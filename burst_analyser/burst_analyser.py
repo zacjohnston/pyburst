@@ -306,7 +306,7 @@ class BurstRun(object):
 
         self.bursts['fluence'] = fluences  # Burst fluence (ergs)
 
-    def save_bursts(self, path=None):
+    def save_burst_lightcurves(self, path=None):
         """Saves burst lightcurves to txt files. Excludes 'pre' bursts
         """
         self.ensure_analysed_is(True)
