@@ -265,6 +265,17 @@ prior_bounds = {
          (0.01, np.inf),  # f1
          (0.01, np.inf),  # f2
          ),
+    27: ((0.1, 0.24),  # mdot1
+         (0.1, 0.24),  # mdot2
+         (0.1, 0.24),  # mdot3
+         (0.65, 0.77),  # x
+         (0.0015, 0.0175),  # z     ***
+         (0.025, 0.125),  # qb
+         (1., 2.6 / 1.4),  # g
+         (1.2, 1.5),  # redshift    ***
+         (0.01, np.inf),  # f1
+         (0.01, np.inf),  # f2
+         ),
 }
 
 # ===== Defines order/number of params provided to BurstFit =====
@@ -411,6 +422,7 @@ version_definitions = {
                  43: 15,
                  44: 15,
                  45: 15,
+                 46: 16,
                  },
             'sim_test':
                 {1: 5,
@@ -480,6 +492,7 @@ version_definitions = {
                     43: prior_bounds[24],
                     44: prior_bounds[25],
                     45: prior_bounds[26],
+                    46: prior_bounds[27],
                 },
             'sim_test':
                 {
@@ -522,6 +535,7 @@ version_definitions = {
                 43: initial_position[12],
                 44: initial_position[12],
                 45: initial_position[12],
+                46: initial_position[12],
             },
             'sim_test': {
 
@@ -563,6 +577,7 @@ version_definitions = {
                     43: param_keys[6],
                     44: param_keys[6],
                     45: param_keys[6],
+                    46: param_keys[6],
                 },
             'sim_test':
                 {
