@@ -407,6 +407,7 @@ class BurstRun(object):
                    'peak': '10^38 erg/s'}
         y_scales = {'tDel': 3600, 'dt': 3600,
                     'fluence': 1e39, 'peak': 1e38}
+        b_start = {True: 1, False: 2}.get(show_first)
 
         fig, ax = plt.subplots(3, 1, figsize=(6, 8))
         ax[0].set_title(self.model_str)
@@ -415,6 +416,7 @@ class BurstRun(object):
             y_unit = y_units.get(bprop)
             y_scale = y_scales.get(bprop, 1.0)
             ax[i].set_ylabel(f'{bprop} ({y_unit})')
+            ax[i].set_xticks(np.arange(b_start, self.n_bursts+1))
 
             b_vals = self.bursts[bprop]
             nv = len(b_vals)
@@ -430,8 +432,6 @@ class BurstRun(object):
 
             self.printv(f'mean: {mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
             if show_values:
-                b_start = {True: 1, False: 2}.get(show_first)
-
                 ax[i].plot(np.arange(b_start, nv+1), b_vals[b_start-1:]/y_scale,
                            marker='o', c='C1', ls='none', label='bursts')
 
