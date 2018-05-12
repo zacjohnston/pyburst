@@ -306,6 +306,33 @@ class BurstRun(object):
 
         self.bursts['fluence'] = fluences  # Burst fluence (ergs)
 
+    def get_save_filename(self, plot_name, extension='png'):
+        return f'{plot_name}_{self.model_str}.{extension}'
+
+    def show_save_fig(self, fig, display, save, plot_name, extension='png'):
+        """Displays and/or Saves given figure
+
+        parameters
+        ----------
+        fig : plt.Figure object
+        display : bool
+        save : bool
+            save the figure to file (to fold in checking from other functions)
+        plot_name : str
+            type of plot being saved. Assumes there is a folder [source]/plots/[plot_name]
+        extension : str
+        """
+        if save:
+            filename = self.get_save_filename(plot_name, extension=extension)
+            filepath = os.path.join(self.source_path, 'plots', plot_name, filename)
+            self.printv(f'Saving figure: {filepath}')
+            fig.savefig(filepath)
+
+        if display:
+            plt.show(block=False)
+        else:
+            plt.close(fig)
+
     def save_burst_lightcurves(self, path=None):
         """Saves burst lightcurves to txt files. Excludes 'pre' bursts
         """
@@ -393,13 +420,13 @@ class BurstRun(object):
         if display:
             plt.show(block=False)
         if save:
-            filename = f'model_{self.model_str}.png'
             filepath = os.path.join(self.source_path, 'plots', 'burst_analysis', filename)
             fig.savefig(filepath)
         return fig
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=1,
-                         show_values=True, legend=True, show_first=True):
+                         show_values=True, legend=True, show_first=True,
+                         display=True, save=False):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
@@ -407,8 +434,8 @@ class BurstRun(object):
                    'peak': '10^38 erg/s'}
         y_scales = {'tDel': 3600, 'dt': 3600,
                     'fluence': 1e39, 'peak': 1e38}
-        b_start = {True: 1, False: 2}.get(show_first)
 
+        b_start = {True: 1, False: 2}.get(show_first)
         fig, ax = plt.subplots(3, 1, figsize=(6, 8))
 
         for i, bprop in enumerate(bprops):
@@ -442,7 +469,7 @@ class BurstRun(object):
         ax[0].set_title(self.model_str)
         ax[-1].set_xlabel('Burst number')
         plt.tight_layout()
-        plt.show(block=False)
+        self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
     def plot_lightcurve(self, burst, save=False, display=True, log=False,
                         zero_time=True):
