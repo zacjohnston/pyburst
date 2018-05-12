@@ -450,10 +450,10 @@ def multithread_extract(batches, source, plot=True):
 
     t0 = time.time()
     with mp.Pool(processes=8) as pool:
-        pool.starmap(extract_burstfit_1808, args)
+        pool.starmap(extract_bursts, args)
     t1 = time.time()
     dt = t1 - t0
-    print(f'Time taken: {dt:.1f} s')
+    print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
 def extract_bursts(batches, source, plot=True, skip_bursts=1):
