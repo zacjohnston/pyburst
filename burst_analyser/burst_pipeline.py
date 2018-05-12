@@ -7,7 +7,6 @@ Wrapper for sequential burst analysis routines, such as:
 """
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import multiprocessing as mp
 import os
 import sys
@@ -110,6 +109,7 @@ def extract_bursts(batches, source, plot=True, skip_bursts=1):
 
             if plot:
                 burstfit.plot_model(display=False, save=True)
+                burstfit.plot_convergence(display=False, save=True)
 
         table = pd.DataFrame(data)
         table = table[col_order]

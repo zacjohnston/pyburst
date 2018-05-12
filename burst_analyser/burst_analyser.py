@@ -1,12 +1,8 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import sys
 import os
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
-import multiprocessing as mp
-import time
 
 # kepler_grids
 from . import burst_tools
