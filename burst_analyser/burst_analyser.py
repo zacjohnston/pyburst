@@ -309,7 +309,8 @@ class BurstRun(object):
     def get_save_filename(self, plot_name, extension='png'):
         return f'{plot_name}_{self.model_str}.{extension}'
 
-    def show_save_fig(self, fig, display, save, plot_name, extension='png'):
+    def show_save_fig(self, fig, display, save, plot_name,
+                      path=None, extension='png'):
         """Displays and/or Saves given figure
 
         parameters
@@ -319,12 +320,19 @@ class BurstRun(object):
         save : bool
             save the figure to file (to fold in checking from other functions)
         plot_name : str
-            type of plot being saved. Assumes there is a folder [source]/plots/[plot_name]
-        extension : str
+            type of plot being saved
+        path : str (optional)
+            path of diretcory to save to.
+            If not provided, assumes there exists a folder [source]/plots/[plot_name]
+        extension : str (optional)
         """
         if save:
             filename = self.get_save_filename(plot_name, extension=extension)
-            filepath = os.path.join(self.source_path, 'plots', plot_name, filename)
+            if path is None:
+                filepath = os.path.join(self.source_path, 'plots', plot_name, filename)
+            else:
+                filepath = os.path.join(path, filename)
+                
             self.printv(f'Saving figure: {filepath}')
             fig.savefig(filepath)
 
