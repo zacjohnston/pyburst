@@ -1,12 +1,26 @@
 """
 Tools for handling synthetic observations, for the purpose of testing mcmc methods
 
+General structure:
+    A collection of synthetic data will be organised into the following hierarchy:
+        1. batch:
+            the collection of synthetic observations
+        2. series:
+            each batch may have multiple series, each representing a synthetic "source"
+        3. epoch:
+            each series may have multiple accretion epochs, differing only
+            by accretion rate.
+
 Note on nomenclature:
     "full_source" here refers to an expanded source string (e.g. 'sim10_2'),
     which also specifies the sim_batch (e.g. 10) and the series (e.g. 2).
     Methods in this module can break this into a smaller "source" string
     for the purposes of organising directories in kepler_grids, to avoid
     having to create/define a new "source" for every synthetic test.
+
+    In other words: The full_source would be 'sim10_2' according to synth_data,
+                    but the kepler_grids source would be 'sim10'
+                    for all intents and purposes.
 """
 import numpy as np
 import pandas as pd
@@ -19,10 +33,11 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 bprops = ['dt', 'u_dt', 'fper', 'u_fper', 'fluence', 'u_fluence', 'peak', 'u_peak']
 
 
-def extract_obs_data(series, sim_batch, sim_name='sim'):
+def extract_obs_data(full_source):
     """Returns obs_data in dict form, e.g. for burstfit
     """
-    summary = load_summary(sim_batch, sim_name)
+    _, series = get_batch_series(full_source)
+    summary = load_summary(full_source)
     subset = grid_tools.reduce_table(summary, params={'series': series})
 
     obs_data = {}
@@ -32,17 +47,17 @@ def extract_obs_data(series, sim_batch, sim_name='sim'):
     return obs_data
 
 
-def load_summary(sim_batch, sim_name='sim'):
-    source = get_source_string(sim_batch, sim_name)
+def load_summary(full_source):
+    source = check_source(full_source)
     path = grid_strings.get_obs_data_path(source)
+
     filename = grid_strings.get_source_filename(source, prefix='summary', extension='.txt')
     filepath = os.path.join(path, filename)
-
     return pd.read_csv(filepath, delim_whitespace=True)
 
 
-def get_summary(sim_batch, sim_name='sim', save=True):
-    table = load_info(sim_batch, sim_name)
+def get_summary(full_source, save=True):
+    table = load_info(full_source)
     new_cols = {'fluence': [], 'u_fluence': [],
                 'peak': [], 'u_peak': []}
 
@@ -51,7 +66,7 @@ def get_summary(sim_batch, sim_name='sim', save=True):
         series = int(table.iloc[i]['series'])
         epoch = int(table.iloc[i]['number'])
 
-        lightcurve = load_lightcurve(epoch, series, sim_batch, sim_name)
+        lightcurve = load_lightcurve(epoch, full_source)
         flu, u_flu = get_fluence(lightcurve)
         peak, u_peak = get_peak(lightcurve)
 
@@ -64,19 +79,18 @@ def get_summary(sim_batch, sim_name='sim', save=True):
 
     table = table.rename(columns={'number': 'epoch'})
     if save:
-        write_summary(table, sim_batch, sim_name)
+        write_summary(table, full_source)
 
     return table
 
 
-def write_summary(table, sim_batch, sim_name='sim'):
+def write_summary(table, full_source):
     cols = ['series', 'epoch', 'dt', 'u_dt', 'fper', 'u_fper',
             'fluence', 'u_fluence', 'peak', 'u_peak', 'bol']
     table_out = table[cols]
-    table_str = table_out.to_string(index=False, justify='left',  # formatters=FORMATTERS,
-                                    col_space=12)
+    table_str = table_out.to_string(index=False, justify='left', col_space=12)
 
-    source = get_source_string(sim_batch, sim_name)
+    source = check_source(full_source)
     path = grid_strings.get_obs_data_path(source)
     filename = grid_strings.get_source_filename(source, prefix='summary', extension='.txt')
     filepath = os.path.join(path, filename)
@@ -105,29 +119,26 @@ def check_source(full_source):
         return full_source
 
 
-def get_source_string(sim_batch, sim_name):
-    return f'{sim_name}{sim_batch}'
-
-
-def load_info(sim_batch, sim_name='sim'):
+def load_info(full_source):
     """Load simulated data info
 
     Returns: pandas.DataFrame object"""
-    source = get_source_string(sim_batch, sim_name)
+    source = check_source(full_source)
     columns = ['series', 'number', 'dt', 'u_dt', 'fper', 'u_fper', 'bol']
 
-    filename = f'{sim_name}_info.csv'
+    filename = f'sim_info.csv'
     path = grid_strings.get_obs_data_path(source)
     filepath = os.path.join(path, filename)
 
     return pd.read_csv(filepath, delim_whitespace=True, skiprows=16, names=columns)
 
 
-def load_lightcurve(epoch, series, sim_batch, sim_name='sim'):
-    source = get_source_string(sim_batch, sim_name)
+def load_lightcurve(epoch, full_source):
     columns = ['time', 'time_step', 'flux', 'u_flux']
+    source = check_source(full_source)
+    _, series = get_batch_series(full_source)
 
-    filename = f'{sim_name}{series}_{epoch}.csv'
+    filename = f'sim{series}_{epoch}.csv'
     path = grid_strings.get_obs_data_path(source)
     filepath = os.path.join(path, 'lightcurves', filename)
 
