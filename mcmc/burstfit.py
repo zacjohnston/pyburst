@@ -125,7 +125,7 @@ class BurstFit:
                    'peak': 'F_pk', 'u_peak': 'F_pk_err'}
 
         if self.source == 'sim_test':
-            filepath = os.path.join(GRIDS_PATH, 'obs_data', 'sim_test_summary.p')
+            filepath = os.path.join(GRIDS_PATH, 'obs_data', 'sim1', 'sim_test_summary.p')
             self.obs_data = pickle.load(open(filepath, 'rb'))
             self.debug.end_function()
             return
