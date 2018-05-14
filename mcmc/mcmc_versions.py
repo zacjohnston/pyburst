@@ -599,11 +599,15 @@ class McmcVersion:
                              'is not defined in mcmc_versions')
         self.source = source
         self.version = version
-        self.disc_model = get_disc_model(source, version)
+        self.param_keys = get_param_keys(source, version)
         self.interpolator = get_interpolator(source, version)
         self.prior_bounds = get_prior_bounds(source, version)
         self.initial_position = get_initial_position(source, version)
-        self.param_keys = get_param_keys(source, version)
+
+        if 'inc' in self.param_keys:
+            self.disc_model = get_disc_model(source, version)
+        else:
+            self.disc_model = None
 
     def __repr__(self):
         return (f'MCMC version definitions for {self.source} V{self.version}'
