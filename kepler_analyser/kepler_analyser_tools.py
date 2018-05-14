@@ -71,9 +71,9 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
 
     # kepler_analyser cyrrently doesn't work with only one model.
     # Hack fix is just double-up a single model
-    N = len(runs)
-    if N == 1:
-        N = 2
+    n = len(runs)
+    if n == 1:
+        n = 2
         runs = np.full(2, runs[0], dtype='int')
         params = np.stack([params, params])
 
@@ -86,7 +86,7 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
     for var in arrays:
         if len(arrays[var]) == 1:
             print(f'Taking {var} to be constant')
-            arrays[var] = np.full(N, arrays[var][0])  # expand array to appropriate length
+            arrays[var] = np.full(n, arrays[var][0])  # expand array to appropriate length
 
     x = arrays['x']
     z = arrays['z']
@@ -108,13 +108,13 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
                                  path_target=inpath)
 
     write_model_table(runs=runs,
-                    x=x,
-                    z=z,
-                    accrate=accrate,
-                    cycles=cycles,
-                    basename=basename,
-                    batch_name=batch_name,
-                    path=inpath)
+                      x=x,
+                      z=z,
+                      accrate=accrate,
+                      cycles=cycles,
+                      basename=basename,
+                      batch_name=batch_name,
+                      path=inpath)
 
 
 def write_model_table(runs, x, z, accrate, cycles, basename, batch_name, path):
