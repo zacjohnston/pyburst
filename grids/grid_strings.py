@@ -22,7 +22,7 @@ def source_shorthand(source):
 def check_synth_source(source):
     """Method to check if a source is from synthetic data
     Returns reformatted string for path purposes"""
-    if ('sim' in source) and (source != 'sim_test'):
+    if ('sim' in source) and (source != 'sim_test') and ('_' in source):
         idx = source.find('_')
         return source[:idx]
     else:
