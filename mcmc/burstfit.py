@@ -132,8 +132,7 @@ class BurstFit:
             self.debug.end_function()
             return
         elif 'sim' in self.source:
-            sim_batch, series = synth_data.get_batch_series(self.source)
-            self.obs_data = synth_data.extract_obs_data(series, sim_batch)
+            self.obs_data = synth_data.extract_obs_data(self.source)
             return
         else:
             self.obs_data = dict.fromkeys(key_map)
