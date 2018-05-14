@@ -96,15 +96,17 @@ def get_batch_series(full_source):
     return sim_batch, series
 
 
+def check_source(full_source):
+    """Method for other modules to use to check if a source is synthetic"""
+    if ('sim' in full_source) and (full_source != 'sim_test'):
+        idx = full_source.find('_')
+        return full_source[:idx]
+    else:
+        return full_source
+
+
 def get_source_string(sim_batch, sim_name):
     return f'{sim_name}{sim_batch}'
-
-
-def reformat_source(full_source):
-    """Reformats source string into one usable by other modules
-    """
-    idx = full_source.find('_')
-    return full_source[:idx]
 
 
 def load_info(sim_batch, sim_name='sim'):
