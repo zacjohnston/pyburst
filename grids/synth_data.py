@@ -8,6 +8,15 @@ from ..grids import grid_strings
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
+def load_summary(sim_batch, sim_name='sim'):
+    source = get_source_string(sim_batch, sim_name)
+    path = grid_strings.get_obs_data_path(source)
+    filename = grid_strings.get_source_filename(source, prefix='summary', extension='.txt')
+    filepath = os.path.join(path, filename)
+
+    return pd.read_csv(filepath, delim_whitespace=True)
+
+
 def get_summary(sim_batch, sim_name='sim', save=True):
     table = load_info(sim_batch, sim_name)
     new_cols = {'fluence': [], 'u_fluence': [],
