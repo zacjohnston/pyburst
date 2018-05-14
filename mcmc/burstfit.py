@@ -132,9 +132,7 @@ class BurstFit:
             self.debug.end_function()
             return
         elif 'sim' in self.source:
-            stripped = self.source.strip('sim')
-            sim_batch = int(stripped[:2])
-            series = int(stripped[3:])
+            sim_batch, series = synth_data.get_batch_series(self.source)
             self.obs_data = synth_data.extract_obs_data(series, sim_batch)
             return
         else:
