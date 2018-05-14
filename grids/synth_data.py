@@ -75,8 +75,26 @@ def write_summary(table, sim_batch, sim_name='sim'):
         f.write(table_str)
 
 
+def get_batch_series(full_source):
+    """Extracts sim_batch and series values from full source string
+
+    e.g.: sim10_1 would return (10, 1)
+    """
+    stripped = full_source.strip('sim')
+    sim_batch = int(stripped[:2])
+    series = int(stripped[3:])
+    return sim_batch, series
+
+
 def get_source_string(sim_batch, sim_name):
     return f'{sim_name}{sim_batch}'
+
+
+def reformat_source(full_source):
+    """Reformats source string into one usable by other modules
+    """
+    idx = full_source.find('_')
+    return full_source[:idx]
 
 
 def load_info(sim_batch, sim_name='sim'):
