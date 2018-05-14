@@ -59,7 +59,7 @@ class BurstFit:
         self.has_inc = 'inc' in self.mcmc_version.param_keys
         self.has_f = 'f_b' in self.mcmc_version.param_keys
 
-        if self.source == 'sim_test':
+        if 'sim' in self.source:
             source = 'biggrid2'  # from here on effectively treat as biggrid2
 
         self.bprops = bprops
