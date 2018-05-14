@@ -49,7 +49,9 @@ def extract_obs_data(source):
 
 def load_summary(source):
     path = grid_strings.get_obs_data_path(source)
-    filename = grid_strings.get_source_filename(source, prefix='summary', extension='.txt')
+    trimmed_source = grid_strings.check_synth_source(source)
+    filename = grid_strings.get_source_filename(trimmed_source,
+                                                prefix='summary', extension='.txt')
     filepath = os.path.join(path, filename)
     return pd.read_csv(filepath, delim_whitespace=True)
 
