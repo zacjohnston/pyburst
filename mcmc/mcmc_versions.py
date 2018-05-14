@@ -1,5 +1,8 @@
 import numpy as np
 
+# kepler_grids
+from ..grids import grid_strings
+
 # Define different prior boundaries.
 # Must be in same order as 'params' in BurstFit
 # '***' signifies values that changed over the previous version
@@ -428,7 +431,7 @@ version_definitions = {
                  6: 6,
                  7: 8,
                  },
-            'sim': {
+            'sim10': {
                 1: 15,
                         },
         },
@@ -499,7 +502,7 @@ version_definitions = {
                     6: prior_bounds[11],
                     7: prior_bounds[16],
                         },
-            'sim': {
+            'sim10': {
                     1: prior_bounds[26],
                         },
         },
@@ -508,7 +511,7 @@ version_definitions = {
             'biggrid1': initial_position[1],
             'biggrid2': initial_position[4],
             'sim_test': initial_position[3],
-            'sim': initial_position[12],
+            'sim10': initial_position[12],
         },
     'initial_position':
         {
@@ -535,7 +538,7 @@ version_definitions = {
                 46: initial_position[12],
                         },
             'sim_test': {},
-            'sim': {},
+            'sim10': {},
 
         },
     'param_keys_default':
@@ -543,7 +546,7 @@ version_definitions = {
             'biggrid1': param_keys[1],
             'biggrid2': param_keys[2],
             'sim_test': param_keys[1],
-            'sim': param_keys[6],
+            'sim10': param_keys[6],
         },
     'param_keys':
         {
@@ -575,7 +578,7 @@ version_definitions = {
                     46: param_keys[6],
                 },
             'sim_test': {},
-            'sim': {},
+            'sim10': {},
         },
 }
 
@@ -585,8 +588,7 @@ class McmcVersion:
     """
 
     def __init__(self, source, version):
-        if ('sim' in source) and (source != 'sim_test'):
-            source = 'sim'
+        source = grid_strings.check_synth_source(source)
 
         if source not in version_definitions['param_keys_default']:
             raise ValueError(f'source ({source}) not defined in mcmc_versions')
@@ -618,23 +620,28 @@ class McmcVersion:
 
 # ===== Convenience functions =====
 def get_disc_model(source, version):
+    source = grid_strings.check_synth_source(source)
     default = version_definitions['disc_model_default'][source]
     return version_definitions['disc_model'][source].get(version, default)
 
 
 def get_interpolator(source, version):
+    source = grid_strings.check_synth_source(source)
     return version_definitions['interpolator'][source][version]
 
 
 def get_prior_bounds(source, version):
+    source = grid_strings.check_synth_source(source)
     return np.array(version_definitions['prior_bounds'][source][version])
 
 
 def get_initial_position(source, version):
+    source = grid_strings.check_synth_source(source)
     default = version_definitions['initial_position_default'][source]
     return version_definitions['initial_position'][source].get(version, default)
 
 
 def get_param_keys(source, version):
+    source = grid_strings.check_synth_source(source)
     default = version_definitions['param_keys_default'][source]
     return version_definitions['param_keys'][source].get(version, default)
