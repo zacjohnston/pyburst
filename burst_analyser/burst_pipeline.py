@@ -51,10 +51,10 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
         burst_tools.combine_extracts(np.arange(1, last_batch+1), source)
 
 
-def multithread_extract(batches, source, plot=True):
+def multithread_extract(batches, source, plot_model=True, plot_convergence=True):
     args = []
     for batch in batches:
-        args.append([batch, source, plot])
+        args.append([batch, source, plot_model, plot_convergence])
 
     t0 = time.time()
     with mp.Pool(processes=8) as pool:
@@ -64,7 +64,8 @@ def multithread_extract(batches, source, plot=True):
     print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
-def extract_bursts(batches, source, plot=True, skip_bursts=1):
+def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
+                   skip_bursts=1):
     source_path = grid_strings.get_source_path(source)
     batches = grid_tools.expand_batches(batches, source)
 
@@ -101,14 +102,20 @@ def extract_bursts(batches, source, plot=True, skip_bursts=1):
 
             for bp in bprops:
                 u_bp = f'u_{bp}'
-                mean = np.mean(burstfit.bursts[bp][skip_bursts:])
-                std = np.std(burstfit.bursts[bp][skip_bursts:])
+
+                if burstfit.n_bursts > skip_bursts+1:
+                    mean = np.mean(burstfit.bursts[bp][skip_bursts:])
+                    std = np.std(burstfit.bursts[bp][skip_bursts:])
+                else:
+                    mean = np.nan
+                    std = np.nan
 
                 data[bp] += [mean]
                 data[u_bp] += [std]
 
-            if plot:
-                # burstfit.plot_model(display=False, save=True)
+            if plot_model:
+                burstfit.plot_model(display=False, save=True)
+            if plot_convergence:
                 burstfit.plot_convergence(display=False, save=True)
 
         table = pd.DataFrame(data)

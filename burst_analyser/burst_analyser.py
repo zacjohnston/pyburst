@@ -432,7 +432,7 @@ class BurstRun(object):
         if self.n_bursts < discard+2:
             print('WARNING: model has too few bursts')
             return
-        
+
         y_units = {'tDel': 'hr', 'dt': 'hr', 'fluence': '10^39 erg',
                    'peak': '10^38 erg/s'}
         y_scales = {'tDel': 3600, 'dt': 3600,
