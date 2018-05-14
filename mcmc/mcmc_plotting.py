@@ -122,7 +122,7 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
     cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['Mass', 'Radius'])
     if not smoothing:
         cc.configure(kde=False, smooth=0)
-        
+
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
         max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
