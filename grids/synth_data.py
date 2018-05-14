@@ -3,9 +3,23 @@ import pandas as pd
 import os
 
 # kepler_grids
-from ..grids import grid_strings
+from ..grids import grid_strings, grid_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
+bprops = ['dt', 'u_dt', 'fper', 'u_fper', 'fluence', 'u_fluence', 'peak', 'u_peak']
+
+
+def extract_obs_data(series, sim_batch, sim_name='sim'):
+    """Returns obs_data in dict form, e.g. for burstfit
+    """
+    summary = load_summary(sim_batch, sim_name)
+    subset = grid_tools.reduce_table(summary, params={'series': series})
+
+    obs_data = {}
+    for bprop in bprops:
+        obs_data[bprop] = np.array(subset[bprop])
+
+    return obs_data
 
 
 def load_summary(sim_batch, sim_name='sim'):
