@@ -5,6 +5,7 @@ import pickle
 # kepler_grids
 from pygrids.misc import pyprint
 from . import mcmc_versions
+from ..grids import grid_strings
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
@@ -41,8 +42,11 @@ def load_chain(source, version, n_steps, n_walkers, verbose=True):
     filename = get_mcmc_string(source=source, version=version,
                                n_steps=n_steps, n_walkers=n_walkers,
                                prefix='chain', extension='.npy')
-    filepath = os.path.join(GRIDS_PATH, 'sources', source, 'mcmc', filename)
+
+    mcmc_path = get_mcmc_path(source)
+    filepath = os.path.join(mcmc_path, filename)
     pyprint.printv(f'Loading chain: {filepath}', verbose=verbose)
+
     return np.load(filepath)
 
 
@@ -130,6 +134,7 @@ def get_sampler_state(sampler):
 
 
 def get_mcmc_path(source):
+    source = grid_strings.check_synth_source(source)
     return os.path.join(GRIDS_PATH, 'sources', source, 'mcmc')
 
 
