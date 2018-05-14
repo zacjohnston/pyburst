@@ -1,3 +1,13 @@
+"""
+Tools for handling synthetic observations, for the purpose of testing mcmc methods
+
+Note on nomenclature:
+    "full_source" here refers to an expanded source string (e.g. 'sim10_2'),
+    which also specifies the sim_batch (e.g. 10) and the series (e.g. 2).
+    Methods in this module can break this into a smaller "source" string
+    for the purposes of organising directories in kepler_grids, to avoid
+    having to create/define a new "source" for every synthetic test.
+"""
 import numpy as np
 import pandas as pd
 import os
