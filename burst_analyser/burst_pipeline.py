@@ -16,7 +16,7 @@ import time
 from . import burst_analyser
 from . import burst_tools
 from ..grids import grid_tools, grid_strings
-from ..misc.pyprint import printv
+from ..misc.pyprint import printv, print_title
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -28,17 +28,17 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
     """
     # 1.
     if copy_params:
-        printv('Copying parameter tables', verbose)
+        print_title('Copying parameter tables')
         grid_tools.copy_paramfiles(batches, source)
 
     # 2.
     if reload:
-        printv('Loading lightcurve files', verbose)
+        print_title('Loading lightcurve files')
         burst_tools.multi_batch_save(batches, source, multithread=multithread)
 
     # 3.
     if analyse:
-        printv('Extracting burst properties from models', verbose)
+        print_title('Extracting burst properties from models')
         if multithread:
             multithread_extract(batches, source)
         else:
@@ -46,7 +46,7 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
 
     # 4.
     if collect:
-        printv('Collecting results', verbose)
+        print_title('Collecting results')
         last_batch = batches[-1]
         burst_tools.combine_extracts(np.arange(1, last_batch+1), source)
 
