@@ -12,6 +12,7 @@ from ..interpolator import kepler_emulator
 from .mcmc_versions import McmcVersion
 from pygrids.mcmc.mcmc_tools import print_params
 from pygrids.misc import pyprint
+from pygrids.grids import synth_data
 
 # concord
 import ctools
@@ -22,7 +23,8 @@ source_map = {
     'biggrid1': 'gs1826',  # alias for the source being modelled
     'biggrid2': 'gs1826',
     'sim_test': 'biggrid2',
-}
+    'sim10': 'biggrid2',
+              }
 
 c = const.c.to(u.cm / u.s)
 msunyer_to_gramsec = (u.M_sun / u.year).to(u.g / u.s)
@@ -129,16 +131,21 @@ class BurstFit:
             self.obs_data = pickle.load(open(filepath, 'rb'))
             self.debug.end_function()
             return
+        elif 'sim' in self.source:
+            stripped = self.source.strip('sim')
+            sim_batch = int(stripped[:2])
+            series = int(stripped[3:])
+            self.obs_data = synth_data.extract_obs_data(series, sim_batch)
+            return
+        else:
+            self.obs_data = dict.fromkeys(key_map)
+            for key in self.obs_data:
+                self.obs_data[key] = np.zeros(self.n_epochs)
+                key_old = key_map[key]
 
-        self.obs_data = dict.fromkeys(key_map)
-        for key in self.obs_data:
-            self.obs_data[key] = np.zeros(self.n_epochs)
-            key_old = key_map[key]
-
-            for i in range(self.n_epochs):
-                self.obs_data[key][i] = self.obs[i].__dict__[key_old].value
-
-        self.debug.end_function()
+                for i in range(self.n_epochs):
+                    self.obs_data[key][i] = self.obs[i].__dict__[key_old].value
+            self.debug.end_function()
 
     def lhood(self, params, plot=False):
         """Return lhood for given params
