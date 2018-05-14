@@ -24,7 +24,7 @@ default_plt_options()
 
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
-                 re_load=False, savelum=True, analyse=True, plot=False):
+                 reload=False, savelum=True, analyse=True, plot=False):
         self.run = run
         self.batch = batch
         self.source = source
@@ -42,7 +42,7 @@ class BurstRun(object):
         self.loaded = False
         self.lum = None
         self.lumf = None
-        self.load(savelum=savelum, re_load=re_load)
+        self.load(savelum=savelum, reload=reload)
 
         self.analysed = False
         self.bursts = {}
@@ -62,11 +62,11 @@ class BurstRun(object):
         if self.verbose:
             print(string)
 
-    def load(self, savelum=True, re_load=False):
+    def load(self, savelum=True, reload=False):
         """Load luminosity data from kepler simulation
         """
         self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
-                                    basename=self.basename, save=savelum, re_load=re_load)
+                                    basename=self.basename, save=savelum, reload=reload)
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
         self.loaded = True
 

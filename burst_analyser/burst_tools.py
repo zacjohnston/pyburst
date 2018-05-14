@@ -17,7 +17,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
-def load(run, batch, source, basename='xrb', re_load=False, save=True,
+def load(run, batch, source, basename='xrb', reload=False, save=True,
          silent=False):
     """Attempts to load pre-saved lumfile, or load binary. Returns luminosity [t, lum]
     """
@@ -32,7 +32,7 @@ def load(run, batch, source, basename='xrb', re_load=False, save=True,
     presaved_filepath = os.path.join(input_path, presaved_file)
 
     # ===== Force reload =====
-    if re_load:
+    if reload:
         print('Force-reloading binary file: ')
         try:
             print('Deleting old presaved file')
@@ -74,7 +74,7 @@ def load(run, batch, source, basename='xrb', re_load=False, save=True,
     return lum
 
 
-def batch_save(batch, source, runs=None, basename='xrb', re_load=True, **kwargs):
+def batch_save(batch, source, runs=None, basename='xrb', reload=True, **kwargs):
     """Loads a collection of models and saves their lightcurves
     """
     if runs is None:
@@ -82,7 +82,7 @@ def batch_save(batch, source, runs=None, basename='xrb', re_load=True, **kwargs)
     runs = grid_tools.expand_runs(runs)
 
     for run in runs:
-        load(run, batch, source, basename=basename, re_load=re_load, **kwargs)
+        load(run, batch, source, basename=basename, reload=reload, **kwargs)
 
 
 def multi_batch_save(batches, source, multithread=True, **kwargs):
