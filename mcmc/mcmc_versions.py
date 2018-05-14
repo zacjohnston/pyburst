@@ -334,14 +334,12 @@ version_definitions = {
         },
     'disc_model':
         {
-            'biggrid1':
-                {
+            'biggrid1': {
                     2: 'he16_a',
                     5: 'he16_a',
                     6: 'he16_a',
-                },
-            'biggrid2':
-                {
+                        },
+            'biggrid2': {
                     2: 'he16_a',
                     3: 'he16_b',
                     10: 'he16_a',
@@ -360,24 +358,21 @@ version_definitions = {
                     26: 'he16_a',
                     27: 'he16_b',
                     38: 'he16_a',
-                },
-            'sim_test':
-                {
-
-                },
+                        },
+            'sim_test': {},
         },
     'interpolator':
         {
-            'biggrid1':
-                {1: 1,
+            'biggrid1': {
+                 1: 1,
                  2: 1,
                  3: 2,
                  4: 2,
                  5: 2,
                  6: 2,
-                 },
-            'biggrid2':
-                {1: 1,
+                        },
+            'biggrid2': {
+                 1: 1,
                  2: 1,
                  3: 1,
                  4: 2,
@@ -423,7 +418,7 @@ version_definitions = {
                  44: 15,
                  45: 15,
                  46: 15,
-                 },
+                        },
             'sim_test':
                 {1: 5,
                  2: 5,
@@ -433,20 +428,21 @@ version_definitions = {
                  6: 6,
                  7: 8,
                  },
+            'sim': {
+                1: 15,
+                        },
         },
     'prior_bounds':
         {
-            'biggrid1':
-                {
+            'biggrid1': {
                     1: prior_bounds[1],
                     2: prior_bounds[1],
                     3: prior_bounds[2],
                     4: prior_bounds[2],
                     5: prior_bounds[2],
                     6: prior_bounds[3],
-                },
-            'biggrid2':
-                {
+                        },
+            'biggrid2': {
                     1: prior_bounds[4],
                     2: prior_bounds[4],
                     3: prior_bounds[4],
@@ -493,9 +489,8 @@ version_definitions = {
                     44: prior_bounds[25],
                     45: prior_bounds[26],
                     46: prior_bounds[27],
-                },
-            'sim_test':
-                {
+                        },
+            'sim_test': {
                     1: prior_bounds[9],
                     2: prior_bounds[10],
                     3: prior_bounds[11],
@@ -503,19 +498,21 @@ version_definitions = {
                     5: prior_bounds[11],
                     6: prior_bounds[11],
                     7: prior_bounds[16],
-                },
+                        },
+            'sim': {
+                    1: prior_bounds[26],
+                        },
         },
     'initial_position_default':
         {
             'biggrid1': initial_position[1],
             'biggrid2': initial_position[4],
             'sim_test': initial_position[3],
+            'sim': initial_position[12],
         },
     'initial_position':
         {
-            'biggrid1': {
-
-            },
+            'biggrid1': {},
             'biggrid2': {
                 21: initial_position[4],
                 22: initial_position[5],
@@ -536,23 +533,21 @@ version_definitions = {
                 44: initial_position[12],
                 45: initial_position[12],
                 46: initial_position[12],
-            },
-            'sim_test': {
+                        },
+            'sim_test': {},
+            'sim': {},
 
-            },
         },
     'param_keys_default':
         {
             'biggrid1': param_keys[1],
             'biggrid2': param_keys[2],
             'sim_test': param_keys[1],
+            'sim': param_keys[6],
         },
     'param_keys':
         {
-            'biggrid1':
-                {
-
-                },
+            'biggrid1': {},
             'biggrid2':
                 {
                     1: param_keys[1],
@@ -579,10 +574,8 @@ version_definitions = {
                     45: param_keys[6],
                     46: param_keys[6],
                 },
-            'sim_test':
-                {
-
-                },
+            'sim_test': {},
+            'sim': {},
         },
 }
 
@@ -592,11 +585,15 @@ class McmcVersion:
     """
 
     def __init__(self, source, version):
-        if source not in version_definitions['disc_model_default']:
+        if ('sim' in source) and (source != 'sim_test'):
+            source = 'sim'
+
+        if source not in version_definitions['param_keys_default']:
             raise ValueError(f'source ({source}) not defined in mcmc_versions')
         elif version not in version_definitions['interpolator'][source]:
             raise ValueError(f'version {version} of source {source} ' +
                              'is not defined in mcmc_versions')
+
         self.source = source
         self.version = version
         self.param_keys = get_param_keys(source, version)
