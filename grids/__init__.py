@@ -5,7 +5,7 @@ from . import grid_strings
 from . import grid_tools
 from . import kepler_files
 from . import kepler_jobscripts
-from . import obs_tools
+from . import synth_data
 
 __all__ = ['grid_analyser',
            'grid_plotting',
@@ -14,5 +14,5 @@ __all__ = ['grid_analyser',
            'grid_tools',
            'kepler_files',
            'kepler_jobscripts',
-           'obs_tools',
+           'synth_data.py',
            ]
