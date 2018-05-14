@@ -45,6 +45,10 @@ def get_analyser_path(source):
     return os.path.join(GRIDS_PATH, 'analyser', source)
 
 
+def get_obs_data_path(source):
+    return os.path.join(GRIDS_PATH, 'obs_data', source)
+
+
 # ======================================================
 # Misc. paths
 # ======================================================
