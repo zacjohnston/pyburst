@@ -19,6 +19,16 @@ def source_shorthand(source):
         return source
 
 
+def check_synth_source(source):
+    """Method to check if a source is from synthetic data
+    Returns reformatted string for path purposes"""
+    if ('sim' in source) and (source != 'sim_test'):
+        idx = source.find('_')
+        return source[:idx]
+    else:
+        return source
+
+
 # ======================================================
 # Basic strings
 # ======================================================
@@ -38,14 +48,17 @@ def get_model_string(run, batch, source, b_tag='', r_tag=''):
 # Top level paths
 # ======================================================
 def get_source_path(source):
+    source = check_synth_source(source)
     return os.path.join(GRIDS_PATH, 'sources', source)
 
 
 def get_analyser_path(source):
+    source = check_synth_source(source)
     return os.path.join(GRIDS_PATH, 'analyser', source)
 
 
 def get_obs_data_path(source):
+    source = check_synth_source(source)
     return os.path.join(GRIDS_PATH, 'obs_data', source)
 
 
@@ -64,6 +77,7 @@ def get_model_path(run, batch, source, basename='xrb'):
 
 
 def get_source_subdir(source, dir_):
+    source = check_synth_source(source)
     source_path = get_source_path(source)
     return os.path.join(source_path, dir_)
 
