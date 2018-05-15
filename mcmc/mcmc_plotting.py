@@ -88,7 +88,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
             truth_values = get_summary(chain, discard=discard, cap=cap,
                                        source=source, version=version)[:, 1]
 
-        fig = cc.plotter.plot(truth=truth_values, display=disopplay)
+        fig = cc.plotter.plot(truth=truth_values, display=display)
     else:
         fig = cc.plotter.plot(display=display)
 
