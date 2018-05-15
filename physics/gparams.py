@@ -123,7 +123,7 @@ def plot_g():
     plt.show(block=False)
 
 
-def gr_corrections(r, m, phi=1.0):
+def gr_corrections(r, m, phi=1.0, verbose=False):
     """Returns GR correction factors given R, M (Eq. B5, Keek & Heger 2007)
 
     parameters
@@ -135,7 +135,6 @@ def gr_corrections(r, m, phi=1.0):
     phi : flt
         Ratio of GR mass to Newtonian mass (unrelated to grav potential phi)
     """
-    print_title(f'Using R={r:.3f} and M={m}:')
 
     R, M = apply_units(r=r, m=m)
     zeta = get_zeta(r=r, m=m)
@@ -146,10 +145,12 @@ def gr_corrections(r, m, phi=1.0):
 
     redshift = xi**2/phi    #NOTE: unrelated to anisotropy xi factor
 
-    print_dashes()
-    print(f'    R_GR = {r*xi:.2f} km')
-    print(f'(1+z)_GR = {redshift:.3f}')
-    print_dashes()
+    if verbose:
+        print_title(f'Using R={r:.3f} and M={m}:')
+        print_dashes()
+        print(f'    R_GR = {r*xi:.2f} km')
+        print(f'(1+z)_GR = {redshift:.3f}')
+        print_dashes()
 
     return xi, redshift
 
