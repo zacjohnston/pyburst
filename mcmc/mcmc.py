@@ -10,7 +10,7 @@ from scipy.optimize import minimize
 from ..grids import grid_tools
 from . import burstfit
 from . import mcmc_versions
-from . import mcmc_plotting
+from . import mcmc_plot
 from . import mcmc_tools
 from ..misc.pyprint import check_params_length
 
@@ -161,11 +161,11 @@ def save_all_plots(source, versions, n_steps, n_walkers,
         chain = mcmc_tools.load_chain(source, version=version, n_steps=n_steps,
                                       n_walkers=n_walkers)
 
-        mcmc_plotting.plot_posteriors(chain, source=source, version=version,
-                                      discard=discard, cap=cap, save=True, display=display)
+        mcmc_plot.plot_posteriors(chain, source=source, version=version,
+                                  discard=discard, cap=cap, save=True, display=display)
 
-        mcmc_plotting.plot_mass_radius(chain, source=source, version=version,
-                                       discard=discard, cap=cap, save=True, display=display)
+        mcmc_plot.plot_mass_radius(chain, source=source, version=version,
+                                   discard=discard, cap=cap, save=True, display=display)
 
-        mcmc_plotting.plot_walkers(chain, source=source, version=version,
-                                   params=pkeys[:5], save=True, display=display)
+        mcmc_plot.plot_walkers(chain, source=source, version=version,
+                               params=pkeys[:5], save=True, display=display)
