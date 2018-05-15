@@ -14,5 +14,5 @@ __all__ = ['grid_analyser',
            'grid_tools',
            'kepler_files',
            'kepler_jobscripts',
-           'synth_data.py',
+           'synth_data',
            ]

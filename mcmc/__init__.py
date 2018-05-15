@@ -7,7 +7,7 @@ from . import mcmc_versions
 
 __all__ = ['burstfit',
            'mcmc',
-           'mcmc_jobs.py',
+           'mcmc_jobs',
            'mcmc_plotting',
            'mcmc_tools',
            'mcmc_versions',
