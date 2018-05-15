@@ -46,6 +46,28 @@ def save_plot(fig, prefix, chain, save, source, version,
         plt.close(fig)
 
 
+def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960,
+                        walkers=True, posteriors=True, contours=False, max_lhood=False):
+    """Save plots for multiple series in a synthetic data batch
+    """
+    for ser in series:
+        full_source = f'{source}_{ser}'
+        chain = mcmc_tools.load_chain(full_source, n_walkers=n_walkers, n_steps=n_steps,
+                                      version=version)
+
+        if walkers:
+            plot_walkers(chain, source=full_source, save=True,
+                         display=False, version=version)
+
+        if posteriors:
+            plot_posteriors(chain, source=full_source, save=True, discard=discard,
+                            display=False, version=version, max_lhood=max_lhood)
+
+        if contours:
+            plot_contours(chain, source=full_source, save=True, discard=discard,
+                          display=False, version=version, max_lhood=max_lhood)
+
+
 def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lhood=False,
                   display=True, save=False, truth_values=None, verbose=True,
                   smoothing=False):
@@ -66,7 +88,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
             truth_values = get_summary(chain, discard=discard, cap=cap,
                                        source=source, version=version)[:, 1]
 
-        fig = cc.plotter.plot(truth=truth_values, display=display)
+        fig = cc.plotter.plot(truth=truth_values, display=disopplay)
     else:
         fig = cc.plotter.plot(display=display)
 
