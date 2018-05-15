@@ -282,7 +282,7 @@ class BurstFit:
         Parameters
         ----------
         interp_params : 1darray
-            parameters specific to the model (mdot1, x, z, qb, mass)
+            parameters specific to the model (e.g. mdot1, x, z, qb, mass)
         mdots : 1darray
             accretion rates for each epoch (as fraction of Eddington rate)
         """

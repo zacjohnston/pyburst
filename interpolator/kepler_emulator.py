@@ -22,13 +22,15 @@ params_exclude = {'gs1826': {'qb': [0.5, 0.7, 0.9],
                              'z': [0.001, 0.003],
                              },
                   'biggrid1': {},
-                  'biggrid2': {'qb': [.075],
+                  'biggrid2': {
+                               # 'qb': [.075],
+                               'qb': [.075, 0.025],
                                'x': [0.5, 0.6, 0.8],
                                # 'accrate': np.arange(5, 24, 2)/100,
-                               'accrate': np.append(np.arange(5, 8)/100,
-                                                    np.arange(9, 24, 2)/100),
+                               'accrate': np.append(np.arange(5, 10)/100,
+                                                    np.arange(11, 24, 2)/100),
                                'z': [0.001],
-                               'z': [0.001, 0.0125, 0.0175],
+                               # 'z': [0.001, 0.0125, 0.0175],
                                # 'mass': [1.4, 2.6]
                                'mass': [0.8, 3.2]
                                },
@@ -122,19 +124,20 @@ class Kemulator:
         acc = self.params['accrate']
         x = self.params['x']
         z = self.params['z']
-        qb = self.params['qb']
+        # qb = self.params['qb']
         mass = self.params['mass']
 
         print('Creating interpolator on grid: ')
         print(f'x:    {np.unique(x)}')
         print(f'z:    {np.unique(z)}')
-        print(f'qb:   {np.unique(qb)}')
+        # print(f'qb:   {np.unique(qb)}')
         print(f'mass: {np.unique(mass)}')
         print(f'acc:  {np.unique(acc)}')
 
         # ==== ensure correct order of parameters ====
-        points = (acc, x, z, qb, mass)
+        # points = (acc, x, z, qb, mass)
         # points = (acc, z, qb, mass)
+        points = (acc, x, z, mass)
 
         n_models = len(self.params)
         n_bprops = len(bprops)
@@ -174,8 +177,9 @@ def convert_params(params):
     ========================================================"""
     # check_params_length(params=params)
     ptype = type(params)
-    pkeys = ['acc', 'x', 'z', 'qb', 'mass']
+    # pkeys = ['acc', 'x', 'z', 'qb', 'mass']
     # pkeys = ['acc', 'z', 'qb', 'mass']
+    pkeys = ['acc', 'x', 'z', 'mass']
 
     if ptype == dict:
         params_out = []
@@ -190,7 +194,7 @@ def convert_params(params):
     return params_out
 
 
-def check_params_length(params, length=5):
+def check_params_length(params, length=4):
     """========================================================
     Checks that five parameters have been provided
     ========================================================"""
