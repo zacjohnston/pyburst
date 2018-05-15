@@ -7,34 +7,10 @@ import pickle
 
 # kepler_grids
 from ..grids import grid_tools, grid_strings
+from . import interp_versions
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
-
-batches_exclude = {'biggrid1': {'batch': [255, 256, 257, 258, 259, 260, 471,
-                                          472, 473, 418, 419, 420]},
-                   'biggrid2': {},
-                   }
-
-params_exclude = {'gs1826': {'qb': [0.5, 0.7, 0.9],
-                             'x': [0.6],
-                             'xi': [0.8, 0.9, 1.0, 1.1, 3.2],
-                             'z': [0.001, 0.003],
-                             },
-                  'biggrid1': {},
-                  'biggrid2': {
-                               # 'qb': [.075],
-                               'qb': [.075, 0.025],
-                               'x': [0.5, 0.6, 0.8],
-                               # 'accrate': np.arange(5, 24, 2)/100,
-                               'accrate': np.append(np.arange(5, 10)/100,
-                                                    np.arange(11, 24, 2)/100),
-                               'z': [0.001],
-                               # 'z': [0.001, 0.0125, 0.0175],
-                               # 'mass': [1.4, 2.6]
-                               'mass': [0.8, 3.2]
-                               },
-                  }
 
 key_map = {'dt': 'tDel', 'u_dt': 'uTDel',
            'fluence': 'fluence', 'u_fluence': 'uFluence',
@@ -65,8 +41,12 @@ class Kemulator:
         summ = grid_tools.load_grid_table('summ', source=source, burst_analyser=burst_analyser)
         params = grid_tools.load_grid_table('params', source=source)
 
+        self.version_def = interp_versions.InterpVersion(source, version)
+        batches_exclude = self.version_def.batches_exclude
+        params_exclude = self.version_def.params_exclude
+
         if exclude_tests:
-            exclude = {**batches_exclude[source], **params_exclude[source]}
+            exclude = {**batches_exclude, **params_exclude}
             params = grid_tools.exclude_params(table=params, params=exclude)
 
             idxs_kept = params.index
