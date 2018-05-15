@@ -1,5 +1,7 @@
 import os
 
+from ..grids import grid_strings
+
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
@@ -29,9 +31,9 @@ def write_submission_script(source, version, n_walkers, n_steps, dump_step,
                                     dump_step=dump_step)
 
     # prepend_str = {True:'restart_', False:''}[restart]
-    path = os.path.join(GRIDS_PATH, 'sources', source, 'logs')
+    logs_path = grid_strings.get_source_subdir(source, 'logs')
     filename = f'{cluster}_{job_str}{ext}'
-    filepath = os.path.join(path, filename)
+    filepath = os.path.join(logs_path, filename)
 
     with open(filepath, 'w') as f:
         f.write(script_str)
