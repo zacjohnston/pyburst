@@ -226,6 +226,19 @@ prior_bounds = {
              (0.01, np.inf),  # f_p
              ),
         },
+
+    7: {
+        1: ((0.1, 0.24),  # mdot1
+            (0.1, 0.24),  # mdot2
+            (0.1, 0.24),  # mdot3
+            (0.65, 0.77),  # x
+            (0.0015, 0.0175),  # z
+            (1., 2.6 / 1.4),  # g
+            (1.2, 1.5),  # redshift
+            (0.01, np.inf),  # f_b
+            (0.01, np.inf),  # f_p
+            ),
+    }
 }
 
 # ===== Defines order/number of params provided to BurstFit =====
@@ -236,6 +249,7 @@ param_keys = {
     4: ['mdot1', 'mdot2', 'mdot3', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
     5: ['mdot1', 'mdot2', 'mdot3', 'z', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
     6: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
+    7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f_b', 'f_p'],
 }
 
 # ===== initial position of walkers =====
@@ -269,6 +283,8 @@ initial_position = {
          0.768, 0.002, 0.08, 1.02, 1.48, 0.28, 0.75),
     14: (0.218, 0.179, 0.133,
          0.7, 0.003, 0.08, 1.02, 1.48, 0.25, 2.6),
+    15: (0.214, 0.182, 0.133,
+         0.71, 0.05, 1.5, 1.45, 0.64, 1.75),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -373,6 +389,7 @@ version_definitions = {
                 44: 15,
                 45: 15,
                 46: 15,
+                47: 15,
             },
             'sim_test':
                 {1: 5,
@@ -432,7 +449,8 @@ version_definitions = {
                 44: prior_bounds[6][25],
                 45: prior_bounds[6][26],
                 46: prior_bounds[6][27],
-                        },
+                47: prior_bounds[7][1],
+            },
             'sim_test': {
                 1: prior_bounds[1][9],
                 2: prior_bounds[1][10],
@@ -478,6 +496,7 @@ version_definitions = {
                 44: initial_position[12],
                 45: initial_position[12],
                 46: initial_position[12],
+                47: initial_position[15],
             },
             'sim_test': {},
             'sim10': {
@@ -521,6 +540,7 @@ version_definitions = {
                     44: param_keys[6],
                     45: param_keys[6],
                     46: param_keys[6],
+                    47: param_keys[7],
                 },
             'sim_test': {},
             'sim10': {},
