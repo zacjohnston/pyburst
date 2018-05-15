@@ -101,24 +101,15 @@ class Kemulator:
         ========================================================
         bprops = [str]  : burst properties to interpolate (e.g., dt, fluence)
         ========================================================"""
-        acc = self.params['accrate']
-        x = self.params['x']
-        z = self.params['z']
-        # qb = self.params['qb']
-        mass = self.params['mass']
+        self.printv('Creating interpolator on grid: ')
+        points = []
 
-        print('Creating interpolator on grid: ')
-        print(f'x:    {np.unique(x)}')
-        print(f'z:    {np.unique(z)}')
-        # print(f'qb:   {np.unique(qb)}')
-        print(f'mass: {np.unique(mass)}')
-        print(f'acc:  {np.unique(acc)}')
+        for param in self.version_def.param_keys:
+            param_points = self.params[param]
+            points += [param_points]
+            self.printv(f'{param}:  {np.unique(param_points)}')
 
-        # ==== ensure correct order of parameters ====
-        # points = (acc, x, z, qb, mass)
-        # points = (acc, z, qb, mass)
-        points = (acc, x, z, mass)
-
+        points = tuple(points)
         n_models = len(self.params)
         n_bprops = len(bprops)
         values = np.full((n_models, n_bprops), np.nan)
@@ -133,7 +124,6 @@ class Kemulator:
 
             values[:, i] = self.summ[key]
         self.interpolator = LinearNDInterpolator(points, values)
-        # self.interpolator = RegularGridInterpolator(points, values)
         t1 = time.time()
         self.printv(f'Setup time: {t1-t0:.1f} s')
 
@@ -143,11 +133,10 @@ class Kemulator:
         ========================================================
         params: acc, x, z, qb, mass
         ========================================================"""
-        check_params_length(params)
+        # check_params_length(params, length=len(self.version_def.param_keys))
         # ==== ensure correct order of parameters ====
-        if type(params) == dict:
-            params = convert_params(params=params)
-
+        # if type(params) == dict:
+        #     params = convert_params(params=params)
         return self.interpolator(params)
 
 
@@ -174,11 +163,10 @@ def convert_params(params):
     return params_out
 
 
-def check_params_length(params, length=4):
+def check_params_length(params, length=5):
     """========================================================
     Checks that five parameters have been provided
     ========================================================"""
-
     def check(array):
         if len(array) != length:
             raise ValueError("'params' must specify each of (acc, x, z, qb, mass)")

@@ -33,7 +33,7 @@ version_defaults = {
 
 
 version_definitions = {
-    'param_keys': {
+    'param_keys': {  # This will set the order of params when calling interpolator
         'biggrid2': {
             14: ['accrate', 'z', 'qb', 'mass'],
             15: ['accrate', 'x', 'z', 'qb', 'mass'],
