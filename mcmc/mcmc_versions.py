@@ -267,6 +267,8 @@ initial_position = {
          0.7, 0.004, 0.026, 1.4, 1.45, 0.64, 1.7),
     13: (0.239, 0.206, 0.153,
          0.768, 0.002, 0.08, 1.02, 1.48, 0.28, 0.75),
+    14: (0.218, 0.179, 0.133,
+         0.7, 0.003, 0.08, 1.02, 1.48, 0.25, 2.6),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -384,6 +386,7 @@ version_definitions = {
             'sim10': {
                 1: 15,
                 2: 15,
+                3: 15,
             },
         },
     'prior_bounds':
@@ -454,6 +457,7 @@ version_definitions = {
             'sim10': {
                 1: prior_bounds[6][26],
                 2: prior_bounds[6][26],
+                3: prior_bounds[6][26],
             },
         },
     'initial_position_default':
@@ -489,8 +493,9 @@ version_definitions = {
             },
             'sim_test': {},
             'sim10': {
-                2: initial_position[13]
-                    },
+                2: initial_position[13],
+                3: initial_position[14],
+            },
 
         },
     'param_keys_default':
