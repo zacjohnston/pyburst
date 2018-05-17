@@ -29,6 +29,9 @@ import os
 # kepler_grids
 from pygrids.grids import grid_strings, grid_tools
 
+# concord
+import ctools
+
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 bprops = ['dt', 'u_dt', 'fper', 'u_fper', 'fluence', 'u_fluence', 'peak', 'u_peak']
 
@@ -157,5 +160,25 @@ def get_peak(lightcurve):
     return peak, u_peak
 
 
-def generate_synth_data():
-    pass
+def generate_synth_data(batches, runs, source):
+    obs = ctools.load_obs('gs1826')
+    models = ctools.load_models(batches=batches, runs=runs, source=source)
+
+
+def pick_random_params():
+    param_lists = {
+        'x': [0.65, 0.7, 0.77],
+        'z': [0.0015, 0.0025, 0.0075, 0.0125, 0.0175],
+        'qb': [0.025, 0.125],
+        'mass': [1.4, 2.0, 2.6],
+    }
+
+    rand_params = {}
+    for param in param_lists:
+        plist = param_lists[param]
+        n_p = len(plist)
+        idx = np.random.randint(n_p)
+        rand_params[param] = plist[idx]
+
+    return rand_params
+
