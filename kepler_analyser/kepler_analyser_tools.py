@@ -278,7 +278,7 @@ def reformat_summ(batch, source, basename='xrb', **kwargs):
     """
     Saves a summ.csv file that is human-readable
     """
-    source = grid_tools.source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     path = kwargs.get('path', GRIDS_PATH)
 
     batch_str = '{source}_{batch}'.format(source=source, batch=batch)
@@ -330,7 +330,7 @@ def plot_analyser(runs,
     # gr      = bool  : use GR corrections
     # path    = str   : path to working directory
     # output  = str   : name of folder containing kepler_analyser output
-    source = grid_tools.source_shorthand(source=source)
+    source = grid_strings.source_shorthand(source=source)
     path = kwargs.get('path', GRIDS_PATH)
     analyser_path = os.path.join(path, 'analyser', source)
 
