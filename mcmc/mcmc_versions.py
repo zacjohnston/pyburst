@@ -115,6 +115,17 @@ prior_bounds = {
              (0.0, np.inf),  # d
              (0, 90)  # inc
              ),
+        20: ((0.08, 0.24),  # mdot1      ***
+             (0.08, 0.24),  # mdot2      ***
+             (0.08, 0.24),  # mdot3      ***
+             (0.65, 0.77),  # x
+             (0.0015, 0.0175),  # z
+             (0.025, 0.125),  # qb
+             (1.0, 2.6/1.4),  # g
+             (1.0, 2.0),  # redshift
+             (0.0, np.inf),  # d
+             (0, 90)  # inc
+             ),
 
         },
 
@@ -322,6 +333,12 @@ initial_position = {
          0.73, 0.004, 1.54, 1.37, 0.55, 1.55),
     18: (0.17, 0.146, 0.106,
          0.7, 0.005, 0.1, 1.5, 1.4, 8.0, 63.),
+    19: (0.17, 0.146, 0.106,
+         0.76, 0.0025, 0.08, 1.05, 1.1, 6.5, 40.),
+    20: (0.17, 0.146, 0.106,
+         0.76, 0.0025, 0.03, 1.05, 1.3, 10, 75.),
+    21: (0.235, 0.207, 0.152,
+         0.7, 0.012, 0.05, 1.25, 1.55, 7, 55.),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -447,6 +464,9 @@ version_definitions = {
                 2: 15,
                 3: 15,
                 4: 15,
+                5: 15,
+                6: 15,
+                7: 15,
             },
         },
     'prior_bounds':
@@ -511,6 +531,9 @@ version_definitions = {
                 2: prior_bounds[6][26],
                 3: prior_bounds[6][26],
                 4: prior_bounds[2][19],
+                5: prior_bounds[2][20],
+                6: prior_bounds[2][20],
+                7: prior_bounds[2][20],
             },
         },
     'initial_position_default':
@@ -553,6 +576,9 @@ version_definitions = {
                 2: initial_position[13],
                 3: initial_position[14],
                 4: initial_position[18],
+                5: initial_position[19],
+                6: initial_position[20],
+                7: initial_position[21],
             },
 
         },
@@ -599,6 +625,9 @@ version_definitions = {
             'sim_test': {},
             'sim10': {
                 4: param_keys[2],
+                5: param_keys[2],
+                6: param_keys[2],
+                7: param_keys[2],
             },
         },
 }
