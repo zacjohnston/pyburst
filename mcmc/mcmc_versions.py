@@ -104,6 +104,17 @@ prior_bounds = {
              (0.0, np.inf),  # d
              (0, 80)  # inc
              ),
+        19: ((0.08, 0.24),  # mdot1      ***
+             (0.08, 0.24),  # mdot2      ***
+             (0.08, 0.24),  # mdot3      ***
+             (0.65, 0.77),  # x
+             (0.0015, 0.0175),  # z
+             (0.025, 0.125),  # qb
+             (1.0, 2.6/1.4),  # g
+             (1.0, 1.5),  # redshift
+             (0.0, np.inf),  # d
+             (0, 90)  # inc
+             ),
 
         },
 
@@ -309,6 +320,8 @@ initial_position = {
          0.73, 0.004, 1.54, 1.47, 0.6, 1.6),
     17: (0.18, 0.15, 0.11,
          0.73, 0.004, 1.54, 1.37, 0.55, 1.55),
+    18: (0.17, 0.146, 0.106,
+         0.7, 0.005, 0.1, 1.5, 1.4, 8.0, 63.),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -326,6 +339,7 @@ version_definitions = {
             'biggrid1': 'he16_d',
             'biggrid2': 'he16_d',
             'sim_test': 'he16_a',
+            'sim10': 'he16_a',
         },
     'disc_model':
         {
@@ -355,6 +369,7 @@ version_definitions = {
                 38: 'he16_a',
             },
             'sim_test': {},
+            'sim10': {},
         },
     'interpolator':
         {
@@ -431,6 +446,7 @@ version_definitions = {
                 1: 15,
                 2: 15,
                 3: 15,
+                4: 15,
             },
         },
     'prior_bounds':
@@ -494,7 +510,8 @@ version_definitions = {
                 1: prior_bounds[6][26],
                 2: prior_bounds[6][26],
                 3: prior_bounds[6][26],
-                        },
+                4: prior_bounds[2][19],
+            },
         },
     'initial_position_default':
         {
@@ -535,6 +552,7 @@ version_definitions = {
             'sim10': {
                 2: initial_position[13],
                 3: initial_position[14],
+                4: initial_position[18],
             },
 
         },
@@ -579,7 +597,9 @@ version_definitions = {
                     50: param_keys[7],
                 },
             'sim_test': {},
-            'sim10': {},
+            'sim10': {
+                4: param_keys[2],
+            },
         },
 }
 
