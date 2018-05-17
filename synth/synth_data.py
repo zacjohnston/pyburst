@@ -170,8 +170,7 @@ def pick_random_params():
         'x': [0.65, 0.7, 0.77],
         'z': [0.0015, 0.0025, 0.0075, 0.0125, 0.0175],
         'qb': [0.025, 0.125],
-        'mass': [1.4, 2.0, 2.6],
-    }
+        'mass': [1.4, 2.0, 2.6]}
 
     rand_params = {}
     for param in param_lists:
@@ -179,6 +178,24 @@ def pick_random_params():
         n_p = len(plist)
         idx = np.random.randint(n_p)
         rand_params[param] = plist[idx]
+    return rand_params
+
+
+def pick_random_factors():
+    bounds = {
+        'redshift': [1.2, 1.5],
+        'd': [2, 12],
+        'inc': [0, 90]}
+
+    rand_params = {}
+    for param in bounds:
+        bound = bounds[param]
+        floor = bound[0]
+        span = np.diff(bound)[0]
+        if param == 'inc':
+            rand_params[param] = (180/np.pi)*np.arcsin(np.random.rand())
+        else:
+            rand_params[param] = span*np.random.rand() + floor
 
     return rand_params
 
