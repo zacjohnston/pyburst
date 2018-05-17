@@ -12,7 +12,7 @@ from ..interpolator import kepler_emulator
 from .mcmc_versions import McmcVersion
 from pygrids.mcmc.mcmc_tools import print_params
 from pygrids.misc import pyprint
-from pygrids.grids import synth_data
+from pygrids.synth import synth_data
 
 # concord
 import ctools

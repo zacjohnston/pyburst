@@ -27,7 +27,7 @@ import pandas as pd
 import os
 
 # kepler_grids
-from ..grids import grid_strings, grid_tools
+from pygrids.grids import grid_strings, grid_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 bprops = ['dt', 'u_dt', 'fper', 'u_fper', 'fluence', 'u_fluence', 'peak', 'u_peak']
@@ -155,3 +155,7 @@ def get_peak(lightcurve):
     u_peak = lightcurve.iloc[idx]['u_flux'] * 1e-9
 
     return peak, u_peak
+
+
+def generate_synth_data():
+    pass
