@@ -416,7 +416,8 @@ class Kgrid:
         var, fixed = self.check_var_fixed(var=var, fixed=fixed)
 
         if self.source == 'biggrid2':
-            accrate_unique = np.arange(8, 25, 2)/100
+            # accrate_unique = np.arange(8, 25, 2)/100
+            accrate_unique = np.arange(8, 25)/100
         else:
             accrate_unique = self.unique_params['accrate']
 
@@ -437,16 +438,23 @@ class Kgrid:
         u_prop = uncertainty_keys.get(bprop)
 
         # ===== Axis properties =====
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(6, 4))
         title = ''
         for p, pv in fixed.items():
             precision = precisions.get(p, 3)
             title += f'{p}={pv:.{precision}f}, '
 
-        ax.set_xlim([0.07, 0.25])
-        ax.set_xlabel(r'$\dot{M} \; (\dot{M}_\mathrm{Edd})$ ')
-        ax.set_ylabel(f'{bprop} ({y_unit})')
-        ax.set_title(title)
+        ax.set_xlim([0.075, 0.245])
+        # ax.set_xlabel(r'$\dot{M} \; (\dot{M}_\mathrm{Edd})$ ') !!!
+        # ax.set_ylabel(f'{bprop} ({y_unit})')
+
+        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+        fontsize = 12
+        ax.set_xlabel(r'Accretion rate ($\dot{M} \;/ \dot{M}_\mathrm{Edd})$ ', fontsize=fontsize)
+        ax.set_ylabel(f'Burst recurrence time (hr)', fontsize=fontsize)
+        title = 'Example grid of burst simulations'
+        ax.set_title(title, fontsize=14)
+        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
         plt.tight_layout()
 
         for v in var_unique:
@@ -483,8 +491,9 @@ class Kgrid:
                 u_y = np.concatenate([u_y, u_tmp])
 
             precision = precisions.get(var, 3)
-            label = f'{var}={v:.{precision}f}'
-            ax.errorbar(x=mdot_x, y=prop_y, yerr=u_y, ls='', marker='o',
+            # label = f'{var}={v:.{precision}f}'
+            label = r'$Z_{CNO}$' + f'={v:.{precision}f}'
+            ax.errorbar(x=mdot_x, y=prop_y, yerr=u_y, ls='-', marker='o',
                         label=label, capsize=3)
 
             del (params['accrate'])
