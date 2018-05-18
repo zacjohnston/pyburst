@@ -1,8 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import chainconsumer
 
 import ctools
 from pygrids.grids import grid_analyser
+from pygrids.mcmc import mcmc_tools
+from pygrids.physics import gparams
 
 
 def compare_lc(burst, point, batches=[19, 1, 1], runs=[10, 20, 12]):
@@ -43,3 +46,28 @@ def compare_lc(burst, point, batches=[19, 1, 1], runs=[10, 20, 12]):
                 ls='none', marker='o', capsize=3)
 
     plt.show(block=False)
+
+
+def plot_posteriors(chain=None, discard=10000):
+    if chain is None:
+        chain = mcmc_tools.load_chain('sim_test', n_walkers=960, n_steps=20000, version=5)
+    params = [r'Accretion rate ($\dot{M} / \dot{M}_\text{Edd}$)', 'Hydrogen',
+              r'$Z_{\text{CNO}}$', r'$Q_\text{b}$ (MeV nucleon$^{-1}$)',
+              'gravity ($10^{14}$ cm s$^{-2}$)', 'redshift (1+z)',
+              'distance (kpc)', 'inclination (degrees)']
+
+    g = gparams.get_acceleration_newtonian(10, 1.4).value / 1e14
+    chain[:, :, 4] *= g
+
+    cc = chainconsumer.ChainConsumer()
+    cc.add_chain(chain[:, discard:, :].reshape((-1, 8)))
+    cc.configure(kde=False, smooth=0)
+
+    fig = cc.plotter.plot_distributions(display=True)
+
+    for i, p in enumerate(params):
+        fig.axes[i].set_title('')
+        fig.axes[i].set_xlabel(p)#, fontsize=10)
+
+    plt.tight_layout()
+    return fig
