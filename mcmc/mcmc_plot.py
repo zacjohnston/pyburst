@@ -48,14 +48,17 @@ def save_plot(fig, prefix, chain, save, source, version,
 
 def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960,
                         walkers=True, posteriors=True, contours=False,
-                        display=False, max_lhood=False, mass_radius=True):
+                        display=False, max_lhood=False, mass_radius=True,
+                        synth=True):
     """Save plots for multiple series in a synthetic data batch
     """
-    # TODO handle non-synth batches too
     # TODO reuse max_lhood point
     for ser in series:
-        # full_source = f'{source}_{ser}'
-        full_source = source
+        if synth:
+            full_source = f'{source}_{ser}'
+        else:
+            full_source = source
+
         chain = mcmc_tools.load_chain(full_source, n_walkers=n_walkers, n_steps=n_steps,
                                       version=version)
 
