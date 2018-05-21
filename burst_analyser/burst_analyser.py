@@ -475,7 +475,7 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
     def plot_lightcurve(self, burst, save=False, display=True, log=False,
-                        zero_time=True):
+                        zero_time=True, title=True, fontsize=14):
         """Plot individual burst lightcurve
         """
         self.ensure_analysed_is(True)
@@ -483,11 +483,12 @@ class BurstRun(object):
                 or burst < 0:
             raise ValueError(f'Burst index ({burst}) out of bounds '
                              f'(n_bursts={self.n_bursts})')
-
         fig, ax = plt.subplots()
-        ax.set_title(f'Burst {burst}')
-        ax.set_ylabel('Lum (erg/s)')
-        ax.set_xlabel('Time (s)')
+
+        if title:
+            ax.set_title(f'Burst {burst}')
+        ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
+        ax.set_xlabel('Time (s)', fontsize=fontsize)
 
         if log:
             ax.set_yscale('log')
@@ -498,9 +499,10 @@ class BurstRun(object):
         x = self.lum[i_start:i_end, 0]
         y = self.lum[i_start:i_end, 1]
 
+        yscale = 1e38
         if zero_time:
-            x -= self.bursts['t_start'][burst]
-        ax.plot(x, y, c='C0')
+            x = x - self.bursts['t_start'][burst]
+        ax.plot(x, y/yscale, c='C0')
 
         plot_path = os.path.join(self.plots_path, 'lightcurves', self.batch_str)
         grid_tools.try_mkdir(plot_path, skip=True)
