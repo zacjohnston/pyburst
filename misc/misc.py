@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 import ctools
 from pygrids.grids import grid_analyser
-
+from pygrids.mcmc import mcmc_tools, burstfit
 
 def compare_lc(burst, point, batches=[19, 1, 1], runs=[10, 20, 12]):
     kg2 = grid_analyser.Kgrid('biggrid2', load_concord_summ=False, exclude_defaults=True,
@@ -43,3 +43,20 @@ def compare_lc(burst, point, batches=[19, 1, 1], runs=[10, 20, 12]):
                 ls='none', marker='o', capsize=3)
 
     plt.show(block=False)
+
+
+def compare_bprops(source, version, n_walkers, n_steps, epoch):
+    """Plot model/obs comparison of single epoch, as one plot"""
+    bfit = burstfit.BurstFit(source, version)
+    max_p = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
+                                     n_steps=n_steps)
+    interp_params = np.zeros(4)
+    interp_params[0] = max_p[epoch-1]
+    interp_params[1:] = max_p[epoch:epoch:3]
+
+    interp = bfit.interpolate(interp_params)
+
+    
+    # 2. shift each bprop to observer
+    # 3. get obs_data values
+    # 4. give to bfit.compare()
