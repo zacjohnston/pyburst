@@ -126,7 +126,7 @@ def combine_extracts(batches, source):
 
     filename = f'burst_analysis_{source}.txt'
     filepath = os.path.join(source_path, 'burst_analysis', filename)
-
+    print(f'Saving: {filepath}')
     with open(filepath, 'w') as f:
         f.write(table_str)
 

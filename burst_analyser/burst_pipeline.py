@@ -30,6 +30,7 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
     if copy_params:
         print_title('Copying parameter tables')
         grid_tools.copy_paramfiles(batches, source)
+        # TODO combine paramfiles (grid_tools)
 
     # 2.
     if reload:
