@@ -28,7 +28,7 @@ class Kemulator:
     ========================================================"""
 
     def __init__(self, source, version, verbose=True, exclude_tests=True,
-                 recalculate_interpolators=False, burst_analyser=False,
+                 recalculate_interpolators=True, burst_analyser=True,
                  bprops=('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak')):
         self.verbose = verbose
         source = grid_strings.source_shorthand(source)
