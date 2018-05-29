@@ -151,6 +151,7 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
 
     See: get_mass_radius()
     """
+    default_plt_options()
     mass_radius_chain = get_mass_radius(chain=chain, discard=discard,
                                         source=source, version=version, cap=cap)
 
@@ -193,6 +194,7 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
     display : bool
     save : bool
     """
+    default_plt_options()
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
 
     # ===== Default to splitting all params into 2 plots  =====
@@ -311,6 +313,7 @@ def get_mass_radius_point(params, source, version):
 
 
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True):
+    default_plt_options()
     max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
                                           n_steps=n_steps, verbose=verbose)
 
@@ -321,6 +324,7 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True):
 def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
     """Saves frames of contour evolution, to make an animation
     """
+    default_plt_options()
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
     n_walkers, n_steps, n_dimensions = chain.shape
     mtarget = os.path.join(GRIDS_PATH, 'sources', source, 'mcmc', 'animation')
@@ -352,6 +356,7 @@ def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
 
 
 def animate_walkers(chain, source, version, stepsize=1, n_steps=100, bin=10, burn=100):
+    default_plt_options()
     mv = mcmc_versions.McmcVersion(source, version)
     g_idx = mv.param_keys.index('g')
     red_idx = mv.param_keys.index('redshift')
