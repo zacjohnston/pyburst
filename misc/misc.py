@@ -7,8 +7,6 @@ from pygrids.grids import grid_analyser
 from pygrids.mcmc import mcmc_tools, burstfit
 from pygrids.physics import gparams
 
-import kepdump
-
 
 def compare_lc(burst, point, batches=[19, 1, 1], runs=[10, 20, 12]):
     kg2 = grid_analyser.Kgrid('biggrid2', load_concord_summ=False, exclude_defaults=True,
@@ -89,27 +87,3 @@ def plot_posteriors(chain=None, discard=10000):
 
     plt.tight_layout()
     return fig
-
-
-def plot_saxj(x_units='time', dumptimes=True):
-    """Plotting SAXJ1808 model, to explore dumpfiles
-    to try and get temperature profiles"""
-    filepath = '/home/zacpetej/archive/kepler/grid_94/xrb2/preload2.txt'
-    lc = np.loadtxt(filepath, skiprows=1)
-    tscale = 1
-    dump_nums = np.arange(len(lc))
-
-    fig, ax = plt.subplots()
-    if x_units == 'time':
-        ax.plot(lc[:, 0]/tscale, lc[:, 1], marker='o', markersize=2)
-    else:
-        ax.plot(dump_nums, lc[:, 1], marker='o', markersize=2)
-
-    if dumptimes:
-        dumps = np.arange(1, 51) * 1000
-        if x_units == 'time':
-            ax.plot(lc[dumps, 0]/tscale, lc[dumps, 1], marker='o', ls='none')
-        else:
-            ax.plot(dumps, lc[dumps, 1], marker='o', ls='none')
-
-    plt.show(block=False)
