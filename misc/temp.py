@@ -61,7 +61,20 @@ def extract_dump(cycle, run=2, basename='xrb'):
 def extract_cycles(cycles):
     """Iterates over dump cycles and saves each as a table
     """
-    pass
+    for cycle in cycles:
+        table = extract_dump(cycle)
+
+
+def save_table(table, cycle):
+    path = '/home/zacpetej/projects/oscillations/saxj1808/grid_94_xrb2'
+
+    filename = f'step{cycle}.txt'
+    filepath = os.path.join(path, filename)
+    print(f'Saving: {filepath}')
+
+    table_str = table.to_string(index=False, justify='left', col_space=12)
+    with open(filepath, 'w') as f:
+        f.write(table_str)
 
 
 def plot_temp(cycle, run=2, basename='xrb'):
