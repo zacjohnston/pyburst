@@ -20,7 +20,8 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 def default_plt_options():
     """Initialise default plot parameters"""
     params = {'mathtext.default': 'regular',
-              'font.family': 'serif', 'text.usetex': False}
+              'font.family': 'serif',
+              'text.usetex': False}
     plt.rcParams.update(params)
 
 
@@ -53,6 +54,7 @@ def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960
     """Save plots for multiple series in a synthetic data batch
     """
     # TODO reuse max_lhood point
+    default_plt_options()
     for ser in series:
         if synth:
             full_source = f'{source}_{ser}'
@@ -84,6 +86,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
                   smoothing=False):
     """Plots posterior contours of mcmc chain
     """
+    default_plt_options()
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
     # TODO: re-use the loaded chainconsumer here instead of reloading
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap,
@@ -109,7 +112,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
 
 
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
-                    display=True, save=False, truth=False, truth_values=None,
+                    display=True, save=False, truth_values=None,
                     verbose=True, smoothing=False):
     """Plots posterior distributions of mcmc chain
 
@@ -119,12 +122,12 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
         Specify parameters of point (e.g. the true value) to draw on the distributions.
         Will be overidden if max_lhood=True
     """
-
+    default_plt_options()
     pkeys = mcmc_versions.get_param_keys(source=source, version=version)
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap,
                              smoothing=smoothing)
     height = 3 * ceil(len(pkeys) / 4)
-    if truth:
+    if truth_values is not None:
         fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
                                             truth=truth_values)
     elif max_lhood:
