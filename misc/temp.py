@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import os
 
 import kepdump
@@ -38,5 +38,20 @@ def load_dump(cycle, run=2, basename='xrb'):
     return kepdump.load(filepath)
 
 
-def plot_temp(dump):
-    pass
+def plot_temp(cycle, run=2, basename='xrb'):
+    """Plot temperature profile at given cycle (timestep)"""
+    dump = load_dump(cycle, run=run, basename=basename)
+    y0 = dump.y[1]  # column depth at inner zone
+
+    fig, ax = plt.subplots()
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+
+    ax.set_xlim([1e5, y0])
+    ax.set_ylim([5e7, 5e9])
+
+    ax.set_xlabel(r'y (g cm$^{-2}$)')
+    ax.set_ylabel(r'T (K)')
+
+    ax.plot(dump.y, dump.tn, color='C1')
+    plt.show(block=False)
