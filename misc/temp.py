@@ -63,12 +63,13 @@ def extract_cycles(cycles):
     """
     for cycle in cycles:
         table = extract_dump(cycle)
+        save_table(table, cycle)
 
 
 def save_table(table, cycle):
     path = '/home/zacpetej/projects/oscillations/saxj1808/grid_94_xrb2'
 
-    filename = f'step{cycle}.txt'
+    filename = f'{cycle}.txt'
     filepath = os.path.join(path, filename)
     print(f'Saving: {filepath}')
 
