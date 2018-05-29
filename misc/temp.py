@@ -66,10 +66,33 @@ def extract_cycles(cycles):
         save_table(table, cycle)
 
 
-def save_table(table, cycle):
+def make_timetable(cycles):
+    table = pd.DataFrame()
+    table['timestep'] = cycles
+    table['time (s)'] = extract_times(cycles)
+
+    save_table(table, cycle=None, name='timesteps.txt')
+    return table
+
+
+def extract_times(cycles, run=2, basename='xrb'):
+    times = np.zeros_like(cycles, dtype=float)
+
+    for i, cycle in enumerate(cycles):
+        dump = load_dump(cycle, run=run, basename=basename)
+        times[i] = dump.time
+
+    return times
+
+
+def save_table(table, cycle, name=None):
     path = '/home/zacpetej/projects/oscillations/saxj1808/grid_94_xrb2'
 
-    filename = f'{cycle}.txt'
+    if name is None:
+        filename = f'{cycle}.txt'
+    else:
+        filename = name
+
     filepath = os.path.join(path, filename)
     print(f'Saving: {filepath}')
 
