@@ -381,21 +381,22 @@ class BurstFit:
         y_units = {'dt': 'hr', 'fluence': '10^-6 erg/cm^2',
                    'peak': '10^-8 erg/cm^2/s', 'fper': '10^-9 erg/cm^2/s'}.get(bprop)
 
-        fig, ax = plt.subplots(figsize=(6, 4))
-        ax.tick_params(axis='x',           # changes apply to the x-axis
-                       which='both',       # both major and minor ticks are affected
-                       bottom=False,       # ticks along the bottom edge are off
-                       top=False,          # ticks along the top edge are off
-                       labelbottom=False)  # labels along the bottom edge are off
-
-        x = np.arange(1, self.n_epochs + 1)
+        fig, ax = plt.subplots(figsize=(5, 4))
+        epochs = np.arange(1, self.n_epochs+1)
+        ax.set_xticks(epochs)
+        # ax.tick_params(axis='x',           # changes apply to the x-axis
+        #                which='both',       # both major and minor ticks are affected
+        #                bottom=False,       # ticks along the bottom edge are off
+        #                top=False,          # ticks along the top edge are off
+        #                labelbottom=True)  # labels along the bottom edge are off
+        x = epochs
         ax.errorbar(x=x - dx, y=model/yscale, yerr=u_model/yscale, ls='none', marker='o',
                     capsize=3, color='r', label='Model')
         ax.errorbar(x=x + dx, y=obs/yscale, yerr=u_obs/yscale, ls='none',
                     marker='o', capsize=3, color='b', label='Observed')
 
         ax.set_ylabel(f'{bprop} ({y_units})')
-        # ax.set_xlabel('epoch number')
+        ax.set_xlabel('epoch number')
         ax.set_title(bprop)
         ax.legend()
         plt.tight_layout()
