@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import os
 
 import kepdump
+from pygrids.grids import grid_strings
+
+GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
 def plot_saxj(x_units='time', dumptimes=True, cycles=None):
@@ -66,7 +69,7 @@ def extract_cycles(cycles):
         save_table(table, cycle)
 
 
-def make_timetable(cycles):
+def save_times(cycles):
     table = pd.DataFrame()
     table['timestep'] = cycles
     table['time (s)'] = extract_times(cycles)
@@ -101,13 +104,15 @@ def save_table(table, cycle, name=None):
         f.write(table_str)
 
 
-def plot_temp(cycle, run=2, basename='xrb'):
+def plot_temp(cycle, run=2, basename='xrb', title='',
+              display=True):
     """Plot temperature profile at given cycle (timestep)
     """
     dump = load_dump(cycle, run=run, basename=basename)
     y0 = dump.y[1]  # column depth at inner zone
 
     fig, ax = plt.subplots()
+    ax.set_title(title)
     ax.set_yscale('log')
     ax.set_xscale('log')
 
@@ -117,5 +122,29 @@ def plot_temp(cycle, run=2, basename='xrb'):
     ax.set_xlabel(r'y (g cm$^{-2}$)')
     ax.set_ylabel(r'T (K)')
 
-    ax.plot(dump.y, dump.tn, color='C1')
-    plt.show(block=False)
+    ax.plot(dump.y, dump.tn, color='C3')
+
+    if display:
+        plt.show(block=False)
+
+    return fig
+
+
+def save_temps(cycles, zero_times=True):
+    """Iterate through cycles and save temperature profile plots
+    """
+    path = grid_strings.get_source_subdir('saxj1808', 'plots')
+    times = extract_times(cycles)
+
+    if zero_times:
+        times = times - times[0]
+
+    for i, cycle in enumerate(cycles):
+        print(f'Cycle {cycle}')
+        title = f'cycle={cycle},  t={times[i]:.6f}'
+        fig = plot_temp(cycle, title=title, display=False)
+
+        filename = f'temp_{i:02}.png'
+        filepath = os.path.join(path, 'temp', filename)
+        fig.savefig(filepath)
+        plt.close('all')
