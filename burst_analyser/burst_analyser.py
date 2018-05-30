@@ -366,24 +366,36 @@ class BurstRun(object):
 
     def plot_model(self, bursts=True, display=True, save=False, log=True,
                    burst_stages=False, candidates=False, legend=False, time_unit='h',
-                   short_wait=False, shocks=False):
+                   short_wait=False, shocks=False, fontsize=14, title=True,
+                   show_all=False):
         """Plots overall model lightcurve, with detected bursts
         """
         self.ensure_analysed_is(True)
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
         time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
-        yscale = 1e38
 
         fig, ax = plt.subplots(figsize=(8, 5))
-        ax.set_title(self.model_str)
-        ax.set_xlabel(f'Time ({time_label})')
-        ax.set_ylabel(f'Luminosity ( {yscale} erg/s)')
+        ax.set_xlabel(f'Time ({time_label})', fontsize=fontsize)
 
-        ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='black')
+        if show_all:
+            burst_stages = True
+            candidates = True
+            short_wait = True
+            shocks = True
+
+        if title:
+            ax.set_title(self.model_str)
 
         if log:
+            yscale = 1
             ax.set_yscale('log')
-            ax.set_ylim([1e-4, 1e2])
+            ax.set_ylim([1e34, 1e40])
+            ax.set_ylabel(f'Luminosity (erg s$^{-1}$)', fontsize=fontsize)
+        else:
+            ax.set_ylabel(f'Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
+            yscale = 1e38
+
+        ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='black')
 
         if candidates:  # NOTE: candidates may be modified if a shock was removed
             t = self.bursts['candidates'][:, 0] / timescale
@@ -483,7 +495,7 @@ class BurstRun(object):
                 or burst < 0:
             raise ValueError(f'Burst index ({burst}) out of bounds '
                              f'(n_bursts={self.n_bursts})')
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(8, 5))
 
         if title:
             ax.set_title(f'Burst {burst}')
