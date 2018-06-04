@@ -746,6 +746,9 @@ class Kgrid:
         out_string = params.to_string(columns=cols, index=False)
         print(out_string)
 
+    def print_unique_params(self):
+        self.print_params_summary(self.params)
+
     def print_params_summary(self, table, show=None):
         """Print summary of unique params in a given table
 
