@@ -731,6 +731,39 @@ class Kgrid:
         out_string = params.to_string(columns=cols, index=False)
         print(out_string)
 
+    def print_params_summary(self, batch, batch_n=None, params=None):
+        """Pretty print a summary of params in a batch
+
+        parameters
+        ----------
+        batch : int
+        batch_n : int (optional)
+            summarise all batches between batch and batch_n
+        params : [str] (optional)
+            specify certain params to print
+        """
+        if params is None:
+            params = ['accrate', 'x', 'z', 'qb', 'mass']
+        if batch_n is None:
+            batches = [batch]
+        else:
+            batches = np.arange(batch, batch_n+1)
+
+        batch_params = self.get_combined_params(batches)
+        for p in params:
+            unique = np.unique(batch_params[p])
+            print(f'{p} = {unique}')
+
+    def get_combined_params(self, batches):
+        """Returns sub-table of self.params with specified batches
+        """
+        table = pd.DataFrame()
+        for batch in batches:
+            batch_params = self.get_params(batch)
+            table = table.append(batch_params, ignore_index=True)
+
+        return table
+
     def best_concord_lhood(self, params={}, plot=False):
         """Returns model with highest likelihood (from given params)
         """
