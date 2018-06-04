@@ -49,7 +49,7 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
     if collect:
         print_title('Collecting results')
         last_batch = batches[-1]
-        burst_tools.combine_extracts(np.arange(1, last_batch+1), source)
+        burst_tools.combine_extracts(np.arange(1, last_batch + 1), source)
 
 
 def multithread_extract(batches, source, plot_model=True, plot_convergence=True):
@@ -65,6 +65,7 @@ def multithread_extract(batches, source, plot_model=True, plot_convergence=True)
     print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
+# noinspection PyTypeChecker
 def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
                    skip_bursts=1):
     source_path = grid_strings.get_source_path(source)
@@ -72,8 +73,8 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
 
     b_ints = ('batch', 'run', 'num')
     bprops = ('dt', 'fluence', 'length', 'peak')
-    col_order = ['batch', 'run', 'num', 'dt', 'u_dt', 'fluence', 'u_fluence',
-                 'length', 'u_length', 'peak', 'u_peak']
+    col_order = ['batch', 'run', 'num', 'dt', 'u_dt', 'rate', 'u_rate',
+                 'fluence', 'u_fluence', 'length', 'u_length', 'peak', 'u_peak']
 
     for batch in batches:
         batch_str = f'{source}_{batch}'
@@ -88,6 +89,9 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
             u_bp = f'u_{bp}'
             data[bp] = []
             data[u_bp] = []
+
+        data['rate'] = []
+        data['u_rate'] = []
 
         for b in b_ints:
             data[b] = []
@@ -104,7 +108,7 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
             for bp in bprops:
                 u_bp = f'u_{bp}'
 
-                if burstfit.n_bursts > skip_bursts+1:
+                if burstfit.n_bursts > skip_bursts + 1:
                     mean = np.mean(burstfit.bursts[bp][skip_bursts:])
                     std = np.std(burstfit.bursts[bp][skip_bursts:])
                 else:
@@ -113,6 +117,9 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
 
                 data[bp] += [mean]
                 data[u_bp] += [std]
+
+            data['rate'] += [8.64e4 / data['dt'][-1]]  # burst rate (per day)
+            data['u_rate'] += [8.64e4 * data['u_dt'][-1] / data['dt'][-1] ** 2]
 
             if plot_model:
                 burstfit.plot_model(display=False, save=True)
