@@ -160,12 +160,25 @@ def copy_sample_plots(batches, source):
 
 
 def add_burst_rate(batches, source):
-    """Calculates burst rate from dt and adds to analysis table
+    """Calculates burst rate from dt and writes to analysis table
     """
+    print('Adding burst rate columns to batches')
     for batch in batches:
         filepath = get_table_filepath(batch, source)
         batch_table = load_batch_table(batch, source)
-    pass
+
+        dt = batch_table['dt']
+        u_dt = batch_table['u_dt']
+        rate, u_rate = calculate_burst_rate(dt=dt, u_dt=u_dt)
+
+        batch_table['rate'] = rate
+        batch_table['u_rate'] = u_rate
+
+        table_str = batch_table.to_string(index=False, justify='left',
+                                          col_space=12)
+        print(f'Saving: {filepath}')
+        with open(filepath, 'w') as f:
+            f.write(table_str)
 
 
 def calculate_burst_rate(dt, u_dt):
@@ -179,5 +192,5 @@ def calculate_burst_rate(dt, u_dt):
         uncertainty in burst recurrence time (s)
     """
     rate = 8.64e4 / dt
-    u_rate = 8.64e4 * u_dt / dt**2
+    u_rate = rate * (u_dt / dt)
     return rate, u_rate
