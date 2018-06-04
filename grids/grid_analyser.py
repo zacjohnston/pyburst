@@ -731,7 +731,7 @@ class Kgrid:
         out_string = params.to_string(columns=cols, index=False)
         print(out_string)
 
-    def print_params_summary(self, batch, batch_n=None, params=None):
+    def print_batch_summary(self, batch, batch_n=None, params=None):
         """Pretty print a summary of params in a batch
 
         parameters
