@@ -113,7 +113,7 @@ def combine_extracts(batches, source):
     big_table = pd.DataFrame()
 
     for batch in batches:
-        batch_table = load_batch_table(batch, source=source)
+        batch_table = load_batch_table(batch, source)
         big_table = pd.concat((big_table, batch_table), ignore_index=True)
 
     table_str = big_table.to_string(index=False, justify='left', col_space=12)
@@ -130,13 +130,17 @@ def combine_extracts(batches, source):
 def load_batch_table(batch, source):
     """Loads summary table of batch from file and returns as pd table
     """
+    filepath = get_table_filepath(batch, source)
+    return pd.read_csv(filepath, delim_whitespace=True)
+
+
+def get_table_filepath(batch, source):
     batch_str = f'{source}_{batch}'
     source_path = grid_strings.get_source_path(source)
     analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
 
     filename = f'burst_analysis_{batch_str}.txt'
-    filepath = os.path.join(analysis_path, filename)
-    return pd.read_csv(filepath, delim_whitespace=True)
+    return os.path.join(analysis_path, filename)
 
 
 def copy_sample_plots(batches, source):
