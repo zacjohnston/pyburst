@@ -113,13 +113,7 @@ def combine_extracts(batches, source):
     big_table = pd.DataFrame()
 
     for batch in batches:
-        batch_str = f'{source}_{batch}'
-        analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
-
-        filename = f'burst_analysis_{batch_str}.txt'
-        filepath = os.path.join(analysis_path, filename)
-        batch_table = pd.read_csv(filepath, delim_whitespace=True)
-
+        batch_table = load_batch_table(batch, source=source)
         big_table = pd.concat((big_table, batch_table), ignore_index=True)
 
     table_str = big_table.to_string(index=False, justify='left', col_space=12)
@@ -131,6 +125,18 @@ def combine_extracts(batches, source):
         f.write(table_str)
 
     return big_table
+
+
+def load_batch_table(batch, source):
+    """Loads summary table of batch from file and returns as pd table
+    """
+    batch_str = f'{source}_{batch}'
+    source_path = grid_strings.get_source_path(source)
+    analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
+
+    filename = f'burst_analysis_{batch_str}.txt'
+    filepath = os.path.join(analysis_path, filename)
+    return pd.read_csv(filepath, delim_whitespace=True)
 
 
 def copy_sample_plots(batches, source):
@@ -147,3 +153,9 @@ def copy_sample_plots(batches, source):
         filepath = os.path.join(source_path, 'plots', 'burst_analysis', filename)
         target_filepath = os.path.join(target_path, filename)
         subprocess.run(['cp', filepath, target_filepath])
+
+
+def add_burst_rate(batches, source):
+    """Calculates burst rate from dt and adds to analysis table
+    """
+    pass
