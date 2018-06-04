@@ -412,8 +412,8 @@ class Kgrid:
         self.printv('')
 
     def plot_burst_property(self, bprop, var, fixed, save=False, show=True,
-                            powerfits=False):
-        """Plots given burst property against accretion rate (including xi factors)
+                            powerfits=False, interpolate=True):
+        """Plots given burst property against accretion rate
         
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
         var     =  str   : variable to iterate over (e.g. plot all available 'Qb')
@@ -437,10 +437,18 @@ class Kgrid:
                                    'peak': 'u_peak'},
                             }.get(self.burst_analyser)
 
-        y_unit = {'dt': 'hr', 'fluence': '10^39 erg',
-                  'peak': '10^38 erg/s'}.get(bprop)
-        unit_f = {'tDel': 3600, 'dt': 3600,
+        y_unit = {'dt': 'hr',
+                  'fluence': '10^39 erg',
+                  'peak': '10^38 erg/s',
+                  'rate': 'day$^{-1}$'
+                  }.get(bprop)
+
+        unit_f = {'tDel': 3600, 'dt': 3600, 'rate': 3600,
                   'fluence': 1e39, 'peak': 1e38}.get(bprop, 1.0)
+
+        rate = (bprop == 'rate')
+        if rate:
+            bprop = 'dt'
 
         u_prop = uncertainty_keys.get(bprop)
 
@@ -452,15 +460,15 @@ class Kgrid:
             title += f'{p}={pv:.{precision}f}, '
 
         ax.set_xlim([0.075, 0.245])
-        # ax.set_xlabel(r'$\dot{M} \; (\dot{M}_\mathrm{Edd})$ ') !!!
-        # ax.set_ylabel(f'{bprop} ({y_unit})')
+        ax.set_xlabel(r'$\dot{M} \; (\dot{M}_\mathrm{Edd})$ ')
+        ax.set_ylabel(f'{bprop} ({y_unit})')
 
         # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
         fontsize = 12
-        ax.set_xlabel(r'Accretion rate ($\dot{M} \;/ \dot{M}_\mathrm{Edd})$ ', fontsize=fontsize)
-        ax.set_ylabel(f'Burst recurrence time (hr)', fontsize=fontsize)
-        title = 'Example grid of burst simulations'
-        ax.set_title(title, fontsize=14)
+        # ax.set_xlabel(r'Accretion rate ($\dot{M} \;/ \dot{M}_\mathrm{Edd})$ ', fontsize=fontsize)
+        # ax.set_ylabel(f'Burst recurrence time (hr)', fontsize=fontsize)
+        # title = 'Example grid of burst simulations'
+        # ax.set_title(title, fontsize=14)
         # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
         plt.tight_layout()
 
@@ -498,10 +506,17 @@ class Kgrid:
                 u_y = np.concatenate([u_y, u_tmp])
 
             precision = precisions.get(var, 3)
-            # label = f'{var}={v:.{precision}f}'
-            label = r'$Z_{CNO}$' + f'={v:.{precision}f}'
-            ax.errorbar(x=mdot_x, y=prop_y, yerr=u_y, ls='-', marker='o',
-                        label=label, capsize=3)
+            if var == 'z':
+                label = r'$Z_{CNO}$' + f'={v:.{precision}f}'
+            else:
+                label = f'{var}={v:.{precision}f}'
+
+            if rate:
+                u_y = u_y * (24 / prop_y**2)
+                prop_y = 24 / prop_y
+
+            ax.errorbar(x=mdot_x, y=prop_y, yerr=u_y, marker='o',
+                        label=label, capsize=3, ls='-' if interpolate else 'none')
 
             del (params['accrate'])
 
