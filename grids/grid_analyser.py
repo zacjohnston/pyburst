@@ -726,12 +726,33 @@ class Kgrid:
     def print_params(self, batch, run):
         """Prints essential params for given batch-run
         """
-        cols = ['batch', 'run', 'z', 'x', 'qb', 'xi', 'mass']
+        cols = ['batch', 'run', 'z', 'x', 'qb', 'mass']
         params = self.get_params(batch=batch, run=run)
         out_string = params.to_string(columns=cols, index=False)
         print(out_string)
 
-    def print_batch_summary(self, batch, batch_n=None, params=None):
+    def print_params_summary(self, table, show=None):
+        """Print summary of unique params in a given table
+
+        parameters
+        ----------
+        table : pandas.DataFrame
+            table of models to summarise (subset of self.params)
+        show : [str] (optional)
+            specify parameters to show.
+            defaults to ['accrate', 'x', 'z', 'qb', 'mass']
+        """
+        if type(table) != pd.core.frame.DataFrame:
+            raise TypeError('table must be pandas.DataFrame')
+
+        if show is None:
+            show = ['accrate', 'x', 'z', 'qb', 'mass']
+
+        for param in show:
+            unique = np.unique(table[param])
+            print(f'{param} = {unique}')
+
+    def print_batch_summary(self, batch, batch_n=None, show=None):
         """Pretty print a summary of params in a batch
 
         parameters
@@ -739,20 +760,16 @@ class Kgrid:
         batch : int
         batch_n : int (optional)
             summarise all batches between batch and batch_n
-        params : [str] (optional)
-            specify certain params to print
+        show : [str] (optional)
+            specify parameters to show
         """
-        if params is None:
-            params = ['accrate', 'x', 'z', 'qb', 'mass']
         if batch_n is None:
             batches = [batch]
         else:
             batches = np.arange(batch, batch_n+1)
 
         batch_params = self.get_combined_params(batches)
-        for p in params:
-            unique = np.unique(batch_params[p])
-            print(f'{p} = {unique}')
+        self.print_params_summary(batch_params, show=show)
 
     def get_combined_params(self, batches):
         """Returns sub-table of self.params with specified batches
