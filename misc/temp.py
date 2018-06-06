@@ -14,26 +14,26 @@ def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb'):
     """Iterates over dump cycles and saves each as a table
     """
     for cycle in cycles:
-        table = extract_dump(cycle, run, batch, source=source, basename=basename)
+        dump = load_dump(cycle, run, batch, source=source, basename=basename)
+        table = extract_dump(dump)
         save_table(table, table_name=f'{cycle}', run=run, batch=batch,
                    source=source, basename=basename, subdir='profiles')
 
 
-def load_dump(cycle, run, batch, source='biggrid2', basename='xrb'):
+def load_dump(cycle, run, batch, source='biggrid2', basename='xrb',
+              prefix='re_'):
     batch_str = get_batch_string(batch, source)
     run_str = get_run_string(run, basename)
-    filename = get_dump_filename(cycle, run, basename)
+    filename = get_dump_filename(cycle, run, basename, prefix=prefix)
 
     filepath = os.path.join(MODELS_PATH, batch_str, run_str, filename)
     return kepdump.load(filepath)
 
 
-def extract_dump(cycle, run, batch, source='biggrid2', basename='xrb'):
-    """Extracts key quantities of dump profile and saves as table
+def extract_dump(dump):
+    """Extracts key quantities of dump profile
     """
     table = pd.DataFrame()
-    dump = load_dump(cycle, run, batch, source=source, basename=basename)
-
     table['y'] = dump.y[1:-2]
     table['rho'] = dump.dn[1:-2]
     table['T'] = dump.tn[1:-2]
