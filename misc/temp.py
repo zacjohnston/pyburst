@@ -10,18 +10,19 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
-def extract_cycles(cycles):
+def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb'):
     """Iterates over dump cycles and saves each as a table
     """
     for cycle in cycles:
-        table = extract_dump(cycle)
-        save_table(table, cycle)
+        table = extract_dump(cycle, run, batch, source=source, basename=basename)
+        save_table(table, table_name=f'{cycle}', run=run, batch=batch,
+                   source=source, basename=basename, subdir='profiles')
 
 
 def load_dump(cycle, run, batch, source='biggrid2', basename='xrb'):
     batch_str = get_batch_string(batch, source)
     run_str = get_run_string(run, basename)
-    filename = get_dump_str(cycle, run, basename)
+    filename = get_dump_filename(cycle, run, basename)
 
     filepath = os.path.join(MODELS_PATH, batch_str, run_str, filename)
     return kepdump.load(filepath)
@@ -46,7 +47,7 @@ def save_times(cycles):
     table['timestep'] = cycles
     table['time (s)'] = extract_times(cycles)
 
-    save_table(table, cycle=None, name='timesteps.txt')
+    save_table(table, table_name='timesteps')
     return table
 
 
@@ -162,5 +163,5 @@ def get_run_string(run, basename='xrb'):
     return f'{basename}{run}'
 
 
-def get_dump_str(cycle, run, basename):
-    return f'{basename}{run}#{cycle}'
+def get_dump_filename(cycle, run, basename, prefix='re_'):
+    return f'{prefix}{basename}{run}#{cycle}'
