@@ -4,22 +4,18 @@ import matplotlib.pyplot as plt
 import os
 
 import kepdump
-from pygrids.grids import grid_strings
+from pygrids.grids import grid_strings, grid_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
-def get_batch_string(batch, source):
-    return f'{source}_{batch}'
-
-
-def get_run_string(run, basename='xrb'):
-    return f'{basename}{run}'
-
-
-def get_dump_str(cycle, run, basename):
-    return f'{basename}{run}#{cycle}'
+def extract_cycles(cycles):
+    """Iterates over dump cycles and saves each as a table
+    """
+    for cycle in cycles:
+        table = extract_dump(cycle)
+        save_table(table, cycle)
 
 
 def load_dump(cycle, run, batch, source='biggrid2', basename='xrb'):
@@ -36,21 +32,13 @@ def extract_dump(cycle, run, batch, source='biggrid2', basename='xrb'):
     """
     table = pd.DataFrame()
     dump = load_dump(cycle, run, batch, source=source, basename=basename)
+
     table['y'] = dump.y[1:-2]
     table['rho'] = dump.dn[1:-2]
     table['T'] = dump.tn[1:-2]
     table['P'] = dump.pn[1:-2]
     table['R'] = dump.rn[1:-2]
-
     return table
-
-
-def extract_cycles(cycles):
-    """Iterates over dump cycles and saves each as a table
-    """
-    for cycle in cycles:
-        table = extract_dump(cycle)
-        save_table(table, cycle)
 
 
 def save_times(cycles):
@@ -72,15 +60,16 @@ def extract_times(cycles, run=2, basename='xrb'):
     return times
 
 
-def save_table(table, cycle, name=None):
-    path = '/home/zacpetej/projects/oscillations/saxj1808/grid_94_xrb2'
+def save_table(table, cycle, run, batch, source='biggrid2', basename='xrb'):
+    source_path = f'/home/zacpetej/projects/oscillations/{source}'
+    batch_str = get_batch_string(batch, source)
+    run_str = get_run_string(run, basename)
 
-    if name is None:
-        filename = f'{cycle}.txt'
-    else:
-        filename = name
+    profiles_path = os.path.join(source_path, batch_str, run_str, 'profiles')
+    grid_tools.try_mkdir(profiles_path, skip=True)
 
-    filepath = os.path.join(path, filename)
+    filename = f'{cycle}.txt'
+    filepath = os.path.join(profiles_path, filename)
     print(f'Saving: {filepath}')
 
     table_str = table.to_string(index=False, justify='left', col_space=12)
@@ -160,3 +149,15 @@ def plot_saxj(x_units='time', dumptimes=True, cycles=None):
         ax.plot(lc[cycles, 0], lc[cycles, 1], marker='o', ls='none')
 
     plt.show(block=False)
+
+
+def get_batch_string(batch, source):
+    return f'{source}_{batch}'
+
+
+def get_run_string(run, basename='xrb'):
+    return f'{basename}{run}'
+
+
+def get_dump_str(cycle, run, basename):
+    return f'{basename}{run}#{cycle}'
