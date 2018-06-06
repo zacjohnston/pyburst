@@ -15,8 +15,7 @@ def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
     """Iterates over dump cycles and saves each as a table
     """
     for i, cycle in enumerate(cycles):
-        pre = {0: ''}.get(i, prefix)    # first cycle has no prefix
-
+        pre = get_prefix(i, prefix)
         dump = load_dump(cycle, run, batch, source=source,
                          basename=basename, prefix=pre)
 
@@ -56,7 +55,7 @@ def save_times(cycles):
     return table
 
 
-def extract_times(cycles, run=2, basename='xrb'):
+def extract_times(cycles, run, batch, source='biggrid2', basename='xrb'):
     times = np.zeros_like(cycles, dtype=float)
 
     for i, cycle in enumerate(cycles):
@@ -158,6 +157,12 @@ def plot_saxj(x_units='time', dumptimes=True, cycles=None):
         ax.plot(lc[cycles, 0], lc[cycles, 1], marker='o', ls='none')
 
     plt.show(block=False)
+
+
+def get_prefix(index, prefix):
+    """Accounts for first cycle dump having no prefix
+    """
+    return {0: ''}.get(index, prefix)
 
 
 def get_batch_string(batch, source):
