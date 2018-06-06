@@ -9,6 +9,7 @@ from pygrids.grids import grid_strings
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
+
 def get_batch_string(batch, source):
     return f'{source}_{batch}'
 
@@ -30,12 +31,11 @@ def load_dump(cycle, run, batch, source='biggrid2', basename='xrb'):
     return kepdump.load(filepath)
 
 
-def extract_dump(cycle, run=2, basename='xrb'):
+def extract_dump(cycle, run, batch, source='biggrid2', basename='xrb'):
     """Extracts key quantities of dump profile and saves as table
     """
     table = pd.DataFrame()
-
-    dump = load_dump(cycle, run=run, basename=basename)
+    dump = load_dump(cycle, run, batch, source=source, basename=basename)
     table['y'] = dump.y[1:-2]
     table['rho'] = dump.dn[1:-2]
     table['T'] = dump.tn[1:-2]
