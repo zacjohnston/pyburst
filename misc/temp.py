@@ -7,42 +7,26 @@ import kepdump
 from pygrids.grids import grid_strings
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
+MODELS_PATH = os.environ['KEPLER_MODELS']
+
+def get_batch_string(batch, source):
+    return f'{source}_{batch}'
 
 
-def plot_saxj(x_units='time', dumptimes=True, cycles=None):
-    """Plotting SAXJ1808 model, to explore dumpfiles
-    to try and get temperature profiles"""
-    filepath = '/home/zacpetej/archive/kepler/grid_94/xrb2/preload2.txt'
-    lc = np.loadtxt(filepath, skiprows=1)
-    tscale = 1
-    dump_nums = np.arange(len(lc))
-
-    fig, ax = plt.subplots()
-    if x_units == 'time':
-        ax.plot(lc[:, 0]/tscale, lc[:, 1], marker='o', markersize=2)
-    else:
-        ax.plot(dump_nums, lc[:, 1], marker='o', markersize=2)
-
-    if dumptimes:
-        dumps = np.arange(1, 51) * 1000
-        if x_units == 'time':
-            ax.plot(lc[dumps, 0]/tscale, lc[dumps, 1], marker='o', ls='none')
-        else:
-            if x_units == 'time':
-                ax.plot(dumps, lc[dumps, 1], marker='o', ls='none')
-
-    if cycles is not None:
-        ax.plot(lc[cycles, 0], lc[cycles, 1], marker='o', ls='none')
-
-    plt.show(block=False)
+def get_run_string(run, basename='xrb'):
+    return f'{basename}{run}'
 
 
-def load_dump(cycle, run=2, basename='xrb'):
-    path = '/home/zacpetej/archive/kepler/grid_94'
-    run_str = f'{basename}{run}'
-    filename = f'{run_str}#{cycle}'
-    filepath = os.path.join(path, run_str, filename)
+def get_dump_str(cycle, run, basename):
+    return f'{basename}{run}#{cycle}'
 
+
+def load_dump(cycle, run, batch, source='biggrid2', basename='xrb'):
+    batch_str = get_batch_string(batch, source)
+    run_str = get_run_string(run, basename)
+    filename = get_dump_str(cycle, run, basename)
+
+    filepath = os.path.join(MODELS_PATH, batch_str, run_str, filename)
     return kepdump.load(filepath)
 
 
@@ -148,3 +132,31 @@ def save_temps(cycles, zero_times=True):
         filepath = os.path.join(path, 'temp', filename)
         fig.savefig(filepath)
         plt.close('all')
+
+
+def plot_saxj(x_units='time', dumptimes=True, cycles=None):
+    """Plotting SAXJ1808 model, to explore dumpfiles
+    to try and get temperature profiles"""
+    filepath = '/home/zacpetej/archive/kepler/grid_94/xrb2/preload2.txt'
+    lc = np.loadtxt(filepath, skiprows=1)
+    tscale = 1
+    dump_nums = np.arange(len(lc))
+
+    fig, ax = plt.subplots()
+    if x_units == 'time':
+        ax.plot(lc[:, 0]/tscale, lc[:, 1], marker='o', markersize=2)
+    else:
+        ax.plot(dump_nums, lc[:, 1], marker='o', markersize=2)
+
+    if dumptimes:
+        dumps = np.arange(1, 51) * 1000
+        if x_units == 'time':
+            ax.plot(lc[dumps, 0]/tscale, lc[dumps, 1], marker='o', ls='none')
+        else:
+            if x_units == 'time':
+                ax.plot(dumps, lc[dumps, 1], marker='o', ls='none')
+
+    if cycles is not None:
+        ax.plot(lc[cycles, 0], lc[cycles, 1], marker='o', ls='none')
+
+    plt.show(block=False)
