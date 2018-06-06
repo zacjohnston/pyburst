@@ -55,11 +55,16 @@ def save_times(cycles):
     return table
 
 
-def extract_times(cycles, run, batch, source='biggrid2', basename='xrb'):
+def extract_times(cycles, run, batch, source='biggrid2', basename='xrb',
+                  prefix='re_'):
+    """Returns timestep values (s) for given cycles
+    """
     times = np.zeros_like(cycles, dtype=float)
 
     for i, cycle in enumerate(cycles):
-        dump = load_dump(cycle, run=run, basename=basename)
+        pre = get_prefix(i, prefix)
+        dump = load_dump(cycle, run, batch, source=source, basename=basename,
+                         prefix=pre)
         times[i] = dump.time
 
     return times
