@@ -19,7 +19,7 @@ def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
         dump = load_dump(cycle, run, batch, source=source,
                          basename=basename, prefix=pre)
 
-        table = extract_dump(dump)
+        table = get_profiles(dump)
         save_table(table, table_name=f'{cycle}', run=run, batch=batch,
                    source=source, basename=basename, subdir='profiles')
 
@@ -34,8 +34,8 @@ def load_dump(cycle, run, batch, source='biggrid2', basename='xrb',
     return kepdump.load(filepath)
 
 
-def extract_dump(dump):
-    """Extracts key quantities of dump profile
+def get_profiles(dump):
+    """Extracts key profile quantities of given dump
     """
     table = pd.DataFrame()
     table['y'] = dump.y[1:-2]
