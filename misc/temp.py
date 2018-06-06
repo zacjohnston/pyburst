@@ -10,11 +10,16 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
-def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb'):
+def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
+                   prefix='re_'):
     """Iterates over dump cycles and saves each as a table
     """
-    for cycle in cycles:
-        dump = load_dump(cycle, run, batch, source=source, basename=basename)
+    for i, cycle in enumerate(cycles):
+        pre = {0: ''}.get(i, prefix)    # first cycle has no prefix
+
+        dump = load_dump(cycle, run, batch, source=source,
+                         basename=basename, prefix=pre)
+
         table = extract_dump(dump)
         save_table(table, table_name=f'{cycle}', run=run, batch=batch,
                    source=source, basename=basename, subdir='profiles')
