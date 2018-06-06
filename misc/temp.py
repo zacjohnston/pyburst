@@ -2,24 +2,31 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import subprocess
 
 import kepdump
 from pygrids.grids import grid_strings, grid_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
+PROJECT_PATH = '/home/zacpetej/projects/oscillations/'
 
 
 def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
                    prefix='re_'):
-    """Iterates over dump cycles and saves each as a table
+    """Iterates over dump cycles and extracts profiles and tables
     """
+    save_times(cycles, run, batch, source=source, basename=basename, prefix=prefix)
+    copy_lightcurve(run, batch, source=source, basename=basename)
+
+    dashes()
+    print('Extracting profiles')
     for i, cycle in enumerate(cycles):
         pre = get_prefix(i, prefix)
         dump = load_dump(cycle, run, batch, source=source,
                          basename=basename, prefix=pre)
 
-        table = get_profiles(dump)
+        table = get_profile(dump)
         save_table(table, table_name=f'{cycle}', run=run, batch=batch,
                    source=source, basename=basename, subdir='profiles')
 
@@ -34,7 +41,7 @@ def load_dump(cycle, run, batch, source='biggrid2', basename='xrb',
     return kepdump.load(filepath)
 
 
-def get_profiles(dump):
+def get_profile(dump):
     """Extracts key profile quantities of given dump
     """
     table = pd.DataFrame()
@@ -46,12 +53,17 @@ def get_profiles(dump):
     return table
 
 
-def save_times(cycles):
+def save_times(cycles, run, batch, source='biggrid2', basename='xrb',
+               prefix='re_'):
+    dashes()
+    print('Extracting cycle times')
     table = pd.DataFrame()
     table['timestep'] = cycles
-    table['time (s)'] = extract_times(cycles)
+    table['time (s)'] = extract_times(cycles, run, batch, source=source,
+                                      basename=basename, prefix=prefix)
 
-    save_table(table, table_name='timesteps')
+    save_table(table, table_name='timesteps', run=run, batch=batch,
+               source=source, basename=basename)
     return table
 
 
@@ -74,7 +86,7 @@ def save_table(table, table_name, run, batch, source='biggrid2', basename='xrb',
                subdir=''):
     """Save provided table to oscillations project
     """
-    source_path = f'/home/zacpetej/projects/oscillations/{source}'
+    source_path = os.path.join(PROJECT_PATH, source)
     batch_str = get_batch_string(batch, source)
     run_str = get_run_string(run, basename)
 
@@ -88,6 +100,30 @@ def save_table(table, table_name, run, batch, source='biggrid2', basename='xrb',
     table_str = table.to_string(index=False, justify='left', col_space=12)
     with open(filepath, 'w') as f:
         f.write(table_str)
+
+
+def copy_lightcurve(run, batch, source='biggrid2', basename='xrb'):
+    """Copies over full model lightcurve
+    """
+    dashes()
+    print('Copying model lightcurve')
+
+    path = grid_strings.get_source_subdir(source, 'burst_analysis')
+    batch_str = get_batch_string(batch, source)
+    run_str = get_run_string(run, basename)
+    model_string = grid_strings.get_model_string(run=run, batch=batch,
+                                                 source=source)
+
+    filename = f'{model_string}.txt'
+    filepath = os.path.join(path, batch_str, 'input', filename)
+
+    target_filename = f'model_lightcurve_{model_string}'
+    target_filepath = os.path.join(PROJECT_PATH, source, batch_str, run_str,
+                               target_filename)
+
+    print(f'from: \n{filepath}'
+          + f'to: {target_filepath}')
+    subprocess.run(['cp', filepath, target_filepath])
 
 
 def plot_temp(cycle, run=2, basename='xrb', title='',
@@ -180,3 +216,7 @@ def get_run_string(run, basename='xrb'):
 
 def get_dump_filename(cycle, run, basename, prefix='re_'):
     return f'{prefix}{basename}{run}#{cycle}'
+
+
+def dashes():
+    print('=' * 40)
