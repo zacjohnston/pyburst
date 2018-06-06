@@ -60,16 +60,19 @@ def extract_times(cycles, run=2, basename='xrb'):
     return times
 
 
-def save_table(table, cycle, run, batch, source='biggrid2', basename='xrb'):
+def save_table(table, table_name, run, batch, source='biggrid2', basename='xrb',
+               subdir=''):
+    """Save provided table to oscillations project
+    """
     source_path = f'/home/zacpetej/projects/oscillations/{source}'
     batch_str = get_batch_string(batch, source)
     run_str = get_run_string(run, basename)
 
-    profiles_path = os.path.join(source_path, batch_str, run_str, 'profiles')
-    grid_tools.try_mkdir(profiles_path, skip=True)
+    run_path = os.path.join(source_path, batch_str, run_str, subdir)
+    grid_tools.try_mkdir(run_path, skip=True)
 
-    filename = f'{cycle}.txt'
-    filepath = os.path.join(profiles_path, filename)
+    filename = f'{table_name}.txt'
+    filepath = os.path.join(run_path, filename)
     print(f'Saving: {filepath}')
 
     table_str = table.to_string(index=False, justify='left', col_space=12)
