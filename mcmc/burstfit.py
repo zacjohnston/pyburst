@@ -376,10 +376,11 @@ class BurstFit:
         bprop : str
             burst property being compared
         """
+        fontsize = 13
         dx = 0.04  # horizontal offset of plot points
         yscale = {'dt': 1.0, 'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
         y_units = {'dt': 'hr', 'fluence': '10^-6 erg/cm^2',
-                   'peak': '10^-8 erg/cm^2/s', 'fper': '10^-9 erg/cm^2/s'}.get(bprop)
+                   'peak': '10^-8 erg/cm^2/s', 'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$'}.get(bprop)
 
         fig, ax = plt.subplots(figsize=(5, 4))
         epochs = np.arange(1, self.n_epochs+1)
@@ -391,13 +392,15 @@ class BurstFit:
         #                labelbottom=True)  # labels along the bottom edge are off
         x = epochs
         ax.errorbar(x=x - dx, y=model/yscale, yerr=u_model/yscale, ls='none', marker='o',
-                    capsize=3, color='r', label='Model')
+                    capsize=3, color='C3', label='Model')
         ax.errorbar(x=x + dx, y=obs/yscale, yerr=u_obs/yscale, ls='none',
-                    marker='o', capsize=3, color='b', label='Observed')
+                    marker='o', capsize=3, color='C0', label='Observed')
+        ax.set_xticklabels(['2007', '2000', '1998'])
 
-        ax.set_ylabel(f'{bprop} ({y_units})')
-        ax.set_xlabel('epoch number')
-        ax.set_title(bprop)
+        ax.set_xlim([3.2, 0.8])
+        ax.set_ylabel(f'{bprop} ({y_units})', fontsize=fontsize)
+        ax.set_xlabel('Epoch', fontsize=fontsize)
+        ax.set_title(bprop, fontsize=fontsize)
         ax.legend()
         plt.tight_layout()
         plt.show()
