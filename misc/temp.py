@@ -119,18 +119,19 @@ def copy_lightcurve(run, batch, source='biggrid2', basename='xrb'):
 
     target_filename = f'model_lightcurve_{model_string}'
     target_filepath = os.path.join(PROJECT_PATH, source, batch_str, run_str,
-                               target_filename)
+                                   target_filename)
 
     print(f'from: \n{filepath}'
           + f'to: {target_filepath}')
     subprocess.run(['cp', filepath, target_filepath])
 
 
-def plot_temp(cycle, run=2, basename='xrb', title='',
+def plot_temp(cycle, run, batch, source='biggrid2', basename='xrb', title='',
               display=True):
     """Plot temperature profile at given cycle (timestep)
     """
-    dump = load_dump(cycle, run=run, basename=basename)
+    dump = load_dump(cycle, run, batch, source=source,
+                     basename=basename)
     y0 = dump.y[1]  # column depth at inner zone
 
     fig, ax = plt.subplots()
@@ -203,7 +204,7 @@ def plot_saxj(x_units='time', dumptimes=True, cycles=None):
 def get_prefix(index, prefix):
     """Accounts for first cycle dump having no prefix
     """
-    return {0: ''}.get(index, prefix)
+    return {-1: ''}.get(index, prefix)
 
 
 def get_batch_string(batch, source):
