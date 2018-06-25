@@ -166,9 +166,9 @@ class BurstRun(object):
         else:
             dt = [np.nan]
             if n_bursts == 0:
-                print('\nWARNING: No bursts in this model!\n')
+                print('\nWARNING: No bursts in this model\n')
             else:
-                self.printv('Only one burst detected')
+                self.printv('WARNING: Only one burst detected')
 
         # ===== find burst start and end =====
         t_pre = peaks[:, 0] - pre_time
