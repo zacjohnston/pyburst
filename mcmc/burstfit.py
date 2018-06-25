@@ -367,7 +367,7 @@ class BurstFit:
         self.debug.end_function()
         return lh.sum()
 
-    def plot_compare(self, model, u_model, obs, u_obs, bprop):
+    def plot_compare(self, model, u_model, obs, u_obs, bprop, title=False):
         """Plots comparison of modelled and observed burst property
 
         Parameters
@@ -378,9 +378,14 @@ class BurstFit:
         """
         fontsize = 13
         dx = 0.04  # horizontal offset of plot points
+        ylabel = {'dt': r'$\Delta t$',
+                  'fluence': r'$E_b$',
+                  'peak': r'$F_{peak}$',
+                  'fper': r'$F_p$'}.get(bprop, bprop)
         yscale = {'dt': 1.0, 'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
-        y_units = {'dt': 'hr', 'fluence': '10^-6 erg/cm^2',
-                   'peak': '10^-8 erg/cm^2/s', 'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$'}.get(bprop)
+        y_units = {'dt': 'hr', 'fluence': r'$10^{-6}$ erg cm$^{-2}$',
+                   'peak': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
+                   'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$'}.get(bprop)
 
         fig, ax = plt.subplots(figsize=(5, 4))
         epochs = np.arange(1, self.n_epochs+1)
@@ -398,9 +403,10 @@ class BurstFit:
         ax.set_xticklabels(['2007', '2000', '1998'])
 
         ax.set_xlim([3.2, 0.8])
-        ax.set_ylabel(f'{bprop} ({y_units})', fontsize=fontsize)
         ax.set_xlabel('Epoch', fontsize=fontsize)
-        ax.set_title(bprop, fontsize=fontsize)
+        ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
+        if title:
+            ax.set_title(ylabel, fontsize=fontsize)
         ax.legend()
         plt.tight_layout()
         plt.show()
