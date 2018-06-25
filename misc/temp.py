@@ -126,17 +126,20 @@ def copy_lightcurve(run, batch, source='biggrid2', basename='xrb'):
     subprocess.run(['cp', filepath, target_filepath])
 
 
-def plot_temp(cycle, run, batch, source='biggrid2', basename='xrb', title='',
-              display=True):
+def plot_temp(cycles, run, batch, source='biggrid2', basename='xrb', title='',
+              display=True, prefix='re_'):
     """Plot temperature profile at given cycle (timestep)
     """
-    dump = load_dump(cycle, run, batch, source=source,
-                     basename=basename)
+    fig, ax = plt.subplots()
+
+    for cycle in cycles:
+        dump = load_dump(cycle, run, batch, source=source,
+                         basename=basename, prefix=prefix)
+        ax.plot(dump.y, dump.tn, color='C3')
 
     y0 = dump.y[1]   # column depth at inner zone
     y1 = dump.y[-3]  # outer zone
 
-    fig, ax = plt.subplots()
     ax.set_title(title)
     ax.set_yscale('log')
     ax.set_xscale('log')
@@ -146,8 +149,6 @@ def plot_temp(cycle, run, batch, source='biggrid2', basename='xrb', title='',
 
     ax.set_xlabel(r'y (g cm$^{-2}$)')
     ax.set_ylabel(r'T (K)')
-
-    ax.plot(dump.y, dump.tn, color='C3')
 
     if display:
         plt.show(block=False)
@@ -171,7 +172,7 @@ def save_temps(cycles, run, batch, source='biggrid2', zero_times=True):
     for i, cycle in enumerate(cycles):
         print(f'Cycle {cycle}')
         title = f'cycle={cycle},  t={times[i]:.6f}'
-        fig = plot_temp(cycle, run, batch, source=source,
+        fig = plot_temp([cycle], run, batch, source=source,
                         title=title, display=False)
 
         filename = f'temp_{source}_{batch}_{run}_{i:02}.png'
