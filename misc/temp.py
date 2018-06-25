@@ -132,14 +132,16 @@ def plot_temp(cycle, run, batch, source='biggrid2', basename='xrb', title='',
     """
     dump = load_dump(cycle, run, batch, source=source,
                      basename=basename)
-    y0 = dump.y[1]  # column depth at inner zone
+
+    y0 = dump.y[1]   # column depth at inner zone
+    y1 = dump.y[-3]  # outer zone
 
     fig, ax = plt.subplots()
     ax.set_title(title)
     ax.set_yscale('log')
     ax.set_xscale('log')
 
-    ax.set_xlim([1e5, y0])
+    ax.set_xlim([y1, y0])
     ax.set_ylim([5e7, 5e9])
 
     ax.set_xlabel(r'y (g cm$^{-2}$)')
@@ -153,11 +155,15 @@ def plot_temp(cycle, run, batch, source='biggrid2', basename='xrb', title='',
     return fig
 
 
-def save_temps(cycles, zero_times=True):
+def save_temps(cycles, run, batch, source='biggrid2', zero_times=True):
     """Iterate through cycles and save temperature profile plots
     """
-    path = grid_strings.get_source_subdir('saxj1808', 'plots')
-    times = extract_times(cycles)
+    batch_str = get_batch_string(batch, source)
+    path = grid_strings.get_source_subdir(source, 'plots')
+    path = os.path.join(path, 'temp', batch_str, str(run))
+    grid_tools.try_mkdir(path, skip=True)
+
+    times = extract_times(cycles, run, batch)
 
     if zero_times:
         times = times - times[0]
@@ -165,10 +171,11 @@ def save_temps(cycles, zero_times=True):
     for i, cycle in enumerate(cycles):
         print(f'Cycle {cycle}')
         title = f'cycle={cycle},  t={times[i]:.6f}'
-        fig = plot_temp(cycle, title=title, display=False)
+        fig = plot_temp(cycle, run, batch, source=source,
+                        title=title, display=False)
 
-        filename = f'temp_{i:02}.png'
-        filepath = os.path.join(path, 'temp', filename)
+        filename = f'temp_{source}_{batch}_{run}_{i:02}.png'
+        filepath = os.path.join(path, filename)
         fig.savefig(filepath)
         plt.close('all')
 
