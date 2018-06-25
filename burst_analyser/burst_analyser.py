@@ -51,6 +51,7 @@ class BurstRun(object):
         self.secondary_bursts = np.array(())
         self.shocks = []
         self.short_waits = False
+        self.too_few_bursts = False
 
         if analyse:
             self.analyse()
@@ -75,8 +76,12 @@ class BurstRun(object):
         """
         self.ensure_analysed_is(False)
         self.identify_bursts()
-        self.find_fluence()
-        self.analysed = True
+
+        if not self.too_few_bursts:
+            self.find_fluence()
+            self.analysed = True
+        else:
+            self.printv('Too few bursts to analyse')
 
     def ensure_analysed_is(self, analysed):
         """Checks that model has (or hasn't) been analysed
@@ -85,7 +90,12 @@ class BurstRun(object):
                    False: 'Model has already been analysed. Reload model first'}
 
         if self.analysed != analysed:
-            raise AttributeError(strings[analysed])
+            if self.too_few_bursts:
+                string = 'Too few bursts for analysis'
+            else:
+                string = strings[analysed]
+                
+            raise AttributeError(string)
 
     def remove_zeros(self):
         """During shocks, kepler can also give zero luminosity (for some reason...)
@@ -164,11 +174,12 @@ class BurstRun(object):
                 dt = np.delete(dt, short_idxs-1)
                 n_bursts -= n_short
         else:
-            dt = [np.nan]
+            self.too_few_bursts = True
             if n_bursts == 0:
                 print('\nWARNING: No bursts in this model\n')
             else:
                 self.printv('WARNING: Only one burst detected')
+            return
 
         # ===== find burst start and end =====
         t_pre = peaks[:, 0] - pre_time
