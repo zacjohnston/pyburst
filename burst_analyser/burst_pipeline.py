@@ -99,19 +99,23 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
         n_runs = grid_tools.get_nruns(batch, source)
         for run in range(1, n_runs + 1):
             sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
-            burstfit = burst_analyser.BurstRun(run, batch, source)
-
+            burstfit = burst_analyser.BurstRun(run, batch, source,
+                                               analyse=True)
             data['batch'] += [batch]
             data['run'] += [run]
             data['num'] += [burstfit.n_bursts]
+            plottable = None
 
             for bp in bprops:
                 u_bp = f'u_{bp}'
 
-                if burstfit.n_bursts > skip_bursts + 1:
-                    mean = np.mean(burstfit.bursts[bp][skip_bursts:])
-                    std = np.std(burstfit.bursts[bp][skip_bursts:])
+                if (burstfit.n_bursts > skip_bursts + 1
+                   and not burstfit.too_few_bursts):
+                        plottable = True
+                        mean = np.mean(burstfit.bursts[bp][skip_bursts:])
+                        std = np.std(burstfit.bursts[bp][skip_bursts:])
                 else:
+                    plottable = False
                     mean = np.nan
                     std = np.nan
 
@@ -121,10 +125,11 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
             data['rate'] += [8.64e4 / data['dt'][-1]]  # burst rate (per day)
             data['u_rate'] += [8.64e4 * data['u_dt'][-1] / data['dt'][-1] ** 2]
 
-            if plot_model:
-                burstfit.plot_model(display=False, save=True)
-            if plot_convergence:
-                burstfit.plot_convergence(display=False, save=True)
+            if plottable:
+                if plot_model:
+                    burstfit.plot_model(display=False, save=True)
+                if plot_convergence:
+                    burstfit.plot_convergence(display=False, save=True)
 
         table = pd.DataFrame(data)
         table = table[col_order]

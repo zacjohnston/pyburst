@@ -94,7 +94,7 @@ class BurstRun(object):
                 string = 'Too few bursts for analysis'
             else:
                 string = strings[analysed]
-                
+
             raise AttributeError(string)
 
     def remove_zeros(self):
@@ -174,6 +174,7 @@ class BurstRun(object):
                 dt = np.delete(dt, short_idxs-1)
                 n_bursts -= n_short
         else:
+            self.n_bursts = n_bursts
             self.too_few_bursts = True
             if n_bursts == 0:
                 print('\nWARNING: No bursts in this model\n')
