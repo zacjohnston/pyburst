@@ -143,6 +143,15 @@ class BurstRun(object):
     def identify_bursts(self):
         """Extracts times, separations, and mean separation of bursts
         """
+        # =============================================
+        # Pipeline:
+        #   1. Get maxima above minimum threshold
+        #   2. Discard shock peaks
+        #   3. Get largest peaks in some radius
+        #   4. Discard short-wait bursts (below fraction of mean dt)
+        #   5. Get start/end times (discard final burst if cut off)
+        # =============================================
+
         pre_time = 30  # time (s) before burst peak that should always contain burst rise
         min_dt_frac = 0.5  # minimum recurrence time (as fraction of mean)
         self.printv('Identifying bursts')
@@ -179,7 +188,7 @@ class BurstRun(object):
             if n_bursts == 0:
                 print('\nWARNING: No bursts in this model\n')
             else:
-                self.printv('WARNING: Only one burst detected')
+                self.printv('\nWARNING: Only one burst detected\n')
             return
 
         # ===== find burst start and end =====
