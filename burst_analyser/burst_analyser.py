@@ -106,40 +106,6 @@ class BurstRun(object):
         self.printv(f'Removed {n_zeros} zeros from luminosity')
         self.lum[zeros, 1] = replace_with
 
-    def remove_shocks(self, maxima):
-        """Cut out convective shocks (extreme spikes in luminosity).
-        Identifies spikes, and replaces them with interpolation from neighbours.
-        maxima : nparray(n,2)
-            local maxima to check (t, lum)
-        """
-        radius = 1  # radius of neighbour zones to compare against
-        tolerance = 2.0  # maxima should not be more than this factor larger than neighbours
-        self.remove_zeros()
-
-        # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
-        shocks = False
-        for max_i in maxima:
-            t, lum = max_i
-            idx = np.searchsorted(self.lum[:, 0], t)
-
-            left = self.lum[idx-radius: idx, 1]  # left neighbours
-            right = self.lum[idx+1: idx+radius+1, 1]  # right neighbours
-            neighbours = np.concatenate([left, right])
-
-            if True in (lum > tolerance*neighbours):
-                if self.verbose:
-                    if not shocks:
-                        print('Shocks detected and removed: consider verifying'
-                              ' with self.plot_model(shocks=True)')
-
-                new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
-                self.lum[idx, 1] = new_lum
-                max_i[1] = new_lum
-                self.shocks.append([idx, t, lum])
-                shocks = True
-
-        self.shocks = np.array(self.shocks)
-
     def identify_bursts(self):
         """Extracts times, separations, and mean separation of bursts
         """
@@ -248,6 +214,40 @@ class BurstRun(object):
         maxima_idxs = argrelextrema(lum_cut[:, 1], np.greater)[0]
         return lum_cut[maxima_idxs]
 
+    def remove_shocks(self, maxima):
+        """Cut out convective shocks (extreme spikes in luminosity).
+        Identifies spikes, and replaces them with interpolation from neighbours.
+        maxima : nparray(n,2)
+            local maxima to check (t, lum)
+        """
+        radius = 1  # radius of neighbour zones to compare against
+        tolerance = 2.0  # maxima should not be more than this factor larger than neighbours
+        self.remove_zeros()
+
+        # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
+        shocks = False
+        for max_i in maxima:
+            t, lum = max_i
+            idx = np.searchsorted(self.lum[:, 0], t)
+
+            left = self.lum[idx-radius: idx, 1]  # left neighbours
+            right = self.lum[idx+1: idx+radius+1, 1]  # right neighbours
+            neighbours = np.concatenate([left, right])
+
+            if True in (lum > tolerance*neighbours):
+                if self.verbose:
+                    if not shocks:
+                        print('Shocks detected and removed: consider verifying'
+                              ' with self.plot_model(shocks=True)')
+
+                new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
+                self.lum[idx, 1] = new_lum
+                max_i[1] = new_lum
+                self.shocks.append([idx, t, lum])
+                shocks = True
+
+        self.shocks = np.array(self.shocks)
+
     def get_burst_peaks(self, maxima):
         """Get largest maxima within some time-window
         """
@@ -321,7 +321,6 @@ class BurstRun(object):
             t1 = self.bursts['t_end_idx'][i]
             fluences[i] = integrate.trapz(y=self.lum[t0:t1 + 1, 1],
                                           x=self.lum[t0:t1 + 1, 0])
-
         self.bursts['fluence'] = fluences  # Burst fluence (ergs)
 
     def show_save_fig(self, fig, display, save, plot_name,
