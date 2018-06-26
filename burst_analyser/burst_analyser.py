@@ -249,7 +249,7 @@ class BurstRun(object):
         return lum_cut[maxima_idxs]
 
     def get_burst_peaks(self, maxima):
-        """Identify which maxima are burst peaks
+        """Get largest maxima within some time-window
         """
         t_radius = 60  # burst peak must be largest maxima within t_radius (s)
         peaks = []
