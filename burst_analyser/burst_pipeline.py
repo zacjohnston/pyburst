@@ -26,6 +26,8 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
                  analyse=True, collect=True, verbose=True):
     """Run sequential analysis steps for burst models
     """
+    # TODO: multithread by runs (for large batches)
+
     # 1.
     if copy_params:
         print_title('Copying parameter tables')
@@ -50,7 +52,6 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
         print_title('Collecting results')
         last_batch = batches[-1]
         burst_tools.combine_extracts(np.arange(1, last_batch + 1), source)
-
 
 def multithread_extract(batches, source, plot_model=True, plot_convergence=True):
     args = []

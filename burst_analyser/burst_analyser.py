@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import sys
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
 
@@ -76,6 +77,7 @@ class BurstRun(object):
         """
         self.ensure_analysed_is(False)
         self.identify_bursts()
+        # self.smooth_lightcurve()
 
         if not self.too_few_bursts:
             self.find_fluence()
@@ -96,6 +98,34 @@ class BurstRun(object):
                 string = strings[analysed]
 
             raise AttributeError(string)
+
+    def smooth_lightcurve(self):
+        bin_size = 0.1  # (s)
+        sub_bins = 10
+        t0 = self.lum[0, 0]
+        total_time = self.lum[-1, 0] - t0
+        n_bins = int(total_time / bin_size)
+
+        bin_centres = t0 + bin_size * (0.5 + np.arange(n_bins))
+        bin_edges = t0 + bin_size * np.arange(n_bins+1)
+
+        new_lum = np.zeros((n_bins, 2))
+        new_lum[:, 0] = bin_centres
+
+        for i in range(n_bins):
+            sys.stdout.write(f'\r{100 * (i+1)/n_bins:.2f} %')
+            t0 = bin_edges[i]
+            t1 = bin_edges[i+1]
+            # i0 = np.searchsorted(self.lum[:, 0], t0)
+            # i1 = np.searchsorted(self.lum[:, 0], t1)
+
+            x = np.linspace(t0, t1, sub_bins)
+            lums = self.lumf(x)
+            # lum_slice = self.lum[i0:i1, 1]
+            new_lum[i, 1] = np.mean(lums)
+        sys.stdout.write('\n')
+
+        self.new_lum = new_lum
 
     def remove_zeros(self):
         """During shocks, kepler can also give zero luminosity (for some reason...)
@@ -123,8 +153,11 @@ class BurstRun(object):
         self.printv('Identifying bursts')
 
         # ===== get maxima in luminosity curve =====
+        # TODO: Cycle this for multiple sweeps, until no new maxima
+        # for _ in range(10):
         candidates = self.get_lum_maxima()
         self.remove_shocks(candidates)
+        self.shocks = np.array(self.shocks)
 
         # ===== determine bursts from maxima =====
         peaks = self.get_burst_peaks(candidates)
@@ -217,6 +250,9 @@ class BurstRun(object):
     def remove_shocks(self, maxima):
         """Cut out convective shocks (extreme spikes in luminosity).
         Identifies spikes, and replaces them with interpolation from neighbours.
+
+        parameters
+        ----------
         maxima : nparray(n,2)
             local maxima to check (t, lum)
         """
@@ -245,8 +281,6 @@ class BurstRun(object):
                 max_i[1] = new_lum
                 self.shocks.append([idx, t, lum])
                 shocks = True
-
-        self.shocks = np.array(self.shocks)
 
     def get_burst_peaks(self, maxima):
         """Get largest maxima within some time-window
