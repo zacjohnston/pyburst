@@ -542,8 +542,8 @@ class BurstRun(object):
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
-    def plot_lightcurve(self, bursts, save=False, display=True, log=False,
-                        zero_time=True, fontsize=14):
+    def plot_lightcurves(self, bursts, save=False, display=True, log=False,
+                         zero_time=True, fontsize=14):
         """Plot individual burst lightcurve
 
         parameters
