@@ -154,9 +154,9 @@ class BurstRun(object):
 
         # ===== get maxima in luminosity curve =====
         # TODO: Cycle this for multiple sweeps, until no new maxima
-        # for _ in range(10):
-        candidates = self.get_lum_maxima()
-        self.remove_shocks(candidates)
+        for _ in range(10):
+            candidates = self.get_lum_maxima()
+            self.remove_shocks(candidates)
         self.shocks = np.array(self.shocks)
 
         # ===== determine bursts from maxima =====
@@ -544,6 +544,7 @@ class BurstRun(object):
                         zero_time=True, title=True, fontsize=14):
         """Plot individual burst lightcurve
         """
+        # TODO plot multiple LC on same axis
         self.ensure_analysed_is(True)
         if burst > self.n_bursts - 1\
                 or burst < 0:
