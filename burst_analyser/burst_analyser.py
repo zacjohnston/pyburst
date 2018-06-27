@@ -376,6 +376,7 @@ class BurstRun(object):
             optional string to attach to filename
         extension : str (optional)
         """
+
         if save:
             filename = f'{plot_name}_{self.model_str}{extra}.{extension}'
             if path is None:
@@ -384,6 +385,7 @@ class BurstRun(object):
                 filepath = os.path.join(path, filename)
 
             self.printv(f'Saving figure: {filepath}')
+            grid_tools.try_mkdir(path, skip=True)
             fig.savefig(filepath)
 
         if display:
@@ -540,20 +542,23 @@ class BurstRun(object):
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
-    def plot_lightcurve(self, burst, save=False, display=True, log=False,
-                        zero_time=True, title=True, fontsize=14):
+    def plot_lightcurve(self, bursts, save=False, display=True, log=False,
+                        zero_time=True, fontsize=14):
         """Plot individual burst lightcurve
+
+        parameters
+        ----------
+        bursts : [int]
+            list of burst indices to plot
+        save : bool
+        display : bool
+        log : bool
+        zero_time : bool
+        fontsize : int
         """
-        # TODO plot multiple LC on same axis
         self.ensure_analysed_is(True)
-        if burst > self.n_bursts - 1\
-                or burst < 0:
-            raise ValueError(f'Burst index ({burst}) out of bounds '
-                             f'(n_bursts={self.n_bursts})')
         fig, ax = plt.subplots(figsize=(8, 5))
 
-        if title:
-            ax.set_title(f'Burst {burst}')
         ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
         ax.set_xlabel('Time (s)', fontsize=fontsize)
 
@@ -561,21 +566,39 @@ class BurstRun(object):
             ax.set_yscale('log')
             ax.set_ylim([1e34, 1e39])
 
+        for burst in bursts:
+            self.add_lightcurve(burst, ax, zero_time=zero_time)
+
+        plot_path = os.path.join(self.plots_path, 'lightcurves', self.batch_str)
+
+        self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
+                           path=plot_path, extra='')
+
+    def add_lightcurve(self, burst, ax, zero_time=True):
+        """Add a lightcurve to the provided matplotlib axis
+
+        parameters
+        ----------
+        burst : int
+            index of burst to add (e.g. 0 for first burst)
+        ax : matplotlib axis
+            axis object to add lightcurves to
+        zero_time : bool
+        """
+        yscale = 1e38
+        if burst > self.n_bursts - 1\
+                or burst < 0:
+            raise ValueError(f'Burst index ({burst}) out of bounds '
+                             f'(n_bursts={self.n_bursts})')
+
         i_start = self.bursts['t_pre_idx'][burst]
         i_end = self.bursts['t_end_idx'][burst]
         x = self.lum[i_start:i_end, 0]
         y = self.lum[i_start:i_end, 1]
 
-        yscale = 1e38
         if zero_time:
             x = x - self.bursts['t_start'][burst]
-        ax.plot(x, y/yscale, c='C0')
-
-        plot_path = os.path.join(self.plots_path, 'lightcurves', self.batch_str)
-        grid_tools.try_mkdir(plot_path, skip=True)
-
-        self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
-                           path=plot_path, extra=f'_{burst:02}')
+        ax.plot(x, y / yscale, c='C0', label=f'{burst}')
 
     def save_all_lightcurves(self, **kwargs):
         for burst in range(self.n_bursts):
