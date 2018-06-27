@@ -43,6 +43,7 @@ class BurstRun(object):
         self.loaded = False
         self.lum = None
         self.lumf = None
+        self.new_lum = None
         self.load(savelum=savelum, reload=reload)
 
         self.analysed = False
@@ -154,9 +155,18 @@ class BurstRun(object):
 
         # ===== get maxima in luminosity curve =====
         # TODO: Cycle this for multiple sweeps, until no new maxima
-        for _ in range(10):
+        maxima_change = 999
+        candidates = [1]
+        count = 0
+        while maxima_change != 0:
+            old_maxima = len(candidates)
             candidates = self.get_lum_maxima()
             self.remove_shocks(candidates)
+
+            maxima_change = old_maxima - len(candidates)
+            count += 1
+
+        print(f'Maxima iterations: {count}')
         self.shocks = np.array(self.shocks)
 
         # ===== determine bursts from maxima =====
@@ -256,7 +266,7 @@ class BurstRun(object):
         maxima : nparray(n,2)
             local maxima to check (t, lum)
         """
-        radius = 1  # radius of neighbour zones to compare against
+        radius = 2  # radius of neighbour zones to compare against
         tolerance = 2.0  # maxima should not be more than this factor larger than neighbours
         self.remove_zeros()
 
@@ -561,7 +571,6 @@ class BurstRun(object):
 
         ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
         ax.set_xlabel('Time (s)', fontsize=fontsize)
-
         if log:
             ax.set_yscale('log')
             ax.set_ylim([1e34, 1e39])
@@ -569,6 +578,7 @@ class BurstRun(object):
         for burst in bursts:
             self.add_lightcurve(burst, ax, zero_time=zero_time)
 
+        ax.set_xlim(xmin=-5)
         plot_path = os.path.join(self.plots_path, 'lightcurves', self.batch_str)
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
