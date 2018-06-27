@@ -483,16 +483,14 @@ class BurstRun(object):
                 ax.plot(t, y, marker='o', c='C2', ls='none', label=label)
 
         if shocks:  # plot shocks that were removed
-            first_shock = True
-            for shock in self.shocks:
+            for i, shock in enumerate(self.shocks):
                 idx = int(shock[0])
                 shock_lum = shock[2]
 
                 shock_slice = self.lum[idx-1:idx+2, :]
                 shock_slice[1, 1] = shock_lum
                 ax.plot(shock_slice[:, 0]/timescale, shock_slice[:, 1]/yscale, c='C3',
-                        label='shocks' if first_shock else '_nolegend_')
-                first_shock = False
+                        label='shocks' if (i == 0) else '_nolegend_')
         if bursts:
             ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
                     label='peaks')
