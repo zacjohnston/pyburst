@@ -501,7 +501,7 @@ class BurstRun(object):
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=1,
                          show_values=True, legend=True, show_first=False,
-                         display=True, save=False):
+                         display=True, save=False, fix_xticks=False):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
@@ -521,10 +521,11 @@ class BurstRun(object):
             y_unit = y_units.get(bprop)
             y_scale = y_scales.get(bprop, 1.0)
             ax[i].set_ylabel(f'{bprop} ({y_unit})')
-            ax[i].set_xticks(np.arange(b_start, self.n_bursts+1))
 
-            if i != len(bprops)-1:
-                ax[i].set_xticklabels([])
+            if fix_xticks:
+                ax[i].set_xticks(np.arange(b_start, self.n_bursts+1))
+                if i != len(bprops)-1:
+                    ax[i].set_xticklabels([])
 
             b_vals = self.bursts[bprop]
             nv = len(b_vals)
