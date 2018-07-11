@@ -22,6 +22,8 @@ def default_plt_options():
 
 default_plt_options()
 
+# TODO: Generalise to non-batch organised models
+
 
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
