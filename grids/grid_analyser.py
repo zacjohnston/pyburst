@@ -28,7 +28,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 # Parameters which have been discontinued from the grid
 params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
                   # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
-                  'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8],
+                  'biggrid2': {'qb': [0.075], 'z': [0.001, 0.0015], 'x': [0.5, 0.6, 0.8],
                                'mass': [0.8, 3.2],
                                'accrate': np.concatenate(([0.05, 0.06, 0.07],
                                                          np.arange(9, 24, 2)))}
@@ -412,7 +412,7 @@ class Kgrid:
         self.printv('')
 
     def plot_burst_property(self, bprop, var, fixed, save=False, show=True,
-                            powerfits=False, interpolate=True):
+                            powerfits=False, interpolate=True, fix_axis=True):
         """Plots given burst property against accretion rate
         
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
@@ -425,6 +425,7 @@ class Kgrid:
         if self.source == 'biggrid2':
             # accrate_unique = np.arange(8, 25, 2)/100
             accrate_unique = np.arange(8, 25)/100
+            # accrate_unique = np.arange(5, 25)/100
         else:
             accrate_unique = self.unique_params['accrate']
 
@@ -459,14 +460,15 @@ class Kgrid:
             precision = precisions.get(p, 3)
             title += f'{p}={pv:.{precision}f}, '
 
-        ax.set_xlim([0.075, 0.245])
-        ax.set_xlabel(r'$\dot{M} \; (\dot{M}_\mathrm{Edd})$ ')
-        ax.set_ylabel(f'{bprop} ({y_unit})')
+        if fix_axis:
+            ax.set_xlim([0.075, 0.245])
 
         # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
-        fontsize = 12
+        fontsize = 14
+        ax.set_xlabel(r'$\dot{M} / \dot{M}_\mathrm{Edd}$', fontsize=fontsize)
         # ax.set_xlabel(r'Accretion rate ($\dot{M} \;/ \dot{M}_\mathrm{Edd})$ ', fontsize=fontsize)
-        # ax.set_ylabel(f'Burst recurrence time (hr)', fontsize=fontsize)
+        ax.set_ylabel(r'Burst rate (day$^{-1}$)', fontsize=fontsize)
+        # ax.set_ylabel(f'{bprop} ({y_unit})')
         # title = 'Example grid of burst simulations'
         # ax.set_title(title, fontsize=14)
         # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
@@ -535,7 +537,7 @@ class Kgrid:
                 label = f'{m:.2f}'
                 ax.plot(x, y, label=label)
 
-        ax.legend()
+        ax.legend(fontsize=fontsize-2)
         plt.tight_layout()
         if show:
             plt.show(block=False)
