@@ -23,4 +23,6 @@ def substrate_lc():
 
     plt.show(block=False)
 
-    return l0
+
+def substrate_temp(cycle0, cycle1):
+    pass
