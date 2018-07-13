@@ -169,9 +169,11 @@ class BurstFit:
 
         # ===== strip non-model params for interpolator =====
         # note: interpolate_epochs() will overwrite the mdot parameter
+        #       assumes g is the last model param (need to make more robust)
         reference_mass = 1.4  # solmass
         interp_params = np.array(params[self.n_epochs - 1: self.param_idxs['g'] + 1])
         interp_params[-1] *= reference_mass
+        self.debug.variable('interp_params', interp_params, '')
 
         # ===== compare model burst properties against observed =====
         lh = 0.0
@@ -295,6 +297,7 @@ class BurstFit:
             interp_params = np.array(interp_params)
             interp_params[0] = mdots
 
+        self.debug.variable('interp_params', interp_params, '')
         output = self.kemulator.emulate_burst(params=interp_params)
         self.debug.end_function()
         return output
