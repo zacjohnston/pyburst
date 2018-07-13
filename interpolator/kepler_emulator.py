@@ -134,32 +134,7 @@ class Kemulator:
         params : [acc, x, z, qb, mass]
         """
         # check_params_length(params, length=len(self.version_def.param_keys))
-        # ==== ensure correct order of parameters ====
-        # if type(params) == dict:
-        #     params = convert_params(params=params)
         return self.interpolator(params)
-
-
-def convert_params(params):
-    """Converts params from dict to list format, and vice versa (ensures order)
-    """
-    # check_params_length(params=params)
-    ptype = type(params)
-    # pkeys = ['acc', 'x', 'z', 'qb', 'mass']
-    # pkeys = ['acc', 'z', 'qb', 'mass']
-    pkeys = ['acc', 'x', 'z', 'mass']
-
-    if ptype == dict:
-        params_out = []
-        for key in pkeys:
-            params_out += [params[key]]
-
-    elif (ptype == list) or (ptype == tuple) or (ptype == np.ndarray):
-        params_out = {}
-        for i, key in enumerate(pkeys):
-            params_out[key] = params[i]
-
-    return params_out
 
 
 def check_params_length(params, length=5):
