@@ -9,7 +9,7 @@ from math import ceil
 
 # kepler_grids
 from ..physics import gparams
-from ..grids.grid_strings import get_source_path
+from ..grids.grid_strings import get_source_path, print_warning
 from . import mcmc_versions
 from . import mcmc_tools
 from . import burstfit
@@ -314,11 +314,18 @@ def get_mass_radius_point(params, source, version):
 
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True):
     default_plt_options()
-    max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
-                                                 n_steps=n_steps, verbose=verbose)
+    max_params, max_lhood = mcmc_tools.get_max_lhood_params(source, version=version,
+                                                            n_walkers=n_walkers,
+                                                            n_steps=n_steps,
+                                                            verbose=verbose,
+                                                            return_lhood=True)
 
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False)
-    bfit.lhood(max_params, plot=True)
+    lhood = bfit.lhood(max_params, plot=True)
+
+    if lhood != max_lhood:
+        print_warning(f'lhoods do not match ({max_lhood:.2f}, {lhood:.2f}). '
+                      + 'BurstFit may have changed')
 
 
 def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):

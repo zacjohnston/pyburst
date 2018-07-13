@@ -118,6 +118,6 @@ def get_model_table_filepath(batch, source, filename='MODELS.txt'):
 # Misc. prints
 # ======================================================
 def print_warning(string):
-    print('X' * 60)
+    print('X' * 70)
     print(f'WARNING: {string}')
-    print('X' * 60)
+    print('X' * 70)
