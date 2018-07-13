@@ -133,7 +133,7 @@ class Kemulator:
 
         params : [acc, x, z, qb, mass]
         """
-        # check_params_length(params, length=len(self.version_def.param_keys))
+        check_params_length(params, length=len(self.version_def.param_keys))
         return self.interpolator(params)
 
 
