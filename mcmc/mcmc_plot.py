@@ -94,8 +94,8 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
 
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
-        max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
-                                              n_steps=n_steps, verbose=verbose)
+        max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
+                                                     n_steps=n_steps, verbose=verbose)
         fig = cc.plotter.plot(truth=max_params, display=display)
     elif truth:
         if truth_values is None:
@@ -132,8 +132,8 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
                                             truth=truth_values)
     elif max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
-        max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
-                                              n_steps=n_steps, verbose=verbose)
+        max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
+                                                     n_steps=n_steps, verbose=verbose)
         fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
                                             truth=max_params)
     else:
@@ -162,8 +162,8 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
 
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
-        max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
-                                              n_steps=n_steps, verbose=verbose)
+        max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
+                                                     n_steps=n_steps, verbose=verbose)
         mass, radius = get_mass_radius_point(max_params, source=source, version=version)
         fig = cc.plotter.plot(display=True, figsize=[6, 6], truth=[mass, radius])
     else:
@@ -314,8 +314,8 @@ def get_mass_radius_point(params, source, version):
 
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True):
     default_plt_options()
-    max_params = mcmc_tools.get_max_lhood(source, version=version, n_walkers=n_walkers,
-                                          n_steps=n_steps, verbose=verbose)
+    max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
+                                                 n_steps=n_steps, verbose=verbose)
 
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False)
     bfit.lhood(max_params, plot=True)

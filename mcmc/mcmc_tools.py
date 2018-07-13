@@ -71,7 +71,7 @@ def get_mcmc_string(source, version, n_walkers=None, n_steps=None,
             + f'{thread_str}{step_str}{label_str}{extension}')
 
 
-def get_max_lhood(source, version, n_walkers, n_steps, verbose=True):
+def get_max_lhood_params(source, version, n_walkers, n_steps, verbose=True):
     """Returns the point with the highest likelihood
     """
     sampler_state = load_sampler_state(source=source, version=version,
