@@ -83,7 +83,7 @@ def get_max_lhood(source, version, n_walkers, n_steps, verbose=True):
     max_idx = np.argmax(lnprob)
     max_lhood = lnprob.flatten()[max_idx]
 
-    n_dimensions = chain.shape[2]
+    n_dimensions = sampler_state['dim']
     flat_chain = chain.reshape((-1, n_dimensions))
     max_params = flat_chain[max_idx]
 

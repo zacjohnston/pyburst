@@ -156,7 +156,6 @@ class BurstRun(object):
         self.printv('Identifying bursts')
 
         # ===== get maxima in luminosity curve =====
-        # TODO: Cycle this for multiple sweeps, until no new maxima
         maxima_change = 999
         candidates = [1]
         count = 0
