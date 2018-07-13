@@ -140,6 +140,7 @@ class Kemulator:
 def check_params_length(params, length=5):
     """Checks that five parameters have been provided
     """
+    # TODO: generalise this for emulators with some parameters fixed
     def check(array):
         if len(array) != length:
             raise ValueError("'params' must specify each of (acc, x, z, qb, mass)")
