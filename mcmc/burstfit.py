@@ -287,7 +287,7 @@ class BurstFit:
             accretion rates for each epoch (as fraction of Eddington rate)
         """
         self.debug.start_function('interpolate_epochs')
-
+        # TODO: generalise to N-epochs
         if self.n_epochs == 3:
             interp_params = np.array((interp_params, interp_params, interp_params))
             interp_params[:, 0] = mdots
