@@ -18,14 +18,19 @@ key_map = {'dt': 'tDel', 'u_dt': 'uTDel',
 
 
 class Kemulator:
-    """========================================================
-    Kepler emulator class. Creates a 'model' of kepler results
-    ========================================================
-    source              = str  : source object of grid to emaulate (e.g., gs1826)
-    verbose             = bool : print diagnostics
-    exclude_tests       = bool : exclude test batches from grid before interpolating
-    create_interpolator = bool : setup interpolator (takes a while)
-    ========================================================"""
+    """Kepler emulator class. Creates a 'model' of kepler results
+
+    parameters
+    ----------
+    source : str
+        source object of grid to emaulate (e.g., gs1826)
+    verbose : bool
+        print diagnostics
+    exclude_tests : bool
+        exclude test batches from grid before interpolating
+    recalculate_interpolators : bool
+        setup interpolator
+    """
 
     def __init__(self, source, version, verbose=True, exclude_tests=True,
                  recalculate_interpolators=True, burst_analyser=True,
@@ -61,23 +66,20 @@ class Kemulator:
             self.load_interpolator()
 
     def printv(self, string, **kwargs):
-        """=================================================
-        Prints string if self.verbose == True
-        ================================================="""
+        """Prints string if self.verbose == True
+        """
         if self.verbose:
             print(string, **kwargs)
 
     def reduce_summ(self, params):
-        """========================================================
-        Returns reduced summ table with specified parameters (e.g., mass, qb)
-        ========================================================"""
+        """Returns reduced summ table with specified parameters (e.g., mass, qb)
+        """
         reduced_idxs = grid_tools.reduce_table_idx(self.params, params=params)
         return self.summ.iloc[reduced_idxs]
 
     def save_interpolator(self):
-        """========================================================
-        Saves (pickles) interpolator to file
-        ========================================================"""
+        """Saves (pickles) interpolator to file
+        """
         self.printv(f'Saving interpolator')
         filename = f'interpolator_{self.source}_V{self.version}'
         filepath = os.path.join(GRIDS_PATH, 'sources', self.source,
@@ -86,9 +88,8 @@ class Kemulator:
         pickle.dump(self.interpolator, open(filepath, 'wb'))
 
     def load_interpolator(self):
-        """========================================================
-        Loads previously-saved (pickled) interpolators from file
-        ========================================================"""
+        """Loads previously-saved (pickled) interpolators from file
+        """
         self.printv(f'Loading interpolator')
         filename = f'interpolator_{self.source}_V{self.version}'
         filepath = os.path.join(GRIDS_PATH, 'sources', self.source,
@@ -96,11 +97,11 @@ class Kemulator:
         self.interpolator = pickle.load(open(filepath, 'rb'))
 
     def setup_interpolator(self, bprops):
-        """========================================================
-        Creates interpolator object from kepler grid data
-        ========================================================
-        bprops = [str]  : burst properties to interpolate (e.g., dt, fluence)
-        ========================================================"""
+        """Creates interpolator object from kepler grid data
+
+        bprops : [str]
+            burst properties to interpolate (e.g., dt, fluence)
+        """
         self.printv('Creating interpolator on grid: ')
         points = []
 
@@ -128,11 +129,10 @@ class Kemulator:
         self.printv(f'Setup time: {t1-t0:.1f} s')
 
     def emulate_burst(self, params):
-        """========================================================
-        Returns interpolated burst properties for given params
-        ========================================================
-        params: acc, x, z, qb, mass
-        ========================================================"""
+        """Returns interpolated burst properties for given params
+
+        params : [acc, x, z, qb, mass]
+        """
         # check_params_length(params, length=len(self.version_def.param_keys))
         # ==== ensure correct order of parameters ====
         # if type(params) == dict:
@@ -141,9 +141,8 @@ class Kemulator:
 
 
 def convert_params(params):
-    """========================================================
-    Converts params from dict to list format, and vice versa (ensures order)
-    ========================================================"""
+    """Converts params from dict to list format, and vice versa (ensures order)
+    """
     # check_params_length(params=params)
     ptype = type(params)
     # pkeys = ['acc', 'x', 'z', 'qb', 'mass']
@@ -164,9 +163,8 @@ def convert_params(params):
 
 
 def check_params_length(params, length=5):
-    """========================================================
-    Checks that five parameters have been provided
-    ========================================================"""
+    """Checks that five parameters have been provided
+    """
     def check(array):
         if len(array) != length:
             raise ValueError("'params' must specify each of (acc, x, z, qb, mass)")
