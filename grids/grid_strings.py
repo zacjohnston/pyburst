@@ -112,3 +112,12 @@ def get_table_filepath(source, table, batch=None):
 def get_model_table_filepath(batch, source, filename='MODELS.txt'):
     path = get_batch_models_path(batch, source)
     return os.path.join(path, filename)
+
+
+# ======================================================
+# Misc. prints
+# ======================================================
+def print_warning(string):
+    print('X' * 60)
+    print(f'WARNING: {string}')
+    print('X' * 60)
