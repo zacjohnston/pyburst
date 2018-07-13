@@ -425,7 +425,6 @@ class Kgrid:
         if self.source == 'biggrid2':
             # accrate_unique = np.arange(8, 25, 2)/100
             accrate_unique = np.arange(8, 25)/100
-            # accrate_unique = np.arange(5, 25)/100
         else:
             accrate_unique = self.unique_params['accrate']
 
@@ -438,11 +437,11 @@ class Kgrid:
                                    'peak': 'u_peak'},
                             }.get(self.burst_analyser)
 
-        y_unit = {'dt': 'hr',
-                  'fluence': '10^39 erg',
-                  'peak': '10^38 erg/s',
-                  'rate': 'day$^{-1}$'
-                  }.get(bprop)
+        y_label = {'dt': r'$\Delta t$ (hr)',
+                   'fluence': r'$E_b$ ($10^{39}$ erg)',
+                   'peak': r'$L_{peak}$ ($10^{38}$ erg s$^{-1}$)',
+                   'rate': 'Burst rate (day$^{-1}$)'
+                   }.get(bprop)
 
         unit_f = {'tDel': 3600, 'dt': 3600, 'rate': 3600,
                   'fluence': 1e39, 'peak': 1e38}.get(bprop, 1.0)
@@ -463,15 +462,10 @@ class Kgrid:
         if fix_axis:
             ax.set_xlim([0.075, 0.245])
 
-        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
         fontsize = 14
         ax.set_xlabel(r'$\dot{M} / \dot{M}_\mathrm{Edd}$', fontsize=fontsize)
-        # ax.set_xlabel(r'Accretion rate ($\dot{M} \;/ \dot{M}_\mathrm{Edd})$ ', fontsize=fontsize)
-        ax.set_ylabel(r'Burst rate (day$^{-1}$)', fontsize=fontsize)
-        # ax.set_ylabel(f'{bprop} ({y_unit})')
-        # title = 'Example grid of burst simulations'
-        # ax.set_title(title, fontsize=14)
-        # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+        ax.set_ylabel(y_label, fontsize=fontsize)
+        ax.set_title(title, fontsize=14)
         plt.tight_layout()
 
         for v in var_unique:
@@ -523,7 +517,6 @@ class Kgrid:
             del (params['accrate'])
 
         # ===== plot power laws =====
-        # return params, var_unique
         # TODO: only plot powerfits for plotted vars (e.g. X)
         if powerfits:
             ax.set_prop_cycle(None)  # reset color cycle
