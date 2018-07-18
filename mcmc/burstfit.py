@@ -114,7 +114,7 @@ class BurstFit:
 
         self.fper_ratios = fper_ratios
         self.mdot_ratio_priors = ratio_priors
-        self.z_prior = norm(loc=-0.5, scale=0.25).pdf  # log-space [z/solar]
+        self.z_prior = norm(loc=-0.5, scale=0.25).pdf  # log10-space [z/solar]
         self.debug.end_function()
 
     def extract_obs_values(self):
