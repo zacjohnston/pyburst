@@ -154,6 +154,7 @@ class BurstFit:
         plot : bool
             whether to plot the comparison
         """
+
         self.debug.start_function('lhood')
         if self.debug.debug:
             print_params(params, source=self.source, version=self.version)
@@ -163,6 +164,9 @@ class BurstFit:
 
         # ===== check priors =====
         lp = self.lnprior(params=params)
+        # !!!
+        return lp
+        # !!!
         if np.isinf(lp):
             self.debug.end_function()
             return -np.inf
