@@ -164,9 +164,6 @@ class BurstFit:
 
         # ===== check priors =====
         lp = self.lnprior(params=params)
-        # !!!
-        return lp
-        # !!!
         if np.isinf(lp):
             self.debug.end_function()
             return -np.inf
