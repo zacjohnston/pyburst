@@ -291,7 +291,14 @@ prior_bounds = {
             (0.01, np.inf),  # f_b
             (0.01, np.inf),  # f_p
             ),
-    }
+    },
+
+    8: {
+        1: ((0.1, 0.24),  # mdot1
+            (0.1, 0.24),  # mdot2
+            (0.1, 0.24),  # mdot3
+            ),
+    },
 }
 
 # ===== Defines order/number of params provided to BurstFit =====
@@ -303,6 +310,7 @@ param_keys = {
     5: ['mdot1', 'mdot2', 'mdot3', 'z', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
     6: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
     7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f_b', 'f_p'],
+    8: ['mdot1', 'mdot2', 'mdot3'],
 }
 
 # ===== initial position of walkers =====
@@ -350,6 +358,7 @@ initial_position = {
          0.76, 0.0025, 0.03, 1.05, 1.3, 10, 75.),
     21: (0.235, 0.207, 0.152,
          0.7, 0.012, 0.05, 1.25, 1.55, 7, 55.),
+    22: (0.21, 0.1789, 0.1311),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -461,6 +470,7 @@ version_definitions = {
                 49: 16,
                 50: 16,
                 51: 17,
+                52: 17,
             },
             'sim_test':
                 {1: 5,
@@ -529,6 +539,7 @@ version_definitions = {
                 49: prior_bounds[7][2],
                 50: prior_bounds[7][3],
                 51: prior_bounds[6][28],
+                52: prior_bounds[8][1],
             },
             'sim_test': {
                 1: prior_bounds[1][9],
@@ -584,6 +595,7 @@ version_definitions = {
                 49: initial_position[16],
                 50: initial_position[17],
                 51: initial_position[14],
+                52: initial_position[22],
             },
             'sim_test': {},
             'sim10': {
@@ -636,6 +648,7 @@ version_definitions = {
                     49: param_keys[7],
                     50: param_keys[7],
                     51: param_keys[6],
+                    52: param_keys[8],
                 },
             'sim_test': {},
             'sim10': {
