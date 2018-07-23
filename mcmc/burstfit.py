@@ -47,7 +47,7 @@ class BurstFit:
 
     def __init__(self, source, version,
                  bprops=('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
-                 verbose=True, lhood_factor=1, debug=False, **kwargs):
+                 verbose=True, lhood_factor=1, debug=False, priors_only=False, **kwargs):
 
         self.source = source
         self.version = version
@@ -65,6 +65,7 @@ class BurstFit:
         self.bprops = bprops
         self.n_bprops = len(bprops)
         self.lhood_factor = lhood_factor
+        self.priors_only = priors_only
         self.kemulator = kepler_emulator.Kemulator(source=source,
                                                    bprops=bprops,
                                                    version=self.mcmc_version.interpolator,
@@ -164,6 +165,8 @@ class BurstFit:
 
         # ===== check priors =====
         lp = self.lnprior(params=params)
+        if self.priors_only:
+            return lp
         if np.isinf(lp):
             self.debug.end_function()
             return -np.inf
@@ -316,11 +319,12 @@ class BurstFit:
             return -np.inf
 
         mdot_ratios = self._mdots / self._mdots[0]
-        z = params[self.param_idxs['z']]
-
         mdot_prior = 0
         for i in range(1, self.n_epochs):
             mdot_prior += np.log(self.mdot_ratio_priors[i](mdot_ratios[i]))
+        # return mdot_prior
+
+        z = params[self.param_idxs['z']]
 
         z_sun = 0.015
         prior_lhood = (np.log(self.z_prior(np.log10(z / z_sun)))
