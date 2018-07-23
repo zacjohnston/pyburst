@@ -312,7 +312,8 @@ def get_mass_radius_point(params, source, version):
     return mass.value, radius.value
 
 
-def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True):
+def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True,
+                   recalculate_interpolators=False):
     default_plt_options()
     max_params, max_lhood = mcmc_tools.get_max_lhood_params(source, version=version,
                                                             n_walkers=n_walkers,
@@ -320,7 +321,8 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True):
                                                             verbose=verbose,
                                                             return_lhood=True)
 
-    bfit = burstfit.BurstFit(source=source, version=version, verbose=False)
+    bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
+                             recalculate_interpolators=recalculate_interpolators)
     lhood = bfit.lhood(max_params, plot=True)
 
     if lhood != max_lhood:
