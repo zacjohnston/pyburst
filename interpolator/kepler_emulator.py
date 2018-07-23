@@ -28,12 +28,12 @@ class Kemulator:
         print diagnostics
     exclude_tests : bool
         exclude test batches from grid before interpolating
-    recalculate_interpolators : bool
+    re_interp: bool
         setup interpolator
     """
 
     def __init__(self, source, version, verbose=True, exclude_tests=True,
-                 recalculate_interpolators=True, burst_analyser=True,
+                 re_interp=True, burst_analyser=True,
                  bprops=('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak')):
         self.verbose = verbose
         source = grid_strings.source_shorthand(source)
@@ -60,7 +60,7 @@ class Kemulator:
         self.summ = summ
         self.params = params
 
-        if recalculate_interpolators:
+        if re_interp:
             self.setup_interpolator(bprops=bprops)
         else:
             self.load_interpolator()
