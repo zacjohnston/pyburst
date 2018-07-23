@@ -23,11 +23,14 @@ class Best:
 
         self.n_bursts = len(self.grid.mean_lc[1])
         self.shifted_lc = None
+        self.interp_lc = None
         self.extract_lc()
 
     def extract_lc(self):
         # NOTE: this overwrites mean_lc. Need to do deep copy
         shifted_lc = self.grid.mean_lc[1]
+        lc_interp = {}
+
         lum_to_flux = self.redshift * 4 * np.pi * self.f_b * 1e45
         tshifts = [8, 8, 8]
 
@@ -37,7 +40,12 @@ class Best:
             shifted_lc[burst][:, 1] *= 1 / lum_to_flux
             shifted_lc[burst][:, 2] *= 1 / lum_to_flux
 
+            lc_interp[burst] = {}
+            lc_interp[burst]['flux'] = interp1d(shifted_lc[burst][:, 0], shifted_lc[burst][:, 1])
+            lc_interp[burst]['flux_err'] = interp1d(shifted_lc[burst][:, 0], shifted_lc[burst][:, 2])
+
         self.shifted_lc = shifted_lc
+        self.interp_lc = lc_interp
 
     def plot(self, residuals=True):
         fig, ax = plt.subplots(self.n_bursts, 2, sharex=True, figsize=(20, 12))
