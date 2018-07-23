@@ -359,6 +359,7 @@ initial_position = {
     21: (0.235, 0.207, 0.152,
          0.7, 0.012, 0.05, 1.25, 1.55, 7, 55.),
     22: (0.21, 0.1789, 0.1311),
+    23: (0.18, 0.16, 0.12),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -471,6 +472,7 @@ version_definitions = {
                 50: 16,
                 51: 17,
                 52: 17,
+                53: 17,
             },
             'sim_test':
                 {1: 5,
@@ -540,6 +542,7 @@ version_definitions = {
                 50: prior_bounds[7][3],
                 51: prior_bounds[6][28],
                 52: prior_bounds[8][1],
+                53: prior_bounds[8][1],
             },
             'sim_test': {
                 1: prior_bounds[1][9],
@@ -596,6 +599,7 @@ version_definitions = {
                 50: initial_position[17],
                 51: initial_position[14],
                 52: initial_position[22],
+                53: initial_position[23],
             },
             'sim_test': {},
             'sim10': {
@@ -649,6 +653,7 @@ version_definitions = {
                     50: param_keys[7],
                     51: param_keys[6],
                     52: param_keys[8],
+                    53: param_keys[8],
                 },
             'sim_test': {},
             'sim10': {
