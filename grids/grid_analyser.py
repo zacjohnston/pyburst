@@ -53,7 +53,7 @@ class Kgrid:
     def __init__(self, source, basename='xrb', con_ver=6,
                  load_lc=False, verbose=True,
                  powerfits=True, exclude_defaults=True,
-                 load_concord_summ=True, burst_analyser=False, **kwargs):
+                 load_concord_summ=False, burst_analyser=True, **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
         basename =  str  : basename of individual models (e.g. xrb)
@@ -97,14 +97,15 @@ class Kgrid:
         if powerfits:
             self.get_powerfits()
 
+        # ===== exclude misc params from plotting, etc. =====
+        self.exclude_defaults = exclude_defaults
+        self.params_exclude = params_exclude.get(source, {})
+
         # ===== Load mean lightcurve data =====
         self.mean_lc = {'columns': ['Time', 'L', 'u(L)', 'R', 'u(R)']}
         if load_lc:
             self.load_all_mean_lightcurves()
 
-        # ===== exclude misc params from plotting, etc. =====
-        self.exclude_defaults = exclude_defaults
-        self.params_exclude = params_exclude.get(source, {})
 
     def printv(self, string, **kwargs):
         """Prints string if self.verbose == True
