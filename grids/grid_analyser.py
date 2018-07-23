@@ -275,12 +275,12 @@ class Kgrid:
         dt = (np.exp(1) ** y0) * (mdot ** m)
         return dt
 
-    def get_nruns(self, params):
-        """Returns the total number of runs in some slice of parameter space
-        """
-        # TOD
-        total = 0
-        pass
+    # def get_nruns_params(self, params):
+    #     """Returns the total number of runs in some slice of parameter space
+    #     """
+    #     # TOD
+    #     total = 0
+    #     pass
 
     def plot_mean_lc(self, batch, run, show=True):
         """Plots mean lightcurve for given batch model
