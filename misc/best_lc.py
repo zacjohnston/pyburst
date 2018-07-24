@@ -46,7 +46,7 @@ class Best:
 
         self.shifted_lc = shifted_lc
         self.interp_lc = lc_interp
-
+    
     def plot(self, residuals=True):
         fig, ax = plt.subplots(self.n_bursts, 2, sharex=True, figsize=(20, 12))
 
@@ -71,10 +71,10 @@ class Best:
 
             # ====== Plot residuals ======
             if residuals:
-                # y_residuals =
+                y_residuals = obs_y - self.interp_lc[burst+1]['flux'](obs_x)
                 ax[burst][1].fill_between(m_x, -m_y_u, m_y_u, color='0.7')
-                # ax[burst][1].hline
-                ax[burst][0].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
+                ax[burst][1].plot([-1e3, 1e3], [0, 0], color='black')
+                ax[burst][1].errorbar(obs_x, y_residuals, yerr=obs_y_u, ls='none', capsize=3, color='C1')
 
         ax[-1][0].set_xlabel('Time (s)', fontsize=20)
         ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=20)
