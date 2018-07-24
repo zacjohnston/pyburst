@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
+from scipy.optimize import minimize
 
 from ..grids import grid_analyser
 from ..mcmc import burstfit, mcmc_tools
@@ -25,6 +26,7 @@ class Best:
         self.shifted_lc = None
         self.interp_lc = None
         self.t_shifts = None
+
         self.extract_lc()
 
     def extract_lc(self):
@@ -47,6 +49,26 @@ class Best:
 
         self.shifted_lc = shifted_lc
         self.interp_lc = lc_interp
+
+    def fit_tshift(self, burst, n_points=500):
+        """Finds LC tshift that minimises chi^2
+        """
+        obs = self.bfit.obs[burst]
+        model = self.shifted_lc[burst + 1]
+
+        min_tshift = (obs.time[-1].value + 0.5*obs.dt[-1].value
+                      - model[-1, 0])
+        max_tshift = (obs.time[0].value + 0.5*obs.dt[0].value
+                      - model[0, 0])
+
+        t = np.linspace(min_tshift, max_tshift, n_points)
+        chi2 = np.zeros_like(t)
+
+        for i in range(n_points):
+            chi2[i] = self.compare(t[i], burst=burst)
+
+        min_idx = np.argmin(chi2)
+        return t[min_idx]
 
     def compare(self, tshift, burst):
         """Returns chi^2 of model vs. observed lightcurves
