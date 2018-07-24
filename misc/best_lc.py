@@ -24,6 +24,7 @@ class Best:
         self.n_bursts = len(self.grid.mean_lc[1])
         self.shifted_lc = None
         self.interp_lc = None
+        self.t_shifts = None
         self.extract_lc()
 
     def extract_lc(self):
@@ -32,11 +33,11 @@ class Best:
         lc_interp = {}
 
         lum_to_flux = self.redshift * 4 * np.pi * self.f_b * 1e45
-        tshifts = [8, 8, 8]
+        # tshifts = [8, 8, 8]
 
         for burst in range(1, self.n_bursts+1):
             shifted_lc[burst][:, 0] *= self.redshift
-            shifted_lc[burst][:, 0] += tshifts[burst-1]
+            # shifted_lc[burst][:, 0] += tshifts[burst-1]
             shifted_lc[burst][:, 1] *= 1 / lum_to_flux
             shifted_lc[burst][:, 2] *= 1 / lum_to_flux
 
@@ -46,13 +47,27 @@ class Best:
 
         self.shifted_lc = shifted_lc
         self.interp_lc = lc_interp
-    
+
+    def compare(self, tshift, burst):
+        """Returns chi^2 of model vs. observed lightcurves
+        """
+        obs_burst = self.bfit.obs[burst]
+        obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)
+        obs_flux = np.array(obs_burst.flux)
+        obs_flux_err = np.array(obs_burst.flux_err)
+
+        model = self.interp_lc[burst+1]
+        model_flux = model['flux'](obs_x - tshift)
+        model_flux_err = model['flux_err'](obs_x - tshift)
+
+        return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
+
     def plot(self, residuals=True):
         fig, ax = plt.subplots(self.n_bursts, 2, sharex=True, figsize=(20, 12))
 
         for burst in range(self.n_bursts):
             obs_burst = self.bfit.obs[burst]
-            obs_x = np.array(obs_burst.time)
+            obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)
             obs_y = np.array(obs_burst.flux)
             obs_y_u = np.array(obs_burst.flux_err)
 
