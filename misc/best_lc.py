@@ -28,6 +28,7 @@ class Best:
         self.t_shifts = None
 
         self.extract_lc()
+        self.get_all_tshifts()
 
     def extract_lc(self):
         # NOTE: this overwrites mean_lc. Need to do deep copy
@@ -49,6 +50,16 @@ class Best:
 
         self.shifted_lc = shifted_lc
         self.interp_lc = lc_interp
+
+    def get_all_tshifts(self):
+        """Gets best t_shift for all bursts
+        """
+        t_shifts = np.full(self.n_bursts, np.nan)
+
+        for i in range(self.n_bursts):
+            t_shifts[i] = self.fit_tshift(burst=i)
+
+        self.t_shifts = t_shifts
 
     def fit_tshift(self, burst, n_points=500):
         """Finds LC tshift that minimises chi^2
