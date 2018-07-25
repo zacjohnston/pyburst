@@ -105,8 +105,9 @@ class Best:
             obs_y_u = np.array(obs_burst.flux_err)
 
             model = self.shifted_lc[burst+1]
+            t_shift = self.t_shifts[burst]
 
-            m_x = model[:, 0]
+            m_x = model[:, 0] + t_shift
             m_y = model[:, 1]
             m_y_u = model[:, 2]
             m_y_upper = m_y + m_y_u
@@ -119,10 +120,10 @@ class Best:
 
             # ====== Plot residuals ======
             if residuals:
-                y_residuals = obs_y - self.interp_lc[burst+1]['flux'](obs_x)
+                y_residuals = obs_y - self.interp_lc[burst+1]['flux'](obs_x - t_shift)
                 ax[burst][1].fill_between(m_x, -m_y_u, m_y_u, color='0.7')
-                ax[burst][1].plot([-1e3, 1e3], [0, 0], color='black')
                 ax[burst][1].errorbar(obs_x, y_residuals, yerr=obs_y_u, ls='none', capsize=3, color='C1')
+                ax[burst][1].plot([-1e3, 1e3], [0, 0], color='black')
 
         ax[-1][0].set_xlabel('Time (s)', fontsize=20)
         ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=20)
