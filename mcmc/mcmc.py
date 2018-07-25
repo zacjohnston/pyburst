@@ -33,7 +33,7 @@ def setup_sampler(source, version, pos=None, n_walkers=None, n_threads=1,
     n_dimensions = len(pos[0])
 
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
-                             **kwargs)
+                             re_interp=False, **kwargs)
 
     sampler = emcee.EnsembleSampler(n_walkers, n_dimensions, bfit.lhood,
                                     threads=n_threads)

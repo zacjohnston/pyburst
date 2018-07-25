@@ -47,7 +47,8 @@ class BurstFit:
 
     def __init__(self, source, version,
                  bprops=('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
-                 verbose=True, lhood_factor=1, debug=False, priors_only=False, **kwargs):
+                 verbose=True, lhood_factor=1, debug=False, priors_only=False,
+                 re_interp=False, **kwargs):
 
         self.source = source
         self.version = version
@@ -69,6 +70,7 @@ class BurstFit:
         self.kemulator = kepler_emulator.Kemulator(source=source,
                                                    bprops=bprops,
                                                    version=self.mcmc_version.interpolator,
+                                                   re_interp=re_interp,
                                                    **kwargs)
 
         concord_source = source_map.get(source, source)
@@ -322,7 +324,6 @@ class BurstFit:
         mdot_prior = 0
         for i in range(1, self.n_epochs):
             mdot_prior += np.log(self.mdot_ratio_priors[i](mdot_ratios[i]))
-        # return mdot_prior
 
         z = params[self.param_idxs['z']]
 
