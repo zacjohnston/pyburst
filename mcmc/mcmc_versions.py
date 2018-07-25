@@ -291,6 +291,16 @@ prior_bounds = {
             (0.01, np.inf),  # f_b
             (0.01, np.inf),  # f_p
             ),
+        4: ((0.1, 0.24),  # mdot1
+            (0.1, 0.24),  # mdot2
+            (0.1, 0.24),  # mdot3
+            (0.65, 0.75),  # x
+            (0.0015, 0.0175),  # z
+            (1., 2.6 / 1.4),  # g
+            (1.2, 1.4),  # redshift
+            (0.01, 10),  # f_b
+            (0.01, 10),  # f_p
+            ),
     },
 
     8: {
@@ -473,6 +483,7 @@ version_definitions = {
                 51: 17,
                 52: 17,
                 53: 17,
+                54: 16,
             },
             'sim_test':
                 {1: 5,
@@ -543,6 +554,7 @@ version_definitions = {
                 51: prior_bounds[6][28],
                 52: prior_bounds[8][1],
                 53: prior_bounds[8][1],
+                54: prior_bounds[7][4],
             },
             'sim_test': {
                 1: prior_bounds[1][9],
@@ -600,6 +612,7 @@ version_definitions = {
                 51: initial_position[14],
                 52: initial_position[22],
                 53: initial_position[23],
+                54: initial_position[17],
             },
             'sim_test': {},
             'sim10': {
@@ -654,6 +667,7 @@ version_definitions = {
                     51: param_keys[6],
                     52: param_keys[8],
                     53: param_keys[8],
+                    54: param_keys[7],
                 },
             'sim_test': {},
             'sim10': {
