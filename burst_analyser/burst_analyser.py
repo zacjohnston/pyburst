@@ -46,17 +46,6 @@ class BurstRun(object):
         self.model_str = grid_strings.get_model_string(run, batch, source)
         self.verbose = verbose
 
-        # ===== linregress things =====
-        self.regress_bprops = ['dt', 'fluence', 'peak']
-        self.min_regress = min_regress
-        self.min_discard = min_discard
-        self.n_regress = None
-        self.slopes = {}    # NOTE: starts at min_discard
-        self.slopes_err = {}
-        self.residuals = {}
-        self.discard = None
-        self.converged = None
-
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
         self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
         self.source_path = grid_strings.get_source_path(source)
@@ -76,6 +65,17 @@ class BurstRun(object):
         self.shocks = []
         self.short_waits = False
         self.too_few_bursts = False
+
+        # ===== linregress things =====
+        self.regress_bprops = ['dt', 'fluence', 'peak']
+        self.min_regress = min_regress
+        self.min_discard = min_discard
+        self.n_regress = None
+        self.slopes = {}    # NOTE: starts at min_discard
+        self.slopes_err = {}
+        self.residuals = {}
+        self.discard = None
+        self.converged = None
 
         if analyse:
             self.analyse()
@@ -423,7 +423,7 @@ class BurstRun(object):
         """
         zero_slope_idxs = []
         for bprop in self.regress_bprops:
-            zero_slope_idxs += np.where(self.residuals[bprop] < 1)
+            zero_slope_idxs += [self.min_discard + np.where(self.residuals[bprop] < 1)[0]]
 
         valid_discards = reduce(np.intersect1d, zero_slope_idxs)
         if len(valid_discards) == 0:
