@@ -100,7 +100,6 @@ class BurstRun(object):
         """
         self.ensure_analysed_is(False)
         self.identify_bursts()
-        # self.smooth_lightcurve()
 
         if not self.too_few_bursts:
             self.find_fluence()
@@ -140,34 +139,6 @@ class BurstRun(object):
             else:
                 string = strings[analysed]
             raise AttributeError(string)
-
-    def smooth_lightcurve(self):
-        bin_size = 0.1  # (s)
-        sub_bins = 10
-        t0 = self.lum[0, 0]
-        total_time = self.lum[-1, 0] - t0
-        n_bins = int(total_time / bin_size)
-
-        bin_centres = t0 + bin_size * (0.5 + np.arange(n_bins))
-        bin_edges = t0 + bin_size * np.arange(n_bins+1)
-
-        new_lum = np.zeros((n_bins, 2))
-        new_lum[:, 0] = bin_centres
-
-        for i in range(n_bins):
-            sys.stdout.write(f'\r{100 * (i+1)/n_bins:.2f} %')
-            t0 = bin_edges[i]
-            t1 = bin_edges[i+1]
-            # i0 = np.searchsorted(self.lum[:, 0], t0)
-            # i1 = np.searchsorted(self.lum[:, 0], t1)
-
-            x = np.linspace(t0, t1, sub_bins)
-            lums = self.lumf(x)
-            # lum_slice = self.lum[i0:i1, 1]
-            new_lum[i, 1] = np.mean(lums)
-        sys.stdout.write('\n')
-
-        self.new_lum = new_lum
 
     def remove_zeros(self):
         """During shocks, kepler can also give zero luminosity (for some reason...)
@@ -443,14 +414,16 @@ class BurstRun(object):
         """Calculate mean burst properties
         """
         bprops = ['dt', 'fluence', 'peak']
+        if self.converged:
+            for bprop in bprops:
+                label = f'mean_{bprop}'
+                std_label = f'std_{bprop}'
+                values = self.bursts[bprop][self.discard:]
 
-        for bprop in bprops:
-            label = f'mean_{bprop}'
-            std_label = f'std_{bprop}'
-            values = self.bursts[bprop][self.discard:]
-
-            self.bursts[label] = np.mean(values)
-            self.bursts[std_label] = np.std(values)
+                self.bursts[label] = np.mean(values)
+                self.bursts[std_label] = np.std(values)
+        else:
+            raise AttributeError("Burst train not converged, can't average properties")
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
