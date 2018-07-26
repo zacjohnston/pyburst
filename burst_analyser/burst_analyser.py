@@ -31,8 +31,8 @@ default_plt_options()
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, savelum=True, analyse=True, plot=False,
-                 min_bursts=20):
-        # min_bursts : int
+                 regress_min_bursts=20):
+        # regress_min_bursts : int
         #   minimum number of bursts to use in linear regression (self.linregress)
         self.run = run
         self.batch = batch
@@ -44,12 +44,13 @@ class BurstRun(object):
         self.verbose = verbose
 
         # ===== linregress things =====
-        self.min_bursts = min_bursts
+        self.regress_min_bursts = regress_min_bursts
         self.regress_bprops = ['dt', 'fluence', 'peak']
         self.slopes = {}
         self.slopes_err = {}
         self.residuals = {}
         self.discard = None
+        self.converged = None
 
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
         self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
@@ -100,12 +101,17 @@ class BurstRun(object):
             self.find_fluence()
 
             # ===== do linregress over bprops =====
-            for bprop in self.regress_bprops:
-                slopes, slopes_err = self.linregress(bprop)
-                self.residuals[bprop] = np.abs(slopes / slopes_err)
-                self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
+            if self.n_bursts < self.regress_min_bursts:
+                self.converged = False
+                self.discard = np.nan
+                print('\nWARNING: Not enough bursts to do linregress\n')
+            else:
+                for bprop in self.regress_bprops:
+                    slopes, slopes_err = self.linregress(bprop)
+                    self.residuals[bprop] = np.abs(slopes / slopes_err)
+                    self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
+                self.discard = self.get_discard()
 
-            self.discard = self.get_discard()
             self.analysed = True
         else:
             self.printv('Too few bursts to analyse')
@@ -393,7 +399,7 @@ class BurstRun(object):
         """Do linear regression on bprop values for different number of burst discards,
         in order to determine when slope is zero (i.e. burst train has converged)
         """
-        n = self.n_bursts + 1 - self.min_bursts
+        n = self.n_bursts + 1 - self.regress_min_bursts
         y = self.bursts[bprop]
         x = np.arange(len(y))
         slope = np.full(n, np.nan)
