@@ -31,9 +31,12 @@ default_plt_options()
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, savelum=True, analyse=True, plot=False,
-                 regress_min_bursts=20):
-        # regress_min_bursts : int
+                 min_regress=20, min_discard=1):
+        # min_regress : int
         #   minimum number of bursts to use in linear regression (self.linregress)
+        # min_discard : int
+        #   minimum no. of bursts to discard when averaging
+
         self.run = run
         self.batch = batch
         self.source = source
@@ -44,9 +47,11 @@ class BurstRun(object):
         self.verbose = verbose
 
         # ===== linregress things =====
-        self.regress_min_bursts = regress_min_bursts
         self.regress_bprops = ['dt', 'fluence', 'peak']
-        self.slopes = {}
+        self.min_regress = min_regress
+        self.min_discard = min_discard
+        self.n_regress = None
+        self.slopes = {}    # NOTE: starts at min_discard
         self.slopes_err = {}
         self.residuals = {}
         self.discard = None
@@ -101,7 +106,8 @@ class BurstRun(object):
             self.find_fluence()
 
             # ===== do linregress over bprops =====
-            if self.n_bursts < self.regress_min_bursts:
+            self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
+            if self.n_regress < 1:
                 self.converged = False
                 self.discard = np.nan
                 print('\nWARNING: Not enough bursts to do linregress\n')
@@ -399,14 +405,14 @@ class BurstRun(object):
         """Do linear regression on bprop values for different number of burst discards,
         in order to determine when slope is zero (i.e. burst train has converged)
         """
-        n = self.n_bursts + 1 - self.regress_min_bursts
+        n = self.n_regress
         y = self.bursts[bprop]
         x = np.arange(len(y))
         slope = np.full(n, np.nan)
         slope_err = np.full(n, np.nan)
 
         for i in range(n):
-            lin = linregress(x[i:], y[i:])
+            lin = linregress(x[self.min_discard + i:], y[self.min_discard + i:])
             slope[i] = lin[0]
             slope_err[i] = lin[-1]
 
@@ -419,11 +425,13 @@ class BurstRun(object):
         for bprop in self.regress_bprops:
             zero_slope_idxs += np.where(self.residuals[bprop] < 1)
 
-        min_discard = reduce(np.intersect1d, zero_slope_idxs)
-        if len(min_discard) == 0:
+        valid_discards = reduce(np.intersect1d, zero_slope_idxs)
+        if len(valid_discards) == 0:
+            print('\nWARNING: Bursts not converged\n')
+            self.converged = False
             return np.nan
         else:
-            return min_discard[0]
+            return valid_discards[0]
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
@@ -611,8 +619,7 @@ class BurstRun(object):
 
     def plot_linregress(self):
         fig, ax = plt.subplots(3, 1, figsize=(10, 12))
-        n = len(self.slopes[self.regress_bprops[0]])
-        x = np.arange(n)
+        x = np.arange(self.n_regress) + self.min_discard
         fontsize = 14
 
         for i, bprop in enumerate(self.regress_bprops):
@@ -620,7 +627,7 @@ class BurstRun(object):
             y_err = self.slopes_err[bprop]
             ax[i].set_ylabel(bprop, fontsize=fontsize)
             ax[i].errorbar(x, y, yerr=y_err, ls='none', marker='o', capsize=3)
-            ax[i].plot([0, n-1], [0, 0], ls='--')
+            ax[i].plot([0, self.n_bursts], [0, 0], ls='--')
 
         ax[-1].set_xlabel('Discarded bursts', fontsize=fontsize)
         plt.tight_layout()
