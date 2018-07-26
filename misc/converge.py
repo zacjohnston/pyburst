@@ -6,22 +6,25 @@ from ..burst_analyser import burst_analyser
 
 
 class BurstRun:
-    def __init__(self, run, batch=1, source='test_bg2', bprop='dt', plot_conv=True):
-        min_points = 4
+    def __init__(self, run, batch=1, source='test_bg2', plot=True, plot_conv=True,
+                 min_points=4):
+        self.min_points = min_points  # Note: dt will use one less point
         self.bg = burst_analyser.BurstRun(run, batch, source=source)
         self.n = self.bg.n_bursts + 1 - min_points
-        self.bprop = bprop
+        self.bprops = ['dt', 'fluence', 'peak']
 
-        self.slope, self.slope_err = self.linregress()
-        self.res = np.abs(self.slope / self.slope_err)
+        self.slope = {}
+        self.slope_err = {}
+        for bprop in self.bprops:
+            self.slope[bprop], self.slope_err[bprop] = self.linregress(bprop)
 
-        self.plot()
-        self.plot2()
+        if plot:
+            self.plot()
         if plot_conv:
             self.bg.plot_convergence()
 
-    def linregress(self):
-        y = self.bg.bursts[self.bprop]
+    def linregress(self, bprop):
+        y = self.bg.bursts[bprop]
         x = np.arange(len(y))
         slope = np.full(self.n, np.nan)
         slope_err = np.full(self.n, np.nan)
@@ -34,17 +37,17 @@ class BurstRun:
         return slope, slope_err
 
     def plot(self):
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(3, 1, figsize=(10, 12))
         x = np.arange(self.n)
+        fontsize = 14
 
-        ax.plot(x, self.res, ls='none', marker='o')
-        ax.plot([0, self.n], [1, 1], color='C1')
-        ax.plot([0, self.n], [2, 2], ls='--', color='C1')
-        plt.show(block=False)
+        for i, bprop in enumerate(self.bprops):
+            y = self.slope[bprop]
+            y_err = self.slope_err[bprop]
+            ax[i].set_ylabel(bprop, fontsize=fontsize)
+            ax[i].errorbar(x, y, yerr=y_err, ls='none', marker='o', capsize=3)
+            ax[i].plot([0, self.n-1], [0, 0], ls='--')
 
-    def plot2(self):
-        fig, ax = plt.subplots()
-        x = np.arange(self.n)
-        ax.errorbar(x, self.slope, yerr=self.slope_err, ls='none', marker='o', capsize=3, color='C0')
-        ax.plot([0, self.n], [0, 0], ls='--', color='C1')
+        ax[-1].set_xlabel('Discarded bursts', fontsize=fontsize)
+        plt.tight_layout()
         plt.show(block=False)
