@@ -4,6 +4,7 @@ import os
 import sys
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
+from scipy.stats import linregress
 
 # kepler_grids
 from . import burst_tools
@@ -23,11 +24,15 @@ def default_plt_options():
 default_plt_options()
 
 # TODO: Generalise to non-batch organised models
+# TODO: param description docstring
 
 
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
-                 reload=False, savelum=True, analyse=True, plot=False):
+                 reload=False, savelum=True, analyse=True, plot=False,
+                 min_bursts=20):
+        # min_bursts : int
+        #   minimum number of bursts to use in linear regression (self.linregress)
         self.run = run
         self.batch = batch
         self.source = source
@@ -36,6 +41,7 @@ class BurstRun(object):
         self.batch_str = grid_strings.get_batch_string(batch, source)
         self.model_str = grid_strings.get_model_string(run, batch, source)
         self.verbose = verbose
+        self.min_bursts = min_bursts
 
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
         self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
@@ -367,6 +373,23 @@ class BurstRun(object):
             fluences[i] = integrate.trapz(y=self.lum[t0:t1 + 1, 1],
                                           x=self.lum[t0:t1 + 1, 0])
         self.bursts['fluence'] = fluences  # Burst fluence (ergs)
+
+    def linregress(self, bprop):
+        """Do linear regression on bprop values for different number of burst discards,
+        in order to determine when slope is zero (i.e. burst train has converged)
+        """
+        n = self.n_bursts + 1 - self.min_bursts
+        y = self.bursts[bprop]
+        x = np.arange(len(y))
+        slope = np.full(n, np.nan)
+        slope_err = np.full(n, np.nan)
+
+        for i in range(n):
+            lin = linregress(x[i:], y[i:])
+            slope[i] = lin[0]
+            slope_err[i] = lin[-1]
+
+        return slope, slope_err
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
