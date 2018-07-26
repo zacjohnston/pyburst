@@ -5,6 +5,7 @@ import sys
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
 from scipy.stats import linregress
+from functools import reduce
 
 # kepler_grids
 from . import burst_tools
@@ -48,6 +49,7 @@ class BurstRun(object):
         self.slopes = {}
         self.slopes_err = {}
         self.residuals = {}
+        self.discard = None
 
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
         self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
@@ -103,6 +105,7 @@ class BurstRun(object):
                 self.residuals[bprop] = np.abs(slopes / slopes_err)
                 self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
 
+            self.discard = self.get_discard()
             self.analysed = True
         else:
             self.printv('Too few bursts to analyse')
@@ -118,7 +121,6 @@ class BurstRun(object):
                 string = 'Too few bursts for analysis'
             else:
                 string = strings[analysed]
-
             raise AttributeError(string)
 
     def smooth_lightcurve(self):
@@ -403,6 +405,19 @@ class BurstRun(object):
             slope_err[i] = lin[-1]
 
         return slope, slope_err
+
+    def get_discard(self):
+        """Returns min no. of bursts to discard, to achieve zero slope in bprops
+        """
+        zero_slope_idxs = []
+        for bprop in self.regress_bprops:
+            zero_slope_idxs += np.where(self.residuals[bprop] < 1)
+
+        min_discard = reduce(np.intersect1d, zero_slope_idxs)
+        if len(min_discard) == 0:
+            return np.nan
+        else:
+            return min_discard[0]
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
