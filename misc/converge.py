@@ -1,13 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import linregress
+from functools import reduce
 
 from ..burst_analyser import burst_analyser
 
 
 class BurstRun:
     def __init__(self, run, batch=1, source='test_bg2', plot=True, plot_conv=True,
-                 min_points=4):
+                 min_points=10):
         self.min_points = min_points  # Note: dt will use one less point
         self.bg = burst_analyser.BurstRun(run, batch, source=source)
         self.n = self.bg.n_bursts + 1 - min_points
@@ -15,8 +16,13 @@ class BurstRun:
 
         self.slope = {}
         self.slope_err = {}
+        self.residual = {}
+
         for bprop in self.bprops:
             self.slope[bprop], self.slope_err[bprop] = self.linregress(bprop)
+            self.residual[bprop] = np.abs(self.slope[bprop] / self.slope_err[bprop])
+
+        self.discard = self.get_discard()
 
         if plot:
             self.plot()
@@ -35,6 +41,15 @@ class BurstRun:
             slope_err[i] = lin[-1]
 
         return slope, slope_err
+
+    def get_discard(self):
+        """Returns min no. of bursts to discard to achieve zero slope
+        """
+        zero_slope_idxs = []
+        for bprop in self.bprops:
+            zero_slope_idxs += np.where(self.residual[bprop] < 1)
+
+        return reduce(np.intersect1d, zero_slope_idxs)[0]
 
     def plot(self):
         fig, ax = plt.subplots(3, 1, figsize=(10, 12))
