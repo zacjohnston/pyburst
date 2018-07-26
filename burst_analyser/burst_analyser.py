@@ -588,6 +588,23 @@ class BurstRun(object):
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
+    def plot_linregress(self):
+        fig, ax = plt.subplots(3, 1, figsize=(10, 12))
+        n = len(self.slopes[self.regress_bprops[0]])
+        x = np.arange(n)
+        fontsize = 14
+
+        for i, bprop in enumerate(self.regress_bprops):
+            y = self.slopes[bprop]
+            y_err = self.slopes_err[bprop]
+            ax[i].set_ylabel(bprop, fontsize=fontsize)
+            ax[i].errorbar(x, y, yerr=y_err, ls='none', marker='o', capsize=3)
+            ax[i].plot([0, n-1], [0, 0], ls='--')
+
+        ax[-1].set_xlabel('Discarded bursts', fontsize=fontsize)
+        plt.tight_layout()
+        plt.show(block=False)
+
     def plot_lightcurves(self, bursts, save=False, display=True, log=False,
                          zero_time=True, fontsize=14):
         """Plot individual burst lightcurve
