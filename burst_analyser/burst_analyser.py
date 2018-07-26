@@ -41,7 +41,13 @@ class BurstRun(object):
         self.batch_str = grid_strings.get_batch_string(batch, source)
         self.model_str = grid_strings.get_model_string(run, batch, source)
         self.verbose = verbose
+
+        # ===== linregress things =====
         self.min_bursts = min_bursts
+        self.regress_bprops = ['dt', 'fluence', 'peak']
+        self.slopes = {}
+        self.slopes_err = {}
+        self.residuals = {}
 
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
         self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
@@ -90,6 +96,13 @@ class BurstRun(object):
 
         if not self.too_few_bursts:
             self.find_fluence()
+
+            # ===== do linregress over bprops =====
+            for bprop in self.regress_bprops:
+                slopes, slopes_err = self.linregress(bprop)
+                self.residuals[bprop] = np.abs(slopes / slopes_err)
+                self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
+
             self.analysed = True
         else:
             self.printv('Too few bursts to analyse')
