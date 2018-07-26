@@ -49,7 +49,11 @@ class BurstRun:
         for bprop in self.bprops:
             zero_slope_idxs += np.where(self.residual[bprop] < 1)
 
-        return reduce(np.intersect1d, zero_slope_idxs)[0]
+        min_discard = reduce(np.intersect1d, zero_slope_idxs)
+        if len(min_discard) == 0:
+            return np.nan
+        else:
+            return min_discard[0]
 
     def plot(self):
         fig, ax = plt.subplots(3, 1, figsize=(10, 12))
