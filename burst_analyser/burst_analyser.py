@@ -68,6 +68,7 @@ class BurstRun(object):
 
         # ===== linregress things =====
         self.regress_bprops = ['dt', 'fluence', 'peak']
+        self.regress_too_few_bursts = False
         self.min_regress = min_regress
         self.min_discard = min_discard
         self.n_regress = None
@@ -109,9 +110,11 @@ class BurstRun(object):
             self.find_fluence()
 
             # ===== do linregress over bprops =====
+            # TODO: Problem here when n_bursts is one less than needed (dt has one less)
             self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
             if self.n_regress < 1:
                 self.discard = np.nan
+                self.regress_too_few_bursts = True
                 self.print_warn(f'Not enough bursts to do linregress ({self.n_bursts}, '
                                 + f'need {self.min_regress + self.min_discard})')
             else:
