@@ -54,10 +54,11 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
         burst_tools.combine_extracts(np.arange(1, last_batch + 1), source)
 
 
-def multithread_extract(batches, source, plot_model=True, plot_convergence=True):
+def multithread_extract(batches, source, plot_model=True, plot_convergence=True,
+                        plot_linregress=True):
     args = []
     for batch in batches:
-        args.append([batch, source, plot_model, plot_convergence])
+        args.append([batch, source, plot_model, plot_convergence, plot_linregress])
 
     t0 = time.time()
     with mp.Pool(processes=8) as pool:
@@ -109,7 +110,7 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
             data['num'] += [burstfit.n_bursts]
             data['discard'] += [burstfit.discard]
             data['converged'] += [bool_map[burstfit.converged]]
-            
+
             for bp in bprops:
                 u_bp = f'u_{bp}'
                 data[bp] += [burstfit.bursts[f'mean_{bp}']]
