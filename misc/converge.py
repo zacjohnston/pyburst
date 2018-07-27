@@ -4,6 +4,7 @@ from scipy.stats import linregress
 from functools import reduce
 
 from ..burst_analyser import burst_analyser
+from ..grids import grid_analyser
 
 
 class BurstRun:
@@ -70,3 +71,10 @@ class BurstRun:
         ax[-1].set_xlabel('Discarded bursts', fontsize=fontsize)
         plt.tight_layout()
         plt.show(block=False)
+
+
+class restart:
+    def __init__(self):
+        self.grid = grid_analyser.Kgrid('biggrid2', load_concord_summ=False,
+                                        exclude_defaults=True, powerfits=False,
+                                        burst_analyser=True)
