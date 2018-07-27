@@ -71,10 +71,12 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
                    plot_linregress=True):
     source_path = grid_strings.get_source_path(source)
     batches = grid_tools.expand_batches(batches, source)
+    bool_map = {True: 'Y', False: 'N'}
 
+    flags = ('converged',)
     b_ints = ('batch', 'run', 'num', 'discard')
     bprops = ('dt', 'fluence', 'length', 'peak')
-    col_order = ['batch', 'run', 'num', 'discard', 'dt', 'u_dt', 'rate', 'u_rate',
+    col_order = ['batch', 'run', 'num', 'converged', 'discard', 'dt', 'u_dt', 'rate', 'u_rate',
                  'fluence', 'u_fluence', 'length', 'u_length', 'peak', 'u_peak']
 
     for batch in batches:
@@ -94,7 +96,7 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
         data['rate'] = []
         data['u_rate'] = []
 
-        for b in b_ints:
+        for b in (b_ints + flags):
             data[b] = []
 
         n_runs = grid_tools.get_nruns(batch, source)
@@ -106,7 +108,8 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
             data['run'] += [run]
             data['num'] += [burstfit.n_bursts]
             data['discard'] += [burstfit.discard]
-
+            data['converged'] += [bool_map[burstfit.converged]]
+            
             for bp in bprops:
                 u_bp = f'u_{bp}'
                 data[bp] += [burstfit.bursts[f'mean_{bp}']]
