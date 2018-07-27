@@ -448,10 +448,10 @@ class BurstRun(object):
 
         if save:
             filename = f'{plot_name}_{self.model_str}{extra}.{extension}'
+
             if path is None:
-                filepath = os.path.join(self.source_path, 'plots', plot_name, filename)
-            else:
-                filepath = os.path.join(path, filename)
+                path = os.path.join(self.source_path, 'plots', plot_name)
+            filepath = os.path.join(path, filename)
 
             self.printv(f'Saving figure: {filepath}')
             grid_tools.try_mkdir(path, skip=True)
@@ -610,7 +610,7 @@ class BurstRun(object):
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
-    def plot_linregress(self):
+    def plot_linregress(self, display=True, save=False):
         fig, ax = plt.subplots(3, 1, figsize=(10, 12))
         x = np.arange(self.n_regress) + self.min_discard
         fontsize = 14
@@ -624,7 +624,7 @@ class BurstRun(object):
 
         ax[-1].set_xlabel('Discarded bursts', fontsize=fontsize)
         plt.tight_layout()
-        plt.show(block=False)
+        self.show_save_fig(fig, display=display, save=save, plot_name='linregress')
 
     def plot_lightcurves(self, bursts, save=False, display=True, log=False,
                          zero_time=True, fontsize=14):
