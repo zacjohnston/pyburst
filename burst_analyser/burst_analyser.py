@@ -87,6 +87,10 @@ class BurstRun(object):
         if self.verbose:
             print(string)
 
+    def print_warn(self, string):
+        full_string = f"\nWARNING: {string}\n"
+        self.printv(full_string)
+
     def load(self, savelum=True, reload=False):
         """Load luminosity data from kepler simulation
         """
@@ -108,8 +112,8 @@ class BurstRun(object):
             self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
             if self.n_regress < 1:
                 self.discard = np.nan
-                print(f'\nWARNING: Not enough bursts to do linregress ({self.n_bursts}, '
-                      + f'need {self.min_regress + self.min_discard})\n')
+                self.print_warn(f'Not enough bursts to do linregress ({self.n_bursts}, '
+                                + f'need {self.min_regress + self.min_discard})')
             else:
                 for bprop in self.regress_bprops:
                     slopes, slopes_err = self.linregress(bprop)
@@ -207,9 +211,9 @@ class BurstRun(object):
             self.n_bursts = n_bursts
             self.too_few_bursts = True
             if n_bursts == 0:
-                print('\nWARNING: No bursts in this model\n')
+                self.print_warn('No bursts in this model')
             else:
-                self.printv('\nWARNING: Only one burst detected\n')
+                self.print_warn('Only one burst detected')
             return
 
         # ===== find burst start and end =====
@@ -405,7 +409,7 @@ class BurstRun(object):
 
         valid_discards = reduce(np.intersect1d, zero_slope_idxs)
         if len(valid_discards) == 0:
-            print('\nWARNING: Bursts not converged\n')
+            self.print_warn('Bursts not converged')
             self.converged = False
             return np.nan
         else:
@@ -565,7 +569,7 @@ class BurstRun(object):
         """
         self.ensure_analysed_is(True)
         if self.n_bursts < discard+2:
-            print('WARNING: model has too few bursts')
+            print('Too few bursts to plot convergence')
             return
 
         y_units = {'tDel': 'hr', 'dt': 'hr', 'fluence': '10^39 erg',
