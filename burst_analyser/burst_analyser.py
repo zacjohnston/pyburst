@@ -113,9 +113,7 @@ class BurstRun(object):
             # TODO: Problem here when n_bursts is one less than needed (dt has one less)
             self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
             if self.n_regress < 1:
-                self.discard = np.nan
-                self.converged = False
-                self.regress_too_few_bursts = True
+                self.set_too_few()
                 self.print_warn(f'Not enough bursts to do linregress ({self.n_bursts}, '
                                 + f'need {self.min_regress + self.min_discard})')
             else:
@@ -128,7 +126,14 @@ class BurstRun(object):
             self.get_means()
             self.analysed = True
         else:
+            self.set_too_few()
+            self.get_means()
             self.printv('Too few bursts to analyse')
+
+    def set_too_few(self):
+        self.discard = np.nan
+        self.converged = False
+        self.regress_too_few_bursts = True
 
     def ensure_analysed_is(self, analysed):
         """Checks that model has (or hasn't) been analysed
