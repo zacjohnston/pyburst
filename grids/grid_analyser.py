@@ -28,10 +28,11 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 # Parameters which have been discontinued from the grid
 params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
                   # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
-                  'biggrid2': {'qb': [0.075], 'z': [0.001, 0.0015], 'x': [0.5, 0.6, 0.8],
-                               'mass': [0.8, 3.2],
-                               'accrate': np.concatenate(([0.05, 0.06, 0.07],
-                                                         np.arange(9, 24, 2)))}
+                  # 'biggrid2': {'qb': [0.075], 'z': [0.001, 0.0015], 'x': [0.5, 0.6, 0.8],
+                  'biggrid2': {'qb': [0.025, 0.075, 0.2], 'z': [0.001, 0.0175],
+                               'x': [0.5, 0.6, 0.77, 0.8], 'mass': [0.8, 3.2],
+                               'accrate': np.concatenate((np.arange(5, 10)/100,
+                                                          np.arange(11, 24, 2)/100))}
                   }
 
 
