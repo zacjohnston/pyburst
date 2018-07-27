@@ -428,7 +428,7 @@ class BurstRun(object):
             for bprop in bprops:
                 self.bursts[f'mean_{bprop}'] = np.nan
                 self.bursts[f'std_{bprop}'] = np.nan
-            self.print_warn("Burst train not converged, can't average properties")
+            self.printv("Burst train not converged, can't average properties")
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
