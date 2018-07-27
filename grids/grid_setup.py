@@ -415,22 +415,22 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
         f.write(table_str)
 
 
-def extend_runs(batches, source, model_table, nbursts=20, basename='xrb',
-                nsdump=1000, walltime=48, do_cmd_files=True, do_jobscripts=True):
-    """Modifies existing models for resuming, to simulate more bursts
+def extend_runs(model_table, source, nbursts=40, basename='xrb',
+                nsdump=1000, walltime=96, do_cmd_files=True, do_jobscripts=True):
+    """Modifies existing models (in model_table) for resuming, to simulate more bursts
     """
     source = grid_strings.source_shorthand(source)
-    batches = grid_tools.ensure_np_list(batches)
+    batches = np.unique(model_table['batch'])
 
     for batch in batches:
         print(f'===== Batch {batch} =====')
-        batch_path = grid_strings.get_batch_path(batch, source)
+        batch_path = grid_strings.get_batch_models_path(batch, source)
         batch_summ = grid_tools.reduce_table(model_table, params={'batch': batch})
         idxs = np.where(batch_summ['num'] < nbursts)[0]
 
         # ===== edit model.cmd files =====
-        print('Re-writing .cmd files:')
         if do_cmd_files:
+            print('Re-writing .cmd files:')
             for i in idxs:
                 run = batch_summ['run'].values[i]
                 num = batch_summ['num'].values[i]
@@ -444,7 +444,7 @@ end"""
                 run_str = grid_strings.get_run_string(run, basename)
                 filename = f'{run_str}.cmd'
                 filepath = os.path.join(batch_path, run_str, filename)
-
+                print(filepath)
                 with open(filepath, 'w') as f:
                     f.write(cmd_str)
 
@@ -498,14 +498,14 @@ def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False
         the model files (by extension) which will be synced
     """
     batches = np.unique(short_model_table['batch'])
-    target_path = f'isync:~/kepler/runs/'
+    target_path = 'isync:~/kepler/runs/'
     sync_paths = []
 
     for batch in batches:
         batch_str = grid_strings.get_batch_string(batch, source)
         batch_path = os.path.join(MODELS_PATH, '.', batch_str)
 
-        batch_table = grid_tools.reduce_table(short_model_table, params={'batch':batch})
+        batch_table = grid_tools.reduce_table(short_model_table, params={'batch': batch})
         runs = np.array(batch_table['run'])
 
         if sync_jobscripts:
