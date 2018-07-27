@@ -419,15 +419,23 @@ class BurstRun(object):
         """Calculate mean burst properties
         """
         bprops = ['dt', 'fluence', 'peak', 'length']
+        sec_day = 8.64e4
+
         if self.converged:
             for bprop in bprops:
                 values = self.bursts[bprop][self.discard:]
                 self.bursts[f'mean_{bprop}'] = np.mean(values)
                 self.bursts[f'std_{bprop}'] = np.std(values)
+
+            # ===== calculate burst rate =====
+            dt = self.bursts['mean_dt']
+            self.bursts['mean_rate'] = sec_day / dt  # burst rate (per day)
+            self.bursts['std_rate'] = sec_day * self.bursts['std_dt'] / dt**2
         else:
-            for bprop in bprops:
+            for bprop in (bprops + ['rate']):
                 self.bursts[f'mean_{bprop}'] = np.nan
                 self.bursts[f'std_{bprop}'] = np.nan
+
             self.printv("Burst train not converged, can't average properties")
 
     def show_save_fig(self, fig, display, save, plot_name,
@@ -615,6 +623,9 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
     def plot_linregress(self, display=True, save=False):
+        if self.regress_too_few_bursts:
+            self.printv("Can't plot linregress: bursts not converged")
+            return
         fig, ax = plt.subplots(3, 1, figsize=(10, 12))
         x = np.arange(self.n_regress) + self.min_discard
         fontsize = 14
