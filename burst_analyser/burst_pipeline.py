@@ -53,6 +53,7 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
         last_batch = batches[-1]
         burst_tools.combine_extracts(np.arange(1, last_batch + 1), source)
 
+
 def multithread_extract(batches, source, plot_model=True, plot_convergence=True):
     args = []
     for batch in batches:
@@ -66,15 +67,14 @@ def multithread_extract(batches, source, plot_model=True, plot_convergence=True)
     print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
-# noinspection PyTypeChecker
 def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
-                   skip_bursts=1):
+                   plot_linregress=True):
     source_path = grid_strings.get_source_path(source)
     batches = grid_tools.expand_batches(batches, source)
 
-    b_ints = ('batch', 'run', 'num')
+    b_ints = ('batch', 'run', 'num', 'discard')
     bprops = ('dt', 'fluence', 'length', 'peak')
-    col_order = ['batch', 'run', 'num', 'dt', 'u_dt', 'rate', 'u_rate',
+    col_order = ['batch', 'run', 'num', 'discard', 'dt', 'u_dt', 'rate', 'u_rate',
                  'fluence', 'u_fluence', 'length', 'u_length', 'peak', 'u_peak']
 
     for batch in batches:
@@ -105,36 +105,29 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
             data['batch'] += [batch]
             data['run'] += [run]
             data['num'] += [burstfit.n_bursts]
-            plottable = None
+            data['discard'] += [burstfit.discard]
 
             for bp in bprops:
                 u_bp = f'u_{bp}'
-
-                if (burstfit.n_bursts > skip_bursts + 1
-                   and not burstfit.too_few_bursts):
-                        plottable = True
-                        mean = np.mean(burstfit.bursts[bp][skip_bursts:])
-                        std = np.std(burstfit.bursts[bp][skip_bursts:])
-                else:
-                    plottable = False
-                    mean = np.nan
-                    std = np.nan
-
-                data[bp] += [mean]
-                data[u_bp] += [std]
+                data[bp] += [burstfit.bursts[f'mean_{bp}']]
+                data[u_bp] += [burstfit.bursts[f'std_{bp}']]
 
             data['rate'] += [8.64e4 / data['dt'][-1]]  # burst rate (per day)
             data['u_rate'] += [8.64e4 * data['u_dt'][-1] / data['dt'][-1] ** 2]
 
-            if plottable:
+            if not burstfit.too_few_bursts:
                 if plot_model:
                     burstfit.plot_model(display=False, save=True)
                 if plot_convergence:
                     burstfit.plot_convergence(display=False, save=True)
 
+                if plot_linregress and not burstfit.regress_too_few_bursts:
+                    burstfit.plot_linregress(display=False, save=True)
+
         table = pd.DataFrame(data)
         table = table[col_order]
-        table_str = table.to_string(index=False, justify='left', col_space=12)
+        table_str = table.to_string(index=False, justify='left', col_space=12,
+                                    formatters={'discard': '{:.0f}'.format})
 
         with open(filepath, 'w') as f:
             f.write(table_str)
