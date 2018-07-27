@@ -108,7 +108,8 @@ class BurstRun(object):
             self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
             if self.n_regress < 1:
                 self.discard = np.nan
-                print('\nWARNING: Not enough bursts to do linregress\n')
+                print(f'\nWARNING: Not enough bursts to do linregress ({self.n_bursts}, '
+                      + f'need {self.min_regress + self.min_discard})\n')
             else:
                 for bprop in self.regress_bprops:
                     slopes, slopes_err = self.linregress(bprop)
