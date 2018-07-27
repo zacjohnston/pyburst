@@ -114,6 +114,7 @@ class BurstRun(object):
             self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
             if self.n_regress < 1:
                 self.discard = np.nan
+                self.converged = False
                 self.regress_too_few_bursts = True
                 self.print_warn(f'Not enough bursts to do linregress ({self.n_bursts}, '
                                 + f'need {self.min_regress + self.min_discard})')
@@ -122,15 +123,9 @@ class BurstRun(object):
                     slopes, slopes_err = self.linregress(bprop)
                     self.residuals[bprop] = np.abs(slopes / slopes_err)
                     self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
-
                 self.discard = self.get_discard()
 
-            if np.isnan(self.discard):
-                self.converged = False
-            else:
-                self.converged = True
-                self.get_means()
-
+            self.get_means()
             self.analysed = True
         else:
             self.printv('Too few bursts to analyse')
@@ -411,11 +406,13 @@ class BurstRun(object):
             zero_slope_idxs += [self.min_discard + np.where(self.residuals[bprop] < 1)[0]]
 
         valid_discards = reduce(np.intersect1d, zero_slope_idxs)
+
         if len(valid_discards) == 0:
             self.print_warn('Bursts not converged')
             self.converged = False
             return np.nan
         else:
+            self.converged = True
             return valid_discards[0]
 
     def get_means(self):
@@ -424,14 +421,14 @@ class BurstRun(object):
         bprops = ['dt', 'fluence', 'peak']
         if self.converged:
             for bprop in bprops:
-                label = f'mean_{bprop}'
-                std_label = f'std_{bprop}'
                 values = self.bursts[bprop][self.discard:]
-
-                self.bursts[label] = np.mean(values)
-                self.bursts[std_label] = np.std(values)
+                self.bursts[f'mean_{bprop}'] = np.mean(values)
+                self.bursts[f'std_{bprop}'] = np.std(values)
         else:
-            raise AttributeError("Burst train not converged, can't average properties")
+            for bprop in bprops:
+                self.bursts[f'mean_{bprop}'] = np.nan
+                self.bursts[f'std_{bprop}'] = np.nan
+            self.print_warn("Burst train not converged, can't average properties")
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
