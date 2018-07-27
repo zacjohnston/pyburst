@@ -109,6 +109,8 @@ def multi_batch_save(batches, source, multithread=True, **kwargs):
 def combine_extracts(batches, source):
     """Combines extracted burst property summary tables
     """
+    col_order = ['batch', 'run', 'num', 'converged', 'discard', 'dt', 'u_dt', 'rate', 'u_rate',
+                 'fluence', 'u_fluence', 'length', 'u_length', 'peak', 'u_peak']
     source_path = grid_strings.get_source_path(source)
     big_table = pd.DataFrame()
 
@@ -116,6 +118,7 @@ def combine_extracts(batches, source):
         batch_table = load_batch_table(batch, source)
         big_table = pd.concat((big_table, batch_table), ignore_index=True)
 
+    big_table = big_table[col_order]
     table_str = big_table.to_string(index=False, justify='left', col_space=12)
 
     filename = f'burst_analysis_{source}.txt'

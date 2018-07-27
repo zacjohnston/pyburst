@@ -107,7 +107,6 @@ class Kgrid:
         if load_lc:
             self.load_all_mean_lightcurves()
 
-
     def printv(self, string, **kwargs):
         """Prints string if self.verbose == True
         """
