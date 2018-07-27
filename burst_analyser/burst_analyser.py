@@ -418,7 +418,7 @@ class BurstRun(object):
     def get_means(self):
         """Calculate mean burst properties
         """
-        bprops = ['dt', 'fluence', 'peak']
+        bprops = ['dt', 'fluence', 'peak', 'length']
         if self.converged:
             for bprop in bprops:
                 values = self.bursts[bprop][self.discard:]
