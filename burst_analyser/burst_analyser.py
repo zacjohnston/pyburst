@@ -108,10 +108,10 @@ class BurstRun(object):
 
         if not self.too_few_bursts:
             self.find_fluence()
-
             # ===== do linregress over bprops =====
             # TODO: Problem here when n_bursts is one less than needed (dt has one less)
             self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
+
             if self.n_regress < 1:
                 self.set_too_few()
                 self.print_warn(f'Not enough bursts to do linregress ({self.n_bursts}, '
@@ -121,17 +121,17 @@ class BurstRun(object):
                     slopes, slopes_err = self.linregress(bprop)
                     self.residuals[bprop] = np.abs(slopes / slopes_err)
                     self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
-                self.discard = self.get_discard()
 
+            self.discard = self.get_discard()
             self.get_means()
             self.analysed = True
         else:
             self.set_too_few()
+            self.discard = self.get_discard()
             self.get_means()
             self.printv('Too few bursts to analyse')
 
     def set_too_few(self):
-        self.discard = np.nan
         self.converged = False
         self.regress_too_few_bursts = True
 
@@ -406,6 +406,10 @@ class BurstRun(object):
     def get_discard(self):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
         """
+        if self.regress_too_few_bursts:
+            self.print_warn('Too few bursts for linregress, using min_discard')
+            return self.min_discard
+
         zero_slope_idxs = []
         for bprop in self.regress_bprops:
             zero_slope_idxs += [self.min_discard + np.where(self.residuals[bprop] < 1)[0]]
@@ -413,9 +417,9 @@ class BurstRun(object):
         valid_discards = reduce(np.intersect1d, zero_slope_idxs)
 
         if len(valid_discards) == 0:
-            self.print_warn('Bursts not converged')
+            self.print_warn('Bursts not converged, using min_discard')
             self.converged = False
-            return np.nan
+            return self.min_discard
         else:
             self.converged = True
             return valid_discards[0]
@@ -426,7 +430,12 @@ class BurstRun(object):
         bprops = ['dt', 'fluence', 'peak', 'length']
         sec_day = 8.64e4
 
-        if self.converged:
+        if self.too_few_bursts:
+            self.printv("Too few bursts to get average properties")
+            for bprop in (bprops + ['rate']):
+                self.bursts[f'mean_{bprop}'] = np.nan
+                self.bursts[f'std_{bprop}'] = np.nan
+        else:
             for bprop in bprops:
                 values = self.bursts[bprop][self.discard:]
                 self.bursts[f'mean_{bprop}'] = np.mean(values)
@@ -434,14 +443,9 @@ class BurstRun(object):
 
             # ===== calculate burst rate =====
             dt = self.bursts['mean_dt']
+            u_dt = self.bursts['std_dt']
             self.bursts['mean_rate'] = sec_day / dt  # burst rate (per day)
-            self.bursts['std_rate'] = sec_day * self.bursts['std_dt'] / dt**2
-        else:
-            for bprop in (bprops + ['rate']):
-                self.bursts[f'mean_{bprop}'] = np.nan
-                self.bursts[f'std_{bprop}'] = np.nan
-
-            self.printv("Burst train not converged, can't average properties")
+            self.bursts['std_rate'] = sec_day * u_dt / dt**2
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
