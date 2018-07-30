@@ -579,12 +579,15 @@ class BurstRun(object):
             ax.legend(loc=4)
         self.show_save_fig(fig, display=display, save=save, plot_name='burst_analysis')
 
-    def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=1,
+    def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=None,
                          show_values=True, legend=True, show_first=False,
                          display=True, save=False, fix_xticks=False):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
+        if discard is None:
+            discard = self.discard
+
         if self.n_bursts < discard+2:
             print('Too few bursts to plot convergence')
             return
