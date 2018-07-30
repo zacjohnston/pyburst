@@ -650,6 +650,7 @@ class BurstRun(object):
             ax[i].plot([0, self.n_bursts], [0, 0], ls='--')
 
         ax[-1].set_xlabel('Discarded bursts', fontsize=fontsize)
+        ax[0].set_title(self.model_str)
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='linregress')
 
