@@ -635,7 +635,7 @@ class BurstRun(object):
         if self.regress_too_few_bursts:
             self.printv("Can't plot linregress: bursts not converged")
             return
-        fig, ax = plt.subplots(3, 1, figsize=(10, 12))
+        fig, ax = plt.subplots(3, 1, figsize=(6, 8))
         x = np.arange(self.n_regress) + self.min_discard
         fontsize = 14
 
