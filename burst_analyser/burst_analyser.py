@@ -577,7 +577,7 @@ class BurstRun(object):
 
         if legend:
             ax.legend(loc=4)
-        self.show_save_fig(fig, display=display, save=save, plot_name='burst_analysis')
+        self.show_save_fig(fig, display=display, save=save, plot_name='model')
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=None,
                          show_values=True, legend=True, show_first=False,
