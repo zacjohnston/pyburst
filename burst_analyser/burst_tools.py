@@ -106,6 +106,26 @@ def multi_batch_save(batches, source, multithread=True, **kwargs):
     print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
+def multi_save(table, source, basename='xrb'):
+    """Extract models from table of arbitrary batches/runs
+    """
+    batches = np.unique(table['batch'])
+    t0 = time.time()
+
+    for batch in batches:
+        subset = grid_tools.reduce_table(table, params={'batch': batch})
+        runs = np.array(subset['run'])
+        args = []
+
+        for run in runs:
+            args.append((run, batch, source, basename, True))
+        with mp.Pool(processes=8) as pool:
+            pool.starmap(load, args)
+
+    t1 = time.time()
+    dt = t1 - t0
+    print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
+
 def combine_extracts(batches, source):
     """Combines extracted burst property summary tables
     """
