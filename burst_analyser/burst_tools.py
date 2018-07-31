@@ -239,3 +239,13 @@ def get_quartiles(x):
     upper = q3 + 1.5*iqr
 
     return lower, q1, q2, q3, upper
+
+
+def snip_outliers(x, percentiles):
+    """Returns array x, with outliers removed
+    """
+    low_idxs = np.where(x < percentiles[0])[0]
+    high_idxs = np.where(x > percentiles[4])[0]
+    idxs = np.concatenate((low_idxs, high_idxs))
+
+    return np.delete(x, idxs)
