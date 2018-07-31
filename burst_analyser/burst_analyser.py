@@ -453,8 +453,12 @@ class BurstRun(object):
             for bprop in self.bprops:
                 values = self.bursts[bprop][self.discard:]
 
-                # if self.exclude_outliers:
-                #     values = burst_tools.snip_outliers(values, self.percentiles)
+                if self.exclude_outliers:
+                    idxs = np.array(self.outlier_idxs) - self.discard
+                    if bprop == 'dt':
+                        idxs -= 1
+                    idxs = idxs[np.where(idxs >= 0)[0]]  # discard negatives
+                    values = np.delete(values, idxs)
 
                 self.summary[f'mean_{bprop}'] = np.mean(values)
                 self.summary[f'std_{bprop}'] = np.std(values)
