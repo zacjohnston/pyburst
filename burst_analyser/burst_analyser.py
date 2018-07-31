@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import sys
@@ -59,6 +60,7 @@ class BurstRun(object):
 
         self.analysed = False
         self.bursts = {}
+        self.burst_table = pd.DataFrame()
         self.summary = {}
         self.n_bursts = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
@@ -269,6 +271,23 @@ class BurstRun(object):
         self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
         self.bursts['dt'] = dt  # Recurrence times (s)
         self.n_bursts = n_bursts
+
+        table = self.burst_table
+        table['n'] = np.arange(n_bursts) + 1
+        table['peak'] = peaks[:, 1]
+        table['dt'] = np.concatenate(([np.nan], dt))
+        table['length'] = t_end - t_start
+
+        table['t_pre'] = t_pre
+        table['t_start'] = t_start
+        table['t_peak'] = peaks[:, 0]
+        table['t_end'] = t_end
+
+        table['t_pre_idx'] = t_pre_idx
+        table['t_start_idx'] = t_start_idx
+        table['peak_idx'] = peak_idxs
+        table['t_end_idx'] = t_end_idx
+
 
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
