@@ -63,8 +63,7 @@ class BurstRun(object):
         self.n_bursts = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.exclude_outliers = exclude_outliers
-        self.outliers = np.array(())
-        self.percentiles = None
+        self.outlier_idxs = None
         self.secondary_bursts = np.array(())
         self.shocks = []
         self.short_waits = False
@@ -127,7 +126,7 @@ class BurstRun(object):
                     self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
 
             self.discard = self.get_discard()
-            self.get_percentiles()
+            self.identify_outliers()
             self.get_means()
             self.analysed = True
         else:
@@ -442,6 +441,10 @@ class BurstRun(object):
         else:
             for bprop in self.bprops:
                 values = self.bursts[bprop][self.discard:]
+
+                # if self.exclude_outliers:
+                #     values = burst_tools.snip_outliers(values, self.percentiles)
+
                 self.summary[f'mean_{bprop}'] = np.mean(values)
                 self.summary[f'std_{bprop}'] = np.std(values)
 
@@ -451,12 +454,14 @@ class BurstRun(object):
             self.summary['mean_rate'] = sec_day / dt  # burst rate (per day)
             self.summary['std_rate'] = sec_day * u_dt / dt**2
 
-    def get_percentiles(self):
-        """Calculate percentiles of burst properties (currently just dt)
-        Note: excludes min_discard from calculation
+    def identify_outliers(self):
+        """Identify outlier bursts
         """
         dt = self.bursts['dt'][self.min_discard:]
-        self.percentiles = burst_tools.get_quartiles(dt)
+        percentiles = burst_tools.get_quartiles(dt)
+        idxs = burst_tools.get_outlier_idxs(dt, percentiles)
+
+        self.outlier_idxs = idxs + self.min_discard + 1
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
