@@ -31,7 +31,7 @@ default_plt_options()
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, savelum=True, analyse=True, plot=False,
-                 min_regress=20, min_discard=1):
+                 min_regress=20, min_discard=1, exclude_outliers=True):
         # min_regress : int
         #   minimum number of bursts to use in linear regression (self.linregress)
         # min_discard : int
@@ -62,8 +62,9 @@ class BurstRun(object):
         self.summary = {}
         self.n_bursts = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
+        self.exclude_outliers = exclude_outliers
         self.outliers = np.array(())
-        self.percentiles = {}
+        self.percentiles = None
         self.secondary_bursts = np.array(())
         self.shocks = []
         self.short_waits = False
@@ -126,6 +127,7 @@ class BurstRun(object):
                     self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
 
             self.discard = self.get_discard()
+            self.get_percentiles()
             self.get_means()
             self.analysed = True
         else:
