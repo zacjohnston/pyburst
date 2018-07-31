@@ -110,6 +110,7 @@ class BurstRun(object):
         self.identify_bursts()
 
         if not self.too_few_bursts:
+            self.identify_outliers()
             self.find_fluence()
             # ===== do linregress over bprops =====
             # TODO: Problem here when n_bursts is one less than needed (dt has one less)
@@ -126,7 +127,6 @@ class BurstRun(object):
                     self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
 
             self.discard = self.get_discard()
-            self.identify_outliers()
             self.get_means()
             self.analysed = True
         else:
@@ -397,11 +397,22 @@ class BurstRun(object):
         n = self.n_regress
         y = self.bursts[bprop]
         x = np.arange(len(y))
+
+        if self.exclude_outliers:
+            idxs = np.array(self.outlier_idxs)
+            if bprop == 'dt':
+                idxs -= 1
+
+            x = np.delete(x, idxs)
+            y = np.delete(y, idxs)
+            n -= len(idxs)
+
         slope = np.full(n, np.nan)
         slope_err = np.full(n, np.nan)
 
         for i in range(n):
-            lin = linregress(x[self.min_discard + i:], y[self.min_discard + i:])
+            i0 = self.min_discard + i
+            lin = linregress(x[i0:], y[i0:])
             slope[i] = lin[0]
             slope_err[i] = lin[-1]
 
