@@ -1,11 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from ..mcmc import burstfit
+from pygrids.mcmc import burstfit
 
 
 class BfitTester:
-
     def __init__(self, source, version, priors_only=True):
         self.bfit = burstfit.BurstFit(source, version, re_interp=True,
                                       priors_only=priors_only)

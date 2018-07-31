@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 from scipy.optimize import minimize
 
-from ..grids import grid_analyser
-from ..mcmc import burstfit, mcmc_tools
+from pygrids.grids import grid_analyser
+from pygrids.mcmc import burstfit, mcmc_tools
 
 
 class Best:

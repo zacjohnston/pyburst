@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from scipy.stats import linregress
 from functools import reduce
 
-from ..burst_analyser import burst_analyser
-from ..grids import grid_analyser
+from pygrids.burst_analyser import burst_analyser
+from pygrids.grids import grid_analyser
 
 
 class BurstRun:
