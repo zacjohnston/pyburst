@@ -113,8 +113,8 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
 
             for bp in bprops:
                 u_bp = f'u_{bp}'
-                data[bp] += [burstfit.bursts[f'mean_{bp}']]
-                data[u_bp] += [burstfit.bursts[f'std_{bp}']]
+                data[bp] += [burstfit.summary[f'mean_{bp}']]
+                data[u_bp] += [burstfit.summary[f'std_{bp}']]
 
             data['rate'] += [8.64e4 / data['dt'][-1]]  # burst rate (per day)
             data['u_rate'] += [8.64e4 * data['u_dt'][-1] / data['dt'][-1] ** 2]
