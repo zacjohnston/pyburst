@@ -52,13 +52,11 @@ class BurstRun(object):
         self.source_path = grid_strings.get_source_path(source)
         self.plots_path = grid_strings.get_source_subdir(source, 'plots')
 
-        self.loaded = False
         self.lum = None
         self.lumf = None
         self.new_lum = None
         self.load(savelum=savelum, reload=reload)
 
-        self.analysed = False
         self.bursts = pd.DataFrame()
         self.candidates = None
         self.summary = {}
@@ -66,14 +64,18 @@ class BurstRun(object):
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.exclude_outliers = exclude_outliers
         self.outlier_i = None
-        self.secondary_bursts = np.array(())
         self.shocks = []
-        self.short_waits = False
-        self.too_few_bursts = False
+
+        self.flags = {'loaded': False,
+                      'analysed': False,
+                      'too_few_bursts': False,
+                      'short_waits': False,
+                      'outliers': False,
+                      'regress_too_few_bursts': False,
+                      }
 
         # ===== linregress things =====
         self.regress_bprops = ['dt', 'fluence', 'peak']
-        self.regress_too_few_bursts = False
         self.min_regress = min_regress
         self.min_discard = min_discard
         self.n_regress = None
@@ -85,7 +87,6 @@ class BurstRun(object):
 
         if analyse:
             self.analyse()
-
         if plot:
             self.plot_model()
 
@@ -103,7 +104,7 @@ class BurstRun(object):
         self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
                                     basename=self.basename, save=savelum, reload=reload)
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
-        self.loaded = True
+        self.flags['loaded'] = True
 
     def analyse(self):
         """Analyses all quantities of the model.
@@ -111,7 +112,7 @@ class BurstRun(object):
         self.ensure_analysed_is(False)
         self.identify_bursts()
 
-        if not self.too_few_bursts:
+        if not self.flags['too_few_bursts']:
             self.identify_outliers()
             self.find_fluence()
             # ===== do linregress over bprops =====
@@ -130,7 +131,7 @@ class BurstRun(object):
 
             self.discard = self.get_discard()
             self.get_means()
-            self.analysed = True
+            self.flags['analysed'] = True
         else:
             self.set_too_few()
             self.discard = self.get_discard()
@@ -139,7 +140,7 @@ class BurstRun(object):
 
     def set_too_few(self):
         self.converged = False
-        self.regress_too_few_bursts = True
+        self.flags['regress_too_few_bursts'] = True
 
     def short(self):
         return self.bursts[self.bursts['short_wait']]
@@ -153,8 +154,8 @@ class BurstRun(object):
         strings = {True: 'Model not yet analysed. Run self.analyse() first',
                    False: 'Model has already been analysed. Reload model first'}
 
-        if self.analysed != analysed:
-            if self.too_few_bursts:
+        if self.flags['analysed'] != analysed:
+            if self.flags['too_few_bursts']:
                 string = 'Too few bursts for analysis'
             else:
                 string = strings[analysed]
@@ -190,7 +191,7 @@ class BurstRun(object):
             self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
         else:
             # TODO: set remaining to nan
-            self.too_few_bursts = True
+            self.flags['too_few_bursts'] = True
             if self.n_bursts == 0:
                 self.print_warn('No bursts in this model')
             else:
@@ -360,6 +361,8 @@ class BurstRun(object):
         min_dt_frac = 0.5
         mean_dt = np.mean(self.bursts['dt'][1:])
         self.bursts['short_wait'] = self.bursts['dt'] < min_dt_frac * mean_dt
+        if True in self.bursts['short_wait']:
+            self.flags['short_waits'] = True
 
     def find_fluence(self):
         """Calculates burst fluences by integrating over burst luminosity
@@ -403,7 +406,7 @@ class BurstRun(object):
     def get_discard(self):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
         """
-        if self.regress_too_few_bursts:
+        if self.flags['regress_too_few_bursts']:
             self.print_warn('Too few bursts for linregress, using min_discard')
             return self.min_discard
 
@@ -426,7 +429,7 @@ class BurstRun(object):
         """
         sec_day = 8.64e4
 
-        if self.too_few_bursts:
+        if self.flags['too_few_bursts']:
             self.printv("Too few bursts to get average properties")
             for bprop in (self.bprops + ['rate']):
                 self.summary[f'mean_{bprop}'] = np.nan
@@ -561,7 +564,7 @@ class BurstRun(object):
             ax.plot(t, y, marker='o', c='C0', ls='none', label='candidates')
 
         if short_wait:
-            if self.short_waits:
+            if self.flags['short_waits']:
                 t = self.bursts['short_wait_peaks'][:, 0] / timescale
                 y = self.bursts['short_wait_peaks'][:, 1] / yscale
                 ax.plot(t, y, marker='o', c='C4', ls='none', label='short-wait')
@@ -647,7 +650,7 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
     def plot_linregress(self, display=True, save=False):
-        if self.regress_too_few_bursts:
+        if self.flags['regress_too_few_bursts']:
             self.printv("Can't plot linregress: bursts not converged")
             return
         fig, ax = plt.subplots(3, 1, figsize=(6, 8))
@@ -726,6 +729,6 @@ class BurstRun(object):
 
     def save_all_lightcurves(self, **kwargs):
         for burst in range(self.n_bursts):
-            self.plot_lightcurve(burst, save=True, display=False, **kwargs)
+            self.plot_lightcurves(burst, save=True, display=False, **kwargs)
 
 
