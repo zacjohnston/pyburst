@@ -202,20 +202,20 @@ class BurstRun(object):
         # ===== get dt, and discard short-wait bursts =====
         if n_bursts > 1:
             dt = np.diff(peaks[:, 0])
-            mean_dt = np.mean(dt)
-            short_wait = (dt < min_dt_frac * mean_dt)
-
-            if True in short_wait:
-                short_idxs = np.where(short_wait)[0] + 1
-                n_short = len(short_idxs)
-                self.printv(f'{n_short} short waiting-time burst detected')
-                self.bursts['short_wait_peaks'] = peaks[short_idxs]
-                self.short_waits = True
-
-                peaks = np.delete(peaks, short_idxs, axis=0)
-                peak_idxs = np.delete(peak_idxs, short_idxs)
-                dt = np.delete(dt, short_idxs-1)
-                n_bursts -= n_short
+            # mean_dt = np.mean(dt)
+            # short_wait = (dt < min_dt_frac * mean_dt)
+            #
+            # if True in short_wait:
+            #     short_idxs = np.where(short_wait)[0] + 1
+            #     n_short = len(short_idxs)
+            #     self.printv(f'{n_short} short waiting-time burst detected')
+            #     self.bursts['short_wait_peaks'] = peaks[short_idxs]
+            #     self.short_waits = True
+            #
+            #     peaks = np.delete(peaks, short_idxs, axis=0)
+            #     peak_idxs = np.delete(peak_idxs, short_idxs)
+            #     dt = np.delete(dt, short_idxs-1)
+            #     n_bursts -= n_short
         else:
             self.n_bursts = n_bursts
             self.too_few_bursts = True
@@ -232,7 +232,7 @@ class BurstRun(object):
         t_start_idx = []
         t_end = []
         t_end_idx = []
-
+        print(len(t_pre_idx))
         for i, pre_idx in enumerate(t_pre_idx):
             start_idx = self.get_burst_start_idx(pre_idx, peak_idxs[i])
             end_idx = self.get_burst_end_idx(peak_idxs[i])
