@@ -288,7 +288,6 @@ class BurstRun(object):
         table['peak_idx'] = peak_idxs
         table['t_end_idx'] = t_end_idx
 
-
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
         """
@@ -381,9 +380,8 @@ class BurstRun(object):
         end_frac = 0.005  # end of burst defined when luminosity falls to this fraction of peak
         min_length = 5  # minimum length of burst after peak (s)
 
-        peak_t = self.lum[peak_idx, 0]
-        peak_lum = self.lum[peak_idx, 1]
         lum_slice = self.lum[peak_idx:]
+        peak_t, peak_lum = lum_slice[0]
 
         time_from_peak = lum_slice[:, 0] - peak_t
         thresh_idx = np.where(lum_slice[:, 1] < end_frac*peak_lum)[0]
