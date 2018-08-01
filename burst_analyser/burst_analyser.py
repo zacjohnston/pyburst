@@ -174,7 +174,6 @@ class BurstRun(object):
         #   4. Discard short-wait bursts (below fraction of mean dt)
         #   5. Get start/end times (discard final burst if cut off)
         # =============================================
-        min_dt_frac = 0.5  # minimum recurrence time (as fraction of mean)
         self.printv('Identifying bursts')
         self.get_burst_candidates()
         self.get_burst_peaks()
@@ -183,9 +182,6 @@ class BurstRun(object):
         if self.n_bursts > 1:
             dt = np.diff(self.bursts['t_peak'])
             self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
-            # TODO: identify short-waits
-            # mean_dt = np.mean(dt)
-            # short_wait = (dt < min_dt_frac * mean_dt)
         else:
             # TODO: set remaining to nan
             self.too_few_bursts = True
@@ -195,6 +191,7 @@ class BurstRun(object):
                 self.print_warn('Only one burst detected')
             return
 
+        self.identify_short_wait_bursts()
         self.get_burst_starts()
         self.get_burst_ends()
         self.bursts['length'] = self.bursts['t_end'] - self.bursts['t_start']
@@ -236,7 +233,7 @@ class BurstRun(object):
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
         """
-        lum_thresh = 1e36  # minimum threshold luminosity
+        lum_thresh = 5e35  # minimum threshold luminosity
         thresh_i = np.where(self.lum[:, 1] > lum_thresh)[0]
         lum_cut = self.lum[thresh_i]
 
@@ -351,6 +348,13 @@ class BurstRun(object):
                 self.bursts.loc[i, 't_end'] = t_end
                 self.bursts.loc[i, 't_end_i'] = np.searchsorted(self.lum[:, 0], t_end)
 
+    def identify_short_wait_bursts(self):
+        """Identify bursts which have unusually short recurrence times
+        """
+        min_dt_frac = 0.5
+        mean_dt = np.mean(self.bursts['dt'][1:])
+        self.bursts['short_wait'] = self.bursts['dt'] < min_dt_frac * mean_dt
+
     def find_fluence(self):
         """Calculates burst fluences by integrating over burst luminosity
         """
@@ -371,7 +375,7 @@ class BurstRun(object):
         x = np.arange(len(y))
 
         if self.exclude_outliers:
-            idxs = np.array(self.outlier_idxs)
+            idxs = np.array(self.outlier_i)
             if bprop == 'dt':
                 idxs -= 1
 
@@ -426,7 +430,7 @@ class BurstRun(object):
                 values = self.bursts[bprop][self.discard:]
 
                 if self.exclude_outliers:
-                    idxs = np.array(self.outlier_idxs) - self.discard
+                    idxs = np.array(self.outlier_i) - self.discard
                     if bprop == 'dt':
                         idxs -= 1
                     idxs = idxs[np.where(idxs >= 0)[0]]  # discard negatives
