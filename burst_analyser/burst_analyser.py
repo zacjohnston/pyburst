@@ -141,6 +141,12 @@ class BurstRun(object):
         self.converged = False
         self.regress_too_few_bursts = True
 
+    def short(self):
+        return self.bursts[self.bursts['short_wait']]
+
+    def not_short(self):
+        return self.bursts[np.invert(self.bursts['short_wait'])]
+
     def ensure_analysed_is(self, analysed):
         """Checks that model has (or hasn't) been analysed
         """
