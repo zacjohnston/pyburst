@@ -59,8 +59,8 @@ class BurstRun(object):
         self.load(savelum=savelum, reload=reload)
 
         self.analysed = False
-        self.bursts = {}
-        self.burst_table = pd.DataFrame()
+        self.bursts = pd.DataFrame()
+        self.candidates = None
         self.summary = {}
         self.n_bursts = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
@@ -208,8 +208,6 @@ class BurstRun(object):
             # if True in short_wait:
             #     short_idxs = np.where(short_wait)[0] + 1
             #     n_short = len(short_idxs)
-            #     self.printv(f'{n_short} short waiting-time burst detected')
-            #     self.bursts['short_wait_peaks'] = peaks[short_idxs]
             #     self.short_waits = True
             #
             #     peaks = np.delete(peaks, short_idxs, axis=0)
@@ -256,37 +254,23 @@ class BurstRun(object):
         t_end = np.array(t_end)
         t_end_idx = np.array(t_end_idx, dtype=int)
 
-        self.bursts['candidates'] = candidates
+        self.candidates = candidates
+        self.n_bursts = n_bursts
+
+        self.bursts['n'] = np.arange(n_bursts) + 1  # burst ID (starting from 1)
+        self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
+        self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
+        self.bursts['length'] = t_end - t_start  # Burst length from t_start to t_end (s)
+
         self.bursts['t_pre'] = t_pre  # pre_time before burst peak (s)
         self.bursts['t_start'] = t_start  # time of reaching start_frac of burst peak
         self.bursts['t_peak'] = peaks[:, 0]  # times of burst peaks (s)
         self.bursts['t_end'] = t_end  # Time of burst end (end_frac of peak) (s)
-        self.bursts['length'] = t_end - t_start  # Burst lengths (s)
 
         self.bursts['t_pre_idx'] = t_pre_idx
         self.bursts['t_start_idx'] = t_start_idx
         self.bursts['peak_idx'] = peak_idxs
         self.bursts['t_end_idx'] = t_end_idx
-
-        self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
-        self.bursts['dt'] = dt  # Recurrence times (s)
-        self.n_bursts = n_bursts
-
-        table = self.burst_table
-        table['n'] = np.arange(n_bursts) + 1
-        table['peak'] = peaks[:, 1]
-        table['dt'] = np.concatenate(([np.nan], dt))
-        table['length'] = t_end - t_start
-
-        table['t_pre'] = t_pre
-        table['t_start'] = t_start
-        table['t_peak'] = peaks[:, 0]
-        table['t_end'] = t_end
-
-        table['t_pre_idx'] = t_pre_idx
-        table['t_start_idx'] = t_start_idx
-        table['peak_idx'] = peak_idxs
-        table['t_end_idx'] = t_end_idx
 
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
@@ -538,8 +522,7 @@ class BurstRun(object):
         if path is None:  # default to model directory
             path = self.batch_models_path
 
-        n = self.bursts['num']
-        for i in range(n):
+        for i in range(self.n_bursts):
             bnum = i + 1
 
             i_start = self.bursts['t_pre_idx'][i]
@@ -592,8 +575,8 @@ class BurstRun(object):
         ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='black')
 
         if candidates:  # NOTE: candidates may be modified if a shock was removed
-            t = self.bursts['candidates'][:, 0] / timescale
-            y = self.bursts['candidates'][:, 1] / yscale
+            t = self.candidates[:, 0] / timescale
+            y = self.candidates[:, 1] / yscale
             ax.plot(t, y, marker='o', c='C0', ls='none', label='candidates')
 
         if short_wait:
