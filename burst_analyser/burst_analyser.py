@@ -380,15 +380,19 @@ class BurstRun(object):
 
     def identify_outliers(self):
         """Identify outlier bursts
+
+        Note: bursts up to min_discard will be labelled outliers by default,
+                and will not be included in the calculation of the mean
         """
         if self.flags['too_few_bursts']:
             self.printv('Too few bursts to get outliers')
             return
 
-        dt = self.bursts['dt'][self.min_discard:]
-        percentiles = burst_tools.get_quartiles(dt)
-        idxs = burst_tools.get_outlier_idxs(dt, percentiles)
-        self.outlier_i = idxs + self.min_discard + 1
+        dt = self.bursts['dt']
+        percentiles = burst_tools.get_quartiles(dt[self.min_discard:])
+        outliers = (dt < percentiles[0]) | (dt > percentiles[-1])
+        outliers[:self.min_discard] = True
+        self.bursts['outlier'] = outliers
 
     def get_bprop_slopes(self):
         """Calculate slopes for properties as the burst sequence progresses
