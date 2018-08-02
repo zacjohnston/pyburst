@@ -116,15 +116,13 @@ class BurstRun(object):
         self.ensure_analysed_is(False)
         self.identify_bursts()
         self.get_fluence()
+        self.identify_outliers()
 
         if not self.flags['too_few_bursts']:
-            self.identify_outliers()
-            # ===== do linregress over bprops =====
-            # TODO: Problem here when n_bursts is one less than needed (dt has one less)
             self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
 
             if self.n_regress < 1:
-                self.set_too_few()
+                self.converged_too_few()
                 self.print_warn(f'Not enough bursts to do linregress ({self.n_bursts}, '
                                 + f'need {self.min_regress + self.min_discard})')
             else:
@@ -133,17 +131,11 @@ class BurstRun(object):
                     self.residuals[bprop] = np.abs(slopes / slopes_err)
                     self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
 
-            self.discard = self.get_discard()
-            self.get_means()
-        else:
-            self.set_too_few()
-            self.discard = self.get_discard()
-            self.get_means()
-            self.printv('Too few bursts to analyse')
-
+        self.discard = self.get_discard()
+        self.get_means()
         self.flags['analysed'] = True
 
-    def set_too_few(self):
+    def converged_too_few(self):
         self.converged = False
         self.flags['regress_too_few_bursts'] = True
 
@@ -290,6 +282,7 @@ class BurstRun(object):
             message = {0: 'No bursts in this model',
                        1: 'Only one burst detected'}[self.n_bursts]
             self.print_warn(message)
+            self.converged_too_few()
 
             if self.n_bursts == 0:
                 raise NoBursts
@@ -423,7 +416,7 @@ class BurstRun(object):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
         """
         if self.flags['regress_too_few_bursts']:
-            self.print_warn('Too few bursts for linregress, using min_discard')
+            self.printv('Too few bursts to find self.discard, using min_discard')
             return self.min_discard
 
         zero_slope_i = []
@@ -473,6 +466,10 @@ class BurstRun(object):
     def identify_outliers(self):
         """Identify outlier bursts
         """
+        if self.flags['too_few_bursts']:
+            self.printv('Too few bursts to get outliers')
+            return
+
         dt = self.bursts['dt'][self.min_discard:]
         percentiles = burst_tools.get_quartiles(dt)
         idxs = burst_tools.get_outlier_idxs(dt, percentiles)
