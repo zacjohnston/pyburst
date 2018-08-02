@@ -315,7 +315,9 @@ class BurstRun(object):
 
         for i in range(self.n_bursts):
             lum_slice = self.lum[self.bursts.loc[i, 't_pre_i']:self.bursts.loc[i, 't_peak_i']]
-            start_lum = start_frac * self.bursts.loc[i, 'peak']
+            pre_lum = lum_slice[0, 1]
+            peak_lum = lum_slice[-1, 1]
+            start_lum = pre_lum + start_frac * (peak_lum - pre_lum)
 
             slice_i = np.searchsorted(lum_slice[:, 1], start_lum)
             t_start = lum_slice[slice_i, 0]
