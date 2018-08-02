@@ -171,16 +171,16 @@ class BurstRun(object):
         self.lum[zeros, 1] = replace_with
 
     def identify_bursts(self):
-        """Extracts times, separations, and mean separation of bursts
+        """Extracts peaks, times, and recurrence times of bursts
+
+         Pipeline:
+         ---------
+           1. Get maxima above minimum threshold
+           2. Discard shock peaks
+           3. Get largest peaks in some radius
+           4. Identify short-wait bursts (below some fraction of mean dt)
+           5. Get start/end times (discard final burst if cut off)
         """
-        # =============================================
-        # Pipeline:
-        #   1. Get maxima above minimum threshold
-        #   2. Discard shock peaks
-        #   3. Get largest peaks in some radius
-        #   4. Discard short-wait bursts (below fraction of mean dt)
-        #   5. Get start/end times (discard final burst if cut off)
-        # =============================================
         self.printv('Identifying bursts')
         self.get_burst_candidates()
         self.get_burst_peaks()
@@ -202,23 +202,6 @@ class BurstRun(object):
         self.get_burst_starts()
         self.get_burst_ends()
         self.bursts['length'] = self.bursts['t_end'] - self.bursts['t_start']
-
-        # for i, pre_i in enumerate(self.bursts['t_pre_i']):
-        #     end_i = self.get_burst_end_idx(peak_i[i])
-        #     TODO: deal with unfinished end burst
-        #     if end_i is None:
-        #         self.printv('Discarding final burst')
-        #         dt = np.delete(dt, -1)
-        #         peaks = np.delete(peaks, -1, axis=0)
-        #         peak_is = np.delete(peak_is, -1)
-        #         t_pre_idx = np.delete(t_pre_idx, -1)
-        #         t_pre = np.delete(t_pre, -1)
-        #         n_bursts -= 1
-        #     else:
-        #     t_start_i.append(start_i)
-        #     t_start.append(self.lum[start_i, 0])
-        #     t_end.append(self.lum[end_i, 0])
-        #     t_end_i.append(end_i)
 
     def get_burst_candidates(self):
         """Identify potential bursts, while removing shocks in lightcurve
