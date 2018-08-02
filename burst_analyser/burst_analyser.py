@@ -118,24 +118,22 @@ class BurstRun(object):
         self.get_fluence()
         self.identify_outliers()
 
-        if not self.flags['too_few_bursts']:
-            self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
-
-            if self.n_regress < 1:
-                self.converged_too_few()
-                self.print_warn(f'Not enough bursts to do linregress ({self.n_bursts}, '
-                                + f'need {self.min_regress + self.min_discard})')
-            else:
-                for bprop in self.regress_bprops:
-                    slopes, slopes_err = self.linregress(bprop)
-                    self.residuals[bprop] = np.abs(slopes / slopes_err)
-                    self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
+        self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
+        if self.n_regress < 1:
+            self.set_converged_too_few()
+            self.printv(f'Too few bursts to do linregress. '
+                        + f'Have {self.n_bursts}, need {self.min_regress + self.min_discard}')
+        else:
+            for bprop in self.regress_bprops:
+                slopes, slopes_err = self.linregress(bprop)
+                self.residuals[bprop] = np.abs(slopes / slopes_err)
+                self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
 
         self.discard = self.get_discard()
         self.get_means()
         self.flags['analysed'] = True
 
-    def converged_too_few(self):
+    def set_converged_too_few(self):
         self.converged = False
         self.flags['regress_too_few_bursts'] = True
 
@@ -282,7 +280,6 @@ class BurstRun(object):
             message = {0: 'No bursts in this model',
                        1: 'Only one burst detected'}[self.n_bursts]
             self.print_warn(message)
-            self.converged_too_few()
 
             if self.n_bursts == 0:
                 raise NoBursts
