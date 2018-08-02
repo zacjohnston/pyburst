@@ -35,8 +35,9 @@ class NoBursts(Exception):
 
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
-                 reload=False, savelum=True, analyse=True, plot=False,
-                 min_regress=20, min_discard=1, exclude_outliers=False):
+                 reload=False, save_lum=True, analyse=True, plot=False,
+                 min_regress=20, min_discard=1, exclude_outliers=False,
+                 exclude_short_wait=True):
         # min_regress : int
         #   minimum number of bursts to use in linear regression (self.linregress)
         # min_discard : int
@@ -50,6 +51,12 @@ class BurstRun(object):
                       'regress_too_few_bursts': False,
                       }
 
+        self.options = {'verbose': verbose,
+                        'reload': reload,
+                        'save_lum': save_lum,
+                        'exclude_outliers': exclude_outliers,
+                        'exclude_short_wait': exclude_short_wait,
+                        }
         self.run = run
         self.batch = batch
         self.source = source
@@ -57,7 +64,6 @@ class BurstRun(object):
         self.run_str = grid_strings.get_run_string(run, basename)
         self.batch_str = grid_strings.get_batch_string(batch, source)
         self.model_str = grid_strings.get_model_string(run, batch, source)
-        self.verbose = verbose
 
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
         self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
@@ -67,14 +73,13 @@ class BurstRun(object):
         self.lum = None
         self.lumf = None
         self.new_lum = None
-        self.load(savelum=savelum, reload=reload)
+        self.load()
 
         self.bursts = pd.DataFrame()
         self.candidates = None
         self.summary = {}
         self.n_bursts = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
-        self.exclude_outliers = exclude_outliers
         self.outlier_i = None
         self.shocks = []
 
@@ -95,18 +100,21 @@ class BurstRun(object):
             self.plot_model()
 
     def printv(self, string):
-        if self.verbose:
+        if self.options['verbose']:
             print(string)
 
     def print_warn(self, string):
         full_string = f"\nWARNING: {string}\n"
         self.printv(full_string)
 
-    def load(self, savelum=True, reload=False):
+    def load(self):
         """Load luminosity data from kepler simulation
         """
         self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
-                                    basename=self.basename, save=savelum, reload=reload)
+                                    basename=self.basename,
+                                    save=self.options['save_lum'],
+                                    reload=self.options['reload'])
+
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
         self.flags['loaded'] = True
 
@@ -235,7 +243,7 @@ class BurstRun(object):
             neighbours = np.concatenate([left, right])
 
             if True in (lum > tolerance*neighbours):
-                if self.verbose:
+                if self.options['verbose']:
                     if not shocks:
                         print('Shocks detected and removed: consider verifying'
                               ' with self.plot_model(shocks=True)')
@@ -403,7 +411,7 @@ class BurstRun(object):
         y = self.bursts[bprop]
         x = np.arange(len(y))
 
-        if self.exclude_outliers:
+        if self.options['exclude_outliers']:
             idxs = np.array(self.outlier_i)
             if bprop == 'dt':
                 idxs -= 1
@@ -458,7 +466,7 @@ class BurstRun(object):
             for bprop in self.bprops:
                 values = self.bursts[bprop][self.discard:]
 
-                if self.exclude_outliers:
+                if self.options['exclude_outliers']:
                     idxs = np.array(self.outlier_i) - self.discard
                     if bprop == 'dt':
                         idxs -= 1
