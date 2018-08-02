@@ -80,7 +80,6 @@ class BurstRun(object):
         self.summary = {}
         self.n_bursts = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
-        self.outlier_i = None
         self.shocks = []
 
         # ===== linregress things =====
@@ -140,6 +139,12 @@ class BurstRun(object):
     def not_short(self):
         return self.bursts[np.invert(self.bursts['short_wait'])]
 
+    def outliers(self):
+        return self.bursts[self.bursts['outlier']]
+
+    def not_outliers(self):
+        return self.bursts[np.invert(self.bursts['short_wait'])]
+
     def ensure_analysed_is(self, analysed):
         """Checks that model has (or hasn't) been analysed
         """
@@ -188,6 +193,7 @@ class BurstRun(object):
 
         self.get_burst_starts()
         self.get_burst_ends()
+        self.bursts.reset_index(inplace=True, drop=True)
 
         self.bursts['length'] = self.bursts['t_end'] - self.bursts['t_start']
         self.bursts['n'] = np.arange(self.n_bursts) + 1  # burst ID (starting from 1)
