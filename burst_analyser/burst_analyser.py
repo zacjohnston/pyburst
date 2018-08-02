@@ -185,7 +185,6 @@ class BurstRun(object):
         self.get_burst_candidates()
         self.get_burst_peaks()
 
-        # ===== get dt, and discard short-wait bursts =====
         if self.n_bursts > 1:
             dt = np.diff(self.bursts['t_peak'])
             self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
@@ -291,15 +290,18 @@ class BurstRun(object):
         """
         pre_time = 30  # time (s) before burst peak that should always contain burst rise
         start_frac = 0.25  # Burst start as fraction of peak lum
+        peak_frac = 10
+
         self.bursts['t_pre'] = self.bursts['t_peak'] - pre_time  # time before burst (s)
         self.bursts['t_pre_i'] = np.searchsorted(self.lum[:, 0], self.bursts['t_pre'])
         self.bursts['lum_pre'] = self.lum[self.bursts['t_pre_i'], 1]
+
         self.bursts['t_start'] = np.full(self.n_bursts, np.nan)
         self.bursts['t_start_i'] = np.zeros(self.n_bursts, dtype=int)
 
         for i, row in self.bursts.iterrows():
             rise_steps = row['t_peak_i'] - row['t_pre_i']
-            if rise_steps < 50:
+            if (rise_steps < 50) or (row['peak'] / row['lum_pre'] < peak_frac):
                 self.printv(f"Removing micro-burst (t={row['t_peak']:.0f} s)")
                 self.delete_burst(i)
                 continue
