@@ -38,6 +38,14 @@ class BurstRun(object):
         # min_discard : int
         #   minimum no. of bursts to discard when averaging
 
+        self.flags = {'loaded': False,
+                      'analysed': False,
+                      'too_few_bursts': False,
+                      'short_waits': False,
+                      'outliers': False,
+                      'regress_too_few_bursts': False,
+                      }
+
         self.run = run
         self.batch = batch
         self.source = source
@@ -65,14 +73,6 @@ class BurstRun(object):
         self.exclude_outliers = exclude_outliers
         self.outlier_i = None
         self.shocks = []
-
-        self.flags = {'loaded': False,
-                      'analysed': False,
-                      'too_few_bursts': False,
-                      'short_waits': False,
-                      'outliers': False,
-                      'regress_too_few_bursts': False,
-                      }
 
         # ===== linregress things =====
         self.regress_bprops = ['dt', 'fluence', 'peak']
@@ -347,8 +347,9 @@ class BurstRun(object):
             intersection = list(set(thresh_i).intersection(min_length_i))
 
             if len(intersection) == 0:
-                self.printv('File ends during burst')
-                return None
+                self.printv('File ends during burst. Discarding final burst')
+                self.bursts = self.bursts.drop(self.n_bursts-1)
+                self.n_bursts -= 1
             else:
                 end_i = np.min(intersection)
                 t_end = lum_slice[end_i, 0]
