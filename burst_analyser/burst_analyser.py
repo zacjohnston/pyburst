@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-import sys
+
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
 from scipy.stats import linregress
@@ -202,6 +202,7 @@ class BurstRun(object):
         self.get_burst_starts()
         self.get_burst_ends()
         self.bursts['length'] = self.bursts['t_end'] - self.bursts['t_start']
+        self.bursts['n'] = np.arange(self.n_bursts) + 1  # burst ID (starting from 1)
 
     def get_burst_candidates(self):
         """Identify potential bursts, while removing shocks in lightcurve
@@ -281,7 +282,6 @@ class BurstRun(object):
                 peaks.append(maxi)
         peaks = np.array(peaks)
         self.n_bursts = len(peaks)
-        self.bursts['n'] = np.arange(self.n_bursts) + 1  # burst ID (starting from 1)
         self.bursts['t_peak'] = peaks[:, 0]  # times of burst peaks (s)
         self.bursts['t_peak_i'] = np.searchsorted(self.lum[:, 0], self.bursts['t_peak'])
         self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
@@ -293,11 +293,18 @@ class BurstRun(object):
         start_frac = 0.25  # Burst start as fraction of peak lum
         self.bursts['t_pre'] = self.bursts['t_peak'] - pre_time  # time before burst (s)
         self.bursts['t_pre_i'] = np.searchsorted(self.lum[:, 0], self.bursts['t_pre'])
+        self.bursts['lum_pre'] = self.lum[self.bursts['t_pre_i'], 1]
         self.bursts['t_start'] = np.full(self.n_bursts, np.nan)
         self.bursts['t_start_i'] = np.zeros(self.n_bursts, dtype=int)
 
-        for i in range(self.n_bursts):
-            lum_slice = self.lum[self.bursts.loc[i, 't_pre_i']:self.bursts.loc[i, 't_peak_i']]
+        for i, row in self.bursts.iterrows():
+            rise_steps = row['t_peak_i'] - row['t_pre_i']
+            if rise_steps < 50:
+                self.printv(f"Removing micro-burst (t={row['t_peak']:.0f} s)")
+                self.delete_burst(i)
+                continue
+
+            lum_slice = self.lum[row['t_pre_i']:row['t_peak_i']]
             pre_lum = lum_slice[0, 1]
             peak_lum = lum_slice[-1, 1]
             start_lum = pre_lum + start_frac * (peak_lum - pre_lum)
@@ -316,9 +323,9 @@ class BurstRun(object):
         self.bursts['t_end'] = np.full(self.n_bursts, np.nan)
         self.bursts['t_end_i'] = np.zeros(self.n_bursts, dtype=int)
 
-        for i in range(self.n_bursts):
-            lum_slice = self.lum[self.bursts.loc[i, 't_peak_i']:]
-            pre_lum = self.lum[self.bursts.loc[i, 't_pre_i'], 1]
+        for i, row in self.bursts.iterrows():
+            lum_slice = self.lum[row['t_peak_i']:]
+            pre_lum = self.lum[row['t_pre_i'], 1]
 
             peak_t, peak_lum = lum_slice[0]
             lum_diff = peak_lum - pre_lum
@@ -333,8 +340,8 @@ class BurstRun(object):
             if len(intersection) == 0:
                 if i == (self.n_bursts - 1):
                     self.printv('File ends during burst. Discarding final burst')
-                    self.bursts = self.bursts.drop(self.n_bursts-1)
-                    self.n_bursts -= 1
+                    self.delete_burst(i)
+                    continue
                 else:
                     raise RuntimeError(f'Failed to find end of burst {i+1} (t={peak_t:.0f s})')
             else:
@@ -342,6 +349,12 @@ class BurstRun(object):
                 t_end = lum_slice[end_i, 0]
                 self.bursts.loc[i, 't_end'] = t_end
                 self.bursts.loc[i, 't_end_i'] = np.searchsorted(self.lum[:, 0], t_end)
+
+    def delete_burst(self, burst_i):
+        """Removes burst from self.bursts table
+        """
+        self.bursts = self.bursts.drop(burst_i)
+        self.n_bursts -= 1
 
     def identify_short_wait_bursts(self):
         """Identify bursts which have unusually short recurrence times
