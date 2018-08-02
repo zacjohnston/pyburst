@@ -332,7 +332,6 @@ class BurstRun(object):
         self.bursts['t_end_i'] = np.zeros(self.n_bursts, dtype=int)
 
         for i in range(self.n_bursts):
-            # TODO: explicitly check last burst. Warn if following fails in earlier burst
             lum_slice = self.lum[self.bursts.loc[i, 't_peak_i']:]
             pre_lum = self.lum[self.bursts.loc[i, 't_pre_i'], 1]
 
@@ -347,9 +346,12 @@ class BurstRun(object):
             intersection = list(set(thresh_i).intersection(min_length_i))
 
             if len(intersection) == 0:
-                self.printv('File ends during burst. Discarding final burst')
-                self.bursts = self.bursts.drop(self.n_bursts-1)
-                self.n_bursts -= 1
+                if i == (self.n_bursts - 1):
+                    self.printv('File ends during burst. Discarding final burst')
+                    self.bursts = self.bursts.drop(self.n_bursts-1)
+                    self.n_bursts -= 1
+                else:
+                    raise RuntimeError(f'Failed to find end of burst {i+1} (t={peak_t:.0f s})')
             else:
                 end_i = np.min(intersection)
                 t_end = lum_slice[end_i, 0]
