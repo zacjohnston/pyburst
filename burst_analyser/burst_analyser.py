@@ -114,7 +114,7 @@ class BurstRun(object):
 
         if not self.flags['too_few_bursts']:
             self.identify_outliers()
-            self.find_fluence()
+            self.get_fluence()
             # ===== do linregress over bprops =====
             # TODO: Problem here when n_bursts is one less than needed (dt has one less)
             self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
@@ -365,7 +365,7 @@ class BurstRun(object):
         if True in self.bursts['short_wait']:
             self.flags['short_waits'] = True
 
-    def find_fluence(self):
+    def get_fluence(self):
         """Calculates burst fluences by integrating over burst luminosity
         """
         self.bursts['fluence'] = np.zeros(self.n_bursts)
