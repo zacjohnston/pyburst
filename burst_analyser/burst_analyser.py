@@ -368,13 +368,11 @@ class BurstRun(object):
     def find_fluence(self):
         """Calculates burst fluences by integrating over burst luminosity
         """
-        fluences = np.zeros(self.n_bursts)
-        for i in range(self.n_bursts):
-            t0 = self.bursts['t_pre_i'][i]
-            t1 = self.bursts['t_end_i'][i]
-            fluences[i] = integrate.trapz(y=self.lum[t0:t1 + 1, 1],
-                                          x=self.lum[t0:t1 + 1, 0])
-        self.bursts['fluence'] = fluences  # Burst fluence (ergs)
+        self.bursts['fluence'] = np.zeros(self.n_bursts)
+        for i, row in self.bursts.iterrows():
+            lum_slice = self.lum[row['t_pre_i']:row['t_end_i']]
+            self.bursts.loc[i, 'fluence'] = integrate.trapz(y=lum_slice[:, 1],
+                                                            x=lum_slice[:, 0])
 
     def linregress(self, bprop):
         """Do linear regression on bprop values for different number of burst discards,
