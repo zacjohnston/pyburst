@@ -117,18 +117,7 @@ class BurstRun(object):
         self.identify_bursts()
         self.get_fluence()
         self.identify_outliers()
-
-        self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
-        if self.n_regress < 1:
-            self.set_converged_too_few()
-            self.printv(f'Too few bursts to do linregress. '
-                        + f'Have {self.n_bursts}, need {self.min_regress + self.min_discard}')
-        else:
-            for bprop in self.regress_bprops:
-                slopes, slopes_err = self.linregress(bprop)
-                self.residuals[bprop] = np.abs(slopes / slopes_err)
-                self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
-
+        self.get_bprop_slopes()
         self.discard = self.get_discard()
         self.get_means()
         self.flags['analysed'] = True
@@ -381,9 +370,34 @@ class BurstRun(object):
             self.bursts.loc[burst.Index, 'fluence'] = integrate.trapz(y=lum_slice[:, 1],
                                                                       x=lum_slice[:, 0])
 
+    def identify_outliers(self):
+        """Identify outlier bursts
+        """
+        if self.flags['too_few_bursts']:
+            self.printv('Too few bursts to get outliers')
+            return
+
+        dt = self.bursts['dt'][self.min_discard:]
+        percentiles = burst_tools.get_quartiles(dt)
+        idxs = burst_tools.get_outlier_idxs(dt, percentiles)
+        self.outlier_i = idxs + self.min_discard + 1
+
+    def get_bprop_slopes(self):
+        """Calculate slopes for properties as the burst sequence progresses
+        """
+        self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
+        if self.n_regress < 1:
+            self.set_converged_too_few()
+            self.printv(f'Too few bursts to do linregress. '
+                        + f'Have {self.n_bursts}, need {self.min_regress + self.min_discard}')
+        else:
+            for bprop in self.regress_bprops:
+                slopes, slopes_err = self.linregress(bprop)
+                self.residuals[bprop] = np.abs(slopes / slopes_err)
+                self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
+
     def linregress(self, bprop):
-        """Do linear regression on bprop values for different number of burst discards,
-        in order to determine when slope is zero (i.e. burst train has converged)
+        """Do linear regression on given bprop for different number of burst discards
         """
         n = self.n_regress
         y = self.bursts[bprop]
@@ -459,19 +473,6 @@ class BurstRun(object):
             u_dt = self.summary['std_dt']
             self.summary['mean_rate'] = sec_day / dt  # burst rate (per day)
             self.summary['std_rate'] = sec_day * u_dt / dt**2
-
-    def identify_outliers(self):
-        """Identify outlier bursts
-        """
-        if self.flags['too_few_bursts']:
-            self.printv('Too few bursts to get outliers')
-            return
-
-        dt = self.bursts['dt'][self.min_discard:]
-        percentiles = burst_tools.get_quartiles(dt)
-        idxs = burst_tools.get_outlier_idxs(dt, percentiles)
-
-        self.outlier_i = idxs + self.min_discard + 1
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
