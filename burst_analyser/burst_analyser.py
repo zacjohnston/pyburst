@@ -29,6 +29,10 @@ default_plt_options()
 # TODO: param description docstring
 
 
+class NoBursts(Exception):
+    pass
+
+
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, savelum=True, analyse=True, plot=False,
@@ -131,12 +135,13 @@ class BurstRun(object):
 
             self.discard = self.get_discard()
             self.get_means()
-            self.flags['analysed'] = True
         else:
             self.set_too_few()
             self.discard = self.get_discard()
             self.get_means()
             self.printv('Too few bursts to analyse')
+
+        self.flags['analysed'] = True
 
     def set_too_few(self):
         self.converged = False
@@ -183,23 +188,20 @@ class BurstRun(object):
         """
         self.printv('Identifying bursts')
         self.get_burst_candidates()
-        self.get_burst_peaks()
+
+        try:
+            self.get_burst_peaks()
+        except NoBursts:
+            return
 
         if self.n_bursts > 1:
             dt = np.diff(self.bursts['t_peak'])
             self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
-        else:
-            # TODO: set remaining to nan
-            self.flags['too_few_bursts'] = True
-            if self.n_bursts == 0:
-                self.print_warn('No bursts in this model')
-            else:
-                self.print_warn('Only one burst detected')
-            return
+            self.identify_short_wait_bursts()
 
-        self.identify_short_wait_bursts()
         self.get_burst_starts()
         self.get_burst_ends()
+
         self.bursts['length'] = self.bursts['t_end'] - self.bursts['t_start']
         self.bursts['n'] = np.arange(self.n_bursts) + 1  # burst ID (starting from 1)
 
@@ -223,7 +225,7 @@ class BurstRun(object):
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
         """
-        lum_thresh = 5e35  # minimum threshold luminosity
+        lum_thresh = 1e36  # minimum threshold luminosity
         thresh_i = np.where(self.lum[:, 1] > lum_thresh)[0]
         lum_cut = self.lum[thresh_i]
 
@@ -266,7 +268,7 @@ class BurstRun(object):
                 shocks = True
 
     def get_burst_peaks(self):
-        """Get largest maxima within some time-window
+        """Keep largest maxima within some time-window
         """
         t_radius = 60  # burst peak must be largest maxima within t_radius (s)
         peaks = []
@@ -279,8 +281,19 @@ class BurstRun(object):
             maxx = np.max(self.lum[i_left:i_right, 1])
             if maxx == lum:
                 peaks.append(maxi)
+
         peaks = np.array(peaks)
         self.n_bursts = len(peaks)
+
+        if self.n_bursts < 2:
+            self.flags['too_few_bursts'] = True
+            message = {0: 'No bursts in this model',
+                       1: 'Only one burst detected'}[self.n_bursts]
+            self.print_warn(message)
+
+            if self.n_bursts == 0:
+                raise NoBursts
+
         self.bursts['t_peak'] = peaks[:, 0]  # times of burst peaks (s)
         self.bursts['t_peak_i'] = np.searchsorted(self.lum[:, 0], self.bursts['t_peak'])
         self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
@@ -299,22 +312,23 @@ class BurstRun(object):
         self.bursts['t_start'] = np.full(self.n_bursts, np.nan)
         self.bursts['t_start_i'] = np.zeros(self.n_bursts, dtype=int)
 
-        for i, row in self.bursts.iterrows():
-            rise_steps = row['t_peak_i'] - row['t_pre_i']
-            if (rise_steps < 50) or (row['peak'] / row['lum_pre'] < peak_frac):
-                self.printv(f"Removing micro-burst (t={row['t_peak']:.0f} s)")
-                self.delete_burst(i)
+        for burst in self.bursts.itertuples():
+            rise_steps = burst.t_peak_i - burst.t_pre_i
+            if (rise_steps < 50
+                    or burst.peak / burst.lum_pre < peak_frac):
+                self.printv(f"Removing micro-burst (t={burst.t_peak:.0f} s)")
+                self.delete_burst(burst.Index)
                 continue
 
-            lum_slice = self.lum[row['t_pre_i']:row['t_peak_i']]
+            lum_slice = self.lum[burst.t_pre_i:burst.t_peak_i]
             pre_lum = lum_slice[0, 1]
             peak_lum = lum_slice[-1, 1]
             start_lum = pre_lum + start_frac * (peak_lum - pre_lum)
 
             slice_i = np.searchsorted(lum_slice[:, 1], start_lum)
             t_start = lum_slice[slice_i, 0]
-            self.bursts.loc[i, 't_start'] = t_start
-            self.bursts.loc[i, 't_start_i'] = np.searchsorted(self.lum[:, 0], t_start)
+            self.bursts.loc[burst.Index, 't_start'] = t_start
+            self.bursts.loc[burst.Index, 't_start_i'] = np.searchsorted(self.lum[:, 0], t_start)
 
     def get_burst_ends(self):
         """Finds first point in lightcurve > min_length after peak that falls
@@ -325,9 +339,9 @@ class BurstRun(object):
         self.bursts['t_end'] = np.full(self.n_bursts, np.nan)
         self.bursts['t_end_i'] = np.zeros(self.n_bursts, dtype=int)
 
-        for i, row in self.bursts.iterrows():
-            lum_slice = self.lum[row['t_peak_i']:]
-            pre_lum = self.lum[row['t_pre_i'], 1]
+        for burst in self.bursts.itertuples():
+            lum_slice = self.lum[burst.t_peak_i:]
+            pre_lum = self.lum[burst.t_pre_i, 1]
 
             peak_t, peak_lum = lum_slice[0]
             lum_diff = peak_lum - pre_lum
@@ -340,17 +354,17 @@ class BurstRun(object):
             intersection = list(set(thresh_i).intersection(min_length_i))
 
             if len(intersection) == 0:
-                if i == (self.n_bursts - 1):
+                if burst.Index == (self.n_bursts - 1):
                     self.printv('File ends during burst. Discarding final burst')
-                    self.delete_burst(i)
+                    self.delete_burst(burst.Index)
                     continue
                 else:
                     raise RuntimeError(f'Failed to find end of burst {i+1} (t={peak_t:.0f s})')
             else:
                 end_i = np.min(intersection)
                 t_end = lum_slice[end_i, 0]
-                self.bursts.loc[i, 't_end'] = t_end
-                self.bursts.loc[i, 't_end_i'] = np.searchsorted(self.lum[:, 0], t_end)
+                self.bursts.loc[burst.Index, 't_end'] = t_end
+                self.bursts.loc[burst.Index, 't_end_i'] = np.searchsorted(self.lum[:, 0], t_end)
 
     def delete_burst(self, burst_i):
         """Removes burst from self.bursts table
@@ -371,10 +385,10 @@ class BurstRun(object):
         """Calculates burst fluences by integrating over burst luminosity
         """
         self.bursts['fluence'] = np.zeros(self.n_bursts)
-        for i, row in self.bursts.iterrows():
-            lum_slice = self.lum[row['t_pre_i']:row['t_end_i']]
-            self.bursts.loc[i, 'fluence'] = integrate.trapz(y=lum_slice[:, 1],
-                                                            x=lum_slice[:, 0])
+        for burst in self.bursts.itertuples():
+            lum_slice = self.lum[burst.t_pre_i:burst.t_end_i]
+            self.bursts.loc[burst.Index, 'fluence'] = integrate.trapz(y=lum_slice[:, 1],
+                                                                      x=lum_slice[:, 0])
 
     def linregress(self, bprop):
         """Do linear regression on bprop values for different number of burst discards,
