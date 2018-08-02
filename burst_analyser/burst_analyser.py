@@ -111,14 +111,14 @@ class BurstRun(object):
         self.flags['loaded'] = True
 
     def analyse(self):
-        """Analyses all quantities of the model.
+        """Performs complete analysis of model.
         """
         self.ensure_analysed_is(False)
         self.identify_bursts()
+        self.get_fluence()
 
         if not self.flags['too_few_bursts']:
             self.identify_outliers()
-            self.get_fluence()
             # ===== do linregress over bprops =====
             # TODO: Problem here when n_bursts is one less than needed (dt has one less)
             self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
@@ -359,7 +359,8 @@ class BurstRun(object):
                     self.delete_burst(burst.Index)
                     continue
                 else:
-                    raise RuntimeError(f'Failed to find end of burst {i+1} (t={peak_t:.0f s})')
+                    raise RuntimeError(f'Failed to find end of burst {burst.Index + 1} '
+                                       + f'(t={peak_t:.0f s})')
             else:
                 end_i = np.min(intersection)
                 t_end = lum_slice[end_i, 0]
