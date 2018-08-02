@@ -115,7 +115,7 @@ class BurstRun(object):
         """
         self.ensure_analysed_is(False)
         self.identify_bursts()
-        self.get_fluence()
+        self.get_fluences()
         self.identify_outliers()
         self.get_bprop_slopes()
         self.discard = self.get_discard()
@@ -361,7 +361,7 @@ class BurstRun(object):
         if True in self.bursts['short_wait']:
             self.flags['short_waits'] = True
 
-    def get_fluence(self):
+    def get_fluences(self):
         """Calculates burst fluences by integrating over burst luminosity
         """
         self.bursts['fluence'] = np.zeros(self.n_bursts)
