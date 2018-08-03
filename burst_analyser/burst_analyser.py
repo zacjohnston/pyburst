@@ -113,19 +113,32 @@ class BurstRun(object):
         self.converged = False
         self.flags['regress_too_few_bursts'] = True
 
-    def clean_bursts(self, exclude_min_regress=False):
+    def clean_bursts(self, exclude_short_wait=None, exclude_outliers=None,
+                     exclude_min_regress=False):
         """Returns subset of self.bursts that are not in min_discard,
             and (depending on exclude options), not outliers or short_waits
+
+        parameters
+        ----------
+        exclude_short_wait : bool (optional)
+            if not provided, fall back on self.options
+        exclude_outliers : bool (optional)
+            if not provided, fall back on self.options
+        exclude_min_regress : bool (optional)
         """
+        if exclude_short_wait is None:
+            exclude_short_wait = self.options['exclude_short_wait']
+        if exclude_outliers is None:
+            exclude_outliers = self.options['exclude_outliers']
+
         mask = np.full(self.n_bursts, True)
         mask[:self.min_discard] = False
 
-        if self.options['exclude_short_wait']:
+        if exclude_short_wait:
             mask = mask & np.invert(self.bursts['short_wait'])
-
-        if self.options['exclude_outliers']:
+        if exclude_outliers:
             mask = mask & np.invert(self.bursts['outlier'])
-        print(mask)
+
         if exclude_min_regress:
             return self.bursts[mask].iloc[:-self.min_regress]
         else:
@@ -225,7 +238,7 @@ class BurstRun(object):
 
         self.get_burst_starts()
         self.get_burst_ends()
-        
+
         self.identify_short_wait_bursts()
         self.bursts.reset_index(inplace=True, drop=True)
 
