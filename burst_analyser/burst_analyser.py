@@ -112,14 +112,22 @@ class BurstRun(object):
         self.converged = False
         self.flags['regress_too_few_bursts'] = True
 
-    def short(self):
+    def short_waits(self):
         return self.bursts[self.bursts['short_wait']]
 
-    def not_short(self):
+    def not_short_waits(self):
         return self.bursts[np.invert(self.bursts['short_wait'])]
 
-    def outliers(self):
-        return self.bursts[self.bursts['outlier']]
+    def outliers(self, unique=False):
+        """Returns subset of self.bursts that are outliers
+
+        unique : bool
+            whether to exclude bursts already identified as short_waits or min_discard
+        """
+        if unique:
+            pass
+        else:
+            return self.bursts[self.bursts['outlier']]
 
     def not_outliers(self):
         return self.bursts[np.invert(self.bursts['outlier'])]
@@ -373,7 +381,7 @@ class BurstRun(object):
         min_dt_frac = 0.5
         mean_dt = np.mean(self.bursts['dt'][1:])
         self.bursts['short_wait'] = self.bursts['dt'] < min_dt_frac * mean_dt
-        self.n_short_wait = len(self.short())
+        self.n_short_wait = len(self.short_waits())
 
         if self.n_short_wait > 0:
             self.printv(f'{self.n_short_wait} short-waiting time bursts detected')
@@ -426,6 +434,9 @@ class BurstRun(object):
 
         if self.options['exclude_short_wait']:
             self.n_regress -= self.n_short_wait
+
+        if self.options['exclude_outliers']:
+            pass
 
     def linregress(self, bprop):
         """Do linear regression on given bprop for different number of burst discards
