@@ -381,6 +381,8 @@ class BurstRun(object):
             self.bursts.loc[burst.Index, 't_start'] = t_start
             self.bursts.loc[burst.Index, 't_start_i'] = np.searchsorted(self.lum[:, 0], t_start)
 
+        self.bursts['lum_start'] = self.lum[self.bursts['t_start_i'], 1]
+
     def get_burst_ends(self):
         """Finds first point in lightcurve > min_length after peak that falls
         to a given fraction of luminosity
@@ -417,6 +419,8 @@ class BurstRun(object):
                 t_end = lum_slice[end_i, 0]
                 self.bursts.loc[burst.Index, 't_end'] = t_end
                 self.bursts.loc[burst.Index, 't_end_i'] = np.searchsorted(self.lum[:, 0], t_end)
+
+        self.bursts['lum_end'] = self.lum[self.bursts['t_end_i'], 1]
 
     def delete_burst(self, burst_i):
         """Removes burst from self.bursts table
