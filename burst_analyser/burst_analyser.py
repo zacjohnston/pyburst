@@ -48,6 +48,7 @@ class BurstRun(object):
                       'short_waits': False,
                       'outliers': False,
                       'regress_too_few_bursts': False,
+                      'converged': False,
                       }
 
         self.options = {'verbose': verbose,
@@ -88,12 +89,10 @@ class BurstRun(object):
         self.regress_bprops = ['dt', 'fluence', 'peak']
         self.min_regress = min_regress
         self.min_discard = min_discard
-        self.n_regress = None
         self.slopes = {}    # NOTE: starts at min_discard
         self.slopes_err = {}
         self.residuals = {}
         self.discard = None
-        self.converged = None
 
         if analyse:
             self.analyse()
@@ -201,7 +200,7 @@ class BurstRun(object):
         pass
 
     def set_converged_too_few(self):
-        self.converged = False
+        self.flags['converged'] = False
         self.flags['regress_too_few_bursts'] = True
 
     def load(self):
@@ -510,11 +509,11 @@ class BurstRun(object):
 
         for burst_i, flat in zero_slope.iteritems():
             if flat:
-                self.converged = True
+                self.flags['converged'] = True
                 return burst_i
         else:
             self.print_warn('Bursts not yet converged, using min_discard')
-            self.converged = False
+            self.flags['converged'] = False
             return self.min_discard
 
     def get_means(self):
