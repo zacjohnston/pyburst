@@ -630,23 +630,23 @@ class BurstRun(object):
         ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='black')
 
         if candidates:  # NOTE: candidates may be modified if a shock was removed
-            t = self.candidates[:, 0] / timescale
+            x = self.candidates[:, 0] / timescale
             y = self.candidates[:, 1] / yscale
-            ax.plot(t, y, marker='o', c='C0', ls='none', label='candidates')
+            ax.plot(x, y, marker='o', c='C0', ls='none', label='candidates')
 
         if short_wait:
             if self.flags['short_waits']:
-                t = self.bursts['short_wait_peaks'][:, 0] / timescale
+                x = self.bursts['short_wait_peaks'][:, 0] / timescale
                 y = self.bursts['short_wait_peaks'][:, 1] / yscale
-                ax.plot(t, y, marker='o', c='C4', ls='none', label='short-wait')
+                ax.plot(x, y, marker='o', c='C4', ls='none', label='short-wait')
 
         if burst_stages:
             for stage in ('t_pre', 't_start', 't_end'):
-                t = self.bursts[stage] / timescale
-                y = self.lumf(t) / yscale
+                x = self.bursts[stage] / timescale
+                y = self.lumf(x) / yscale
                 label = {'t_pre': 'stages'}.get(stage, None)
 
-                ax.plot(t, y, marker='o', c='C2', ls='none', label=label)
+                ax.plot(x, y, marker='o', c='C2', ls='none', label=label)
 
         if shocks:  # plot shocks that were removed
             for i, shock in enumerate(self.shocks):
