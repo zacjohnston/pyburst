@@ -596,7 +596,7 @@ class BurstRun(object):
 
             np.savetxt(filepath, lightcurve, header=header)
 
-    def plot_model(self, bursts=True, display=True, save=False, log=True,
+    def plot_model(self, peaks=True, display=True, save=False, log=True,
                    burst_stages=False, candidates=False, legend=False, time_unit='h',
                    short_wait=False, shocks=False, fontsize=14, title=True,
                    show_all=False):
@@ -632,13 +632,18 @@ class BurstRun(object):
         if candidates:  # NOTE: candidates may be modified if a shock was removed
             x = self.candidates[:, 0] / timescale
             y = self.candidates[:, 1] / yscale
-            ax.plot(x, y, marker='o', c='C0', ls='none', label='candidates')
+            ax.plot(x, y, marker='o', c='C4', ls='none', label='candidates')
+
+        if peaks:
+            ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
+                    label='peaks')
 
         if short_wait:
             if self.flags['short_waits']:
-                x = self.bursts['short_wait_peaks'][:, 0] / timescale
-                y = self.bursts['short_wait_peaks'][:, 1] / yscale
-                ax.plot(x, y, marker='o', c='C4', ls='none', label='short-wait')
+                bursts = self.short_waits()
+                x = bursts['t_peak'] / timescale
+                y = bursts['peak'] / yscale
+                ax.plot(x, y, marker='o', c='C0', ls='none', label='short-wait')
 
         if burst_stages:
             for stage in ('t_pre', 't_start', 't_end'):
@@ -657,9 +662,6 @@ class BurstRun(object):
                 shock_slice[1, 1] = shock_lum
                 ax.plot(shock_slice[:, 0]/timescale, shock_slice[:, 1]/yscale, c='C3',
                         label='shocks' if (i == 0) else '_nolegend_')
-        if bursts:
-            ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
-                    label='peaks')
 
         if legend:
             ax.legend(loc=4)
