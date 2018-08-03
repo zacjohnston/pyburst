@@ -118,7 +118,7 @@ class BurstRun(object):
         self.identify_outliers()
         self.get_bprop_slopes()
         self.discard = self.get_discard()
-        # self.get_means()
+        self.get_means()
         self.flags['analysed'] = True
 
     def ensure_analysed_is(self, analysed):
@@ -161,7 +161,7 @@ class BurstRun(object):
             mask = mask & np.invert(self.bursts['outlier'])
         if exclude_discard:
             mask[:self.discard] = False
-            
+
         if exclude_min_regress:
             return self.bursts[mask].iloc[:-self.min_regress + 1]
         else:
@@ -525,24 +525,14 @@ class BurstRun(object):
                 self.summary[f'mean_{bprop}'] = np.nan
                 self.summary[f'std_{bprop}'] = np.nan
         else:
+            bursts = self.clean_bursts(exclude_discard=True)
             for bprop in self.bprops:
-                values = self.bursts[bprop][self.discard:]
-
-                if self.options['exclude_outliers']:
-                    idxs = np.array(self.outlier_i) - self.discard
-                    if bprop == 'dt':
-                        idxs -= 1
-                    idxs = idxs[np.where(idxs >= 0)[0]]  # discard negatives
-                    values = np.delete(values, idxs)
-
+                values = bursts[bprop]
                 self.summary[f'mean_{bprop}'] = np.mean(values)
                 self.summary[f'std_{bprop}'] = np.std(values)
 
-            # ===== calculate burst rate =====
-            dt = self.summary['mean_dt']
-            u_dt = self.summary['std_dt']
-            self.summary['mean_rate'] = sec_day / dt  # burst rate (per day)
-            self.summary['std_rate'] = sec_day * u_dt / dt**2
+            self.summary['mean_rate'] = sec_day / self.summary['mean_dt']  # burst rate (per day)
+            self.summary['std_rate'] = sec_day * self.summary['std_dt'] / self.summary['mean_dt']**2
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
