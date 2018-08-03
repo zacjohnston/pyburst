@@ -135,7 +135,7 @@ class BurstRun(object):
             raise AttributeError(string)
 
     def clean_bursts(self, exclude_short_wait=None, exclude_outliers=None,
-                     exclude_min_regress=False):
+                     exclude_min_regress=False, exclude_discard=False):
         """Returns subset of self.bursts that are not in min_discard,
             and (depending on exclude options), not outliers or short_waits
 
@@ -159,7 +159,9 @@ class BurstRun(object):
             mask = mask & np.invert(self.bursts['short_wait'])
         if exclude_outliers:
             mask = mask & np.invert(self.bursts['outlier'])
-
+        if exclude_discard:
+            mask[:self.discard] = False
+            
         if exclude_min_regress:
             return self.bursts[mask].iloc[:-self.min_regress + 1]
         else:
