@@ -79,6 +79,8 @@ class BurstRun(object):
         self.candidates = None
         self.summary = {}
         self.n_bursts = None
+        self.n_short_wait = None
+        self.n_outliers = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.shocks = []
 
@@ -126,8 +128,7 @@ class BurstRun(object):
         """Load luminosity data from kepler simulation
         """
         self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
-                                    basename=self.basename,
-                                    save=self.options['save_lum'],
+                                    basename=self.basename, save=self.options['save_lum'],
                                     reload=self.options['reload'])
 
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
@@ -372,7 +373,10 @@ class BurstRun(object):
         min_dt_frac = 0.5
         mean_dt = np.mean(self.bursts['dt'][1:])
         self.bursts['short_wait'] = self.bursts['dt'] < min_dt_frac * mean_dt
-        if True in self.bursts['short_wait']:
+        self.n_short_wait = len(self.short())
+
+        if self.n_short_wait > 0:
+            self.printv(f'{self.n_short_wait} short-waiting time bursts detected')
             self.flags['short_waits'] = True
 
     def get_fluences(self):
@@ -399,11 +403,12 @@ class BurstRun(object):
         outliers = (dt < percentiles[0]) | (dt > percentiles[-1])
         outliers[:self.min_discard] = True
         self.bursts['outlier'] = outliers
+        self.n_outliers = len(self.outliers())
 
     def get_bprop_slopes(self):
         """Calculate slopes for properties as the burst sequence progresses
         """
-        self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
+        self.get_n_regress()
         if self.n_regress < 1:
             self.set_converged_too_few()
             self.printv(f'Too few bursts to do linregress. '
@@ -414,6 +419,14 @@ class BurstRun(object):
                 self.residuals[bprop] = np.abs(slopes / slopes_err)
                 self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
 
+    def get_n_regress(self):
+        """Determine number of potential discards to try with linregress
+        """
+        self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
+
+        if self.options['exclude_short_wait']:
+            self.n_regress -= self.n_short_wait
+
     def linregress(self, bprop):
         """Do linear regression on given bprop for different number of burst discards
         """
@@ -423,10 +436,6 @@ class BurstRun(object):
 
         if self.options['exclude_outliers']:
             idxs = np.array(self.outlier_i)
-
-            x = np.delete(x, idxs)
-            y = np.delete(y, idxs)
-            n -= len(idxs)
 
         slope = np.full(n, np.nan)
         slope_err = np.full(n, np.nan)
