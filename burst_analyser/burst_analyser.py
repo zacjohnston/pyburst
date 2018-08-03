@@ -650,10 +650,10 @@ class BurstRun(object):
                 ax.plot(x, y, marker='o', c='C0', ls='none', label='Short-wait')
 
         if burst_stages:
-            for stage in ('t_pre', 't_start', 't_end'):
-                x = self.bursts[stage] / timescale
-                y = self.lumf(x) / yscale
-                label = {'t_pre': 'Burst stages'}.get(stage, None)
+            for stage in ('pre', 'start', 'end'):
+                x = self.bursts[f't_{stage}'] / timescale
+                y = self.bursts[f'lum_{stage}'] / yscale
+                label = {'pre': 'Burst stages'}.get(stage, None)
                 ax.plot(x, y, marker='o', c='C2', ls='none', label=label)
 
         if shocks:  # plot shocks that were removed
