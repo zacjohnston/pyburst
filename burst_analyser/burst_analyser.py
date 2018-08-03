@@ -125,7 +125,9 @@ class BurstRun(object):
             whether to exclude bursts already identified as short_waits or min_discard
         """
         if unique:
-            pass
+            unique_mask = self.bursts['outlier'] & np.invert(self.bursts['short_wait'])
+            unique_mask.iloc[:self.min_discard] = False
+            return self.bursts[unique_mask]
         else:
             return self.bursts[self.bursts['outlier']]
 
