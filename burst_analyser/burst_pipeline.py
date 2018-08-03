@@ -76,7 +76,7 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
 
     flags = ('converged',)
     b_ints = ('batch', 'run', 'num', 'discard')
-    bprops = ('dt', 'fluence', 'length', 'peak')
+    bprops = ('dt', 'fluence', 'length', 'peak', 'rate')
     col_order = ['batch', 'run', 'num', 'converged', 'discard', 'dt', 'u_dt', 'rate', 'u_rate',
                  'fluence', 'u_fluence', 'length', 'u_length', 'peak', 'u_peak']
 
@@ -116,16 +116,13 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
                 data[bp] += [burstfit.summary[f'mean_{bp}']]
                 data[u_bp] += [burstfit.summary[f'std_{bp}']]
 
-            data['rate'] += [8.64e4 / data['dt'][-1]]  # burst rate (per day)
-            data['u_rate'] += [8.64e4 * data['u_dt'][-1] / data['dt'][-1] ** 2]
-
-            if not burstfit.too_few_bursts:
+            if not burstfit.flags['too_few_bursts']:
                 if plot_model:
                     burstfit.plot_model(display=False, save=True)
                 if plot_convergence:
                     burstfit.plot_convergence(display=False, save=True)
 
-                if plot_linregress and not burstfit.regress_too_few_bursts:
+                if plot_linregress and not burstfit.flags['regress_too_few_bursts']:
                     burstfit.plot_linregress(display=False, save=True)
 
         table = pd.DataFrame(data)
