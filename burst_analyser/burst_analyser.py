@@ -114,11 +114,18 @@ class BurstRun(object):
         self.flags['regress_too_few_bursts'] = True
 
     def clean_bursts(self, exclude_min_regress=False):
-        """Returns subset of self.bursts that are not outliers, short_waits, or min_discard
+        """Returns subset of self.bursts that are not in min_discard,
+            and (depending on exclude options), not outliers or short_waits
         """
-        mask = np.invert(self.bursts['short_wait']) & np.invert(self.bursts['outlier'])
-        mask.iloc[:self.min_discard] = False
+        mask = np.full(self.n_bursts, True)
+        mask[:self.min_discard] = False
 
+        if self.options['exclude_short_wait']:
+            mask = mask & np.invert(self.bursts['short_wait'])
+
+        if self.options['exclude_outliers']:
+            mask = mask & np.invert(self.bursts['outlier'])
+        print(mask)
         if exclude_min_regress:
             return self.bursts[mask].iloc[:-self.min_regress]
         else:
@@ -215,10 +222,11 @@ class BurstRun(object):
         if self.n_bursts > 1:
             dt = np.diff(self.bursts['t_peak'])
             self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
-            self.identify_short_wait_bursts()
 
         self.get_burst_starts()
         self.get_burst_ends()
+        
+        self.identify_short_wait_bursts()
         self.bursts.reset_index(inplace=True, drop=True)
 
         self.bursts['length'] = self.bursts['t_end'] - self.bursts['t_start']
@@ -408,6 +416,7 @@ class BurstRun(object):
         mean_dt = np.mean(self.bursts['dt'][1:])
         self.bursts['short_wait'] = self.bursts['dt'] < min_dt_frac * mean_dt
         self.n_short_wait = len(self.short_waits())
+        print('SHORT WAITS', self.n_short_wait)
 
         if self.n_short_wait > 0:
             self.printv(f'{self.n_short_wait} short-waiting time bursts detected')
