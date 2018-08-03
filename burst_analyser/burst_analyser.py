@@ -512,9 +512,9 @@ class BurstRun(object):
                 self.flags['converged'] = True
                 return burst_i
         else:
-            self.print_warn('Bursts not yet converged, using min_discard')
+            self.print_warn('Bursts not yet converged, using largest discard to satisfy min_regress')
             self.flags['converged'] = False
-            return self.min_discard
+            return bursts.index[-1]
 
     def get_means(self):
         """Calculate mean burst properties
