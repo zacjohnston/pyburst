@@ -81,6 +81,7 @@ class BurstRun(object):
         self.n_bursts = None
         self.n_short_wait = None
         self.n_outliers = None
+        self.n_outliers_unique = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.shocks = []
 
@@ -437,10 +438,7 @@ class BurstRun(object):
         outliers[:self.min_discard] = True
         self.bursts['outlier'] = outliers
         self.n_outliers = len(self.outliers())
-
-        unique_mask = self.bursts['outlier'] & np.invert(self.bursts['short_wait'])
-        unique_mask.iloc[:self.min_discard] = False
-        return self.bursts[unique_mask]
+        self.n_outliers_unique = len(self.outliers(unique=True))
 
     def get_bprop_slopes(self):
         """Calculate slopes for properties as the burst sequence progresses
