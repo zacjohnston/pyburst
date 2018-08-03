@@ -671,8 +671,7 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='model')
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=None,
-                         show_values=True, legend=False, show_first=False,
-                         display=True, save=False, fix_xticks=False):
+                         legend=False, display=True, save=False, fix_xticks=False):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
@@ -688,8 +687,8 @@ class BurstRun(object):
         y_scales = {'tDel': 3600, 'dt': 3600,
                     'fluence': 1e39, 'peak': 1e38}
 
-        b_start = {True: 1, False: 2}.get(show_first)
         fig, ax = plt.subplots(3, 1, figsize=(6, 8))
+        bursts = self.clean_bursts(exclude_discard=False)
 
         for i, bprop in enumerate(bprops):
             y_unit = y_units.get(bprop)
@@ -697,26 +696,25 @@ class BurstRun(object):
             ax[i].set_ylabel(f'{bprop} ({y_unit})')
 
             if fix_xticks:
-                ax[i].set_xticks(np.arange(b_start, self.n_bursts+1))
+                ax[i].set_xticks(self.bursts['n'])
                 if i != len(bprops)-1:
                     ax[i].set_xticklabels([])
 
             b_vals = self.bursts[bprop]
             nv = len(b_vals)
 
-            for j in range(discard+1, nv+1):
-                b_slice = b_vals[discard:j]
-                mean = np.mean(b_slice)
-                std = np.std(b_slice)
+            # for j in range(discard+1, nv+1):
+            #     b_slice = b_vals[discard:j]
+            #     mean = np.mean(b_slice)
+            #     std = np.std(b_slice)
+            #
+            #     ax[i].errorbar(j, mean/y_scale, yerr=std/y_scale, ls='none',
+            #                    marker='o', c='C0', capsize=3,
+            #                    label='cumulative mean' if j == discard+1 else '_nolegend_')
 
-                ax[i].errorbar(j, mean/y_scale, yerr=std/y_scale, ls='none',
-                               marker='o', c='C0', capsize=3,
-                               label='cumulative mean' if j == discard+1 else '_nolegend_')
-
-            self.printv(f'{bprop}: mean={mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
-            if show_values:
-                ax[i].plot(np.arange(b_start, nv+1), b_vals[b_start-1:]/y_scale,
-                           marker='o', c='C1', ls='none', label='bursts')
+            # self.printv(f'{bprop}: mean={mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
+            ax[i].plot(bursts['n'], bursts[bprop] / y_scale, marker='o',
+                       c='C1', ls='none', label='Bursts')
         if legend:
             ax[0].legend(loc=1)
 
