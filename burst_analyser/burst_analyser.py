@@ -117,7 +117,7 @@ class BurstRun(object):
         self.get_fluences()
         self.identify_outliers()
         self.get_bprop_slopes()
-        # self.discard = self.get_discard()
+        self.discard = self.get_discard()
         # self.get_means()
         self.flags['analysed'] = True
 
@@ -482,34 +482,35 @@ class BurstRun(object):
                     self.bursts.loc[burst.Index, f'slope_{bprop}_err'] = lin[-1]
 
         else:
-            self.set_converged_too_few()
             minimum = (self.min_regress + self.min_discard
                        + self.n_short_wait + self.n_outliers_unique)
             self.print_warn(f'Too few bursts to do linregress. '
                             + f'Have {self.n_bursts}, need at least {minimum} '
                             + '(assuming no further outliers/short_waits occur)')
+            self.set_converged_too_few()
 
     def get_discard(self):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
         """
         if self.flags['regress_too_few_bursts']:
-            self.printv('Too few bursts to find self.discard, using min_discard')
+            self.printv('Too few bursts to find self.discard, defaulting to min_discard')
             return self.min_discard
 
-        zero_slope_i = []
+        bursts = self.clean_bursts(exclude_min_regress=True)
+        zero_slope = np.full(len(bursts), True)
+
         for bprop in self.regress_bprops:
-            # self.residuals[bprop] = np.abs(slopes / slopes_err)
-            zero_slope_i += [self.min_discard + np.where(self.residuals[bprop] < 1)[0]]
+            residuals = np.abs(bursts[f'slope_{bprop}'] / bursts[f'slope_{bprop}_err'])
+            zero_slope = zero_slope & (residuals < 1)
 
-        valid_discards = reduce(np.intersect1d, zero_slope_i)
-
-        if len(valid_discards) == 0:
-            self.print_warn('Bursts not converged, using min_discard')
+        for burst_i, flat in zero_slope.iteritems():
+            if flat:
+                self.converged = True
+                return burst_i
+        else:
+            self.print_warn('Bursts not yet converged, using min_discard')
             self.converged = False
             return self.min_discard
-        else:
-            self.converged = True
-            return valid_discards[0]
 
     def get_means(self):
         """Calculate mean burst properties
