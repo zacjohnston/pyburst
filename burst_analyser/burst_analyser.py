@@ -106,6 +106,22 @@ class BurstRun(object):
         full_string = f"\nWARNING: {string}\n"
         self.printv(full_string)
 
+    def set_converged_too_few(self):
+        self.converged = False
+        self.flags['regress_too_few_bursts'] = True
+
+    def short(self):
+        return self.bursts[self.bursts['short_wait']]
+
+    def not_short(self):
+        return self.bursts[np.invert(self.bursts['short_wait'])]
+
+    def outliers(self):
+        return self.bursts[self.bursts['outlier']]
+
+    def not_outliers(self):
+        return self.bursts[np.invert(self.bursts['short_wait'])]
+
     def load(self):
         """Load luminosity data from kepler simulation
         """
@@ -129,22 +145,6 @@ class BurstRun(object):
         self.get_means()
         self.flags['analysed'] = True
 
-    def set_converged_too_few(self):
-        self.converged = False
-        self.flags['regress_too_few_bursts'] = True
-
-    def short(self):
-        return self.bursts[self.bursts['short_wait']]
-
-    def not_short(self):
-        return self.bursts[np.invert(self.bursts['short_wait'])]
-
-    def outliers(self):
-        return self.bursts[self.bursts['outlier']]
-
-    def not_outliers(self):
-        return self.bursts[np.invert(self.bursts['short_wait'])]
-
     def ensure_analysed_is(self, analysed):
         """Checks that model has (or hasn't) been analysed
         """
@@ -157,15 +157,6 @@ class BurstRun(object):
             else:
                 string = strings[analysed]
             raise AttributeError(string)
-
-    def remove_zeros(self):
-        """During shocks, kepler can also give zero luminosity (for some reason...)
-        """
-        replace_with = 1e35
-        zeros = np.where(self.lum[:, 1] == 0.0)
-        n_zeros = len(zeros)
-        self.printv(f'Removed {n_zeros} zeros from luminosity')
-        self.lum[zeros, 1] = replace_with
 
     def identify_bursts(self):
         """Extracts peaks, times, and recurrence times of bursts
@@ -259,6 +250,15 @@ class BurstRun(object):
                 max_i[1] = new_lum
                 self.shocks.append([idx, t, lum])
                 shocks = True
+
+    def remove_zeros(self):
+        """During shocks, kepler can also give zero luminosity (for some reason...)
+        """
+        replace_with = 1e35
+        zeros = np.where(self.lum[:, 1] == 0.0)
+        n_zeros = len(zeros)
+        self.printv(f'Removed {n_zeros} zeros from luminosity')
+        self.lum[zeros, 1] = replace_with
 
     def get_burst_peaks(self):
         """Keep largest maxima within some time-window
