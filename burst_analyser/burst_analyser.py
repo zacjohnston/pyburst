@@ -109,9 +109,30 @@ class BurstRun(object):
         full_string = f"\nWARNING: {string}\n"
         self.printv(full_string)
 
-    def set_converged_too_few(self):
-        self.converged = False
-        self.flags['regress_too_few_bursts'] = True
+    def analyse(self):
+        """Performs complete analysis of model.
+        """
+        self.ensure_analysed_is(False)
+        self.identify_bursts()
+        self.get_fluences()
+        self.identify_outliers()
+        self.get_bprop_slopes()
+        # self.discard = self.get_discard()
+        # self.get_means()
+        self.flags['analysed'] = True
+
+    def ensure_analysed_is(self, analysed):
+        """Checks that model has (or hasn't) been analysed
+        """
+        strings = {True: 'Model not yet analysed. Run self.analyse() first',
+                   False: 'Model has already been analysed. Reload model first'}
+
+        if self.flags['analysed'] != analysed:
+            if self.flags['too_few_bursts']:
+                string = 'Too few bursts for analysis'
+            else:
+                string = strings[analysed]
+            raise AttributeError(string)
 
     def clean_bursts(self, exclude_short_wait=None, exclude_outliers=None,
                      exclude_min_regress=False):
@@ -178,6 +199,10 @@ class BurstRun(object):
         """
         pass
 
+    def set_converged_too_few(self):
+        self.converged = False
+        self.flags['regress_too_few_bursts'] = True
+
     def load(self):
         """Load luminosity data from kepler simulation
         """
@@ -187,31 +212,6 @@ class BurstRun(object):
 
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
         self.flags['loaded'] = True
-
-    def analyse(self):
-        """Performs complete analysis of model.
-        """
-        self.ensure_analysed_is(False)
-        self.identify_bursts()
-        self.get_fluences()
-        self.identify_outliers()
-        self.get_bprop_slopes()
-        # self.discard = self.get_discard()
-        # self.get_means()
-        self.flags['analysed'] = True
-
-    def ensure_analysed_is(self, analysed):
-        """Checks that model has (or hasn't) been analysed
-        """
-        strings = {True: 'Model not yet analysed. Run self.analyse() first',
-                   False: 'Model has already been analysed. Reload model first'}
-
-        if self.flags['analysed'] != analysed:
-            if self.flags['too_few_bursts']:
-                string = 'Too few bursts for analysis'
-            else:
-                string = strings[analysed]
-            raise AttributeError(string)
 
     def identify_bursts(self):
         """Extracts peaks, times, and recurrence times of bursts
@@ -466,7 +466,6 @@ class BurstRun(object):
     def get_bprop_slopes(self):
         """Calculate slopes for properties as the burst sequence progresses
         """
-        self.get_n_regress()
         bursts_regress = self.clean_bursts(exclude_min_regress=True)
         bursts_regress_full = self.clean_bursts(exclude_min_regress=False)
 
@@ -484,19 +483,11 @@ class BurstRun(object):
 
         else:
             self.set_converged_too_few()
-            self.printv(f'Too few bursts to do linregress. '
-                        + f'Have {self.n_bursts}, need {self.min_regress + self.min_discard}')
-
-    def get_n_regress(self):
-        """Determine number of potential discards to try with linregress
-        """
-        self.n_regress = self.n_bursts + 1 - self.min_regress - self.min_discard
-
-        if self.options['exclude_short_wait']:
-            self.n_regress -= self.n_short_wait
-
-        if self.options['exclude_outliers']:
-            self.n_regress -= len(self.outliers(unique=True))
+            minimum = (self.min_regress + self.min_discard
+                       + self.n_short_wait + self.n_outliers_unique)
+            self.print_warn(f'Too few bursts to do linregress. '
+                            + f'Have {self.n_bursts}, need at least {minimum} '
+                            + '(assuming no further outliers/short_waits occur)')
 
     def get_discard(self):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
