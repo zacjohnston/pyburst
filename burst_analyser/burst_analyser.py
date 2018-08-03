@@ -112,11 +112,24 @@ class BurstRun(object):
         self.converged = False
         self.flags['regress_too_few_bursts'] = True
 
+    def clean_bursts(self):
+        """Returns subset of self.bursts that are not outliers, short_waits, or min_discard
+        """
+        mask = np.invert(self.bursts['short_wait']) & np.invert(self.bursts['outlier'])
+        mask.iloc[:self.min_discard] = False
+        return self.bursts[mask]
+
     def short_waits(self):
-        return self.bursts[self.bursts['short_wait']]
+        """Returns subset of self.bursts that are classified as short_wait
+        """
+        mask = self.bursts['short_wait']
+        return self.bursts[mask]
 
     def not_short_waits(self):
-        return self.bursts[np.invert(self.bursts['short_wait'])]
+        """Returns subset of self.bursts that are NOT classified as short_wait
+        """
+        mask = np.invert(self.bursts['short_wait'])
+        return self.bursts[mask]
 
     def outliers(self, unique=False):
         """Returns subset of self.bursts that are outliers
@@ -125,14 +138,20 @@ class BurstRun(object):
             whether to exclude bursts already identified as short_waits or min_discard
         """
         if unique:
-            unique_mask = self.bursts['outlier'] & np.invert(self.bursts['short_wait'])
-            unique_mask.iloc[:self.min_discard] = False
-            return self.bursts[unique_mask]
+            mask = self.bursts['outlier'] & np.invert(self.bursts['short_wait'])
+            mask.iloc[:self.min_discard] = False
         else:
-            return self.bursts[self.bursts['outlier']]
+            mask = self.bursts['outlier']
+
+        return self.bursts[mask]
 
     def not_outliers(self):
         return self.bursts[np.invert(self.bursts['outlier'])]
+
+    def regress_bursts(self):
+        """Return subset of self.bursts to use for linregress
+        """
+        pass
 
     def load(self):
         """Load luminosity data from kepler simulation
@@ -401,8 +420,8 @@ class BurstRun(object):
     def identify_outliers(self):
         """Identify outlier bursts
 
-        Note: bursts up to min_discard will be labelled outliers by default,
-                and will not be included in the calculation of the mean
+        Note: bursts up to min_discard and short_waits will not be considered
+                in the calculation of the mean
         """
         if self.flags['too_few_bursts']:
             self.printv('Too few bursts to get outliers')
@@ -415,19 +434,23 @@ class BurstRun(object):
         self.bursts['outlier'] = outliers
         self.n_outliers = len(self.outliers())
 
+        unique_mask = self.bursts['outlier'] & np.invert(self.bursts['short_wait'])
+        unique_mask.iloc[:self.min_discard] = False
+        return self.bursts[unique_mask]
+
     def get_bprop_slopes(self):
         """Calculate slopes for properties as the burst sequence progresses
         """
         self.get_n_regress()
-        if self.n_regress < 1:
-            self.set_converged_too_few()
-            self.printv(f'Too few bursts to do linregress. '
-                        + f'Have {self.n_bursts}, need {self.min_regress + self.min_discard}')
-        else:
+        if self.n_regress > 0:
             for bprop in self.regress_bprops:
                 slopes, slopes_err = self.linregress(bprop)
                 self.residuals[bprop] = np.abs(slopes / slopes_err)
                 self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
+        else:
+            self.set_converged_too_few()
+            self.printv(f'Too few bursts to do linregress. '
+                        + f'Have {self.n_bursts}, need {self.min_regress + self.min_discard}')
 
     def get_n_regress(self):
         """Determine number of potential discards to try with linregress
