@@ -140,7 +140,7 @@ class BurstRun(object):
             mask = mask & np.invert(self.bursts['outlier'])
 
         if exclude_min_regress:
-            return self.bursts[mask].iloc[:-self.min_regress]
+            return self.bursts[mask].iloc[:-self.min_regress + 1]
         else:
             return self.bursts[mask]
 
@@ -196,8 +196,8 @@ class BurstRun(object):
         self.get_fluences()
         self.identify_outliers()
         self.get_bprop_slopes()
-        self.discard = self.get_discard()
-        self.get_means()
+        # self.discard = self.get_discard()
+        # self.get_means()
         self.flags['analysed'] = True
 
     def ensure_analysed_is(self, analysed):
@@ -467,11 +467,21 @@ class BurstRun(object):
         """Calculate slopes for properties as the burst sequence progresses
         """
         self.get_n_regress()
-        if self.n_regress > 0:
+        bursts_regress = self.clean_bursts(exclude_min_regress=True)
+        bursts_regress_full = self.clean_bursts(exclude_min_regress=False)
+
+        if len(bursts_regress) > 0:
             for bprop in self.regress_bprops:
-                slopes, slopes_err = self.linregress(bprop)
-                self.residuals[bprop] = np.abs(slopes / slopes_err)
-                self.slopes[bprop], self.slopes_err[bprop] = slopes, slopes_err
+                self.bursts[f'slope_{bprop}'] = np.full(self.n_bursts, np.nan)
+                self.bursts[f'slope_{bprop}_err'] = np.full(self.n_bursts, np.nan)
+
+                for burst in bursts_regress.itertuples():
+                    regress_slice = bursts_regress_full[burst.Index:]
+                    lin = linregress(regress_slice['n'], regress_slice[bprop])
+
+                    self.bursts.loc[burst.Index, f'slope_{bprop}'] = lin[0]
+                    self.bursts.loc[burst.Index, f'slope_{bprop}_err'] = lin[-1]
+
         else:
             self.set_converged_too_few()
             self.printv(f'Too few bursts to do linregress. '
@@ -488,27 +498,6 @@ class BurstRun(object):
         if self.options['exclude_outliers']:
             self.n_regress -= len(self.outliers(unique=True))
 
-    def linregress(self, bprop):
-        """Do linear regression on given bprop for different number of burst discards
-        """
-        n = self.n_regress
-        y = self.bursts[bprop]
-        x = np.arange(len(y))
-
-        if self.options['exclude_outliers']:
-            idxs = np.array(self.outlier_i)
-
-        slope = np.full(n, np.nan)
-        slope_err = np.full(n, np.nan)
-
-        for i in range(n):
-            i0 = self.min_discard + i
-            lin = linregress(x[i0:], y[i0:])
-            slope[i] = lin[0]
-            slope_err[i] = lin[-1]
-
-        return slope, slope_err
-
     def get_discard(self):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
         """
@@ -518,6 +507,7 @@ class BurstRun(object):
 
         zero_slope_i = []
         for bprop in self.regress_bprops:
+            # self.residuals[bprop] = np.abs(slopes / slopes_err)
             zero_slope_i += [self.min_discard + np.where(self.residuals[bprop] < 1)[0]]
 
         valid_discards = reduce(np.intersect1d, zero_slope_i)
