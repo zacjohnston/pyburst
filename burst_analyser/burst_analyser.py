@@ -438,7 +438,7 @@ class BurstRun(object):
             self.n_regress -= self.n_short_wait
 
         if self.options['exclude_outliers']:
-            pass
+            self.n_regress -= len(self.outliers(unique=True))
 
     def linregress(self, bprop):
         """Do linear regression on given bprop for different number of burst discards
