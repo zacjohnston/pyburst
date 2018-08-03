@@ -109,7 +109,7 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
             data['run'] += [run]
             data['num'] += [burstfit.n_bursts]
             data['discard'] += [burstfit.discard]
-            data['converged'] += [bool_map[burstfit.converged]]
+            data['converged'] += [bool_map[burstfit.flags['converged']]]
 
             for bp in bprops:
                 u_bp = f'u_{bp}'
