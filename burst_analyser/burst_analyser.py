@@ -429,10 +429,9 @@ class BurstRun(object):
         mean_dt = np.mean(self.bursts['dt'][1:])
         self.bursts['short_wait'] = self.bursts['dt'] < min_dt_frac * mean_dt
         self.n_short_wait = len(self.short_waits())
-        print('SHORT WAITS', self.n_short_wait)
 
         if self.n_short_wait > 0:
-            self.printv(f'{self.n_short_wait} short-waiting time bursts detected')
+            self.printv(f'{self.n_short_wait} short-wait bursts detected')
             self.flags['short_waits'] = True
 
     def get_fluences(self):
@@ -454,10 +453,12 @@ class BurstRun(object):
             self.printv('Too few bursts to get outliers')
             return
 
-        dt = self.bursts['dt']
-        percentiles = burst_tools.get_quartiles(dt[self.min_discard:])
-        outliers = (dt < percentiles[0]) | (dt > percentiles[-1])
+        clean_dt = self.clean_bursts(exclude_outliers=False)['dt']
+        percentiles = burst_tools.get_quartiles(clean_dt)
+
+        outliers = (self.bursts['dt'] < percentiles[0]) | (self.bursts['dt'] > percentiles[-1])
         outliers[:self.min_discard] = True
+
         self.bursts['outlier'] = outliers
         self.n_outliers = len(self.outliers())
         self.n_outliers_unique = len(self.outliers(unique=True))
