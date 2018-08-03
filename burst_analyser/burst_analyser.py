@@ -6,7 +6,6 @@ import os
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
 from scipy.stats import linregress
-from functools import reduce
 
 # kepler_grids
 from . import burst_tools
@@ -728,12 +727,13 @@ class BurstRun(object):
             self.printv("Can't plot linregress: bursts not converged")
             return
         fig, ax = plt.subplots(3, 1, figsize=(6, 8))
-        x = np.arange(self.n_regress) + self.min_discard
+        bursts = self.clean_bursts(exclude_min_regress=True)
+        x = bursts['n']
         fontsize = 14
 
         for i, bprop in enumerate(self.regress_bprops):
-            y = self.slopes[bprop]
-            y_err = self.slopes_err[bprop]
+            y = bursts[f'slope_{bprop}']
+            y_err = bursts[f'slope_{bprop}_err']
             ax[i].set_ylabel(bprop, fontsize=fontsize)
             ax[i].errorbar(x, y, yerr=y_err, ls='none', marker='o', capsize=3)
             ax[i].plot([0, self.n_bursts], [0, 0], ls='--')

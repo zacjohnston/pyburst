@@ -16,7 +16,7 @@ import time
 from . import burst_analyser
 from . import burst_tools
 from ..grids import grid_tools, grid_strings
-from ..misc.pyprint import printv, print_title
+from ..misc.pyprint import print_title
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
