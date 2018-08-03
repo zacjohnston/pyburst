@@ -84,7 +84,7 @@ def create_batch(batch, dv, source,
                          'accmass': [1e16], 'accdepth': [1e20]},
                  lburn=1, t_end=1.3e5, exclude={}, basename='xrb',
                  walltime=96, qos='general',
-                 check_params=True, nsdump=1000,
+                 check_params=False, nsdump=1000,
                  file_sourcepath='/home/zacpetej/projects/codes/mdot/tmp/',
                  auto_t_end=True, notes='No notes given', debug=False,
                  nbursts=20, parallel=False, ntasks=8, kgrid=None, **kwargs):
