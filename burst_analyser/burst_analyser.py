@@ -120,7 +120,7 @@ class BurstRun(object):
         return self.bursts[self.bursts['outlier']]
 
     def not_outliers(self):
-        return self.bursts[np.invert(self.bursts['short_wait'])]
+        return self.bursts[np.invert(self.bursts['outlier'])]
 
     def load(self):
         """Load luminosity data from kepler simulation
@@ -423,8 +423,6 @@ class BurstRun(object):
 
         if self.options['exclude_outliers']:
             idxs = np.array(self.outlier_i)
-            if bprop == 'dt':
-                idxs -= 1
 
             x = np.delete(x, idxs)
             y = np.delete(y, idxs)
