@@ -134,29 +134,13 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
             f.write(table_str)
 
 
-def check_n_bursts(batches, source, kgrid):
-    """Compares n_bursts detected with kepler_analyser against burstfit_1808
+def extract_runs(runs, batch, source):
+    """Do burst analysis on run(s) from a single batch and save results
     """
-    mismatch = np.zeros(4)
-    filename = f'mismatch_{source}_{batches[0]}-{batches[-1]}.txt'
-    filepath = os.path.join(GRIDS_PATH, filename)
+    runs = grid_tools.ensure_np_list(runs)
 
-    for batch in batches:
-        summ = kgrid.get_summ(batch)
-        n_runs = len(summ)
-
-        for i in range(n_runs):
-            run = i + 1
-            n_bursts1 = summ.iloc[i]['num']
-            sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
-
-            burstfit = burst_analyser.BurstRun(run, batch, source, verbose=False)
-            burstfit.analyse()
-            n_bursts2 = burstfit.n_bursts
-
-            if n_bursts1 != n_bursts2:
-                m_new = np.array((batch, run, n_bursts1, n_bursts2))
-                mismatch = np.vstack((mismatch, m_new))
-
-        np.savetxt(filepath, mismatch)
-    return mismatch
+    for run in runs:
+        print_title(f'Run {run}')
+        model = burst_analyser.BurstRun(run, batch, source, analyse=True)
+        model.save_burst_table()
+        model.save_summary_table()
