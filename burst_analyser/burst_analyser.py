@@ -711,21 +711,43 @@ class BurstRun(object):
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
-    def plot_linregress(self, display=True, save=False):
+    def plot_linregress(self, display=True, save=False, short_waits=True,
+                        outliers=True):
         if self.flags['regress_too_few_bursts']:
             self.printv("Can't plot linregress: bursts not converged")
             return
         fig, ax = plt.subplots(3, 1, figsize=(6, 8))
-        bursts = self.clean_bursts(exclude_min_regress=True)
-        x = bursts['n']
+        markersize = 8
+        markeredgecolor = '0'
         fontsize = 14
 
+        bursts_clean = self.clean_bursts(exclude_min_regress=True)
+        bursts_outliers = self.outliers()
+        bursts_short_waits = self.short_waits()
+        x = bursts_clean['n']
+
         for i, bprop in enumerate(self.regress_bprops):
-            y = bursts[f'slope_{bprop}']
-            y_err = bursts[f'slope_{bprop}_err']
+            ax[i].plot([0, self.n_bursts], [0, 0], ls='--', c='0', markersize=markersize)
+            y = bursts_clean[f'slope_{bprop}']
+            y_err = bursts_clean[f'slope_{bprop}_err']
             ax[i].set_ylabel(bprop, fontsize=fontsize)
-            ax[i].errorbar(x, y, yerr=y_err, ls='none', marker='o', capsize=3)
-            ax[i].plot([0, self.n_bursts], [0, 0], ls='--')
+
+            if outliers:
+                x_outliers = np.array(bursts_outliers['n'])
+                ax[i].plot(x_outliers, np.zeros_like(x_outliers),
+                           c=self.plot_colours['outliers'], marker='o', ls='none',
+                           markeredgecolor=markeredgecolor, markersize=markersize,
+                           label='Outliers')
+
+            if short_waits:
+                x_short = np.array(bursts_short_waits['n'])
+                ax[i].plot(x_short, np.zeros_like(x_short),
+                           c=self.plot_colours['short_waits'], marker='o', ls='none',
+                           markeredgecolor=markeredgecolor, markersize=markersize)
+
+            ax[i].errorbar(x, y, yerr=y_err,
+                           c=self.plot_colours['bursts'], ls='none', marker='o', capsize=3,
+                           markersize=markersize, markeredgecolor=markeredgecolor)
 
         ax[-1].set_xlabel('Discarded bursts', fontsize=fontsize)
         ax[0].set_title(self.model_str)
