@@ -553,8 +553,8 @@ class BurstRun(object):
 
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
-             short_wait=False, shocks=False, fontsize=14, title=True,
-             outliers=False, show_all=False):
+             short_wait=True, shocks=False, fontsize=14, title=True,
+             outliers=True, show_all=False):
         """Plots overall model lightcurve, with detected bursts
         """
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
