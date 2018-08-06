@@ -57,6 +57,14 @@ class BurstRun(object):
                         'exclude_outliers': exclude_outliers,
                         'exclude_short_wait': exclude_short_wait,
                         }
+
+        self.plot_colours = {'bursts': 'C1',
+                             'candidates': 'C4',
+                             'outliers': 'C9',
+                             'short_waits': 'C4',
+                             'burst_stages': 'C2',
+                             'shocks': 'C3',
+                             }
         self.run = run
         self.batch = batch
         self.source = source
@@ -586,35 +594,36 @@ class BurstRun(object):
         if candidates:  # NOTE: candidates may be modified if a shock was removed
             x = self.candidates[:, 0] / timescale
             y = self.candidates[:, 1] / yscale
-            ax.plot(x, y, marker='o', c='C4', ls='none', label='Candidates',
-                    markersize=markersize, markeredgecolor=markeredgecolor)
+            ax.plot(x, y, marker='o', c=self.plot_colours['candidates'], ls='none',
+                    markersize=markersize, markeredgecolor=markeredgecolor, label='Candidates')
 
         if peaks:
-            ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
-                    label='Bursts', markeredgecolor=markeredgecolor, markersize=markersize)
+            ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', ls='none',
+                    label='Bursts', markeredgecolor=markeredgecolor, markersize=markersize,
+                    c=self.plot_colours['bursts'])
 
         if outliers:
             bursts = self.outliers()
             x = bursts['t_peak'] / timescale
             y = bursts['peak'] / yscale
-            ax.plot(x, y, marker='o', c='C9', ls='none', label='Outliers',
-                    markeredgecolor=markeredgecolor, markersize=markersize)
+            ax.plot(x, y, marker='o', c=self.plot_colours['outliers'], ls='none',
+                    markeredgecolor=markeredgecolor, markersize=markersize, label='Outliers')
 
         if short_wait:
             if self.flags['short_waits']:
                 bursts = self.short_waits()
                 x = bursts['t_peak'] / timescale
                 y = bursts['peak'] / yscale
-                ax.plot(x, y, marker='o', c='C4', ls='none', label='Short-wait',
-                        markersize=markersize, markeredgecolor=markeredgecolor)
+                ax.plot(x, y, marker='o', c=self.plot_colours['short_waits'], ls='none',
+                        markersize=markersize, markeredgecolor=markeredgecolor, label='Short-wait')
 
         if burst_stages:
             for stage in ('pre', 'start', 'end'):
                 x = self.bursts[f't_{stage}'] / timescale
                 y = self.bursts[f'lum_{stage}'] / yscale
                 label = {'pre': 'Burst stages'}.get(stage, None)
-                ax.plot(x, y, marker='o', c='C2', ls='none', label=label,
-                        markersize=markersize, markeredgecolor=markeredgecolor)
+                ax.plot(x, y, marker='o', c=self.plot_colours['burst_stages'], ls='none',
+                        markersize=markersize, markeredgecolor=markeredgecolor, label=label)
 
         if shocks:  # plot shocks that were removed
             for i, shock in enumerate(self.shocks):
@@ -623,7 +632,8 @@ class BurstRun(object):
 
                 shock_slice = self.lum[idx-1:idx+2, :]
                 shock_slice[1, 1] = shock_lum
-                ax.plot(shock_slice[:, 0]/timescale, shock_slice[:, 1]/yscale, c='C3',
+                ax.plot(shock_slice[:, 0]/timescale, shock_slice[:, 1]/yscale,
+                        c=self.plot_colours['shocks'],
                         label='shocks' if (i == 0) else '_nolegend_')
 
         if legend:
@@ -670,25 +680,29 @@ class BurstRun(object):
                 bslice = bursts_discard.loc[:burst.Index][bprop]
                 mean = np.mean(bslice)
                 std = np.std(bslice)
-                ax[i].errorbar(burst.Index, mean/y_scale, yerr=std/y_scale, ls='none',
-                               marker='o', c='C0', capsize=3, markersize=markersize,
-                               markeredgecolor=markeredgecolor,
+                ax[i].errorbar(burst.Index, mean/y_scale, yerr=std/y_scale,
+                               marker='o', c='C0', capsize=3, ls='none',
+                               markersize=markersize, markeredgecolor=markeredgecolor,
                                label='cumulative mean' if burst.Index == bursts_discard.index[0] else '_nolegend_')
 
             self.printv(f'{bprop}: mean={mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
 
             if outliers:
                 ax[i].plot(bursts_outliers['n'], bursts_outliers[bprop] / y_scale,
-                           marker='o', c='C9', ls='none', markersize=markersize,
-                           markeredgecolor=markeredgecolor, label='Short waits')
+                           marker='o', c=self.plot_colours['outliers'], ls='none',
+                           markersize=markersize, markeredgecolor=markeredgecolor,
+                           label='Short waits')
 
             if short_waits:
                 ax[i].plot(bursts_short_waits['n'], bursts_short_waits[bprop] / y_scale,
-                           marker='o', c='C4', ls='none', markersize=markersize,
-                           markeredgecolor=markeredgecolor, label='Short waits')
+                           marker='o', c=self.plot_colours['short_waits'], ls='none',
+                           markersize=markersize, markeredgecolor=markeredgecolor,
+                           label='Short waits')
 
-            ax[i].plot(bursts['n'], bursts[bprop] / y_scale, marker='o', label='Bursts',
-                       markersize=markersize, c='C1', ls='none', markeredgecolor=markeredgecolor)
+            ax[i].plot(bursts['n'], bursts[bprop] / y_scale,
+                       marker='o', c=self.plot_colours['bursts'], ls='none',
+                       markersize=markersize, markeredgecolor=markeredgecolor,
+                       label='Bursts')
         if legend:
             ax[0].legend(loc=1)
 
