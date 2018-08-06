@@ -35,7 +35,7 @@ class NoBursts(Exception):
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, save_lum=True, analyse=True, plot=False,
-                 min_regress=20, min_discard=1, exclude_outliers=False,
+                 min_regress=20, min_discard=1, exclude_outliers=True,
                  exclude_short_wait=True):
         # min_regress : int
         #   minimum number of bursts to use in linear regression (self.linregress)
