@@ -1,4 +1,6 @@
 import numpy as np
+import os
+import sys
 import matplotlib.pyplot as plt
 import chainconsumer
 
@@ -6,6 +8,10 @@ import ctools
 from pygrids.grids import grid_analyser
 from pygrids.mcmc import mcmc_tools, burstfit
 from pygrids.physics import gparams
+from pygrids.burst_analyser import burst_analyser
+
+GRIDS_PATH = os.environ['KEPLER_GRIDS']
+MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
 def compare_lc(burst, point, batches=[19, 1, 1], runs=[10, 20, 12]):
@@ -87,3 +93,31 @@ def plot_posteriors(chain=None, discard=10000):
 
     plt.tight_layout()
     return fig
+
+
+def check_n_bursts(batches, source, kgrid):
+    """Compares n_bursts detected with kepler_analyser against burstfit_1808
+    """
+    mismatch = np.zeros(4)
+    filename = f'mismatch_{source}_{batches[0]}-{batches[-1]}.txt'
+    filepath = os.path.join(GRIDS_PATH, filename)
+
+    for batch in batches:
+        summ = kgrid.get_summ(batch)
+        n_runs = len(summ)
+
+        for i in range(n_runs):
+            run = i + 1
+            n_bursts1 = summ.iloc[i]['num']
+            sys.stdout.write(f'\r{source}_{batch} xrb{run:02}')
+
+            model = burst_analyser.BurstRun(run, batch, source, verbose=False)
+            model.analyse()
+            n_bursts2 = model.n_bursts
+
+            if n_bursts1 != n_bursts2:
+                m_new = np.array((batch, run, n_bursts1, n_bursts2))
+                mismatch = np.vstack((mismatch, m_new))
+
+        np.savetxt(filepath, mismatch)
+    return mismatch
