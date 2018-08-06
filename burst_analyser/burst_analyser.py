@@ -712,7 +712,7 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
     def plot_linregress(self, display=True, save=False, short_waits=True,
-                        outliers=True):
+                        outliers=True, legend=False):
         if self.flags['regress_too_few_bursts']:
             self.printv("Can't plot linregress: bursts not converged")
             return
@@ -743,14 +743,18 @@ class BurstRun(object):
                 x_short = np.array(bursts_short_waits['n'])
                 ax[i].plot(x_short, np.zeros_like(x_short),
                            c=self.plot_colours['short_waits'], marker='o', ls='none',
-                           markeredgecolor=markeredgecolor, markersize=markersize)
+                           markeredgecolor=markeredgecolor, markersize=markersize,
+                           label='Short waits')
 
             ax[i].errorbar(x, y, yerr=y_err,
                            c=self.plot_colours['bursts'], ls='none', marker='o', capsize=3,
-                           markersize=markersize, markeredgecolor=markeredgecolor)
+                           markersize=markersize, markeredgecolor=markeredgecolor,
+                           label='Slopes')
 
         ax[-1].set_xlabel('Discarded bursts', fontsize=fontsize)
         ax[0].set_title(self.model_str)
+        if legend:
+            ax[0].legend()
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='linregress')
 
