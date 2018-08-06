@@ -542,7 +542,6 @@ class BurstRun(object):
              outliers=False, show_all=False):
         """Plots overall model lightcurve, with detected bursts
         """
-        self.ensure_analysed_is(True)
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
         time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
         markersize = 10
@@ -571,6 +570,11 @@ class BurstRun(object):
             yscale = 1e38
 
         ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='black')
+
+        if not self.flags['analysed']:
+            self.print_warn('Model not analysed. Only plotting raw lightcurve')
+            self.show_save_fig(fig, display=display, save=save, plot_name='model')
+            return
 
         if candidates:  # NOTE: candidates may be modified if a shock was removed
             x = self.candidates[:, 0] / timescale
