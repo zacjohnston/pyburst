@@ -23,7 +23,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
 def run_analysis(batches, source, copy_params=True, reload=True, multithread=True,
-                 analyse=True, collect=True, verbose=True):
+                 analyse=True, collect=True):
     """Run sequential analysis steps for burst models
     """
     # TODO: multithread by runs (for large batches)
