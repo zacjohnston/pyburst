@@ -537,9 +537,9 @@ class BurstRun(object):
             self.summary['std_rate'] = sec_day * self.summary['std_dt'] / self.summary['mean_dt']**2
 
     def plot(self, peaks=True, display=True, save=False, log=True,
-                   burst_stages=False, candidates=False, legend=False, time_unit='h',
-                   short_wait=False, shocks=False, fontsize=14, title=True,
-                   show_all=False):
+             burst_stages=False, candidates=False, legend=False, time_unit='h',
+             short_wait=False, shocks=False, fontsize=14, title=True,
+             outliers=False, show_all=False):
         """Plots overall model lightcurve, with detected bursts
         """
         self.ensure_analysed_is(True)
@@ -554,6 +554,7 @@ class BurstRun(object):
             candidates = True
             short_wait = True
             shocks = True
+            outliers = True
 
         if title:
             ax.set_title(self.model_str)
@@ -577,6 +578,12 @@ class BurstRun(object):
         if peaks:
             ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
                     label='Bursts')
+
+        if outliers:
+            bursts = self.outliers()
+            x = bursts['t_peak'] / timescale
+            y = bursts['peak'] / yscale
+            ax.plot(x, y, marker='o', c='C6', ls='none', label='Outliers')
 
         if short_wait:
             if self.flags['short_waits']:
