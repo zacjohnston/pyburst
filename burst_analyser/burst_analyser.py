@@ -89,9 +89,10 @@ class BurstRun(object):
         self.new_lum = None
         self.load()
 
+        self.summary = {}
+        self.summary_table = pd.DataFrame()
         self.bursts = pd.DataFrame()
         self.candidates = None
-        self.summary = {}
         self.n_bursts = None
         self.n_short_wait = None
         self.n_outliers = None
@@ -130,8 +131,27 @@ class BurstRun(object):
         self.identify_outliers()
         self.get_bprop_slopes()
         self.discard = self.get_discard()
-        self.get_means()
+        self.setup_summary()
         self.flags['analysed'] = True
+
+    def setup_summary(self):
+        """Collects remaining model properties into dictionary
+        """
+        self.summary['batch'] = self.batch
+        self.summary['run'] = self.run
+        self.summary['num'] = self.n_bursts
+        self.summary['burn_in'] = self.discard
+        self.summary['converged'] = self.flags['converged']
+        self.summary['short_waits'] = self.flags['short_waits']
+        self.summary['outliers'] = self.flags['outliers']
+        self.summary['n_outliers'] = self.n_outliers_unique
+        self.summary['n_short_waits'] = self.n_short_wait
+        self.get_means()
+
+    def save_summary_table(self):
+        """Saves table of model summary to file
+        """
+        pass
 
     def save_burst_table(self):
         """Saves table of burst properties to file
@@ -146,7 +166,6 @@ class BurstRun(object):
 
         with open(filepath, 'w') as f:
             f.write(table_str)
-
 
     def ensure_analysed_is(self, analysed):
         """Checks that model has (or hasn't) been analysed
@@ -222,11 +241,6 @@ class BurstRun(object):
 
     def not_outliers(self):
         return self.bursts[np.invert(self.bursts['outlier'])]
-
-    def regress_bursts(self):
-        """Return subset of self.bursts to use for linregress
-        """
-        pass
 
     def set_converged_too_few(self):
         self.flags['converged'] = False
@@ -503,6 +517,10 @@ class BurstRun(object):
         self.n_outliers = len(self.outliers())
         self.n_outliers_unique = len(self.outliers(unique=True))
 
+        if self.n_outliers_unique > 0:
+            self.printv(f'{self.n_outliers_unique} additional outliers identified')
+            self.flags['outliers'] = True
+
     def get_bprop_slopes(self):
         """Calculate slopes for properties as the burst sequence progresses
         """
@@ -559,18 +577,20 @@ class BurstRun(object):
 
         if self.flags['too_few_bursts']:
             self.printv("Too few bursts to get average properties")
+            self.summary['n_used'] = np.nan
             for bprop in (self.bprops + ['rate']):
-                self.summary[f'mean_{bprop}'] = np.nan
-                self.summary[f'std_{bprop}'] = np.nan
+                self.summary[bprop] = np.nan
+                self.summary[f'u_{bprop}'] = np.nan
         else:
             bursts = self.clean_bursts(exclude_discard=True)
+            self.summary['n_used'] = len(bursts)
             for bprop in self.bprops:
                 values = bursts[bprop]
-                self.summary[f'mean_{bprop}'] = np.mean(values)
-                self.summary[f'std_{bprop}'] = np.std(values)
+                self.summary[bprop] = np.mean(values)
+                self.summary[f'u_{bprop}'] = np.std(values)
 
-            self.summary['mean_rate'] = sec_day / self.summary['mean_dt']  # burst rate (per day)
-            self.summary['std_rate'] = sec_day * self.summary['std_dt'] / self.summary['mean_dt']**2
+            self.summary['rate'] = sec_day / self.summary['dt']  # burst rate (per day)
+            self.summary['u_rate'] = sec_day * self.summary['u_dt'] / self.summary['dt']**2
 
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
