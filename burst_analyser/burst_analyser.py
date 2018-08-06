@@ -65,6 +65,12 @@ class BurstRun(object):
                              'burst_stages': 'C2',
                              'shocks': 'C3',
                              }
+
+        self.burst_cols = ['n', 'dt', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
+                           't_pre', 't_pre_i', 'lum_pre', 't_start', 't_start_i',
+                           'lum_start', 't_end', 't_end_i', 'lum_end', 'slope_dt',
+                           'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
+                           'slope_peak', 'slope_peak_err', 'short_wait', 'outlier', ]
         self.run = run
         self.batch = batch
         self.source = source
@@ -74,8 +80,8 @@ class BurstRun(object):
         self.model_str = grid_strings.get_model_string(run, batch, source)
 
         self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
-        self.analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
         self.source_path = grid_strings.get_source_path(source)
+        self.analysis_path = os.path.join(self.source_path, 'burst_analysis', self.batch_str)
         self.plots_path = grid_strings.get_source_subdir(source, 'plots')
 
         self.lum = None
@@ -126,6 +132,21 @@ class BurstRun(object):
         self.discard = self.get_discard()
         self.get_means()
         self.flags['analysed'] = True
+
+    def save_burst_table(self):
+        """Saves table of burst properties to file
+        """
+        # TODO: set non-existent columns to nans
+        self.ensure_analysed_is(True)
+        filename = f'bursts_{self.model_str}.txt'
+        filepath = os.path.join(self.analysis_path, 'output', filename)
+
+        table = self.bursts[self.burst_cols]
+        table_str = table.to_string(index=False, justify='left')
+
+        with open(filepath, 'w') as f:
+            f.write(table_str)
+
 
     def ensure_analysed_is(self, analysed):
         """Checks that model has (or hasn't) been analysed
