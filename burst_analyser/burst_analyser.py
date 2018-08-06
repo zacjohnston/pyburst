@@ -429,10 +429,16 @@ class BurstRun(object):
 
     def identify_short_wait_bursts(self):
         """Identify bursts which have unusually short recurrence times
+            Here defined as less than 'min_dt_frac' of the following burst
         """
         min_dt_frac = 0.5
-        mean_dt = np.mean(self.bursts['dt'][1:])
-        self.bursts['short_wait'] = self.bursts['dt'] < min_dt_frac * mean_dt
+        # TODO: check if enough bursts to do following operation
+        dt_0 = np.array(self.bursts.iloc[1:-1]['dt'])
+        dt_1 = np.array(self.bursts.iloc[2:]['dt'])
+        short_wait = dt_0 < (min_dt_frac * dt_1)
+
+        self.bursts['short_wait'] = np.full(self.n_bursts, False)
+        self.bursts.loc[1:self.bursts.index[-2], 'short_wait'] = short_wait
         self.n_short_wait = len(self.short_waits())
 
         if self.n_short_wait > 0:
