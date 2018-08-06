@@ -410,8 +410,8 @@ class BurstRun(object):
                     self.delete_burst(burst.Index)
                     continue
                 else:
-                    raise RuntimeError(f'Failed to find end of burst {burst.Index + 1} '
-                                       + f'(t={peak_t:.0f} s)')
+                    raise RuntimeError(f'Failed to find end of burst {burst.Index + 1}, '
+                                       + f't={peak_t:.0f} s ({peak_t/3600:.1f} hr)')
             else:
                 end_i = np.min(intersection)
                 t_end = lum_slice[end_i, 0]
