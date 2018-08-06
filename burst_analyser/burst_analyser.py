@@ -807,4 +807,3 @@ class BurstRun(object):
             plt.show(block=False)
         else:
             plt.close(fig)
-

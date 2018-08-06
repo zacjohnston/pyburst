@@ -118,7 +118,7 @@ def extract_bursts(batches, source, plot_model=True, plot_convergence=True,
 
             if not burstfit.flags['too_few_bursts']:
                 if plot_model:
-                    burstfit.plot(display=False, save=True)
+                    burstfit.plot(short_wait=True, outliers=True, display=False, save=True)
                 if plot_convergence:
                     burstfit.plot_convergence(display=False, save=True)
 
