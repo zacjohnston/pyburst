@@ -126,6 +126,7 @@ def multi_save(table, source, basename='xrb'):
     dt = t1 - t0
     print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
+
 def combine_extracts(batches, source):
     """Combines extracted burst property summary tables
     """

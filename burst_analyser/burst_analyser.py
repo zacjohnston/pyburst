@@ -536,68 +536,6 @@ class BurstRun(object):
             self.summary['mean_rate'] = sec_day / self.summary['mean_dt']  # burst rate (per day)
             self.summary['std_rate'] = sec_day * self.summary['std_dt'] / self.summary['mean_dt']**2
 
-    def show_save_fig(self, fig, display, save, plot_name,
-                      path=None, extra='', extension='png'):
-        """Displays and/or Saves given figure
-
-        parameters
-        ----------
-        fig : plt.Figure object
-        display : bool
-        save : bool
-            save the figure to file (to fold in checking from other functions)
-        plot_name : str
-            type of plot being saved
-        path : str (optional)
-            path of diretcory to save to.
-            If not provided, assumes there exists a folder [source]/plots/[plot_name]
-        extra : str (optional)
-            optional string to attach to filename
-        extension : str (optional)
-        """
-
-        if save:
-            filename = f'{plot_name}_{self.model_str}{extra}.{extension}'
-
-            if path is None:
-                path = os.path.join(self.source_path, 'plots', plot_name)
-            filepath = os.path.join(path, filename)
-
-            self.printv(f'Saving figure: {filepath}')
-            grid_tools.try_mkdir(path, skip=True)
-            fig.savefig(filepath)
-
-        if display:
-            plt.show(block=False)
-        else:
-            plt.close(fig)
-
-    def save_burst_lightcurves(self, path=None):
-        """Saves burst lightcurves to txt files. Excludes 'pre' bursts
-        """
-        self.ensure_analysed_is(True)
-        if path is None:  # default to model directory
-            path = self.batch_models_path
-
-        for i in range(self.n_bursts):
-            bnum = i + 1
-
-            i_start = self.bursts['t_pre_i'][i]
-            i_zero = self.bursts['t_start_i'][i]
-            i_end = self.bursts['t_end_i'][i]
-
-            t = self.lum[i_start:i_end, 0] - self.lum[i_zero, 0]
-            lum = self.lum[i_start:i_end, 1]
-            uncertainty = 0.02
-            u_lum = lum * uncertainty
-
-            lightcurve = np.array([t, lum, u_lum]).transpose()
-            header = 'time luminosity u_luminosity'
-            b_file = f'b{bnum}.txt'
-            filepath = os.path.join(path, b_file)
-
-            np.savetxt(filepath, lightcurve, header=header)
-
     def plot(self, peaks=True, display=True, save=False, log=True,
                    burst_stages=False, candidates=False, legend=False, time_unit='h',
                    short_wait=False, shocks=False, fontsize=14, title=True,
@@ -739,6 +677,32 @@ class BurstRun(object):
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='linregress')
 
+    def save_burst_lightcurves(self, path=None):
+        """Saves burst lightcurves to txt files. Excludes 'pre' bursts
+        """
+        self.ensure_analysed_is(True)
+        if path is None:  # default to model directory
+            path = self.batch_models_path
+
+        for i in range(self.n_bursts):
+            bnum = i + 1
+
+            i_start = self.bursts['t_pre_i'][i]
+            i_zero = self.bursts['t_start_i'][i]
+            i_end = self.bursts['t_end_i'][i]
+
+            t = self.lum[i_start:i_end, 0] - self.lum[i_zero, 0]
+            lum = self.lum[i_start:i_end, 1]
+            uncertainty = 0.02
+            u_lum = lum * uncertainty
+
+            lightcurve = np.array([t, lum, u_lum]).transpose()
+            header = 'time luminosity u_luminosity'
+            b_file = f'b{bnum}.txt'
+            filepath = os.path.join(path, b_file)
+
+            np.savetxt(filepath, lightcurve, header=header)
+
     def plot_lightcurves(self, bursts, save=False, display=True, log=False,
                          zero_time=True, fontsize=14):
         """Plot individual burst lightcurve
@@ -801,4 +765,39 @@ class BurstRun(object):
         for burst in range(self.n_bursts):
             self.plot_lightcurves(burst, save=True, display=False, **kwargs)
 
+    def show_save_fig(self, fig, display, save, plot_name,
+                      path=None, extra='', extension='png'):
+        """Displays and/or Saves given figure
+
+        parameters
+        ----------
+        fig : plt.Figure object
+        display : bool
+        save : bool
+            save the figure to file (to fold in checking from other functions)
+        plot_name : str
+            type of plot being saved
+        path : str (optional)
+            path of diretcory to save to.
+            If not provided, assumes there exists a folder [source]/plots/[plot_name]
+        extra : str (optional)
+            optional string to attach to filename
+        extension : str (optional)
+        """
+
+        if save:
+            filename = f'{plot_name}_{self.model_str}{extra}.{extension}'
+
+            if path is None:
+                path = os.path.join(self.source_path, 'plots', plot_name)
+            filepath = os.path.join(path, filename)
+
+            self.printv(f'Saving figure: {filepath}')
+            grid_tools.try_mkdir(path, skip=True)
+            fig.savefig(filepath)
+
+        if display:
+            plt.show(block=False)
+        else:
+            plt.close(fig)
 
