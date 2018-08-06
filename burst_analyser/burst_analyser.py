@@ -365,7 +365,8 @@ class BurstRun(object):
             rise_steps = burst.t_peak_i - burst.t_pre_i
             if (rise_steps < 50
                     or burst.peak / burst.lum_pre < peak_frac):
-                self.printv(f"Removing micro-burst (t={burst.t_peak:.0f} s)")
+                self.printv(f'Removing micro-burst at t={burst.t_peak:.0f} s '
+                            + f'({burst.t_peak/3600:.1f} hr)')
                 self.delete_burst(burst.Index)
                 continue
 
@@ -405,7 +406,7 @@ class BurstRun(object):
             intersection = list(set(thresh_i).intersection(min_length_i))
 
             if len(intersection) == 0:
-                if burst.Index == (self.n_bursts - 1):
+                if burst.Index == self.bursts.index[-1]:
                     self.printv('File ends during burst. Discarding final burst')
                     self.delete_burst(burst.Index)
                     continue
