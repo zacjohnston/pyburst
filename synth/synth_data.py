@@ -90,7 +90,7 @@ def write_summary(table, source):
     cols = ['series', 'epoch', 'dt', 'u_dt', 'fper', 'u_fper',
             'fluence', 'u_fluence', 'peak', 'u_peak', 'bol']
     table_out = table[cols]
-    table_str = table_out.to_string(index=False, justify='left', col_space=12)
+    table_str = table_out.to_string(index=False, justify='left')
 
     path = grid_strings.get_obs_data_path(source)
     filename = grid_strings.get_source_filename(source, prefix='summary', extension='.txt')

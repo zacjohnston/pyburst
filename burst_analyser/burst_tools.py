@@ -140,7 +140,7 @@ def combine_extracts(batches, source):
         big_table = pd.concat((big_table, batch_table), ignore_index=True)
 
     big_table = big_table[col_order]
-    table_str = big_table.to_string(index=False, justify='left', col_space=12)
+    table_str = big_table.to_string(index=False, justify='left')
 
     filename = f'burst_analysis_{source}.txt'
     filepath = os.path.join(source_path, 'burst_analysis', filename)
@@ -198,8 +198,7 @@ def add_burst_rate(batches, source):
         batch_table['rate'] = rate
         batch_table['u_rate'] = u_rate
 
-        table_str = batch_table.to_string(index=False, justify='left',
-                                          col_space=12)
+        table_str = batch_table.to_string(index=False, justify='left')
         print(f'Saving: {filepath}')
         with open(filepath, 'w') as f:
             f.write(table_str)

@@ -407,8 +407,7 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
     ptable = pd.DataFrame(p)
     ptable = ptable[col_order]  # Fix column order
 
-    table_str = ptable.to_string(index=False, justify='left', col_space=8,
-                                 formatters=FORMATTERS)
+    table_str = ptable.to_string(index=False, justify='left', formatters=FORMATTERS)
 
     filepath = os.path.join(path, filename)
     with open(filepath, 'w') as f:

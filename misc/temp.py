@@ -97,7 +97,7 @@ def save_table(table, table_name, run, batch, source='biggrid2', basename='xrb',
     filepath = os.path.join(run_path, filename)
     print(f'Saving: {filepath}')
 
-    table_str = table.to_string(index=False, justify='left', col_space=12)
+    table_str = table.to_string(index=False, justify='left')
     with open(filepath, 'w') as f:
         f.write(table_str)
 

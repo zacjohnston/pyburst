@@ -297,8 +297,7 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
 
     # ===== Ensure column order =====
     table_out = table_out[cols]
-    table_str = table_out.to_string(index=False, justify='left', formatters=FORMATTERS,
-                                    col_space=8)
+    table_str = table_out.to_string(index=False, justify='left', formatters=FORMATTERS)
 
     filename = grid_strings.get_source_filename(source, table_basename, extension='.txt')
     filepath = os.path.join(table_path, filename)
