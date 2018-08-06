@@ -545,6 +545,8 @@ class BurstRun(object):
         self.ensure_analysed_is(True)
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
         time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
+        markersize = 10
+        markeredgecolor = '0'
 
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.set_xlabel(f'Time ({time_label})', fontsize=fontsize)
@@ -573,31 +575,35 @@ class BurstRun(object):
         if candidates:  # NOTE: candidates may be modified if a shock was removed
             x = self.candidates[:, 0] / timescale
             y = self.candidates[:, 1] / yscale
-            ax.plot(x, y, marker='o', c='C4', ls='none', label='Candidates')
+            ax.plot(x, y, marker='o', c='C4', ls='none', label='Candidates',
+                    markersize=markersize, markeredgecolor=markeredgecolor)
 
         if peaks:
             ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', c='C1', ls='none',
-                    label='Bursts')
+                    label='Bursts', markeredgecolor=markeredgecolor, markersize=markersize)
 
         if outliers:
             bursts = self.outliers()
             x = bursts['t_peak'] / timescale
             y = bursts['peak'] / yscale
-            ax.plot(x, y, marker='o', c='C6', ls='none', label='Outliers')
+            ax.plot(x, y, marker='o', c='C9', ls='none', label='Outliers',
+                    markeredgecolor=markeredgecolor, markersize=markersize)
 
         if short_wait:
             if self.flags['short_waits']:
                 bursts = self.short_waits()
                 x = bursts['t_peak'] / timescale
                 y = bursts['peak'] / yscale
-                ax.plot(x, y, marker='o', c='C0', ls='none', label='Short-wait')
+                ax.plot(x, y, marker='o', c='C0', ls='none', label='Short-wait',
+                        markersize=markersize, markeredgecolor=markeredgecolor)
 
         if burst_stages:
             for stage in ('pre', 'start', 'end'):
                 x = self.bursts[f't_{stage}'] / timescale
                 y = self.bursts[f'lum_{stage}'] / yscale
                 label = {'pre': 'Burst stages'}.get(stage, None)
-                ax.plot(x, y, marker='o', c='C2', ls='none', label=label)
+                ax.plot(x, y, marker='o', c='C2', ls='none', label=label,
+                        markersize=markersize, markeredgecolor=markeredgecolor)
 
         if shocks:  # plot shocks that were removed
             for i, shock in enumerate(self.shocks):
@@ -610,7 +616,7 @@ class BurstRun(object):
                         label='shocks' if (i == 0) else '_nolegend_')
 
         if legend:
-            ax.legend(loc=4)
+            ax.legend(loc=1, framealpha=1, edgecolor='0')
         self.show_save_fig(fig, display=display, save=save, plot_name='model')
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=None,
