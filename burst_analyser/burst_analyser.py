@@ -605,7 +605,7 @@ class BurstRun(object):
                 bursts = self.short_waits()
                 x = bursts['t_peak'] / timescale
                 y = bursts['peak'] / yscale
-                ax.plot(x, y, marker='o', c='C0', ls='none', label='Short-wait',
+                ax.plot(x, y, marker='o', c='C4', ls='none', label='Short-wait',
                         markersize=markersize, markeredgecolor=markeredgecolor)
 
         if burst_stages:
@@ -631,10 +631,13 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='model')
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=None,
-                         legend=False, display=True, save=False, fix_xticks=False):
+                         legend=False, display=True, save=False, fix_xticks=False,
+                         short_waits=False, outliers=False):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
+        markersize = 8
+        markeredgecolor = '0'
         if discard is None:
             discard = self.discard
 
@@ -650,6 +653,8 @@ class BurstRun(object):
         fig, ax = plt.subplots(3, 1, figsize=(6, 8))
         bursts = self.clean_bursts()
         bursts_discard = self.clean_bursts(exclude_discard=True)
+        bursts_short_waits = self.short_waits()
+        bursts_outliers = self.outliers()
 
         for i, bprop in enumerate(bprops):
             y_unit = y_units.get(bprop)
@@ -666,12 +671,24 @@ class BurstRun(object):
                 mean = np.mean(bslice)
                 std = np.std(bslice)
                 ax[i].errorbar(burst.Index, mean/y_scale, yerr=std/y_scale, ls='none',
-                               marker='o', c='C0', capsize=3,
+                               marker='o', c='C0', capsize=3, markersize=markersize,
+                               markeredgecolor=markeredgecolor,
                                label='cumulative mean' if burst.Index == bursts_discard.index[0] else '_nolegend_')
 
             self.printv(f'{bprop}: mean={mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
-            ax[i].plot(bursts['n'], bursts[bprop] / y_scale, marker='o',
-                       c='C1', ls='none', label='Bursts')
+
+            if outliers:
+                ax[i].plot(bursts_outliers['n'], bursts_outliers[bprop] / y_scale,
+                           marker='o', c='C9', ls='none', markersize=markersize,
+                           markeredgecolor=markeredgecolor, label='Short waits')
+
+            if short_waits:
+                ax[i].plot(bursts_short_waits['n'], bursts_short_waits[bprop] / y_scale,
+                           marker='o', c='C4', ls='none', markersize=markersize,
+                           markeredgecolor=markeredgecolor, label='Short waits')
+
+            ax[i].plot(bursts['n'], bursts[bprop] / y_scale, marker='o', label='Bursts',
+                       markersize=markersize, c='C1', ls='none', markeredgecolor=markeredgecolor)
         if legend:
             ax[0].legend(loc=1)
 
