@@ -90,7 +90,6 @@ class BurstRun(object):
         self.load()
 
         self.summary = {}
-        self.summary_table = pd.DataFrame()
         self.bursts = pd.DataFrame()
         self.candidates = None
         self.n_bursts = None
@@ -151,7 +150,16 @@ class BurstRun(object):
     def save_summary_table(self):
         """Saves table of model summary to file
         """
-        pass
+        self.ensure_analysed_is(True)
+        table = pd.DataFrame()
+        for col in self.summary:
+            table[col] = [self.summary[col]]
+
+        filename = f'summary_{self.model_str}.txt'
+        filepath = os.path.join(self.analysis_path, 'output', filename)
+        table_str = table.to_string(index=False, justify='left')
+        with open(filepath, 'w') as f:
+            f.write(table_str)
 
     def save_burst_table(self):
         """Saves table of burst properties to file
