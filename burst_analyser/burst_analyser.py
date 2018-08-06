@@ -97,7 +97,7 @@ class BurstRun(object):
         if analyse:
             self.analyse()
         if plot:
-            self.plot_model()
+            self.plot()
 
     def printv(self, string):
         if self.options['verbose']:
@@ -299,7 +299,7 @@ class BurstRun(object):
                 if self.options['verbose']:
                     if not shocks:
                         print('Shocks detected and removed: consider verifying'
-                              ' with self.plot_model(shocks=True)')
+                              ' with self.plot(shocks=True)')
 
                 new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
                 self.lum[idx, 1] = new_lum
@@ -598,7 +598,7 @@ class BurstRun(object):
 
             np.savetxt(filepath, lightcurve, header=header)
 
-    def plot_model(self, peaks=True, display=True, save=False, log=True,
+    def plot(self, peaks=True, display=True, save=False, log=True,
                    burst_stages=False, candidates=False, legend=False, time_unit='h',
                    short_wait=False, shocks=False, fontsize=14, title=True,
                    show_all=False):
