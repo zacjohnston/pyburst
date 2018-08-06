@@ -664,7 +664,7 @@ class BurstRun(object):
         bursts = self.clean_bursts()
         bursts_discard = self.clean_bursts(exclude_discard=True)
         bursts_short_waits = self.short_waits()
-        bursts_outliers = self.outliers()
+        bursts_outliers = self.outliers(unique=True)
 
         for i, bprop in enumerate(bprops):
             y_unit = y_units.get(bprop)
