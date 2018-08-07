@@ -151,6 +151,31 @@ def combine_extracts(batches, source):
     return big_table
 
 
+def combine_run_summaries(batch, source):
+    """Combines summary files of individual batch runs into a single table
+    """
+    batch_str = grid_strings.get_batch_string(batch, source)
+    n_runs = grid_tools.get_nruns(batch, source)
+    analysis_path = grid_strings.batch_analysis_path(batch, source)
+
+    for run in range(1, n_runs+1):
+        pass
+    #   load summary,
+    #   combine to collection
+
+    # save combined table
+
+
+def load_run_summary(run, batch, source):
+    """Loads summary file of given run
+    """
+    analysis_path = grid_strings.batch_analysis_path(batch, source)
+    filename = grid_strings.get_batch_filename('summary', batch, source,
+                                               run=run, extension='.txt')
+    filepath = os.path.join(analysis_path, 'output', filename)
+    return pd.read_csv(filepath, delim_whitespace=True)
+
+
 def load_batch_table(batch, source):
     """Loads summary table of batch from file and returns as pd table
     """
