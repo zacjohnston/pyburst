@@ -284,10 +284,7 @@ class BurstRun(object):
         except NoBursts:
             return
 
-        if self.n_bursts > 1:
-            dt = np.diff(self.bursts['t_peak'])
-            self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
-
+        self.get_recurrence_times()
         self.get_burst_starts()
         self.get_burst_ends()
 
@@ -398,6 +395,15 @@ class BurstRun(object):
         self.bursts['t_peak'] = peaks[:, 0]  # times of burst peaks (s)
         self.bursts['t_peak_i'] = np.searchsorted(self.lum[:, 0], self.bursts['t_peak'])
         self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
+
+    def get_recurrence_times(self):
+        """Finds recurence times (dt (s), time between bursts)
+        """
+        if self.n_bursts > 1:
+            dt = np.diff(self.bursts['t_peak'])
+            self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
+        else:
+            self.bursts.loc[0, 'dt'] = np.nan
 
     def get_burst_starts(self):
         """Finds first point in lightcurve that reaches a given fraction of the peak
