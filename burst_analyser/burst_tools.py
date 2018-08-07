@@ -159,11 +159,9 @@ def load_batch_table(batch, source):
 
 
 def get_table_filepath(batch, source):
-    batch_str = f'{source}_{batch}'
-    source_path = grid_strings.get_source_path(source)
-    analysis_path = os.path.join(source_path, 'burst_analysis', batch_str)
-
-    filename = f'burst_analysis_{batch_str}.txt'
+    analysis_path = grid_strings.batch_analysis_path(batch, source)
+    filename = grid_strings.get_batch_filename('burst_analysis', batch=batch,
+                                               source=source, extension='.txt')
     return os.path.join(analysis_path, filename)
 
 
