@@ -77,6 +77,7 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
 
 def extract_batches(batches, source, save_plots=True, multithread=True):
     """Do burst analysis on arbitrary number of batches"""
+    t0 = time.time()
     batches = grid_tools.ensure_np_list(batches)
 
     for batch in batches:
@@ -87,10 +88,22 @@ def extract_batches(batches, source, save_plots=True, multithread=True):
         grid_tools.try_mkdir(output_path, skip=True)
 
         n_runs = grid_tools.get_nruns(batch, source)
-        for run in range(1, n_runs + 1):
-            extract_runs(run, batch, source, save_plots=save_plots)
+        runs = np.arange(n_runs) + 1
+        print(n_runs, runs)
+        if multithread:
+            args = []
+            for run in runs:
+                args.append((run, batch, source, save_plots))
+            with mp.Pool(processes=8) as pool:
+                pool.starmap(extract_runs, args)
+        else:
+            extract_runs(runs, batch, source, save_plots=save_plots)
 
         burst_tools.combine_run_summaries(batch, source)
+
+    t1 = time.time()
+    dt = t1 - t0
+    print_title(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
 def extract_runs(runs, batch, source, save_plots=True):
