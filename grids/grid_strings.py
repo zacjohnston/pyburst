@@ -76,6 +76,12 @@ def get_model_path(run, batch, source, basename='xrb'):
     return os.path.join(batch_path, run_str)
 
 
+def batch_analysis_path(batch, source):
+    batch_str = get_batch_string(batch, source)
+    analysis_path = get_source_subdir(source, 'burst_analysis')
+    return os.path.join(analysis_path, batch_str)
+
+
 def get_source_subdir(source, dir_):
     source = check_synth_source(source)
     source_path = get_source_path(source)
@@ -88,10 +94,6 @@ def get_source_subdir(source, dir_):
 def get_batch_filename(batch, source, prefix, extension=''):
     batch_str = get_batch_string(batch, source)
     return f'{prefix}_{batch_str}{extension}'
-
-
-def get_source_filename(source, prefix, extension=''):
-    return f'{prefix}_{source}{extension}'
 
 
 def get_table_filepath(source, table, batch=None):
@@ -107,6 +109,10 @@ def get_table_filepath(source, table, batch=None):
     table_path = get_source_subdir(source, table)
     table_filename = get_source_filename(source, prefix=table, extension=extension)
     return os.path.join(table_path, table_filename)
+
+
+def get_source_filename(source, prefix, extension=''):
+    return f'{prefix}_{source}{extension}'
 
 
 def get_model_table_filepath(batch, source, filename='MODELS.txt'):
