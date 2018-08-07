@@ -537,18 +537,18 @@ class BurstRun(object):
         bursts_regress = self.clean_bursts(exclude_min_regress=True)
         bursts_regress_full = self.clean_bursts(exclude_min_regress=False)
 
+        for bprop in self.regress_bprops:
+            self.bursts[f'slope_{bprop}'] = np.full(self.n_bursts, np.nan)
+            self.bursts[f'slope_{bprop}_err'] = np.full(self.n_bursts, np.nan)
+
         if len(bursts_regress) > 0:
             for bprop in self.regress_bprops:
-                self.bursts[f'slope_{bprop}'] = np.full(self.n_bursts, np.nan)
-                self.bursts[f'slope_{bprop}_err'] = np.full(self.n_bursts, np.nan)
-
                 for burst in bursts_regress.itertuples():
                     regress_slice = bursts_regress_full[burst.Index:]
                     lin = linregress(regress_slice['n'], regress_slice[bprop])
 
                     self.bursts.loc[burst.Index, f'slope_{bprop}'] = lin[0]
                     self.bursts.loc[burst.Index, f'slope_{bprop}_err'] = lin[-1]
-
         else:
             minimum = (self.min_regress + self.min_discard
                        + self.n_short_wait + self.n_outliers_unique)
