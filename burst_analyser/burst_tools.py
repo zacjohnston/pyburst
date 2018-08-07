@@ -127,11 +127,9 @@ def multi_save(table, source, basename='xrb'):
     print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
-def combine_extracts(batches, source):
-    """Combines extracted burst property summary tables
+def combine_batch_summaries(batches, source):
+    """Combines summary files of given batches into single table
     """
-    col_order = ['batch', 'run', 'num', 'converged', 'discard', 'dt', 'u_dt', 'rate', 'u_rate',
-                 'fluence', 'u_fluence', 'length', 'u_length', 'peak', 'u_peak']
     source_path = grid_strings.get_source_path(source)
     big_table = pd.DataFrame()
 
@@ -139,7 +137,6 @@ def combine_extracts(batches, source):
         batch_table = load_batch_table(batch, source)
         big_table = pd.concat((big_table, batch_table), ignore_index=True)
 
-    big_table = big_table[col_order]
     table_str = big_table.to_string(index=False, justify='left')
 
     filename = f'burst_analysis_{source}.txt'
