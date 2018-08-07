@@ -49,6 +49,8 @@ class BurstRun(object):
                       'outliers': False,
                       'regress_too_few_bursts': False,
                       'converged': False,
+                      'shocks': False,
+                      'zeros': False,
                       }
 
         self.options = {'verbose': verbose,
@@ -337,7 +339,6 @@ class BurstRun(object):
         self.remove_zeros()
 
         # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
-        shocks = False
         for max_i in maxima:
             t, lum = max_i
             idx = np.searchsorted(self.lum[:, 0], t)
@@ -347,25 +348,26 @@ class BurstRun(object):
             neighbours = np.concatenate([left, right])
 
             if True in (lum > tolerance*neighbours):
-                if self.options['verbose']:
-                    if not shocks:
-                        print('Shocks detected and removed: consider verifying'
-                              ' with self.plot(shocks=True)')
+                if not self.flags['shocks']:
+                    self.printv('Shocks detected and removed: consider verifying'
+                                ' with self.plot(shocks=True)')
+                    self.flags['shocks'] = True
 
                 new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
-                self.lum[idx, 1] = new_lum
                 max_i[1] = new_lum
+                self.lum[idx, 1] = new_lum
                 self.shocks.append([idx, t, lum])
-                shocks = True
 
     def remove_zeros(self):
         """During shocks, kepler can also give zero luminosity (for some reason...)
         """
         replace_with = 1e35
         zeros = np.where(self.lum[:, 1] == 0.0)
-        n_zeros = len(zeros)
-        self.printv(f'Removed {n_zeros} zeros from luminosity')
-        self.lum[zeros, 1] = replace_with
+        if len(zeros) > 0:
+            if not self.flags['zeros']:
+                self.printv(f'Zeros removed from luminosity')
+                self.flags['zeros'] = True
+            self.lum[zeros, 1] = replace_with
 
     def get_burst_peaks(self):
         """Keep largest maxima within some time-window
