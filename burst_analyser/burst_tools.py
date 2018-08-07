@@ -154,16 +154,22 @@ def combine_extracts(batches, source):
 def combine_run_summaries(batch, source):
     """Combines summary files of individual batch runs into a single table
     """
-    batch_str = grid_strings.get_batch_string(batch, source)
+    print(f'Combining model summaries')
     n_runs = grid_tools.get_nruns(batch, source)
-    analysis_path = grid_strings.batch_analysis_path(batch, source)
+    run_tables = []
 
     for run in range(1, n_runs+1):
-        pass
-    #   load summary,
-    #   combine to collection
+        run_tables += [load_run_summary(run, batch, source)]
 
-    # save combined table
+    combined_table = pd.concat(run_tables, ignore_index=True)
+    table_str = combined_table.to_string(index=False, justify='left')
+
+    filepath = get_table_filepath(batch, source)
+    print(f'Saving: {filepath}')
+    with open(filepath, 'w') as f:
+        f.write(table_str)
+
+    return combined_table
 
 
 def load_run_summary(run, batch, source):
