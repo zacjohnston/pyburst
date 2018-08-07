@@ -68,7 +68,7 @@ class BurstRun(object):
                              'shocks': 'C3',
                              }
 
-        self.burst_cols = ['n', 'dt', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
+        self.cols = ['n', 'dt', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
                            't_pre', 't_pre_i', 'lum_pre', 't_start', 't_start_i',
                            'lum_start', 't_end', 't_end_i', 'lum_end', 'slope_dt',
                            'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
@@ -170,7 +170,7 @@ class BurstRun(object):
         filename = f'bursts_{self.model_str}.txt'
         filepath = os.path.join(self.analysis_path, 'output', filename)
 
-        table = self.bursts[self.burst_cols]
+        table = self.bursts[self.cols]
         table_str = table.to_string(index=False, justify='left')
 
         with open(filepath, 'w') as f:
