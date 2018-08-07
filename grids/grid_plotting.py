@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import os
 
 # kepler_grids
 from . import grid_analyser
+from . import grid_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
@@ -39,3 +42,33 @@ def save_grid_params(source, param_list=('x', 'z', 'qb', 'mass')):
         filename = f'grid_{source}_{param}.pdf'
         show_plot(fig, save=True, savepath=savepath, savename=filename)
 
+
+def plot_short_waits(kgrid, fixed=None):
+    """Map out parameters where short-wait bursts occur
+    """
+    if fixed is None:
+        fixed = {'x': 0.7, 'mass': 1.4}
+
+    fig, ax = plt.subplots()
+    sub_p = kgrid.get_params(params=fixed)
+    sub_s = kgrid.get_summ(params=fixed)
+
+    short_map = sub_s['short_waits']
+    shorts = sub_p[short_map]
+    not_shorts = sub_p[np.invert(short_map)]
+
+    ax.plot(shorts['accrate'], shorts['z'], marker='o', ls='none')
+    ax.plot(not_shorts['accrate'], not_shorts['z'], marker='o', ls='none')
+
+    plt.show(block=False)
+
+
+def get_subset(kgrid, sub_params=None):
+    if sub_params is None:
+        sub_params = {'x': [0.65, 0.7, 0.75]}
+
+    subsets = []
+    for x in sub_params['x']:
+        subsets += kgrid.get_params(params={'x': x})
+
+    return pd.concat(subsets, ignore_index=True)
