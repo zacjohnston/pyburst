@@ -266,9 +266,10 @@ def ensure_np_list(variable):
 def combine_grid_tables(batches, table_basename, source, **kwargs):
     """Reads table files of batches and combines them into a single file
     """
-
+    # TODO: rewrite this. Use pandas properly, don't write column names separately
     def get_filepath(base, source, batch, table_path):
-        filename = grid_strings.get_batch_filename(batch, source, base, extension='.txt')
+        filename = grid_strings.get_batch_filename(prefix=base, batch=batch, source=source,
+                                                   extension='.txt')
         return os.path.join(table_path, filename)
 
     source = grid_strings.source_shorthand(source=source)
