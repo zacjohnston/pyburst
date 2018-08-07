@@ -91,8 +91,10 @@ def get_source_subdir(source, dir_):
 # ======================================================
 # Misc. files
 # ======================================================
-def get_batch_filename(batch, source, prefix, extension=''):
+def get_batch_filename(prefix, batch, source, run=None, extension=''):
     batch_str = get_batch_string(batch, source)
+    if run is not None:
+        batch_str += f'_{run}'
     return f'{prefix}_{batch_str}{extension}'
 
 
