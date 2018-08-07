@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import subprocess
 import os
+import sys
 import multiprocessing as mp
 import time
 
@@ -130,13 +131,16 @@ def multi_save(table, source, basename='xrb'):
 def combine_batch_summaries(batches, source):
     """Combines summary files of given batches into single table
     """
+    print('Combining batch summary tables:')
     source_path = grid_strings.get_source_path(source)
     big_table = pd.DataFrame()
 
     for batch in batches:
+        sys.stdout.write(f'\r{source} {batch}/{batches[-1]}')
         batch_table = load_batch_table(batch, source)
         big_table = pd.concat((big_table, batch_table), ignore_index=True)
 
+    sys.stdout.write('\n')
     table_str = big_table.to_string(index=False, justify='left')
 
     filename = f'burst_analysis_{source}.txt'
@@ -151,13 +155,16 @@ def combine_batch_summaries(batches, source):
 def combine_run_summaries(batch, source):
     """Combines summary files of individual batch runs into a single table
     """
-    print(f'Combining model summaries')
+    print(f'Combining model summary tables:')
     n_runs = grid_tools.get_nruns(batch, source)
+    runs = np.arange(n_runs) + 1
     run_tables = []
 
-    for run in range(1, n_runs+1):
+    for run in runs:
+        sys.stdout.write(f'\r{source}{batch} {run}/{runs[-1]}')
         run_tables += [load_run_summary(run, batch, source)]
 
+    sys.stdout.write('\n')
     combined_table = pd.concat(run_tables, ignore_index=True)
     table_str = combined_table.to_string(index=False, justify='left')
 
