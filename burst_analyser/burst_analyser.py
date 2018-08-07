@@ -166,7 +166,6 @@ class BurstRun(object):
     def save_burst_table(self):
         """Saves table of burst properties to file
         """
-        # TODO: set non-existent columns to nans
         self.ensure_analysed_is(True)
         filename = f'bursts_{self.model_str}.txt'
         filepath = os.path.join(self.analysis_path, 'output', filename)

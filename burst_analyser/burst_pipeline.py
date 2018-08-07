@@ -77,33 +77,20 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
 
 def extract_batches(batches, source, save_plots=True, multithread=True):
     """Do burst analysis on arbitrary number of batches"""
-    analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
     batches = grid_tools.ensure_np_list(batches)
-
-    flags = ('converged',)
-    b_ints = ('batch', 'run', 'num', 'discard')
-    bprops = ('dt', 'fluence', 'length', 'peak', 'rate')
-    col_order = ['batch', 'run', 'num', 'converged', 'discard', 'dt', 'u_dt', 'rate', 'u_rate',
-                 'fluence', 'u_fluence', 'length', 'u_length', 'peak', 'u_peak']
 
     for batch in batches:
         print_title(f'Batch {batch}')
-        batch_str = f'{source}_{batch}'
-        batch_path = os.path.join(analysis_path, batch_str)
-        grid_tools.try_mkdir(analysis_path, skip=True)
 
-        filename = f'burst_analysis_{batch_str}.txt'
-        filepath = os.path.join(analysis_path, filename)
+        analysis_path = grid_strings.batch_analysis_path(batch, source)
+        output_path = os.path.join(analysis_path, 'output')
+        grid_tools.try_mkdir(output_path, skip=True)
 
         n_runs = grid_tools.get_nruns(batch, source)
         for run in range(1, n_runs + 1):
             extract_runs(run, batch, source, save_plots=save_plots)
 
-        # table = table[col_order]
-        # table_str = table.to_string(index=False, justify='left',
-        #                             formatters={'discard': '{:.0f}'.format})
-        # with open(filepath, 'w') as f:
-        #     f.write(table_str)
+        burst_tools.combine_run_summaries(batch, source)
 
 
 def extract_runs(runs, batch, source, save_plots=True):
