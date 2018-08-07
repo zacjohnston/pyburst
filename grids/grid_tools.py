@@ -247,18 +247,18 @@ def ensure_np_list(variable):
                 (Will evaluate all items if variable is a dict)
     """
 
-    def check_value(val):
+    def check_value(var):
         """Returns value as np.array if not already"""
-        if type(val) in [int, float]:
-            return np.array([val])
+        if type(var) in [np.ndarray, list, tuple]:
+            return np.array(var)
         else:
-            return np.array(val)
+            return np.array([var])
 
     if type(variable) == dict:
         for key, val in variable.items():
-            variable[key] = check_value(val=val)
+            variable[key] = check_value(val)
     else:
-        variable = check_value(val=variable)
+        variable = check_value(variable)
 
     return variable
 
