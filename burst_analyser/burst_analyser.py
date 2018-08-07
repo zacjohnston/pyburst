@@ -408,7 +408,7 @@ class BurstRun(object):
     def get_burst_starts(self):
         """Finds first point in lightcurve that reaches a given fraction of the peak
         """
-        pre_time = 30  # time (s) before burst peak that should always contain burst rise
+        pre_time = 60  # time (s) before burst peak that should always contain burst rise
         start_frac = 0.25  # Burst start as fraction of peak lum
         peak_frac = 10
 
