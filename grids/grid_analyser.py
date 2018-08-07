@@ -26,6 +26,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 #       -
 # -----------------------------------
 # Parameters which have been discontinued from the grid
+# TODO: make this into an option/setting. Reform into "include"
 params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
                   # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
                   # 'biggrid2': {'qb': [0.075], 'z': [0.001, 0.0015], 'x': [0.5, 0.6, 0.8],
