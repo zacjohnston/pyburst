@@ -714,7 +714,7 @@ class BurstRun(object):
         bursts = self.clean_bursts()
         bursts_discard = self.clean_bursts(exclude_discard=True)
         bursts_short_waits = self.short_waits()
-        bursts_outliers = self.outliers(unique=True)
+        bursts_outliers = self.outliers(unique=False)
 
         for i, bprop in enumerate(bprops):
             y_unit = y_units.get(bprop)
@@ -741,7 +741,7 @@ class BurstRun(object):
                 ax[i].plot(bursts_outliers['n'], bursts_outliers[bprop] / y_scale,
                            marker='o', c=self.plot_colours['outliers'], ls='none',
                            markersize=markersize, markeredgecolor=markeredgecolor,
-                           label='Short waits')
+                           label='Outliers')
 
             if short_waits:
                 ax[i].plot(bursts_short_waits['n'], bursts_short_waits[bprop] / y_scale,
@@ -754,7 +754,7 @@ class BurstRun(object):
                        markersize=markersize, markeredgecolor=markeredgecolor,
                        label='Bursts')
         if legend:
-            ax[0].legend(loc=1)
+            ax[0].legend(loc=3)
 
         ax[0].set_title(self.model_str)
         ax[-1].set_xlabel('Burst number')
