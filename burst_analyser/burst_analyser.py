@@ -15,14 +15,16 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
-def default_plt_options():
-    """Initialise default plot parameters"""
-    params = {'mathtext.default': 'regular',
-              'font.family': 'serif', 'text.usetex': False}
-    plt.rcParams.update(params)
+# def default_plt_options():
+#     """Initialise default plot parameters"""
+#     params = {'mathtext.default': 'regular',
+#               'font.family': 'serif', 'text.usetex': False}
+#     plt.rcParams.update(params)
 
+plt.rc('text', usetex=False)
+plt.rc('font', family='serif')
 
-default_plt_options()
+# default_plt_options()
 
 # TODO: Generalise to non-batch organised models
 # TODO: param description docstring
@@ -69,10 +71,10 @@ class BurstRun(object):
                              }
 
         self.cols = ['n', 'dt', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
-                           't_pre', 't_pre_i', 'lum_pre', 't_start', 't_start_i',
-                           'lum_start', 't_end', 't_end_i', 'lum_end', 'slope_dt',
-                           'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
-                           'slope_peak', 'slope_peak_err', 'short_wait', 'outlier', ]
+                     't_pre', 't_pre_i', 'lum_pre', 't_start', 't_start_i',
+                     'lum_start', 't_end', 't_end_i', 'lum_end', 'slope_dt',
+                     'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
+                     'slope_peak', 'slope_peak_err', 'short_wait', 'outlier', ]
         self.run = run
         self.batch = batch
         self.source = source
@@ -763,7 +765,7 @@ class BurstRun(object):
             ax[0].legend(loc=3)
 
         ax[0].set_title(self.model_str)
-        ax[-1].set_xlabel('Burst number')
+        ax[-1].set_xlabel('Burst num')
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
