@@ -38,7 +38,7 @@ class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, save_lum=True, analyse=True, plot=False,
                  min_regress=20, min_discard=1, exclude_outliers=True,
-                 exclude_short_wait=True):
+                 exclude_short_wait=True, load_bursts=False):
         # min_regress : int
         #   minimum number of bursts to use in linear regression (self.linregress)
         # min_discard : int
@@ -92,14 +92,17 @@ class BurstRun(object):
         self.lumf = None
         self.new_lum = None
         self.load()
+        self.load_bursts = load_bursts
 
-        self.summary = {}
         self.bursts = pd.DataFrame()
-        self.candidates = None
         self.n_bursts = None
         self.n_short_wait = None
         self.n_outliers = None
         self.n_outliers_unique = None
+        self.bursts = pd.DataFrame()
+
+        self.summary = {}
+        self.candidates = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.shocks = []
 
@@ -107,11 +110,10 @@ class BurstRun(object):
         self.regress_bprops = ['dt', 'fluence', 'peak']
         self.min_regress = min_regress
         self.min_discard = min_discard
-        self.slopes = {}    # NOTE: starts at min_discard
-        self.slopes_err = {}
-        self.residuals = {}
         self.discard = None
 
+        if self.load_bursts:
+            self.load_burst_table()
         if analyse:
             self.analyse()
         if plot:
@@ -125,14 +127,37 @@ class BurstRun(object):
         full_string = f"\nWARNING: {string}\n"
         self.printv(full_string)
 
+    def load(self):
+        """Load luminosity data from kepler simulation
+        """
+        self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
+                                    basename=self.basename, save=self.options['save_lum'],
+                                    reload=self.options['reload'])
+
+        self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
+        self.flags['loaded'] = True
+
+    def load_burst_table(self):
+        """Load pre-extracted burst properties from file
+        """
+        self.printv('Loading pre-extracted burst properties from file')
+        self.bursts = burst_tools.load_run_table(run=self.run, batch=self.batch,
+                                                 source=self.source, table='bursts')
+        self.n_bursts = len(self.bursts)
+        self.n_short_wait = len(self.short_waits())
+        self.n_outliers = len(self.outliers())
+        self.n_outliers_unique = len(self.outliers(unique=True))
+
     def analyse(self):
         """Performs complete analysis of model.
         """
         self.ensure_analysed_is(False)
-        self.identify_bursts()
-        self.get_fluences()
-        self.identify_outliers()
-        self.get_bprop_slopes()
+        if not self.load_bursts:
+            self.identify_bursts()
+            self.get_fluences()
+            self.identify_outliers()
+            self.get_bprop_slopes()
+
         self.discard = self.get_discard()
         self.setup_summary()
         self.flags['analysed'] = True
@@ -256,16 +281,6 @@ class BurstRun(object):
     def set_converged_too_few(self):
         self.flags['converged'] = False
         self.flags['regress_too_few_bursts'] = True
-
-    def load(self):
-        """Load luminosity data from kepler simulation
-        """
-        self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
-                                    basename=self.basename, save=self.options['save_lum'],
-                                    reload=self.options['reload'])
-
-        self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
-        self.flags['loaded'] = True
 
     def identify_bursts(self):
         """Extracts peaks, times, and recurrence times of bursts
