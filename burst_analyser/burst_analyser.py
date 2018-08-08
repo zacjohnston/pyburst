@@ -38,7 +38,7 @@ class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, save_lum=True, analyse=True, plot=False,
                  min_regress=20, min_discard=1, exclude_outliers=True,
-                 exclude_short_wait=True, load_bursts=False):
+                 exclude_short_wait=True, load_bursts=False, load_summary=False):
         # min_regress : int
         #   minimum number of bursts to use in linear regression (self.linregress)
         # min_discard : int
@@ -93,6 +93,7 @@ class BurstRun(object):
         self.new_lum = None
         self.load()
         self.load_bursts = load_bursts
+        self.load_summary = load_summary
 
         self.bursts = pd.DataFrame()
         self.n_bursts = None
@@ -114,6 +115,13 @@ class BurstRun(object):
 
         if self.load_bursts:
             self.load_burst_table()
+        if self.load_summary:
+            if not self.load_bursts:
+                self.print_warn('Loading summary but not bursts. The summary values are '
+                                + 'not gauranteed to match the burst properties.'
+                                + '\nTHIS IS NOT RECOMMENDED')
+            self.load_summary_table()
+
         if analyse:
             self.analyse()
         if plot:
@@ -148,6 +156,15 @@ class BurstRun(object):
         self.n_outliers = len(self.outliers())
         self.n_outliers_unique = len(self.outliers(unique=True))
 
+    def load_summary_table(self):
+        self.printv('Loading pre-extracted model summary from file')
+        summary_table = burst_tools.load_run_table(run=self.run, batch=self.batch,
+                                                   source=self.source, table='summary')
+
+        self.summary = summary_table.to_dict('list')
+        for key, val in self.summary.items():
+            self.summary[key] = val[0]
+
     def analyse(self):
         """Performs complete analysis of model.
         """
@@ -159,7 +176,9 @@ class BurstRun(object):
             self.get_bprop_slopes()
 
         self.discard = self.get_discard()
-        self.setup_summary()
+        if not self.load_summary:
+            self.setup_summary()
+
         self.flags['analysed'] = True
 
     def setup_summary(self):
