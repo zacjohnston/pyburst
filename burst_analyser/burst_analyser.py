@@ -38,7 +38,8 @@ class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, save_lum=True, analyse=True, plot=False,
                  min_regress=20, min_discard=1, exclude_outliers=True,
-                 exclude_short_wait=True, load_bursts=False, load_summary=False):
+                 exclude_short_wait=True, load_lum=True, load_bursts=False,
+                 load_summary=False):
         # min_regress : int
         #   minimum number of bursts to use in linear regression (self.linregress)
         # min_discard : int
@@ -91,7 +92,7 @@ class BurstRun(object):
         self.lum = None
         self.lumf = None
         self.new_lum = None
-        self.load()
+        self.load_lum = load_lum
         self.load_bursts = load_bursts
         self.load_summary = load_summary
 
@@ -107,14 +108,19 @@ class BurstRun(object):
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.shocks = []
 
-        # ===== linregress things =====
+        # ====== linregress things ======
         self.regress_bprops = ['dt', 'fluence', 'peak']
         self.min_regress = min_regress
         self.min_discard = min_discard
         self.discard = None
 
+        # ====== Loading things ======
+        if self.load_lum:
+            self.load_lum_file()
+
         if self.load_bursts:
             self.load_burst_table()
+
         if self.load_summary:
             if not self.load_bursts:
                 self.print_warn('Loading summary but not bursts. The summary values are '
@@ -135,7 +141,7 @@ class BurstRun(object):
         full_string = f"\nWARNING: {string}\n"
         self.printv(full_string)
 
-    def load(self):
+    def load_lum_file(self):
         """Load luminosity data from kepler simulation
         """
         self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
@@ -148,6 +154,7 @@ class BurstRun(object):
     def load_burst_table(self):
         """Load pre-extracted burst properties from file
         """
+        # TODO: set any flags that will be skipped from analyse()
         self.printv('Loading pre-extracted burst properties from file')
         self.bursts = burst_tools.load_run_table(run=self.run, batch=self.batch,
                                                  source=self.source, table='bursts')
@@ -312,6 +319,8 @@ class BurstRun(object):
            4. Identify short-wait bursts (below some fraction of mean dt)
            5. Get start/end times (discard final burst if cut off)
         """
+        if not self.flags['loaded']:
+            self.load_lum_file()
         self.printv('Identifying bursts')
         self.get_burst_candidates()
 
@@ -649,6 +658,9 @@ class BurstRun(object):
              outliers=True, show_all=False):
         """Plots overall model lightcurve, with detected bursts
         """
+        if not self.flags['loaded']:
+            self.load_lum_file()
+
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
         time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
         markersize = 10
