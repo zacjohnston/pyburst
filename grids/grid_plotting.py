@@ -43,22 +43,22 @@ def save_grid_params(source, param_list=('x', 'z', 'qb', 'mass')):
         show_plot(fig, save=True, savepath=savepath, savename=filename)
 
 
-def plot_short_waits(kgrid, fixed=None):
+def plot_flags(kgrid, fixed=None, flag='short_waits'):
     """Map out parameters where short-wait bursts occur
     """
     if fixed is None:
-        fixed = {'x': 0.7, 'mass': 1.4}
+        fixed = {'z': 0.005, 'mass': 1.4}
 
     fig, ax = plt.subplots()
     sub_p = kgrid.get_params(params=fixed)
     sub_s = kgrid.get_summ(params=fixed)
 
-    short_map = sub_s['short_waits']
+    short_map = sub_s[flag]
     shorts = sub_p[short_map]
     not_shorts = sub_p[np.invert(short_map)]
 
-    ax.plot(shorts['accrate'], shorts['z'], marker='o', ls='none')
-    ax.plot(not_shorts['accrate'], not_shorts['z'], marker='o', ls='none')
+    ax.plot(not_shorts['accrate'], not_shorts['x'], marker='o', ls='none')
+    ax.plot(shorts['accrate'], shorts['x'], marker='o', ls='none', color='C3')
 
     plt.show(block=False)
 
