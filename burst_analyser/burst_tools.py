@@ -162,7 +162,7 @@ def combine_run_summaries(batch, source):
 
     for run in runs:
         sys.stdout.write(f'\r{source}{batch} {run}/{runs[-1]}')
-        run_tables += [load_run_summary(run, batch, source)]
+        run_tables += [load_run_table(run, batch, source=source, table='summary')]
 
     sys.stdout.write('\n')
     combined_table = pd.concat(run_tables, ignore_index=True)
@@ -176,11 +176,14 @@ def combine_run_summaries(batch, source):
     return combined_table
 
 
-def load_run_summary(run, batch, source):
-    """Loads summary file of given run
+def load_run_table(run, batch, source, table):
+    """Loads file of given run (either summary or burst table)
     """
+    if table not in ['summary', 'bursts']:
+        raise ValueError("table must be on of ['summary', 'bursts']")
+
     analysis_path = grid_strings.batch_analysis_path(batch, source)
-    filename = grid_strings.get_batch_filename('summary', batch, source,
+    filename = grid_strings.get_batch_filename(table, batch, source,
                                                run=run, extension='.txt')
     filepath = os.path.join(analysis_path, 'output', filename)
     return pd.read_csv(filepath, delim_whitespace=True)
