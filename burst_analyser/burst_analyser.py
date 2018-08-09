@@ -76,6 +76,13 @@ class BurstRun(object):
                      'lum_start', 't_end', 't_end_i', 'lum_end', 'slope_dt',
                      'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
                      'slope_peak', 'slope_peak_err', 'short_wait', 'outlier', ]
+
+        self.paths = {'batch_models': grid_strings.get_batch_models_path(batch, source),
+                      'source': grid_strings.get_source_path(source),
+                      'analysis': grid_strings.batch_analysis_path(batch, source),
+                      'plots': grid_strings.get_source_subdir(source, 'plots'),
+                      }
+
         self.run = run
         self.batch = batch
         self.source = source
@@ -83,11 +90,6 @@ class BurstRun(object):
         self.run_str = grid_strings.get_run_string(run, basename)
         self.batch_str = grid_strings.get_batch_string(batch, source)
         self.model_str = grid_strings.get_model_string(run, batch, source)
-
-        self.batch_models_path = grid_strings.get_batch_models_path(batch, source)
-        self.source_path = grid_strings.get_source_path(source)
-        self.analysis_path = os.path.join(self.source_path, 'burst_analysis', self.batch_str)
-        self.plots_path = grid_strings.get_source_subdir(source, 'plots')
 
         self.lum = None
         self.lumf = None
@@ -211,7 +213,7 @@ class BurstRun(object):
             table[col] = [self.summary[col]]
 
         filename = f'summary_{self.model_str}.txt'
-        filepath = os.path.join(self.analysis_path, 'output', filename)
+        filepath = os.path.join(self.paths['analysis'], 'output', filename)
         table_str = table.to_string(index=False, justify='left')
         with open(filepath, 'w') as f:
             f.write(table_str)
@@ -221,7 +223,7 @@ class BurstRun(object):
         """
         self.ensure_analysed_is(True)
         filename = f'bursts_{self.model_str}.txt'
-        filepath = os.path.join(self.analysis_path, 'output', filename)
+        filepath = os.path.join(self.paths['analysis'], 'output', filename)
 
         table = self.bursts[self.cols]
         table_str = table.to_string(index=False, justify='left')
@@ -867,7 +869,7 @@ class BurstRun(object):
         """
         self.ensure_analysed_is(True)
         if path is None:  # default to model directory
-            path = self.batch_models_path
+            path = self.paths['batch_models']
 
         for i in range(self.n_bursts):
             bnum = i + 1
@@ -915,7 +917,7 @@ class BurstRun(object):
             self.add_lightcurve(burst, ax, zero_time=zero_time)
 
         ax.set_xlim(xmin=-5)
-        plot_path = os.path.join(self.plots_path, 'lightcurves', self.batch_str)
+        plot_path = os.path.join(self.paths['plots'], 'lightcurves', self.batch_str)
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
                            path=plot_path, extra='')
@@ -974,7 +976,7 @@ class BurstRun(object):
             filename = f'{plot_name}_{self.model_str}{extra}.{extension}'
 
             if path is None:
-                path = os.path.join(self.source_path, 'plots', plot_name)
+                path = os.path.join(self.paths['source'], 'plots', plot_name)
             filepath = os.path.join(path, filename)
 
             self.printv(f'Saving figure: {filepath}')
