@@ -540,6 +540,7 @@ class BurstRun(object):
         self.bursts['short_wait'] = np.full(self.n_bursts, False)
         if self.n_bursts < 3:
             self.printv('Too few bursts to identify short-waits')
+            self.n_short_wait = 0
             return
 
         min_dt_frac = 0.5
