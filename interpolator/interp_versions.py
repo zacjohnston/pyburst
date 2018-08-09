@@ -41,6 +41,8 @@ version_definitions = {
             18: ['accrate', 'x', 'z', 'mass'],
             19: ['accrate', 'x', 'z', 'mass'],
             20: ['accrate', 'x', 'z', 'mass'],
+            21: ['accrate', 'x', 'z', 'qb', 'mass'],
+            22: ['accrate', 'x', 'z', 'qb', 'mass'],
         },
     },
 
@@ -116,6 +118,19 @@ version_definitions = {
                 'qb': [0.025, 0.075, 0.2],
                 'mass': [0.8, 2.6, 3.2],
             },
+            21: {
+                'accrate': np.arange(5, 8) / 100,
+                'x': [0.5, 0.8],
+                'z': [0.001],
+                'mass': [0.8, 3.2],
+            },
+            22: {
+                'accrate': np.arange(5, 8) / 100,
+                'x': [0.5, 0.8],
+                'z': [0.001],
+                'mass': [0.8, 3.2],
+            },
+
         },
     },
 }
