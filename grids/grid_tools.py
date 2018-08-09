@@ -263,6 +263,15 @@ def ensure_np_list(variable):
     return variable
 
 
+def get_unique_param(param, source):
+    """Return unique values of given parameter
+    """
+    source = grid_strings.source_shorthand(source=source)
+    params_filepath = grid_strings.get_table_filepath(source, 'params')
+    param_table = pd.read_table(params_filepath, delim_whitespace=True)
+    return np.unique(param_table[param])
+
+
 def combine_grid_tables(batches, table_basename, source, **kwargs):
     """Reads table files of batches and combines them into a single file
     """

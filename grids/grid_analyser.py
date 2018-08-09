@@ -818,15 +818,6 @@ class Kgrid:
         return model, best_concord
 
 
-def get_unique_param(param, source):
-    """Return unique values of given parameter
-    """
-    source = grid_strings.source_shorthand(source=source)
-    params_filepath = grid_strings.get_params_filepath(source)
-    param_table = pd.read_table(params_filepath, delim_whitespace=True)
-    return np.unique(param_table[param])
-
-
 def check_kgrid(kgrid, source):
     if kgrid is None:
         kgrid = Kgrid(source, load_concord_summ=False, exclude_test_batches=False,
