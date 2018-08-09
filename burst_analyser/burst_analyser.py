@@ -591,12 +591,16 @@ class BurstRun(object):
     def get_bprop_slopes(self):
         """Calculate slopes for properties as the burst sequence progresses
         """
-        bursts_regress = self.clean_bursts(exclude_min_regress=True)
-        bursts_regress_full = self.clean_bursts(exclude_min_regress=False)
-
         for bprop in self.regress_bprops:
             self.bursts[f'slope_{bprop}'] = np.full(self.n_bursts, np.nan)
             self.bursts[f'slope_{bprop}_err'] = np.full(self.n_bursts, np.nan)
+
+        if self.flags['regress_too_few_bursts']:
+            self.printv('Too few bursts to get burst slopes')
+            return
+
+        bursts_regress = self.clean_bursts(exclude_min_regress=True)
+        bursts_regress_full = self.clean_bursts(exclude_min_regress=False)
 
         if len(bursts_regress) > 0:
             for bprop in self.regress_bprops:
@@ -609,7 +613,7 @@ class BurstRun(object):
         else:
             minimum = (self.min_regress + self.min_discard
                        + self.n_short_wait + self.n_outliers_unique)
-            self.print_warn(f'Too few bursts to do linregress. '
+            self.print_warn(f'Too few bursts to get slopes. '
                             + f'Have {self.n_bursts}, need at least {minimum} '
                             + '(assuming no further outliers/short_waits occur)')
             self.set_converged_too_few()
