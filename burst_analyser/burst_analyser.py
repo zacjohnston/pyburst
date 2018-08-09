@@ -569,6 +569,7 @@ class BurstRun(object):
         Note: bursts up to min_discard and short_waits will not be considered
                 in the calculation of the mean
         """
+        self.bursts['outlier'] = np.full(self.n_bursts, np.nan)
         if self.flags['too_few_bursts']:
             self.printv('Too few bursts to get outliers')
             return
