@@ -432,6 +432,7 @@ class BurstRun(object):
 
         if self.n_bursts < 2:
             self.flags['too_few_bursts'] = True
+            self.set_converged_too_few()
             message = {0: 'No bursts in this model',
                        1: 'Only one burst detected'}[self.n_bursts]
             self.print_warn(message)
@@ -536,13 +537,16 @@ class BurstRun(object):
         """Identify bursts which have unusually short recurrence times
             Here defined as less than 'min_dt_frac' of the following burst
         """
+        self.bursts['short_wait'] = np.full(self.n_bursts, False)
+        if self.n_bursts < 3:
+            self.printv('Too few bursts to identify short-waits')
+            return
+
         min_dt_frac = 0.5
-        # TODO: check if enough bursts to do following operation
         dt_0 = np.array(self.bursts.iloc[1:-1]['dt'])
         dt_1 = np.array(self.bursts.iloc[2:]['dt'])
         short_wait = dt_0 < (min_dt_frac * dt_1)
 
-        self.bursts['short_wait'] = np.full(self.n_bursts, False)
         self.bursts.loc[1:self.bursts.index[-2], 'short_wait'] = short_wait
         self.n_short_wait = len(self.short_waits())
 
