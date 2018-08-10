@@ -697,7 +697,12 @@ class BurstRun(object):
         ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='black')
 
         if not self.flags['analysed']:
-            self.print_warn('Model not analysed. Only plotting raw lightcurve')
+            self.printv('Model not analysed. Only plotting raw lightcurve')
+            self.show_save_fig(fig, display=display, save=save, plot_name='model')
+            return
+
+        if self.n_bursts == 0:
+            self.printv('No bursts. Only plotting raw lightcurve')
             self.show_save_fig(fig, display=display, save=save, plot_name='model')
             return
 
