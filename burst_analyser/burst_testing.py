@@ -3,6 +3,11 @@ import numpy as np
 from pygrids.burst_analyser import burst_analyser
 
 
+def test_few_bursts(run=1, batch=281, source='biggrid2', plot=False):
+    for n_bursts in [0, 1, 2, 3]:
+        test_bursts(n_bursts=n_bursts, run=run, batch=batch, source=source, plot=plot)
+
+
 def test_bursts(n_bursts, run=1, batch=281, source='biggrid2', plot=True):
     """Test burst_analyser when model has zero bursts
     """
