@@ -24,6 +24,7 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
                  analyse=True, save_plots=True, collect=True):
     """Run all analysis steps for burst models
     """
+    # TODO: copy generators
     all_batches = np.arange(batches[-1]) + 1  # assumes batches[-1] is final batch of grid
     if copy_params:
         print_title('Copying parameter tables')

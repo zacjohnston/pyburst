@@ -66,6 +66,8 @@ class BurstRun(object):
                            'end_frac': 0.01,  # burst end lum is this frac of peak lum
                            'min_length': 5,  # min time between burst peak and end (sec)
                            'short_wait_frac': 0.5,  # short_waits below frac of following dt
+                           'n_bimodal': 20,  # n_bursts to check for bimodality
+                           'bimodal_sigma': 3,  # number of std's modes are separated by
                            }
 
         self.plot_colours = {'bursts': 'C1',
@@ -208,6 +210,7 @@ class BurstRun(object):
         self.summary['n_outliers'] = self.n_outliers_unique
         self.summary['n_short_waits'] = self.n_short_wait
         self.get_means()
+        self.test_bimodal()
 
     def save_summary_table(self):
         """Saves table of model summary to file
@@ -657,6 +660,29 @@ class BurstRun(object):
 
             self.summary['rate'] = sec_day / self.summary['dt']  # burst rate (per day)
             self.summary['u_rate'] = sec_day * self.summary['u_dt'] / self.summary['dt']**2
+
+    def test_bimodal(self):
+        """Determines if the burst sequence is bimodal
+        """
+        # TODO: enough bursts
+        # TODO: check analysed
+        bursts = self.clean_bursts()
+        n_bimodal = self.parameters['n_bimodal']
+        if self.flags['too_few_bursts'] or len(bursts) < n_bimodal:
+            self.printv('Too few bursts to check for bimodality')
+            self.summary['bimodal'] = False
+            return
+
+        dt = np.sort(bursts.iloc[-n_bimodal:]['dt'])
+        dt_lo, dt_hi = np.array_split(dt, 2)
+
+        mean_lo = np.mean(dt_lo)
+        mean_hi = np.mean(dt_hi)
+        std_lo = np.std(dt_lo)
+        std_hi = np.std(dt_hi)
+
+        separation = (mean_hi - mean_lo) / np.sqrt(std_hi**2 + std_lo**2)
+        self.summary['bimodal'] = separation > self.parameters['bimodal_sigma']
 
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
