@@ -9,22 +9,14 @@ from scipy.stats import linregress
 
 # kepler_grids
 from . import burst_tools
-from ..grids import grid_tools, grid_strings
+from pygrids.grids import grid_tools, grid_strings
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
-
-# def default_plt_options():
-#     """Initialise default plot parameters"""
-#     params = {'mathtext.default': 'regular',
-#               'font.family': 'serif', 'text.usetex': False}
-#     plt.rcParams.update(params)
-
 plt.rc('text', usetex=False)
 plt.rc('font', family='serif')
 
-# default_plt_options()
 
 # TODO: Generalise to non-batch organised models
 # TODO: param description docstring

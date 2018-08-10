@@ -10,9 +10,8 @@ import time
 import lcdata
 
 # pygrids
-from ..misc import pyprint
-from ..grids.grid_tools import try_mkdir
-from ..grids import grid_strings, grid_tools
+from pygrids.misc import pyprint
+from pygrids.grids import grid_strings, grid_tools
 
 MODELS_PATH = os.environ['KEPLER_MODELS']
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -26,7 +25,7 @@ def load(run, batch, source, basename='xrb', reload=False, save=True,
 
     analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
     input_path = os.path.join(analysis_path, batch_str, 'input')
-    try_mkdir(input_path, skip=True)
+    grid_tools.try_mkdir(input_path, skip=True)
 
     presaved_file = f'{batch_str}_{run}.txt'
     run_str = grid_strings.get_run_string(run, basename)
