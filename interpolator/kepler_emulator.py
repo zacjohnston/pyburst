@@ -6,7 +6,7 @@ import time
 import pickle
 
 # kepler_grids
-from ..grids import grid_tools, grid_strings
+from pygrids.grids import grid_tools, grid_strings
 from . import interp_versions
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -122,8 +122,14 @@ class Kemulator:
                 key = key_map[bp]
             else:
                 key = bp
-
+            # !!!
+            # TODO
+            # Testing forced uncertainty
+            # if key[0] == 'u':
+            #     values[:, i] = 0.02 * self.summ[key.strip('u_')]
+            # else:
             values[:, i] = self.summ[key]
+            # !!!
         self.interpolator = LinearNDInterpolator(points, values)
         t1 = time.time()
         self.printv(f'Setup time: {t1-t0:.1f} s')

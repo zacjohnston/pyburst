@@ -1,6 +1,6 @@
 import os
 
-from ..grids import grid_strings
+from pygrids.grids import grid_strings
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 

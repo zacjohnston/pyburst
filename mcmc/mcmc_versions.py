@@ -1,7 +1,7 @@
 import numpy as np
 
 # kepler_grids
-from ..grids import grid_strings
+from pygrids.grids import grid_strings
 # -----------------------------------
 # Define different prior boundaries.
 # Must be in same order as 'params' in BurstFit

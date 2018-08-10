@@ -8,11 +8,11 @@ import chainconsumer
 from math import ceil
 
 # kepler_grids
-from ..physics import gparams
-from ..grids.grid_strings import get_source_path, print_warning
 from . import mcmc_versions
 from . import mcmc_tools
 from . import burstfit
+from pygrids.physics import gparams
+from pygrids.grids.grid_strings import get_source_path, print_warning
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
