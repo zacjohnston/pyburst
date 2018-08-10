@@ -63,6 +63,19 @@ class BurstRun(object):
                         'exclude_short_wait': exclude_short_wait,
                         }
 
+        self.parameters = {'lum_cutoff': 1e36,  # luminosity cutoff for burst detection
+                           'shock_radius': 2,  # neighbour zones to compare for shocks
+                           'shock_frac': 2.0,  # lum factor that shocks exceed neighbours by
+                           'zero_replacement': 1e35,  # zero lums set to this
+                           'maxima_radius': 60,  # bursts are largest maxima within (sec)
+                           'pre_time': 60,  # look for burst rise within sec before peak
+                           'start_frac': 0.25,  # burst start as frac of peak lum above lum_pre
+                           'peak_frac': 10,  # peak must be larger than pre_lum by this frac
+                           'end_frac': 0.01,  # burst end lum is this frac of peak lum
+                           'min_length': 5,  # min time between burst peak and end (sec)
+                           'short_wait_frac': 0.5,  # short_waits below frac of following dt
+                           }
+
         self.plot_colours = {'bursts': 'C1',
                              'candidates': 'C4',
                              'outliers': 'C9',
@@ -256,6 +269,7 @@ class BurstRun(object):
         exclude_outliers : bool (optional)
             if not provided, fall back on self.options
         exclude_min_regress : bool (optional)
+        exclude_discard : bool (optional)
         """
         if exclude_short_wait is None:
             exclude_short_wait = self.options['exclude_short_wait']
@@ -361,8 +375,7 @@ class BurstRun(object):
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
         """
-        lum_thresh = 1e36  # minimum threshold luminosity
-        thresh_i = np.where(self.lum[:, 1] > lum_thresh)[0]
+        thresh_i = np.where(self.lum[:, 1] > self.parameters['lum_cutoff'])[0]
         lum_cut = self.lum[thresh_i]
 
         maxima_i = argrelextrema(lum_cut[:, 1], np.greater)[0]
@@ -377,20 +390,18 @@ class BurstRun(object):
         maxima : nparray(n,2)
             local maxima to check (t, lum)
         """
-        radius = 2  # radius of neighbour zones to compare against
-        tolerance = 2.0  # maxima should not be more than this factor larger than neighbours
         self.remove_zeros()
-
+        radius = self.parameters['shock_radius']
         # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
         for max_i in maxima:
             t, lum = max_i
             idx = np.searchsorted(self.lum[:, 0], t)
 
-            left = self.lum[idx-radius: idx, 1]  # left neighbours
-            right = self.lum[idx+1: idx+radius+1, 1]  # right neighbours
+            left = self.lum[idx - radius: idx, 1]  # left neighbours
+            right = self.lum[idx + 1: idx + radius + 1, 1]  # right neighbours
             neighbours = np.concatenate([left, right])
 
-            if True in (lum > tolerance*neighbours):
+            if True in (lum > self.parameters['shock_frac'] * neighbours):
                 if not self.flags['shocks']:
                     self.printv('Shocks detected and removed: consider verifying'
                                 ' with self.plot(shocks=True)')
@@ -404,18 +415,17 @@ class BurstRun(object):
     def remove_zeros(self):
         """During shocks, kepler can also give zero luminosity (for some reason...)
         """
-        replace_with = 1e35
         zeros = np.where(self.lum[:, 1] == 0.0)
         if len(zeros) > 0:
             if not self.flags['zeros']:
                 self.printv(f'Zeros removed from luminosity')
                 self.flags['zeros'] = True
-            self.lum[zeros, 1] = replace_with
+            self.lum[zeros, 1] = self.parameters['zero_replacement']
 
     def get_burst_peaks(self):
         """Keep largest maxima within some time-window
         """
-        t_radius = 60  # burst peak must be largest maxima within t_radius (s)
+        t_radius = self.parameters['maxima_radius']
         peaks = []
 
         for maxi in self.candidates:
@@ -456,11 +466,7 @@ class BurstRun(object):
     def get_burst_starts(self):
         """Finds first point in lightcurve that reaches a given fraction of the peak
         """
-        pre_time = 60  # time (s) before burst peak that should always contain burst rise
-        start_frac = 0.25  # Burst start as fraction of peak lum
-        peak_frac = 10
-
-        self.bursts['t_pre'] = self.bursts['t_peak'] - pre_time  # time before burst (s)
+        self.bursts['t_pre'] = self.bursts['t_peak'] - self.parameters['pre_time']
         self.bursts['t_pre_i'] = np.searchsorted(self.lum[:, 0], self.bursts['t_pre'])
         self.bursts['lum_pre'] = self.lum[self.bursts['t_pre_i'], 1]
 
@@ -469,8 +475,7 @@ class BurstRun(object):
 
         for burst in self.bursts.itertuples():
             rise_steps = burst.t_peak_i - burst.t_pre_i
-            if (rise_steps < 50
-                    or burst.peak / burst.lum_pre < peak_frac):
+            if rise_steps < 50 or (burst.peak / burst.lum_pre) < self.parameters['peak_frac']:
                 self.printv(f'Removing micro-burst at t={burst.t_peak:.0f} s '
                             + f'({burst.t_peak/3600:.1f} hr)')
                 self.delete_burst(burst.Index)
@@ -479,7 +484,7 @@ class BurstRun(object):
             lum_slice = self.lum[burst.t_pre_i:burst.t_peak_i]
             pre_lum = lum_slice[0, 1]
             peak_lum = lum_slice[-1, 1]
-            start_lum = pre_lum + start_frac * (peak_lum - pre_lum)
+            start_lum = pre_lum + self.parameters['start_frac'] * (peak_lum - pre_lum)
 
             slice_i = np.searchsorted(lum_slice[:, 1], start_lum)
             t_start = lum_slice[slice_i, 0]
@@ -492,8 +497,6 @@ class BurstRun(object):
         """Finds first point in lightcurve > min_length after peak that falls
         to a given fraction of luminosity
         """
-        end_frac = 0.01  # end of burst defined when luminosity falls to this fraction of peak
-        min_length = 5  # minimum length of burst after peak (s)
         self.bursts['t_end'] = np.full(self.n_bursts, np.nan)
         self.bursts['t_end_i'] = np.zeros(self.n_bursts, dtype=int)
 
@@ -505,10 +508,10 @@ class BurstRun(object):
             lum_diff = peak_lum - pre_lum
 
             time_from_peak = lum_slice[:, 0] - peak_t
-            threshold_lum = pre_lum + (end_frac * lum_diff)
+            threshold_lum = pre_lum + (self.parameters['end_frac'] * lum_diff)
             thresh_i = np.where(lum_slice[:, 1] < threshold_lum)[0]
 
-            min_length_i = np.where(time_from_peak > min_length)[0]
+            min_length_i = np.where(time_from_peak > self.parameters['min_length'])[0]
             intersection = list(set(thresh_i).intersection(min_length_i))
 
             if len(intersection) == 0:
@@ -543,10 +546,9 @@ class BurstRun(object):
             self.n_short_wait = 0
             return
 
-        min_dt_frac = 0.5
         dt_0 = np.array(self.bursts.iloc[1:-1]['dt'])
         dt_1 = np.array(self.bursts.iloc[2:]['dt'])
-        short_wait = dt_0 < (min_dt_frac * dt_1)
+        short_wait = dt_0 < (self.parameters['short_wait_frac'] * dt_1)
 
         self.bursts.loc[1:self.bursts.index[-2], 'short_wait'] = short_wait
         self.n_short_wait = len(self.short_waits())
