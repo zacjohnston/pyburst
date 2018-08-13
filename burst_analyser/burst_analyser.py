@@ -315,10 +315,6 @@ class BurstRun(object):
     def not_outliers(self):
         return self.bursts[np.invert(self.bursts['outlier'])]
 
-    def set_converged_too_few(self):
-        self.flags['converged'] = False
-        self.flags['regress_too_few_bursts'] = True
-
     def identify_bursts(self):
         """Extracts peaks, times, and recurrence times of bursts
 
@@ -437,7 +433,7 @@ class BurstRun(object):
 
         if self.n_bursts < 2:
             self.flags['too_few_bursts'] = True
-            self.set_converged_too_few()
+            self.flags['regress_too_few_bursts'] = True
             message = {0: 'No bursts in this model',
                        1: 'Only one burst detected'}[self.n_bursts]
             self.print_warn(message)
@@ -609,12 +605,12 @@ class BurstRun(object):
                     self.bursts.loc[burst.Index, f'slope_{bprop}'] = lin[0]
                     self.bursts.loc[burst.Index, f'slope_{bprop}_err'] = lin[-1]
         else:
+            self.flags['regress_too_few_bursts'] = True
             minimum = (self.min_regress + self.min_discard
                        + self.n_short_wait + self.n_outliers_unique)
             self.print_warn(f'Too few bursts to get slopes. '
-                            + f'Have {self.n_bursts}, need at least {minimum} '
+                            + f'Has {self.n_bursts}, need at least {minimum} '
                             + '(assuming no further outliers/short_waits occur)')
-            self.set_converged_too_few()
 
     def get_discard(self):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
