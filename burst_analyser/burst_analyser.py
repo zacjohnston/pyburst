@@ -163,14 +163,30 @@ class BurstRun(object):
     def load_burst_table(self):
         """Load pre-extracted burst properties from file
         """
-        # TODO: set any flags that will be skipped from analyse()
-        self.printv('Loading pre-extracted burst properties from file')
+        self.printv('Loading pre-extracted bursts from file')
         self.bursts = burst_tools.load_run_table(run=self.run, batch=self.batch,
                                                  source=self.source, table='bursts')
         self.n_bursts = len(self.bursts)
         self.n_short_wait = len(self.short_waits())
         self.n_outliers = len(self.outliers())
         self.n_outliers_unique = len(self.outliers(unique=True))
+
+        self.determine_flags_from_table()
+
+    def determine_flags_from_table(self):
+        """Determine flags from a loaded burst table (without full analysis)
+        """
+        if self.n_short_wait > 0:
+            self.flags['short_waits'] = True
+
+        if self.n_outliers_unique > 0:
+            self.flags['outliers'] = True
+
+        if self.n_bursts < 2:
+            self.flags['too_few_bursts'] = True
+
+        if False not in np.isnan(np.array(self.bursts['slope_dt'])):
+            self.flags['regress_too_few_bursts'] = True
 
     def load_summary_table(self):
         self.printv('Loading pre-extracted model summary from file')
