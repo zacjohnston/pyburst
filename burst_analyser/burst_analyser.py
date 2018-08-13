@@ -664,7 +664,6 @@ class BurstRun(object):
     def test_bimodal(self):
         """Determines if the burst sequence is bimodal
         """
-        # TODO: enough bursts
         # TODO: check analysed
         bursts = self.clean_bursts()
         n_bimodal = self.parameters['n_bimodal']
@@ -783,7 +782,7 @@ class BurstRun(object):
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=None,
                          legend=False, display=True, save=False, fix_xticks=False,
-                         short_waits=False, outliers=False):
+                         short_waits=False, outliers=False, show_mean=True):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
@@ -817,16 +816,16 @@ class BurstRun(object):
                 if i != len(bprops)-1:
                     ax[i].set_xticklabels([])
 
-            for burst in bursts_discard.itertuples():
-                bslice = bursts_discard.loc[:burst.Index][bprop]
-                mean = np.mean(bslice)
-                std = np.std(bslice)
-                ax[i].errorbar(burst.Index, mean/y_scale, yerr=std/y_scale,
-                               marker='o', c='C0', capsize=3, ls='none',
-                               markersize=markersize, markeredgecolor=markeredgecolor,
-                               label='cumulative mean' if burst.Index == bursts_discard.index[0] else '_nolegend_')
-
-            self.printv(f'{bprop}: mean={mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
+            if show_mean:
+                for burst in bursts_discard.itertuples():
+                    bslice = bursts_discard.loc[:burst.Index][bprop]
+                    mean = np.mean(bslice)
+                    std = np.std(bslice)
+                    ax[i].errorbar(burst.Index, mean/y_scale, yerr=std/y_scale,
+                                   marker='o', c='C0', capsize=3, ls='none',
+                                   markersize=markersize, markeredgecolor=markeredgecolor,
+                                   label='cumulative mean' if burst.Index == bursts_discard.index[0] else '_nolegend_')
+                self.printv(f'{bprop}: mean={mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
 
             if outliers:
                 ax[i].plot(bursts_outliers['n'], bursts_outliers[bprop] / y_scale,
