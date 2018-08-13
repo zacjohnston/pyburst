@@ -821,7 +821,7 @@ class BurstRun(object):
                     bslice = bursts_discard.loc[:burst.Index][bprop]
                     mean = np.mean(bslice)
                     std = np.std(bslice)
-                    ax[i].errorbar(burst.Index, mean/y_scale, yerr=std/y_scale,
+                    ax[i].errorbar(burst.n, mean/y_scale, yerr=std/y_scale,
                                    marker='o', c='C0', capsize=3, ls='none',
                                    markersize=markersize, markeredgecolor=markeredgecolor,
                                    label='cumulative mean' if burst.Index == bursts_discard.index[0] else '_nolegend_')
