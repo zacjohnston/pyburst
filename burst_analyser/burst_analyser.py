@@ -782,8 +782,8 @@ class BurstRun(object):
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=None,
                          legend=False, display=True, save=False, fix_xticks=False,
-                         short_waits=False, outliers=False, show_mean=True,
-                         shaded=False):
+                         short_waits=False, outliers=False, show_mean=False,
+                         shaded=True, frac=True):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
@@ -802,7 +802,7 @@ class BurstRun(object):
         y_scales = {'tDel': 3600, 'dt': 3600,
                     'fluence': 1e39, 'peak': 1e38}
 
-        fig, ax = plt.subplots(3, 1, figsize=(6, 8))
+        fig, ax = plt.subplots(len(bprops), 1, figsize=(6, 8))
         bursts = self.clean_bursts()
         bursts_discard = self.clean_bursts(exclude_discard=True)
         bursts_short_waits = self.short_waits()
@@ -836,6 +836,10 @@ class BurstRun(object):
                 y = np.array([mean, mean])
                 ax[i].plot(x, y, color='C0')
                 ax[i].fill_between(x, y+std, y-std, color='0.8')
+
+                if frac:
+                    ax[i].text(x[1], 1.005*(y[1]+std), f'({100*std/mean:.1f}%)',
+                               horizontalalignment='right')
 
             if outliers:
                 ax[i].plot(bursts_outliers['n'], bursts_outliers[bprop] / y_scale,
