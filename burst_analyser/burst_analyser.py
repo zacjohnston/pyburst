@@ -782,12 +782,14 @@ class BurstRun(object):
 
     def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=None,
                          legend=False, display=True, save=False, fix_xticks=False,
-                         short_waits=False, outliers=False, show_mean=True):
+                         short_waits=False, outliers=False, show_mean=True,
+                         shaded=False):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
         markersize = 8
         markeredgecolor = '0'
+        # TODO Use manually set discard when plotting means/shaded
         if discard is None:
             discard = self.discard
 
@@ -819,13 +821,21 @@ class BurstRun(object):
             if show_mean:
                 for burst in bursts_discard.itertuples():
                     bslice = bursts_discard.loc[:burst.Index][bprop]
-                    mean = np.mean(bslice)
-                    std = np.std(bslice)
-                    ax[i].errorbar(burst.n, mean/y_scale, yerr=std/y_scale,
+                    mean = np.mean(bslice) / y_scale
+                    std = np.std(bslice) / y_scale
+                    ax[i].errorbar(burst.n, mean, yerr=std,
                                    marker='o', c='C0', capsize=3, ls='none',
                                    markersize=markersize, markeredgecolor=markeredgecolor,
                                    label='cumulative mean' if burst.Index == bursts_discard.index[0] else '_nolegend_')
                 self.printv(f'{bprop}: mean={mean:.3e}, std={std:.3e}, frac={std/mean:.3f}')
+
+            if shaded:
+                mean = np.mean(bursts_discard[bprop]) / y_scale
+                std = np.std(bursts_discard[bprop]) / y_scale
+                x = [discard+1, self.n_bursts]
+                y = np.array([mean, mean])
+                ax[i].plot(x, y, color='C0')
+                ax[i].fill_between(x, y+std, y-std, color='0.8')
 
             if outliers:
                 ax[i].plot(bursts_outliers['n'], bursts_outliers[bprop] / y_scale,
