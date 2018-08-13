@@ -195,7 +195,7 @@ class BurstRun(object):
 
         self.summary = summary_table.to_dict('list')
         for key, val in self.summary.items():
-            self.summary[key] = val[0]
+            self.summary[key] = val[0]  # don't store as arrays
 
     def analyse(self):
         """Performs complete analysis of model.
