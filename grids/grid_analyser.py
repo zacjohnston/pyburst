@@ -414,7 +414,8 @@ class Kgrid:
         self.printv('')
 
     def plot_burst_property(self, bprop, var, fixed, save=False, show=True,
-                            powerfits=False, interpolate=True, fix_axis=True):
+                            powerfits=False, interpolate=True, fix_axis=True,
+                            shaded=True):
         """Plots given burst property against accretion rate
         
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
@@ -512,6 +513,9 @@ class Kgrid:
             if rate:
                 u_y = u_y * (24 / prop_y**2)
                 prop_y = 24 / prop_y
+
+            if shaded:
+                ax.fill_between(mdot_x, prop_y+u_y, prop_y-u_y, alpha=0.3)
 
             ax.errorbar(x=mdot_x, y=prop_y, yerr=u_y, marker='o',
                         label=label, capsize=3, ls='-' if interpolate else 'none')
