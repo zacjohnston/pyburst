@@ -804,6 +804,8 @@ class BurstRun(object):
         # TODO Use manually set discard when plotting means/shaded
         if discard is None:
             discard = self.discard
+        else:
+            self.discard = discard
 
         if self.n_bursts < discard+2:
             print('Too few bursts to plot convergence')
@@ -816,6 +818,7 @@ class BurstRun(object):
 
         fig, ax = plt.subplots(len(bprops), 1, figsize=(6, 8))
         bursts = self.clean_bursts()
+
         bursts_discard = self.clean_bursts(exclude_discard=True)
         bursts_short_waits = self.short_waits()
         bursts_outliers = self.outliers(unique=False)
