@@ -546,6 +546,7 @@ version_definitions = {
                 59: 21,
                 60: 22,
                 61: 23,
+                62: 23,
             },
             'sim_test':
                 {1: 5,
@@ -624,6 +625,7 @@ version_definitions = {
                 59: prior_bounds[6][29],
                 60: prior_bounds[6][29],
                 61: prior_bounds[7][8],
+                62: prior_bounds[7][8],
             },
             'sim_test': {
                 1: prior_bounds[1][9],
@@ -689,6 +691,7 @@ version_definitions = {
                 59: initial_position[24],
                 60: initial_position[24],
                 61: initial_position[25],
+                62: initial_position[25],
             },
             'sim_test': {},
             'sim10': {
@@ -751,6 +754,7 @@ version_definitions = {
                     59: param_keys[6],
                     60: param_keys[6],
                     61: param_keys[7],
+                    62: param_keys[7],
                 },
             'sim_test': {},
             'sim10': {
