@@ -624,7 +624,7 @@ class BurstRun(object):
             self.flags['regress_too_few_bursts'] = True
             minimum = (self.min_regress + self.min_discard
                        + self.n_short_wait + self.n_outliers_unique)
-            self.print_warn(f'Too few bursts to get slopes. '
+            self.printv(f'Too few bursts to get slopes. '
                             + f'Has {self.n_bursts}, need at least {minimum} '
                             + '(assuming no further outliers/short_waits occur)')
 
