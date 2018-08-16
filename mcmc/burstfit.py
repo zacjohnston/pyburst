@@ -270,7 +270,8 @@ class BurstFit:
                 phi = (redshift - 1) * c.value ** 2 / redshift  # gravitational potential
                 shifted = (values * mdot_edd * phi) / (redshift * 4*np.pi * flux_factor_p)
             else:
-                raise ValueError('bprop must be one of (dt, u_dt, fluence, u_fluence, '
+                raise ValueError('bprop must be one of (dt, u_dt, rate, u_rate, '
+                                 + 'fluence, u_fluence, '
                                  + 'peak, u_peak, fper)')
         self.debug.end_function()
         return shifted
@@ -391,12 +392,16 @@ class BurstFit:
         """
         fontsize = 13
         dx = 0.04  # horizontal offset of plot points
+        yscale = {'dt': 1.0, 'rate': 1.0,
+                  'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
         ylabel = {'dt': r'$\Delta t$',
+                  'rate': 'Burst rate',
                   'fluence': r'$E_b$',
                   'peak': r'$F_{peak}$',
                   'fper': r'$F_p$'}.get(bprop, bprop)
-        yscale = {'dt': 1.0, 'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
-        y_units = {'dt': 'hr', 'fluence': r'$10^{-6}$ erg cm$^{-2}$',
+        y_units = {'dt': 'hr',
+                   'rate': 'day$^{-1}$',
+                   'fluence': r'$10^{-6}$ erg cm$^{-2}$',
                    'peak': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
                    'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$'}.get(bprop)
 
