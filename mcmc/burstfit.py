@@ -240,6 +240,8 @@ class BurstFit:
 
         if bprop in ('dt', 'u_dt'):
             shifted = values * redshift / 3600
+        elif bprop in ('rate', 'u_rate'):
+            shifted = values / redshift
         else:
             if self.has_f:  # model uses generalised flux_factors xi*d^2 (x10^45)
                 flux_factor_b = 1e45 * params[self.param_idxs['f_b']]
