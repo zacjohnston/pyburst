@@ -59,7 +59,9 @@ def plot_flags(kgrid, fixed=None, flag='short_waits'):
 
     ax.plot(not_shorts['accrate'], not_shorts['x'], marker='o', ls='none')
     ax.plot(shorts['accrate'], shorts['x'], marker='o', ls='none', color='C3')
-
+    ax.set_title(fixed)
+    ax.set_xlabel('accrate')
+    ax.set_ylabel('X')
     plt.show(block=False)
 
 
