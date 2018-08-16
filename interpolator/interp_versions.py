@@ -52,14 +52,14 @@ version_definitions = {
                     14: ['accrate', 'z', 'qb', 'mass'],
                     15: ['accrate', 'x', 'z', 'qb', 'mass'],
                     16: ['accrate', 'x', 'z', 'mass'],
-                    18: ['accrate', 'x', 'z', 'mass'],
-                    19: ['accrate', 'x', 'z', 'mass'],
-                    20: ['accrate', 'x', 'z', 'mass'],
-                    21: ['accrate', 'x', 'z', 'qb', 'mass'],
-                    22: ['accrate', 'x', 'z', 'qb', 'mass'],
-                    23: ['accrate', 'x', 'z', 'mass'],
-                    24: ['accrate', 'x', 'z', 'mass'],
-                    25: ['accrate', 'x', 'z', 'mass'],
+                    18: 16,
+                    19: 16,
+                    20: 16,
+                    21: 15,
+                    22: 15,
+                    23: 16,
+                    24: 16,
+                    25: 16,
                 },
         },
 
@@ -144,25 +144,14 @@ version_definitions = {
                     'qb': [0.025, 0.075, 0.2],
                     'mass': [0.8, 2.6, 3.2],
                     },
-                20: {
-                    'accrate': np.append(np.arange(5, 10) / 100, np.arange(11, 24, 2) / 100),
-                    'x': [0.5, 0.6, 0.77, 0.8],
-                    'z': [0.001, 0.0175],
-                    'qb': [0.025, 0.075, 0.2],
-                    'mass': [0.8, 2.6, 3.2],
-                    },
+                20: 19,
                 21: {
                     'accrate': np.arange(5, 8) / 100,
                     'x': [0.5, 0.8],
                     'z': [0.001],
                     'mass': [0.8, 3.2],
                     },
-                22: {
-                    'accrate': np.arange(5, 8) / 100,
-                    'x': [0.5, 0.8],
-                    'z': [0.001],
-                    'mass': [0.8, 3.2],
-                    },
+                22: 21,
                 23: {
                     'accrate': np.append(np.arange(5, 10), np.arange(11, 24, 2))/100,
                     'x': [0.5, 0.6, 0.75, 0.77, 0.8],
@@ -170,20 +159,8 @@ version_definitions = {
                     'z': [0.001, 0.0015, 0.0125, 0.0175],
                     'mass': [0.8, 1.4, 2.6, 3.2],
                     },
-                24: {
-                    'accrate': np.append(np.arange(5, 10), np.arange(11, 24, 2))/100,
-                    'x': [0.5, 0.6, 0.75, 0.77, 0.8],
-                    'qb': [0.025, 0.075, 0.125, 0.2],
-                    'z': [0.001, 0.0015, 0.0125, 0.0175],
-                    'mass': [0.8, 1.4, 2.6, 3.2],
-                    },
-                25: {
-                    'accrate': np.append(np.arange(5, 10), np.arange(11, 24, 2)) / 100,
-                    'x': [0.5, 0.6, 0.75, 0.77, 0.8],
-                    'qb': [0.025, 0.075, 0.125, 0.2],
-                    'z': [0.001, 0.0015, 0.0125, 0.0175],
-                    'mass': [0.8, 1.4, 2.6, 3.2],
-                },
+                24: 23,
+                25: 23,
                 },
         },
 }
@@ -211,5 +188,9 @@ class InterpVersion:
 
 def get_parameter(source, version, parameter):
     default = version_defaults[parameter][source]
-    return version_definitions[parameter][source].get(version, default)
+    out = version_definitions[parameter][source].get(version, default)
+    if type(out) is int:
+        return version_definitions[parameter][source][out]
+    else:
+        return out
 
