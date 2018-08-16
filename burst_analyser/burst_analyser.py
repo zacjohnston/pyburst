@@ -801,7 +801,8 @@ class BurstRun(object):
         self.ensure_analysed_is(True)
         markersize = 8
         markeredgecolor = '0'
-        # TODO Use manually set discard when plotting means/shaded
+        fontsize = 14
+
         if discard is None:
             discard = self.discard
         else:
@@ -811,8 +812,8 @@ class BurstRun(object):
             print('Too few bursts to plot convergence')
             return
 
-        y_units = {'tDel': 'hr', 'dt': 'hr', 'fluence': '10^39 erg',
-                   'peak': '10^38 erg/s'}
+        y_units = {'tDel': 'hr', 'dt': 'hr', 'fluence': '10$^{39}$ erg',
+                   'peak': '10$^{38}$ erg/s'}
         y_scales = {'tDel': 3600, 'dt': 3600,
                     'fluence': 1e39, 'peak': 1e38}
 
@@ -826,7 +827,7 @@ class BurstRun(object):
         for i, bprop in enumerate(bprops):
             y_unit = y_units.get(bprop)
             y_scale = y_scales.get(bprop, 1.0)
-            ax[i].set_ylabel(f'{bprop} ({y_unit})')
+            ax[i].set_ylabel(f'{bprop} ({y_unit})', fontsize=fontsize)
 
             if fix_xticks:
                 ax[i].set_xticks(self.bursts['n'])
@@ -875,8 +876,8 @@ class BurstRun(object):
         if legend:
             ax[0].legend(loc=3)
 
-        ax[0].set_title(self.model_str)
-        ax[-1].set_xlabel('Burst num')
+        ax[0].set_title(self.model_str, fontsize=fontsize)
+        ax[-1].set_xlabel('Burst num', fontsize=fontsize)
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
