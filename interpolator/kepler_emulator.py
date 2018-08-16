@@ -33,12 +33,10 @@ class Kemulator:
     """
 
     def __init__(self, source, version, verbose=True, exclude_tests=True,
-                 re_interp=True, burst_analyser=True,
-                 bprops=('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak')):
+                 re_interp=True, burst_analyser=True):
         self.verbose = verbose
         source = grid_strings.source_shorthand(source)
         self.source = source
-        self.bprops = bprops
         self.version = version
         self.burst_analyser = burst_analyser
         self.interpolator = None
@@ -47,13 +45,13 @@ class Kemulator:
         params = grid_tools.load_grid_table('params', source=source)
 
         self.version_def = interp_versions.InterpVersion(source, version)
+        self.bprops = self.version_def.bprops
         batches_exclude = self.version_def.batches_exclude
         params_exclude = self.version_def.params_exclude
 
         if exclude_tests:
             exclude = {**batches_exclude, **params_exclude}
             params = grid_tools.exclude_params(table=params, params=exclude)
-
             idxs_kept = params.index
             summ = summ.loc[idxs_kept]
 
@@ -61,7 +59,7 @@ class Kemulator:
         self.params = params
 
         if re_interp:
-            self.setup_interpolator(bprops=bprops)
+            self.setup_interpolator(self.bprops)
         else:
             self.load_interpolator()
 
