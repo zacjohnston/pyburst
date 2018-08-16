@@ -8,6 +8,8 @@ from pygrids.grids import grid_strings
 # '***' signifies values that changed over the previous version
 # First layer identifies param_keys
 # -----------------------------------
+# TODO: clean the fuck up
+
 prior_bounds = {
     1: {
         9: ((0.08, 0.24),  # mdot1
@@ -436,14 +438,46 @@ initial_position = {
 #         ---version
 #               ---parameter value
 
-version_definitions = {
-    'disc_model_default':
+version_defaults = {
+    'disc_model':
         {
             'biggrid1': 'he16_d',
             'biggrid2': 'he16_d',
             'sim_test': 'he16_a',
             'sim10': 'he16_a',
         },
+
+    'interpolator':
+        {
+            'biggrid1': 1,
+            'biggrid2': 1,
+        },
+
+    'prior_bounds':
+        {
+            'biggrid1': {},
+            'biggrid2': prior_bounds[2][13],
+        },
+
+    'initial_position':
+        {
+            'biggrid1': initial_position[1],
+            'biggrid2': initial_position[4],
+            'sim_test': initial_position[3],
+            'sim10': initial_position[12],
+        },
+
+    'param_keys':
+        {
+            'biggrid1': param_keys[1],
+            'biggrid2': param_keys[2],
+            'sim_test': param_keys[1],
+            'sim10': param_keys[6],
+        },
+}
+
+
+version_definitions = {
     'disc_model':
         {
             'biggrid1': {
@@ -646,13 +680,6 @@ version_definitions = {
                 7: prior_bounds[2][20],
             },
         },
-    'initial_position_default':
-        {
-            'biggrid1': initial_position[1],
-            'biggrid2': initial_position[4],
-            'sim_test': initial_position[3],
-            'sim10': initial_position[12],
-        },
     'initial_position':
         {
             'biggrid1': {},
@@ -703,13 +730,6 @@ version_definitions = {
                 7: initial_position[21],
             },
 
-        },
-    'param_keys_default':
-        {
-            'biggrid1': param_keys[1],
-            'biggrid2': param_keys[2],
-            'sim_test': param_keys[1],
-            'sim10': param_keys[6],
         },
     'param_keys':
         {
@@ -774,7 +794,7 @@ class McmcVersion:
     def __init__(self, source, version):
         source = grid_strings.check_synth_source(source)
 
-        if source not in version_definitions['param_keys_default']:
+        if source not in version_defaults['param_keys']:
             raise ValueError(f'source ({source}) not defined in mcmc_versions')
         elif version not in version_definitions['interpolator'][source]:
             raise ValueError(f'version {version} of source {source} ' +
@@ -782,13 +802,13 @@ class McmcVersion:
 
         self.source = source
         self.version = version
-        self.param_keys = get_param_keys(source, version)
-        self.interpolator = get_interpolator(source, version)
-        self.prior_bounds = get_prior_bounds(source, version)
-        self.initial_position = get_initial_position(source, version)
+        self.param_keys = get_parameter(source, version, 'param_keys')
+        self.interpolator = get_parameter(source, version, 'interpolator')
+        self.prior_bounds = get_parameter(source, version, 'prior_bounds')
+        self.initial_position = get_parameter(source, version, 'initial_position')
 
         if 'inc' in self.param_keys:
-            self.disc_model = get_disc_model(source, version)
+            self.disc_model = get_parameter(source, version, 'disc_model')
         else:
             self.disc_model = None
 
@@ -802,30 +822,8 @@ class McmcVersion:
                 )
 
 
-# ===== Convenience functions =====
-def get_disc_model(source, version):
+def get_parameter(source, version, parameter):
     source = grid_strings.check_synth_source(source)
-    default = version_definitions['disc_model_default'][source]
-    return version_definitions['disc_model'][source].get(version, default)
+    default = version_defaults[parameter][source]
+    return version_definitions[parameter][source].get(version, default)
 
-
-def get_interpolator(source, version):
-    source = grid_strings.check_synth_source(source)
-    return version_definitions['interpolator'][source][version]
-
-
-def get_prior_bounds(source, version):
-    source = grid_strings.check_synth_source(source)
-    return np.array(version_definitions['prior_bounds'][source][version])
-
-
-def get_initial_position(source, version):
-    source = grid_strings.check_synth_source(source)
-    default = version_definitions['initial_position_default'][source]
-    return version_definitions['initial_position'][source].get(version, default)
-
-
-def get_param_keys(source, version):
-    source = grid_strings.check_synth_source(source)
-    default = version_definitions['param_keys_default'][source]
-    return version_definitions['param_keys'][source].get(version, default)
