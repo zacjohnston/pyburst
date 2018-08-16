@@ -195,10 +195,10 @@ class InterpVersion:
     def __init__(self, source, version):
         self.source = source
         self.version = version
-        self.param_keys = get_param_keys(source, version)
-        self.bprops = get_bprops(source, version)
-        self.batches_exclude = get_batches_exclude(source, version)
-        self.params_exclude = get_params_exclude(source, version)
+        self.param_keys = get_parameter(source, version, 'param_keys')
+        self.bprops = get_parameter(source, version, 'bprops')
+        self.batches_exclude = get_parameter(source, version, 'batches_exclude')
+        self.params_exclude = get_parameter(source, version, 'params_exclude')
 
     def __repr__(self):
         return (f'MCMC version definitions for {self.source} V{self.version}'
@@ -209,22 +209,7 @@ class InterpVersion:
                 )
 
 
-# ===== Convenience functions =====
-def get_param_keys(source, version):
-    default = version_defaults['param_keys'][source]
-    return version_definitions['param_keys'][source].get(version, default)
+def get_parameter(source, version, parameter):
+    default = version_defaults[parameter][source]
+    return version_definitions[parameter][source].get(version, default)
 
-
-def get_bprops(source, version):
-    default = version_defaults['bprops'][source]
-    return version_definitions['bprops'][source].get(version, default)
-
-
-def get_batches_exclude(source, version):
-    default = version_defaults['batches_exclude'][source]
-    return version_definitions['batches_exclude'][source].get(version, default)
-
-
-def get_params_exclude(source, version):
-    default = version_defaults['params_exclude'][source]
-    return version_definitions['params_exclude'][source].get(version, default)
