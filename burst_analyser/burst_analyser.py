@@ -29,14 +29,8 @@ class NoBursts(Exception):
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, save_lum=True, analyse=True, plot=False,
-                 min_regress=20, min_discard=1, exclude_outliers=True,
-                 exclude_short_wait=True, load_lum=True, load_bursts=False,
-                 load_summary=False):
-        # min_regress : int
-        #   minimum number of bursts to use in linear regression (self.linregress)
-        # min_discard : int
-        #   minimum no. of bursts to discard when averaging
-
+                 exclude_outliers=True, exclude_short_wait=True, load_lum=True,
+                 load_bursts=False, load_summary=False):
         self.flags = {'loaded': False,
                       'analysed': False,
                       'too_few_bursts': False,
@@ -66,6 +60,8 @@ class BurstRun(object):
                            'end_frac': 0.01,  # burst end lum is this frac of peak lum
                            'min_length': 5,  # min time between burst peak and end (sec)
                            'short_wait_frac': 0.5,  # short_waits below frac of following dt
+                           'min_discard': 1,  # min num of bursts to discard
+                           'min_regress': 20,  # min num of bursts to do linear regression
                            'n_bimodal': 20,  # n_bursts to check for bimodality
                            'bimodal_sigma': 3,  # number of std's modes are separated by
                            }
@@ -119,8 +115,6 @@ class BurstRun(object):
 
         # ====== linregress things ======
         self.regress_bprops = ['dt', 'fluence', 'peak']
-        self.min_regress = min_regress
-        self.min_discard = min_discard
         self.discard = None
 
         # ====== Loading things ======
@@ -288,7 +282,7 @@ class BurstRun(object):
             exclude_outliers = self.options['exclude_outliers']
 
         mask = np.full(self.n_bursts, True)
-        mask[:self.min_discard] = False
+        mask[:self.parameters['min_discard']] = False
 
         if exclude_short_wait:
             mask = mask & np.invert(self.bursts['short_wait'])
@@ -298,7 +292,7 @@ class BurstRun(object):
             mask[:self.discard] = False
 
         if exclude_min_regress:
-            return self.bursts[mask].iloc[:-self.min_regress + 1]
+            return self.bursts[mask].iloc[:-self.parameters['min_regress'] + 1]
         else:
             return self.bursts[mask]
 
@@ -322,7 +316,7 @@ class BurstRun(object):
         """
         if unique:
             mask = self.bursts['outlier'] & np.invert(self.bursts['short_wait'])
-            mask.iloc[:self.min_discard] = False
+            mask.iloc[:self.parameters['min_discard']] = False
         else:
             mask = self.bursts['outlier']
 
@@ -588,7 +582,7 @@ class BurstRun(object):
         percentiles = burst_tools.get_quartiles(clean_dt)
 
         outliers = (self.bursts['dt'] < percentiles[0]) | (self.bursts['dt'] > percentiles[-1])
-        outliers[:self.min_discard] = True
+        outliers[:self.parameters['min_discard']] = True
 
         self.bursts['outlier'] = outliers
         self.n_outliers = len(self.outliers())
@@ -622,7 +616,7 @@ class BurstRun(object):
                     self.bursts.loc[burst.Index, f'slope_{bprop}_err'] = lin[-1]
         else:
             self.flags['regress_too_few_bursts'] = True
-            minimum = (self.min_regress + self.min_discard
+            minimum = (self.parameters['min_regress'] + self.parameters['min_discard']
                        + self.n_short_wait + self.n_outliers_unique)
             self.printv(f'Too few bursts to get slopes. '
                             + f'Has {self.n_bursts}, need at least {minimum} '
@@ -633,7 +627,7 @@ class BurstRun(object):
         """
         if self.flags['regress_too_few_bursts']:
             self.printv('Too few bursts to find self.discard, defaulting to min_discard')
-            return self.min_discard
+            return self.parameters['min_discard']
 
         bursts = self.clean_bursts(exclude_min_regress=True)
         zero_slope = np.full(len(bursts), True)
