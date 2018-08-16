@@ -449,8 +449,8 @@ version_defaults = {
 
     'bprops':
         {
-            'biggrid1': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
-            'biggrid2': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+            'biggrid1': ('dt', 'fluence', 'peak'),
+            'biggrid2': ('dt', 'fluence', 'peak'),
         },
     'disc_model':
         {
@@ -584,7 +584,7 @@ version_definitions = {
             'biggrid1': {},
             'biggrid2':
                 {
-                  63: ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+                  63: ('rate', 'fluence', 'peak'),
                 },
         },
     'param_keys':

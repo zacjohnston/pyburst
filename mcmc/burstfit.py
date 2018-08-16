@@ -194,7 +194,7 @@ class BurstFit:
             self.debug.end_function()
             return -np.inf
 
-        for i, bprop in enumerate(['dt', 'fluence', 'peak']):
+        for i, bprop in enumerate(self.bprops):
             u_bprop = f'u_{bprop}'
             bprop_col = 2*i
             u_bprop_col = bprop_col + 1
