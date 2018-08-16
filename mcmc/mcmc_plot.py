@@ -87,7 +87,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
     """Plots posterior contours of mcmc chain
     """
     default_plt_options()
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     # TODO: re-use the loaded chainconsumer here instead of reloading
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap,
                              smoothing=smoothing)
@@ -123,7 +123,7 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
         Will be overidden if max_lhood=True
     """
     default_plt_options()
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap,
                              smoothing=smoothing)
     height = 3 * ceil(len(pkeys) / 4)
@@ -195,7 +195,7 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
     save : bool
     """
     default_plt_options()
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
     # ===== Default to splitting all params into 2 plots  =====
     if params is None:
@@ -242,7 +242,7 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
 def get_summary(chain, discard, source, version, cap=None):
     """Return summary values from MCMC chain (mean, uncertainties)
     """
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     n_dimensions = chain.shape[2]
     summary = np.full((n_dimensions, 3), np.nan)
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
@@ -260,7 +260,7 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None,
     if type(param_labels) == type(None):
         if (source is None) or (version is None):
             raise ValueError('If param_labels not provided, must give source, version')
-        param_labels = mcmc_versions.get_param_keys(source=source, version=version)
+        param_labels = mcmc_versions.get_parameter(source, version, 'param_keys')
 
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_dimensions = chain.shape[2]
@@ -285,7 +285,8 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     n_walkers, n_steps, n_dimensions = chain.shape
     chain_flat = chain.reshape((-1, n_dimensions))
 
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+
     redshift = chain_flat[:, pkeys.index('redshift')]
     g = chain_flat[:, pkeys.index('g')] * g_reference
     mass, radius = gparams.get_mass_radius(g=g, redshift=redshift)
@@ -305,7 +306,8 @@ def get_mass_radius_point(params, source, version):
     radius_reference = 10
     g_reference = gparams.get_acceleration_newtonian(r=radius_reference, m=mass_reference)
 
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+
     redshift = params[pkeys.index('redshift')]
     g = params[pkeys.index('g')] * g_reference
     mass, radius = gparams.get_mass_radius(g=g, redshift=redshift)
@@ -333,7 +335,8 @@ def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
     """Saves frames of contour evolution, to make an animation
     """
     default_plt_options()
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+
     n_walkers, n_steps, n_dimensions = chain.shape
     mtarget = os.path.join(GRIDS_PATH, 'sources', source, 'mcmc', 'animation')
     ftarget = os.path.join(mtarget, 'frames')

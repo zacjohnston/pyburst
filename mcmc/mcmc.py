@@ -127,7 +127,7 @@ def optimise(source, version, params0):
 def convert_params(params, source, version):
     """Converts params from dict to raw list format, and vice versa (ensures order)
     """
-    pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+    pkeys = mcmc_versions.get_parameter(source, version, parameter='param_keys')
     check_params_length(params=params, n=len(pkeys))
     ptype = type(params)
 
@@ -156,7 +156,7 @@ def save_all_plots(source, versions, n_steps, n_walkers,
     versions = grid_tools.ensure_np_list(versions)
 
     for version in versions:
-        pkeys = mcmc_versions.get_param_keys(source=source, version=version)
+        pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
         chain = mcmc_tools.load_chain(source, version=version, n_steps=n_steps,
                                       n_walkers=n_walkers)
