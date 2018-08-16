@@ -45,9 +45,8 @@ class BurstFit:
     """Class for comparing modelled bursts to observed bursts
     """
 
-    def __init__(self, source, version,
-                 bprops=('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
-                 verbose=True, lhood_factor=1, debug=False, priors_only=False,
+    def __init__(self, source, version, verbose=True,
+                 lhood_factor=1, debug=False, priors_only=False,
                  re_interp=False, **kwargs):
 
         self.source = source
@@ -63,12 +62,11 @@ class BurstFit:
         if 'sim' in self.source:
             source = 'biggrid2'  # from here on effectively treat as biggrid2
 
-        self.bprops = bprops
-        self.n_bprops = len(bprops)
+        self.bprops = self.mcmc_version.bprops
+        self.n_bprops = len(self.bprops)
         self.lhood_factor = lhood_factor
         self.priors_only = priors_only
         self.kemulator = kepler_emulator.Kemulator(source=source,
-                                                   bprops=bprops,
                                                    version=self.mcmc_version.interpolator,
                                                    re_interp=re_interp,
                                                    **kwargs)

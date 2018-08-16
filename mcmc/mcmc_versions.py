@@ -439,6 +439,19 @@ initial_position = {
 #               ---parameter value
 
 version_defaults = {
+    'param_keys':
+        {
+            'biggrid1': param_keys[1],
+            'biggrid2': param_keys[2],
+            'sim_test': param_keys[1],
+            'sim10': param_keys[6],
+        },
+
+    'bprops':
+        {
+            'biggrid1': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+            'biggrid2': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+        },
     'disc_model':
         {
             'biggrid1': 'he16_d',
@@ -467,47 +480,10 @@ version_defaults = {
             'sim10': initial_position[12],
         },
 
-    'param_keys':
-        {
-            'biggrid1': param_keys[1],
-            'biggrid2': param_keys[2],
-            'sim_test': param_keys[1],
-            'sim10': param_keys[6],
-        },
 }
 
 
 version_definitions = {
-    'disc_model':
-        {
-            'biggrid1': {
-                2: 'he16_a',
-                5: 'he16_a',
-                6: 'he16_a',
-            },
-            'biggrid2': {
-                2: 'he16_a',
-                3: 'he16_b',
-                10: 'he16_a',
-                11: 'he16_b',
-                12: 'he16_c',
-                14: 'he16_a',
-                15: 'he16_b',
-                16: 'he16_c',
-                18: 'he16_a',
-                19: 'he16_b',
-                20: 'he16_c',
-                22: 'he16_a',
-                23: 'he16_b',
-                24: 'he16_c',
-                25: 'he16_b',
-                26: 'he16_a',
-                27: 'he16_b',
-                38: 'he16_a',
-            },
-            'sim_test': {},
-            'sim10': {},
-        },
     'interpolator':
         {
             'biggrid1': {
@@ -581,6 +557,7 @@ version_definitions = {
                 60: 22,
                 61: 23,
                 62: 24,
+                63: 25,
             },
             'sim_test':
                 {1: 5,
@@ -601,6 +578,70 @@ version_definitions = {
                 7: 15,
             },
         },
+
+    'bprops':
+        {
+            'biggrid1': {},
+            'biggrid2':
+                {
+                  63: ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+                },
+        },
+    'param_keys':
+        {
+            'biggrid1': {},
+            'biggrid2':
+                {
+                    1: param_keys[1],
+                    2: param_keys[1],
+                    3: param_keys[1],
+                    4: param_keys[1],
+                    5: param_keys[1],
+                    6: param_keys[1],
+                    7: param_keys[1],
+                    8: param_keys[1],
+                    9: param_keys[1],
+                    10: param_keys[1],
+                    11: param_keys[1],
+                    12: param_keys[1],
+                    31: param_keys[3],
+                    36: param_keys[3],
+                    37: param_keys[3],
+                    39: param_keys[4],
+                    40: param_keys[4],
+                    41: param_keys[5],
+                    42: param_keys[5],
+                    43: param_keys[6],
+                    44: param_keys[6],
+                    45: param_keys[6],
+                    46: param_keys[6],
+                    47: param_keys[7],
+                    48: param_keys[7],
+                    49: param_keys[7],
+                    50: param_keys[7],
+                    51: param_keys[6],
+                    52: param_keys[8],
+                    53: param_keys[8],
+                    54: param_keys[7],
+                    55: param_keys[7],
+                    56: param_keys[7],
+                    57: param_keys[7],
+                    58: param_keys[7],
+                    59: param_keys[6],
+                    60: param_keys[6],
+                    61: param_keys[7],
+                    62: param_keys[7],
+                    63: param_keys[7],
+                },
+            'sim_test': {},
+            'sim10': {
+                4: param_keys[2],
+                5: param_keys[2],
+                6: param_keys[2],
+                7: param_keys[2],
+            },
+        },
+
     'prior_bounds':
         {
             'biggrid1': {},
@@ -660,6 +701,7 @@ version_definitions = {
                 60: prior_bounds[6][29],
                 61: prior_bounds[7][8],
                 62: prior_bounds[7][8],
+                63: prior_bounds[7][8],
             },
             'sim_test': {
                 1: prior_bounds[1][9],
@@ -719,6 +761,7 @@ version_definitions = {
                 60: initial_position[24],
                 61: initial_position[25],
                 62: initial_position[25],
+                63: initial_position[25],
             },
             'sim_test': {},
             'sim10': {
@@ -731,58 +774,36 @@ version_definitions = {
             },
 
         },
-    'param_keys':
+
+    'disc_model':
         {
-            'biggrid1': {},
-            'biggrid2':
-                {
-                    1: param_keys[1],
-                    2: param_keys[1],
-                    3: param_keys[1],
-                    4: param_keys[1],
-                    5: param_keys[1],
-                    6: param_keys[1],
-                    7: param_keys[1],
-                    8: param_keys[1],
-                    9: param_keys[1],
-                    10: param_keys[1],
-                    11: param_keys[1],
-                    12: param_keys[1],
-                    31: param_keys[3],
-                    36: param_keys[3],
-                    37: param_keys[3],
-                    39: param_keys[4],
-                    40: param_keys[4],
-                    41: param_keys[5],
-                    42: param_keys[5],
-                    43: param_keys[6],
-                    44: param_keys[6],
-                    45: param_keys[6],
-                    46: param_keys[6],
-                    47: param_keys[7],
-                    48: param_keys[7],
-                    49: param_keys[7],
-                    50: param_keys[7],
-                    51: param_keys[6],
-                    52: param_keys[8],
-                    53: param_keys[8],
-                    54: param_keys[7],
-                    55: param_keys[7],
-                    56: param_keys[7],
-                    57: param_keys[7],
-                    58: param_keys[7],
-                    59: param_keys[6],
-                    60: param_keys[6],
-                    61: param_keys[7],
-                    62: param_keys[7],
-                },
-            'sim_test': {},
-            'sim10': {
-                4: param_keys[2],
-                5: param_keys[2],
-                6: param_keys[2],
-                7: param_keys[2],
+            'biggrid1': {
+                2: 'he16_a',
+                5: 'he16_a',
+                6: 'he16_a',
             },
+            'biggrid2': {
+                2: 'he16_a',
+                3: 'he16_b',
+                10: 'he16_a',
+                11: 'he16_b',
+                12: 'he16_c',
+                14: 'he16_a',
+                15: 'he16_b',
+                16: 'he16_c',
+                18: 'he16_a',
+                19: 'he16_b',
+                20: 'he16_c',
+                22: 'he16_a',
+                23: 'he16_b',
+                24: 'he16_c',
+                25: 'he16_b',
+                26: 'he16_a',
+                27: 'he16_b',
+                38: 'he16_a',
+            },
+            'sim_test': {},
+            'sim10': {},
         },
 }
 
@@ -803,8 +824,9 @@ class McmcVersion:
         self.source = source
         self.version = version
         self.param_keys = get_parameter(source, version, 'param_keys')
+        self.bprops = get_parameter(source, version, 'bprops')
         self.interpolator = get_parameter(source, version, 'interpolator')
-        self.prior_bounds = get_parameter(source, version, 'prior_bounds')
+        self.prior_bounds = np.array(get_parameter(source, version, 'prior_bounds'))
         self.initial_position = get_parameter(source, version, 'initial_position')
 
         if 'inc' in self.param_keys:
@@ -814,11 +836,12 @@ class McmcVersion:
 
     def __repr__(self):
         return (f'MCMC version definitions for {self.source} V{self.version}'
-                + f'\nparam keys: {self.param_keys}'
-                + f'\ninitial position: {self.initial_position}'
-                + f'\ndisc model: {self.disc_model}'
-                + f'\ninterpolator: {self.interpolator}'
-                + f'\nprior bounds: \n{self.prior_bounds}'
+                + f'\nparam keys       : {self.param_keys}'
+                + f'\nbprops           : {self.bprops}'
+                + f'\ninitial position : {self.initial_position}'
+                + f'\ndisc model       : {self.disc_model}'
+                + f'\ninterpolator     : {self.interpolator}'
+                + f'\nprior bounds     : {self.prior_bounds}'
                 )
 
 
