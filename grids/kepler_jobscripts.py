@@ -199,7 +199,7 @@ qstat -f $PBS_JOBID     # Print statistics """
             return f"""#!/bin/bash --login
 #PBS -N {job_str}
 #PBS -l walltime={time_str}
-#PBS -l mem=4000mb
+#PBS -l mem=2000mb
 #PBS -l file=4gb
 #PBS -l nodes=1:ppn=1
 #PBS -j oe
