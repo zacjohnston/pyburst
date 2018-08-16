@@ -63,7 +63,6 @@ class BurstFit:
             source = 'biggrid2'  # from here on effectively treat as biggrid2
 
         self.bprops = self.mcmc_version.bprops
-        self.n_bprops = len(self.bprops)
         self.lhood_factor = lhood_factor
         self.priors_only = priors_only
         self.kemulator = kepler_emulator.Kemulator(source=source,
@@ -122,6 +121,7 @@ class BurstFit:
         """Unpacks observed burst properties (dt, fper, etc.) from data
         """
         self.debug.start_function('extract_obs_values')
+        hr_day = 24
         key_map = {'dt': 'tdel', 'u_dt': 'tdel_err',
                    'fper': 'fper', 'u_fper': 'fper_err',
                    'fluence': 'fluen', 'u_fluence': 'fluen_err',
@@ -143,6 +143,10 @@ class BurstFit:
 
                 for i in range(self.n_epochs):
                     self.obs_data[key][i] = self.obs[i].__dict__[key_old].value
+
+            # ====== extract burst rates ======
+            self.obs_data['rate'] = hr_day / self.obs_data['dt']
+            self.obs_data['u_rate'] = hr_day * self.obs_data['u_dt'] / self.obs_data['dt']**2
             self.debug.end_function()
 
     def lhood(self, params, plot=False):
