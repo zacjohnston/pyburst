@@ -82,6 +82,7 @@ class BurstFit:
         self.obs_data = None
         self.extract_obs_values()
         self.z_prior = None
+        self.f_ratio_prior = None
         self.setup_priors()
 
     def printv(self, string, **kwargs):
@@ -103,6 +104,7 @@ class BurstFit:
     def setup_priors(self):
         self.debug.start_function('setup_priors')
         self.z_prior = norm(loc=-0.5, scale=0.25).pdf  # log10-space [z/solar]
+        self.f_ratio_prior = norm(loc=1.0, scale=0.1).pdf
         self.debug.end_function()
 
     def extract_obs_values(self):
@@ -320,7 +322,10 @@ class BurstFit:
         z_sun = 0.015
         prior_lhood = np.log(self.z_prior(np.log10(z / z_sun)))
 
-        if self.has_inc:
+        if self.has_two_f:
+            f_ratio = params[self.param_idxs['f_b']] / params[self.param_idxs['f_p']]
+            prior_lhood += np.log(self.f_ratio_prior(f_ratio))
+        elif self.has_inc:
             inc = params[self.param_idxs['inc']]
             prior_lhood += np.log(np.sin(inc * u.deg)).value
 
