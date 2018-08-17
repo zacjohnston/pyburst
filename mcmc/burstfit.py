@@ -69,7 +69,6 @@ class BurstFit:
                                                    version=self.mcmc_version.interpolator,
                                                    re_interp=re_interp,
                                                    **kwargs)
-
         concord_source = source_map.get(source, source)
         self.obs = ctools.load_obs(concord_source)
         self.n_epochs = len(self.obs)
@@ -80,9 +79,6 @@ class BurstFit:
 
         self.obs_data = None
         self.extract_obs_values()
-
-        self.fper_ratios = None
-        self.mdot_ratio_priors = None
         self.z_prior = None
         self.setup_priors()
 
@@ -104,16 +100,6 @@ class BurstFit:
 
     def setup_priors(self):
         self.debug.start_function('setup_priors')
-        fper_ratios = self.obs_data['fper'] / self.obs_data['fper'][0]
-        frac_uncert = self.obs_data['u_fper'] / self.obs_data['fper']
-
-        ratio_priors = {}
-        for i in range(self.n_epochs):
-            u_ratio = fper_ratios[i] * np.sqrt(np.sum(frac_uncert[[0, i]] ** 2))
-            ratio_priors[i] = norm(loc=fper_ratios[i], scale=u_ratio).pdf
-
-        self.fper_ratios = fper_ratios
-        self.mdot_ratio_priors = ratio_priors
         self.z_prior = norm(loc=-0.5, scale=0.25).pdf  # log10-space [z/solar]
         self.debug.end_function()
 
@@ -325,17 +311,9 @@ class BurstFit:
         if False in inside_bounds:
             return -np.inf
 
-        mdot_ratios = self._mdots / self._mdots[0]
-        mdot_prior = 0
-        for i in range(1, self.n_epochs):
-            mdot_prior += np.log(self.mdot_ratio_priors[i](mdot_ratios[i]))
-
         z = params[self.param_idxs['z']]
-
         z_sun = 0.015
-        prior_lhood = (np.log(self.z_prior(np.log10(z / z_sun)))
-                       + mdot_prior
-                       )
+        prior_lhood = np.log(self.z_prior(np.log10(z / z_sun)))
 
         if self.has_inc:
             inc = params[self.param_idxs['inc']]
@@ -428,24 +406,6 @@ class BurstFit:
         ax.legend()
         plt.tight_layout()
         plt.show()
-
-    def plot_mdot_priors(self):
-        """Plots priors on mdot ratio
-        """
-        x = np.linspace(0., 1.5, 1000)
-        fig, ax = plt.subplots()
-
-        for i, mdot in enumerate(['mdot1', 'mdot2', 'mdot3']):
-            y = self.mdot_ratio_priors[i](x)
-            # peak = np.max(y)
-            # y /= peak
-            ax.plot(x, y, label=mdot)
-
-        ax.set_xlabel('mdot / mdot1')
-        ax.set_xlim([0.5, 1.1])
-        ax.legend()
-        plt.tight_layout()
-        plt.show(block=False)
 
     def plot_z_prior(self):
         z_sun = 0.015
