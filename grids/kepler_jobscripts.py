@@ -63,7 +63,7 @@ def write_individual_scripts(batches, runs, source, walltime, **kwargs):
 
 def write_submission_script(batch, source, walltime, path=None,
                             run0=None, run1=None, runs=None,
-                            parallel=False, qos='medium', basename='xrb',
+                            parallel=False, qos='normal', basename='xrb',
                             restart=False, max_tasks=16, debug=False):
     """Writes jobscripts to execute on MONARCH/ICER cluster
 
@@ -144,7 +144,7 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
 #SBATCH --nodes=1
 #SBATCH --ntasks={ntasks}
 #SBATCH --cpus-per-task=1
-#SBATCH --qos={qos}_qos
+#SBATCH --qos={qos}
 #SBATCH --partition=batch,medium
 #SBATCH --mem-per-cpu=2000
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -163,7 +163,7 @@ cd /home/zacpetej/id43/kepler/runs/{source}_{batch}/logs
 #SBATCH --time={time_str}
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --qos={qos}_qos
+#SBATCH --qos={qos}
 #SBATCH --mem-per-cpu=2000
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=zac.johnston@monash.edu
