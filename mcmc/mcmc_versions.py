@@ -362,9 +362,22 @@ prior_bounds = {
             (0.1, 0.24),  # mdot3
             ),
     },
+
+    9: {
+        1: ((0.1, 0.22),  # mdot1
+            (0.1, 0.22),  # mdot2
+            (0.1, 0.22),  # mdot3
+            (0.65, 0.72),  # x
+            (0.0025, 0.0075),  # z
+            (1.7/1.4, 2.3/1.4),  # g
+            (1.2, 1.4),  # redshift
+            (0.01, 10),  # f
+            ),
+    },
 }
 
 # ===== Defines order/number of params provided to BurstFit =====
+# TODO: Ensure correspond to prior_bounds
 param_keys = {
     1: ['mdot1', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
     2: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
@@ -374,6 +387,7 @@ param_keys = {
     6: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
     7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f_b', 'f_p'],
     8: ['mdot1', 'mdot2', 'mdot3'],
+    9: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f'],
 }
 
 # ===== initial position of walkers =====
@@ -427,6 +441,8 @@ initial_position = {
          0.7, 0.004, 0.026, 1.4, 1.3, 0.64, 1.5),
     25: (0.20, 0.16, 0.12,
          0.68, 0.004, 1.4, 1.3, 0.65, 1.6),
+    26: (0.18, 0.15, 0.11,
+         0.71, 0.004, 1.4, 1.35, 1.),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -558,6 +574,7 @@ version_definitions = {
                 61: 23,
                 62: 24,
                 63: 25,
+                64: 25,
             },
             'sim_test':
                 {1: 5,
@@ -585,6 +602,7 @@ version_definitions = {
             'biggrid2':
                 {
                   63: ('rate', 'fluence', 'peak'),
+                  64: ('rate', 'fluence', 'peak'),
                 },
         },
     'param_keys':
@@ -632,6 +650,7 @@ version_definitions = {
                     61: 47,
                     62: 47,
                     63: 47,
+                    64: param_keys[9],
                 },
             'sim_test': {},
             'sim10': {
@@ -702,6 +721,7 @@ version_definitions = {
                 61: prior_bounds[7][8],
                 62: 61,
                 63: 61,
+                64: prior_bounds[9][1],
             },
             'sim_test': {
                 1: prior_bounds[1][1],
@@ -762,6 +782,7 @@ version_definitions = {
                 61: initial_position[25],
                 62: 61,
                 63: 61,
+                64: initial_position[26],
             },
             'sim_test': {},
             'sim10': {
