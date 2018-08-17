@@ -575,6 +575,7 @@ version_definitions = {
                 62: 24,
                 63: 25,
                 64: 25,
+                65: 25,
             },
             'sim_test':
                 {1: 5,
@@ -603,6 +604,7 @@ version_definitions = {
                 {
                   63: ('rate', 'fluence', 'peak'),
                   64: ('rate', 'fluence', 'peak'),
+                  65: ('rate', 'fluence', 'peak'),
                 },
         },
     'param_keys':
@@ -651,6 +653,7 @@ version_definitions = {
                     62: 47,
                     63: 47,
                     64: param_keys[9],
+                    65: 47,
                 },
             'sim_test': {},
             'sim10': {
@@ -722,6 +725,7 @@ version_definitions = {
                 62: 61,
                 63: 61,
                 64: prior_bounds[9][1],
+                65: 61,
             },
             'sim_test': {
                 1: prior_bounds[1][1],
@@ -783,6 +787,7 @@ version_definitions = {
                 62: 61,
                 63: 61,
                 64: initial_position[26],
+                65: 61,
             },
             'sim_test': {},
             'sim10': {
