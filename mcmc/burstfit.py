@@ -57,7 +57,9 @@ class BurstFit:
         self.param_idxs = {}
         self.get_param_indexes()
         self.has_inc = 'inc' in self.mcmc_version.param_keys
-        self.has_f = 'f_b' in self.mcmc_version.param_keys
+        self.has_one_f = 'f' in self.mcmc_version.param_keys
+        self.has_two_f = ('f_b' in self.mcmc_version.param_keys
+                          and 'f_p' in self.mcmc_version.param_keys)
 
         if 'sim' in self.source:
             source = 'biggrid2'  # from here on effectively treat as biggrid2
@@ -145,7 +147,7 @@ class BurstFit:
         plot : bool
             whether to plot the comparison
         """
-
+        u_fper_frac = 0.03
         self.debug.start_function('lhood')
         if self.debug.debug:
             print_params(params, source=self.source, version=self.version)
@@ -196,7 +198,7 @@ class BurstFit:
 
         # ===== compare predicted persistent flux with observed =====
         fper = self.shift_to_observer(values=self._mdots, bprop='fper', params=params)
-        u_fper = fper * 1e-2  # Give 1% uncertainty to model persistent flux
+        u_fper = fper * u_fper_frac  # Assign uncertainty to model persistent flux
 
         lh += self.compare(model=fper, u_model=u_fper, label='fper',
                            obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'],
@@ -229,9 +231,12 @@ class BurstFit:
         elif bprop in ('rate', 'u_rate'):
             shifted = values / redshift
         else:
-            if self.has_f:  # model uses generalised flux_factors xi*d^2 (x10^45)
+            if self.has_two_f:  # model uses generalised flux_factors xi*d^2 (x10^45)
                 flux_factor_b = 1e45 * params[self.param_idxs['f_b']]
                 flux_factor_p = 1e45 * params[self.param_idxs['f_p']]
+            elif self.has_one_f:
+                flux_factor_b = 1e45 * params[self.param_idxs['f']]
+                flux_factor_p = flux_factor_b
             else:
                 if self.has_inc:  # model explicitly uses inclination
                     inc = params[self.param_idxs['inc']]
