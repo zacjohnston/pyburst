@@ -328,7 +328,7 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
 
     if lhood != max_lhood:
         print_warning(f'lhoods do not match ({max_lhood:.2f}, {lhood:.2f}). '
-                      + 'BurstFit may have changed')
+                      + 'BurstFit (lhood, lnhood) or interpolator may have changed')
 
 
 def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
