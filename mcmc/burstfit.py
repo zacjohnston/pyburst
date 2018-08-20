@@ -104,7 +104,7 @@ class BurstFit:
     def setup_priors(self):
         self.debug.start_function('setup_priors')
         self.z_prior = norm(loc=-0.5, scale=0.25).pdf  # log10-space [z/solar]
-        self.f_ratio_prior = norm(loc=1.0, scale=0.1).pdf
+        self.f_ratio_prior = norm(loc=2.2, scale=0.2).pdf
         self.debug.end_function()
 
     def extract_obs_values(self):
@@ -149,8 +149,8 @@ class BurstFit:
         plot : bool
             whether to plot the comparison
         """
-        u_fper_frac = 0.03
         self.debug.start_function('lhood')
+        u_fper_frac = 0.03
         if self.debug.debug:
             print_params(params, source=self.source, version=self.version)
 
@@ -160,6 +160,7 @@ class BurstFit:
         # ===== check priors =====
         lp = self.lnprior(params=params)
         if self.priors_only:
+            self.debug.end_function()
             return lp
         if np.isinf(lp):
             self.debug.end_function()
@@ -184,6 +185,10 @@ class BurstFit:
             self.debug.end_function()
             return -np.inf
 
+        plot_map = np.arange(4).reshape((2, 2))
+        if plot:
+            fig, ax = plt.subplots(2, 2, figsize=(10, 8))
+
         for i, bprop in enumerate(self.bprops):
             u_bprop = f'u_{bprop}'
             bprop_col = 2*i
@@ -194,17 +199,27 @@ class BurstFit:
                 col = bprop_col + j
                 interp[:, col] = self.shift_to_observer(values=interp[:, col],
                                                         bprop=key, params=params)
-            lh += self.compare(model=interp[:, bprop_col],
-                               u_model=interp[:, u_bprop_col], obs=self.obs_data[bprop],
-                               u_obs=self.obs_data[u_bprop], label=bprop, plot=plot)
+            model = interp[:, bprop_col]
+            u_model = interp[:, u_bprop_col]
+
+            lh += self.compare(model=model, u_model=u_model, obs=self.obs_data[bprop],
+                               u_obs=self.obs_data[u_bprop], label=bprop)
+            if plot:
+                self.plot_compare(model=model, u_model=u_model, obs=self.obs_data[bprop],
+                                  u_obs=self.obs_data[u_bprop], bprop=bprop,
+                                  ax=ax[np.where(plot_map == i)][0], display=False)
 
         # ===== compare predicted persistent flux with observed =====
         fper = self.shift_to_observer(values=self._mdots, bprop='fper', params=params)
         u_fper = fper * u_fper_frac  # Assign uncertainty to model persistent flux
 
         lh += self.compare(model=fper, u_model=u_fper, label='fper',
-                           obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'],
-                           plot=plot)
+                           obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'])
+        if plot:
+            self.plot_compare(model=fper, u_model=u_fper, bprop='fper',
+                              obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'],
+                              ax=ax[np.where(plot_map == 3)][0], display=False)
+            plt.show(block=False)
 
         self.debug.end_function()
         return (lp + lh) * self.lhood_factor
@@ -309,6 +324,7 @@ class BurstFit:
     def lnprior(self, params):
         """Return logarithm prior lhood of params
         """
+        # TODO: How to encode different priors in mcmc versions?
         self.debug.start_function('lnprior')
         lower_bounds = self.mcmc_version.prior_bounds[:, 0]
         upper_bounds = self.mcmc_version.prior_bounds[:, 1]
@@ -323,8 +339,9 @@ class BurstFit:
         prior_lhood = np.log(self.z_prior(np.log10(z / z_sun)))
 
         if self.has_two_f:
-            f_ratio = params[self.param_idxs['f_b']] / params[self.param_idxs['f_p']]
-            prior_lhood += np.log(self.f_ratio_prior(f_ratio))
+            # f_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
+            # prior_lhood += np.log(self.f_ratio_prior(f_ratio))
+            pass
         elif self.has_inc:
             inc = params[self.param_idxs['inc']]
             prior_lhood += np.log(np.sin(inc * u.deg)).value
@@ -369,7 +386,8 @@ class BurstFit:
         self.debug.end_function()
         return lh.sum()
 
-    def plot_compare(self, model, u_model, obs, u_obs, bprop, title=False):
+    def plot_compare(self, model, u_model, obs, u_obs, bprop, ax=None, title=False,
+                     display=True):
         """Plots comparison of modelled and observed burst property
 
         Parameters
@@ -393,15 +411,13 @@ class BurstFit:
                    'peak': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
                    'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$'}.get(bprop)
 
-        fig, ax = plt.subplots(figsize=(5, 4))
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(5, 4))
+
         epochs = np.arange(1, self.n_epochs+1)
         ax.set_xticks(epochs)
-        # ax.tick_params(axis='x',           # changes apply to the x-axis
-        #                which='both',       # both major and minor ticks are affected
-        #                bottom=False,       # ticks along the bottom edge are off
-        #                top=False,          # ticks along the top edge are off
-        #                labelbottom=True)  # labels along the bottom edge are off
         x = epochs
+
         ax.errorbar(x=x - dx, y=model/yscale, yerr=u_model/yscale, ls='none', marker='o',
                     capsize=3, color='C3', label='Model')
         ax.errorbar(x=x + dx, y=obs/yscale, yerr=u_obs/yscale, ls='none',
@@ -413,9 +429,11 @@ class BurstFit:
         ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
         if title:
             ax.set_title(ylabel, fontsize=fontsize)
+
         ax.legend()
         plt.tight_layout()
-        plt.show()
+        if display:
+            plt.show(block=False)
 
     def plot_z_prior(self):
         z_sun = 0.015
