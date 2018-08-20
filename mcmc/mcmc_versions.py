@@ -354,6 +354,16 @@ prior_bounds = {
             (0.01, 10),  # f_b
             (0.01, 10),  # f_p
             ),
+        9: ((0.1, 0.22),  # mdot1
+            (0.1, 0.22),  # mdot2
+            (0.1, 0.22),  # mdot3
+            (0.65, 0.73),  # x
+            (0.0025, 0.0075),  # z
+            (1.7 / 1.4, 2.3 / 1.4),  # g
+            (1.2, 1.6),  # redshift
+            (0.01, 10),  # f_b
+            (0.01, 10),  # f_p
+            ),
     },
 
     8: {
@@ -576,6 +586,7 @@ version_definitions = {
                 63: 25,
                 64: 25,
                 65: 25,
+                66: 25,
             },
             'sim_test':
                 {1: 5,
@@ -605,6 +616,7 @@ version_definitions = {
                   63: ('rate', 'fluence', 'peak'),
                   64: ('rate', 'fluence', 'peak'),
                   65: ('rate', 'fluence', 'peak'),
+                  66: ('rate', 'fluence', 'peak'),
                 },
         },
     'param_keys':
@@ -654,6 +666,7 @@ version_definitions = {
                     63: 47,
                     64: param_keys[9],
                     65: 47,
+                    66: 47,
                 },
             'sim_test': {},
             'sim10': {
@@ -726,6 +739,7 @@ version_definitions = {
                 63: 61,
                 64: prior_bounds[9][1],
                 65: 61,
+                66: prior_bounds[7][9],
             },
             'sim_test': {
                 1: prior_bounds[1][1],
@@ -788,6 +802,7 @@ version_definitions = {
                 63: 61,
                 64: initial_position[26],
                 65: 61,
+                66: 61,
             },
             'sim_test': {},
             'sim10': {
