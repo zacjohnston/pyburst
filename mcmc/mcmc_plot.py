@@ -28,22 +28,29 @@ def default_plt_options():
 default_plt_options()
 
 
-def save_plot(fig, prefix, chain, save, source, version,
-              display, label=None, extension='.png'):
+def save_plot(fig, prefix, save, source, version, display, chain=None, n_dimensions=None,
+              n_walkers=None, n_steps=None, label=None, extension='.png'):
     """Handles saving/displaying of a figure passed to it
     """
+    if None in (n_dimensions, n_walkers, n_steps):
+        if chain is None:
+            raise ValueError('Must provide chain, or specify each of '
+                             '(n_dimensions, n_walkers, n_steps)')
+        else:
+            n_walkers, n_steps, n_dimensions = chain.shape
+
     if save:
-        n_walkers, n_steps, n_dimensions = chain.shape
         filename = mcmc_tools.get_mcmc_string(source=source, version=version,
                                               n_walkers=n_walkers, n_steps=n_steps,
                                               prefix=prefix, label=label,
                                               extension=extension)
         source_path = get_source_path(source)
-        filepath = os.path.join(source_path, 'plots',
-                                prefix, f'{filename}')
+        filepath = os.path.join(source_path, 'plots', prefix, f'{filename}')
         fig.savefig(filepath)
 
-    if not display:
+    if display:
+        plt.show(block=False)
+    else:
         plt.close(fig)
 
 
@@ -314,7 +321,8 @@ def get_mass_radius_point(params, source, version):
     return mass.value, radius.value
 
 
-def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=False):
+def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=False,
+                   display=True, save=False):
     default_plt_options()
     max_params, max_lhood = mcmc_tools.get_max_lhood_params(source, version=version,
                                                             n_walkers=n_walkers,
@@ -322,13 +330,16 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
                                                             verbose=verbose,
                                                             return_lhood=True)
 
-    bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
-                             re_interp=re_interp)
+    bfit = burstfit.BurstFit(source=source, version=version, verbose=False, re_interp=re_interp)
     lhood, fig = bfit.lhood(max_params, plot=True)
 
     if lhood != max_lhood:
         print_warning(f'lhoods do not match ({max_lhood:.2f}, {lhood:.2f}). '
                       + 'BurstFit (lhood, lnhood) or interpolator may have changed')
+
+    save_plot(fig, prefix='compare', n_dimensions=len(max_params),
+              n_walkers=n_walkers, n_steps=n_steps, save=save, source=source,
+              version=version, display=display)
 
 
 def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
