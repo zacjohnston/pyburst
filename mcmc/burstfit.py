@@ -188,6 +188,8 @@ class BurstFit:
         plot_map = np.arange(4).reshape((2, 2))
         if plot:
             fig, ax = plt.subplots(2, 2, figsize=(10, 8))
+        else:
+            fig = ax = None
 
         for i, bprop in enumerate(self.bprops):
             u_bprop = f'u_{bprop}'
@@ -215,14 +217,18 @@ class BurstFit:
 
         lh += self.compare(model=fper, u_model=u_fper, label='fper',
                            obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'])
+
+        lhood = (lp + lh) * self.lhood_factor
+
         if plot:
             self.plot_compare(model=fper, u_model=u_fper, bprop='fper',
                               obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'],
                               ax=ax[np.where(plot_map == 3)][0], display=False)
-            plt.show(block=False)
-
-        self.debug.end_function()
-        return (lp + lh) * self.lhood_factor
+            self.debug.end_function()
+            return lhood, fig
+        else:
+            self.debug.end_function()
+            return lhood
 
     def shift_to_observer(self, values, bprop, params):
         """Returns burst property shifted to observer frame/units

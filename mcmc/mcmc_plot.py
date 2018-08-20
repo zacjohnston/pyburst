@@ -324,7 +324,7 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
 
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
                              re_interp=re_interp)
-    lhood = bfit.lhood(max_params, plot=True)
+    lhood, fig = bfit.lhood(max_params, plot=True)
 
     if lhood != max_lhood:
         print_warning(f'lhoods do not match ({max_lhood:.2f}, {lhood:.2f}). '
