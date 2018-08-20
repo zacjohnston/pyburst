@@ -147,4 +147,4 @@ def print_params(params, source, version):
     """
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     for i, p in enumerate(params):
-        print(f'{pkeys[i]:8}    {p:.3f}')
+        print(f'{pkeys[i]:8}    {p:.4f}')
