@@ -3,6 +3,7 @@ Notes/descriptions of different MCMC versions (defined in mcmc_versions.py)
 Source: bigrid2
 ---------------
 Version     Note
+----------------
 56          extended to z=0.0015
 57          mass bounds 1.4 - 2.3
 58          same as 57, with forced 2% bprop uncertainties
