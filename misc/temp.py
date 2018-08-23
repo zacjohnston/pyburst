@@ -13,7 +13,7 @@ PROJECT_PATH = '/home/zacpetej/projects/oscillations/'
 
 
 def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
-                   prefix='re_'):
+                   prefix=''):
     """Iterates over dump cycles and extracts profiles and tables
     """
     save_times(cycles, run, batch, source=source, basename=basename, prefix=prefix)
@@ -32,7 +32,7 @@ def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
 
 
 def load_dump(cycle, run, batch, source='biggrid2', basename='xrb',
-              prefix='re_'):
+              prefix=''):
     batch_str = get_batch_string(batch, source)
     run_str = get_run_string(run, basename)
     filename = get_dump_filename(cycle, run, basename, prefix=prefix)
@@ -54,7 +54,7 @@ def get_profile(dump):
 
 
 def save_times(cycles, run, batch, source='biggrid2', basename='xrb',
-               prefix='re_'):
+               prefix=''):
     dashes()
     print('Extracting cycle times')
     table = pd.DataFrame()
@@ -68,7 +68,7 @@ def save_times(cycles, run, batch, source='biggrid2', basename='xrb',
 
 
 def extract_times(cycles, run, batch, source='biggrid2', basename='xrb',
-                  prefix='re_'):
+                  prefix=''):
     """Returns timestep values (s) for given cycles
     """
     times = np.zeros_like(cycles, dtype=float)
@@ -126,8 +126,36 @@ def copy_lightcurve(run, batch, source='biggrid2', basename='xrb'):
     subprocess.run(['cp', filepath, target_filepath])
 
 
+def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='', legend=True):
+    """Plots Temp profiles of multiple different sources/batches/runs
+
+    cycles,runs,batches,sources are arrays of length N, where the i'th entry
+        correspond to a single model to plot
+    """
+    fig, ax = plt.subplots()
+    dump = None
+    for i, cycle in enumerate(cycles):
+        dump = load_dump(cycle, runs[i], batches[i], source=sources[i],
+                         basename=basename, prefix=prefix)
+        ax.plot(dump.y, dump.tn, label=f'{sources[i]}_{batches[i]}_{runs[i]}_#{cycle}')
+
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+
+    y0 = dump.y[1]   # column depth at inner zone
+    y1 = dump.y[-3]  # outer zone
+    ax.set_xlim([y1, y0])
+    # ax.set_ylim([5e7, 5e9])
+
+    ax.set_xlabel(r'y (g cm$^{-2}$)')
+    ax.set_ylabel(r'T (K)')
+    if legend:
+        ax.legend()
+    plt.show(block=False)
+
+
 def plot_temp(cycles, run, batch, source='biggrid2', basename='xrb', title='',
-              display=True, prefix='re_'):
+              display=True, prefix=''):
     """Plot temperature profile at given cycle (timestep)
     """
     fig, ax = plt.subplots()
@@ -166,7 +194,7 @@ def plot_temp(cycles, run, batch, source='biggrid2', basename='xrb', title='',
 
 
 def plot_base_temp(cycles, run, batch, source='biggrid2', basename='xrb', title='',
-                   display=True, prefix='re_'):
+                   display=True, prefix=''):
     fig, ax = plt.subplots()
     temps = np.zeros_like(cycles)
     times = np.zeros_like(cycles)
