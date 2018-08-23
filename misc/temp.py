@@ -178,9 +178,11 @@ def plot_base_temp(cycles, run, batch, source='biggrid2', basename='xrb', title=
         temps[i] = dump.tn[1]
 
     ax.plot(times/3600, temps, marker='o')
-    ax.set_yscale('log')
+    # ax.set_yscale('log')
     ax.set_ylabel(r'T (K)')
     ax.set_xlabel('time (hr)')
+    # ax.set_ylim([2e8, 4e8])
+    plt.tight_layout()
     plt.show(block=False)
 
 
