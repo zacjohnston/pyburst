@@ -133,9 +133,17 @@ def plot_temp(cycles, run, batch, source='biggrid2', basename='xrb', title='',
     fig, ax = plt.subplots()
 
     for cycle in cycles:
-        dump = load_dump(cycle, run, batch, source=source,
-                         basename=basename, prefix=prefix)
-        ax.plot(dump.y, dump.tn, color='C3')
+        dump = load_dump(cycle, run, batch, source=source, basename=basename, prefix=prefix)
+        ax.plot(dump.y, dump.tn, label=f'#{cycle}')  # color='C3')
+
+    bookends = cycles[[0, -1]]
+    temp = [0, 0]
+
+    for i, cyc in enumerate(bookends):
+        dump = load_dump(cyc, run, batch, source=source, basename=basename, prefix=prefix)
+        temp[i] = dump.tn[1]
+
+    print(f'{temp[1]/temp[0]:.3f}')
 
     y0 = dump.y[1]   # column depth at inner zone
     y1 = dump.y[-3]  # outer zone
@@ -149,11 +157,31 @@ def plot_temp(cycles, run, batch, source='biggrid2', basename='xrb', title='',
 
     ax.set_xlabel(r'y (g cm$^{-2}$)')
     ax.set_ylabel(r'T (K)')
+    ax.legend()
 
     if display:
         plt.show(block=False)
 
     return fig
+
+
+def plot_base_temp(cycles, run, batch, source='biggrid2', basename='xrb', title='',
+                   display=True, prefix='re_'):
+    fig, ax = plt.subplots()
+    temps = np.zeros_like(cycles)
+    times = np.zeros_like(cycles)
+
+    for i, cycle in enumerate(cycles):
+        print(cycle)
+        dump = load_dump(cycle, run, batch, source=source, basename=basename, prefix=prefix)
+        times[i] = dump.time
+        temps[i] = dump.tn[1]
+
+    ax.plot(times/3600, temps, marker='o')
+    ax.set_yscale('log')
+    ax.set_ylabel(r'T (K)')
+    ax.set_xlabel('time (hr)')
+    plt.show(block=False)
 
 
 def save_temps(cycles, run, batch, source='biggrid2', zero_times=True):
