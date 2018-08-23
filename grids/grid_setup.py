@@ -87,7 +87,8 @@ def create_batch(batch, dv, source,
                  check_params=False, nsdump=1000,
                  file_sourcepath='/home/zacpetej/projects/codes/mdot/tmp/',
                  auto_t_end=True, notes='No notes given', debug=False,
-                 nbursts=20, parallel=False, ntasks=8, kgrid=None, **kwargs):
+                 nbursts=20, parallel=False, ntasks=8, kgrid=None,
+                 nuc_heat=False, **kwargs):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -270,6 +271,7 @@ def create_batch(batch, dv, source,
                                    accmass=params_full['accmass'][i],
                                    lumdata=lumdata,
                                    nsdump=nsdump,
+                                   nuc_heat=nuc_heat,
                                    cnv=0)
 
 
