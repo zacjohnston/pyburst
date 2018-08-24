@@ -67,7 +67,7 @@ class BurstRun(object):
                            }
 
         self.plot_colours = {'bursts': 'C1',
-                             'candidates': 'C4',
+                             'candidates': 'C3',
                              'outliers': 'C9',
                              'short_waits': 'C4',
                              'burst_stages': 'C2',
@@ -371,18 +371,17 @@ class BurstRun(object):
     def get_burst_candidates(self):
         """Identify potential bursts, while removing shocks in lightcurve
         """
-        maxima_change = 999
-        self.candidates = [1]
+        old_candidates = [0]
+        candidates = self.get_lum_maxima()
         count = 0
-        while maxima_change != 0:
-            old_maxima = len(self.candidates)
-            self.candidates = self.get_lum_maxima()
-            self.remove_shocks(self.candidates)
-
-            maxima_change = old_maxima - len(self.candidates)
+        while not np.array_equal(old_candidates, candidates):
+            old_candidates = candidates
+            self.remove_shocks(candidates)
+            candidates = self.get_lum_maxima()
             count += 1
 
-        print(f'Maxima iterations: {count}')
+        print(f'Shock removal iterations: {count}')
+        self.candidates = candidates
         self.shocks = np.array(self.shocks)
 
     def get_lum_maxima(self):
