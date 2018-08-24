@@ -222,6 +222,18 @@ class BurstRun(object):
         self.get_means()
         self.test_bimodal()
 
+    def print_summary(self):
+        """Print summary of burst properties
+        """
+        self.ensure_analysed_is(True)
+        for bprop in self.bprops:
+            value = self.summary[bprop]
+            u_value = self.summary[f'u_{bprop}']
+
+            power = int(np.log10(value))
+            print(f'{bprop} = {value*10**(-power):.4f} +/- {u_value*10**(-power):.4f} '
+                  f'(10^{power})')
+
     def save_summary_table(self):
         """Saves table of model summary to file
         """
