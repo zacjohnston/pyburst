@@ -200,18 +200,24 @@ def plot_base_temp(cycles, run, batch, source='biggrid2', basename='xrb', title=
     times = np.zeros_like(cycles)
 
     for i, cycle in enumerate(cycles):
-        print(cycle)
         dump = load_dump(cycle, run, batch, source=source, basename=basename, prefix=prefix)
         times[i] = dump.time
         temps[i] = dump.tn[1]
+        if i == 0:
+            t0 = dump.tn[1]
 
+    t1 = dump.tn[1]
+    print(f'{run}     {t1/t0 - 1:.2e}')
     ax.plot(times/3600, temps, marker='o')
     # ax.set_yscale('log')
     ax.set_ylabel(r'T (K)')
     ax.set_xlabel('time (hr)')
     # ax.set_ylim([2e8, 4e8])
     plt.tight_layout()
-    plt.show(block=False)
+    if display:
+        plt.show(block=False)
+    else:
+        plt.close()
 
 
 def save_temps(cycles, run, batch, source='biggrid2', zero_times=True):
