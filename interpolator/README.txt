@@ -16,3 +16,4 @@ Version     Note
 23          new models with qb=0.05
 24          same as 23 but forced 2% uncertainties
 25          Use burst rate (rate) in place of recurrent time (dt)
+26          same as 25, but with bprops 10% smaller, to test qnuc heating models
