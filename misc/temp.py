@@ -204,23 +204,48 @@ def plot_base_temp(cycles, run, batch, source='biggrid2', basename='xrb', title=
         times[i] = dump.time
         temps[i] = dump.tn[1]
         if i == 0:
-            t0 = dump.tn[1]
+            t0 = dump.time/3600
+            temp0 = dump.tn[1]
 
-    t1 = dump.tn[1]
-    print(f'{run}     {t1/t0 - 1:.2e}')
+    t1 = dump.time/3600
+    temp1 = dump.tn[1]
+    slope = (temp1 - temp0) / (t1 - t0)
+    days = 1e8 / (24 * np.abs(slope))
+    print(f'{run}     {slope:.2e} (K/hr)     {days:.1f} (days)')
     ax.plot(times/3600, temps, marker='o')
     # ax.set_yscale('log')
     ax.set_ylabel(r'T (K)')
     ax.set_xlabel('time (hr)')
     # ax.set_ylim([2e8, 4e8])
+    ax.set_title(f'{source}_{batch}_{run}')
     plt.tight_layout()
     if display:
         plt.show(block=False)
     else:
         plt.close()
 
+    return slope
 
-def save_temps(cycles, run, batch, source='biggrid2', zero_times=True):
+
+def get_qnuc(cycles, run, batch, source):
+    """Return energy generation per mass averaged over model (erg/g)
+    cycles: length 2 array
+    """
+    dumps = []
+    for i, cycle in enumerate(cycles):
+        # between two dumps:
+        #   get energy produced (q epro)
+        #   get mass accreted (q xmacc)
+        #   calculate energy per mass accreted (erg/g)
+        dumps += [load_dump(cycle, run=run, batch=batch, source=source)]
+
+    mass_diff = dumps[1].qparm('xmacc') - dumps[0].qparm('xmacc')
+    energy_diff = dumps[1].qparm('epro') - dumps[0].qparm('epro')
+
+    return energy_diff / mass_diff
+
+
+def save_temps(cycles, run, batch, source, zero_times=True):
     """Iterate through cycles and save temperature profile plots
     """
     batch_str = get_batch_string(batch, source)
