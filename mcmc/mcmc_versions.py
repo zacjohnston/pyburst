@@ -587,6 +587,7 @@ version_definitions = {
                 64: 25,
                 65: 25,
                 66: 25,
+                67: 26,
             },
             'sim_test':
                 {1: 5,
@@ -614,9 +615,10 @@ version_definitions = {
             'biggrid2':
                 {
                   63: ('rate', 'fluence', 'peak'),
-                  64: ('rate', 'fluence', 'peak'),
-                  65: ('rate', 'fluence', 'peak'),
-                  66: ('rate', 'fluence', 'peak'),
+                  64: 63,
+                  65: 63,
+                  66: 63,
+                  67: 63,
                 },
         },
     'param_keys':
@@ -667,6 +669,7 @@ version_definitions = {
                     64: param_keys[9],
                     65: 47,
                     66: 47,
+                    67: 47,
                 },
             'sim_test': {},
             'sim10': {
@@ -740,6 +743,7 @@ version_definitions = {
                 64: prior_bounds[9][1],
                 65: 61,
                 66: prior_bounds[7][9],
+                67: 61,
             },
             'sim_test': {
                 1: prior_bounds[1][1],
@@ -803,6 +807,7 @@ version_definitions = {
                 64: initial_position[26],
                 65: 61,
                 66: 61,
+                67: 61,
             },
             'sim_test': {},
             'sim10': {
