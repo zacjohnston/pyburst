@@ -60,6 +60,7 @@ version_definitions = {
                     23: 16,
                     24: 16,
                     25: 16,
+                    26: 16,
                 },
         },
 
@@ -70,6 +71,7 @@ version_definitions = {
             'biggrid2':
                 {
                     25: ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+                    26: 25
                 },
         },
 
@@ -161,6 +163,7 @@ version_definitions = {
                     },
                 24: 23,
                 25: 23,
+                26: 23,
                 },
         },
 }
