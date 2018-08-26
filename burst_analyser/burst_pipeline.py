@@ -21,7 +21,8 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
 def run_analysis(batches, source, copy_params=True, reload=True, multithread=True,
-                 analyse=True, save_plots=True, collect=True, load_bursts=False):
+                 analyse=True, save_plots=True, collect=True, load_bursts=False,
+                 auto_last_batch=True):
     """Run all analysis steps for burst models
     """
     # TODO: copy generators
@@ -38,9 +39,13 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
 
     if collect:
         print_title('Collecting results')
-        kgrid = grid_analyser.Kgrid(source, load_concord_summ=False, exclude_defaults=True,
-                                    powerfits=False, burst_analyser=True)
-        last_batch = int(kgrid.params.iloc[-1]['batch'])
+        if auto_last_batch:
+            kgrid = grid_analyser.Kgrid(source, load_concord_summ=False, exclude_defaults=True,
+                                        powerfits=False, burst_analyser=True)
+            last_batch = int(kgrid.params.iloc[-1]['batch'])
+        else:
+            last_batch = batches[-1]
+            
         burst_tools.combine_batch_summaries(np.arange(last_batch) + 1, source)
 
 
