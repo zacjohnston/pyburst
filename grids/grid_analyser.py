@@ -449,6 +449,7 @@ class Kgrid:
         unit_f = {'tDel': 3600, 'dt': 3600, 'rate': 3600,
                   'fluence': 1e39, 'peak': 1e38}.get(bprop, 1.0)
 
+        # TODO: Make work natively with rate from burst table
         rate = (bprop == 'rate')
         if rate:
             bprop = 'dt'
@@ -596,7 +597,7 @@ class Kgrid:
         return [p for p in p_list
                 if (p != var)]
 
-    def save_all_plots(self, fixed=None, bprops=('tDel', 'fluence', 'peakLum'),
+    def save_all_plots(self, fixed=None, bprops=('dt', 'fluence', 'peak'),
                        do_bprops=True, **kwargs):
         """Saves all lhood and var plots for given z,qb
         """
@@ -617,12 +618,12 @@ class Kgrid:
                                         'qb': [0.1, 0.2],
                                         'x': [0.0, 0.05, 0.1]},
 
-                             'biggrid2': {'z': [0.0015, 0.0025, 0.0075, 0.0125, 0.0175],
-                                          'qb': [0.025, 0.125],
+                             'biggrid2': {'z': [0.0025, 0.005, 0.0075],
+                                          'qb': [0.05],
                                           # 'mass': [0.8, 1.4, 2.0, 2.6, 3.2],
-                                          'mass': [1.4, 2.0, 2.6],
+                                          'mass': [1.7, 2.0, 2.3],
                                           # 'x': [0.6, 0.7, 0.8]},
-                                          'x': [0.65, 0.7, 0.77]},
+                                          'x': [0.65, 0.7, 0.72, 0.73]},
                              }
             fixed = default_fixed.get(self.source, use_unique())
 
