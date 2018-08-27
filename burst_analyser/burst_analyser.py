@@ -61,7 +61,7 @@ class BurstRun(object):
                            'min_length': 5,  # min time between burst peak and end (sec)
                            'short_wait_frac': 0.5,  # short_waits below frac of following dt
                            'min_discard': 1,  # min num of bursts to discard
-                           'min_regress': 10,  # min num of bursts to do linear regression
+                           'min_regress': 20,  # min num of bursts to do linear regression
                            'n_bimodal': 20,  # n_bursts to check for bimodality
                            'bimodal_sigma': 3,  # number of std's modes are separated by
                            }
