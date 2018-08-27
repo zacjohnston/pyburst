@@ -2,6 +2,7 @@ import numpy as np
 
 # kepler_grids
 from pygrids.grids import grid_strings
+
 # -----------------------------------
 # Define different prior boundaries.
 # Must be in same order as 'params' in BurstFit
@@ -48,7 +49,7 @@ prior_bounds = {
             (0.0, np.inf),  # d
             (0, 90)  # inc             ***
             ),
-        },
+    },
 
     2: {
         1: ((0.05, 0.24),  # mdot1
@@ -112,7 +113,7 @@ prior_bounds = {
             (0.65, 0.77),  # x
             (0.0015, 0.0175),  # z
             (0.025, 0.125),  # qb
-            (1.0, 2.6/1.4),  # g
+            (1.0, 2.6 / 1.4),  # g
             (1.0, 1.5),  # redshift
             (0.0, np.inf),  # d
             (0, 90)  # inc
@@ -123,13 +124,13 @@ prior_bounds = {
             (0.65, 0.77),  # x
             (0.0015, 0.0175),  # z
             (0.025, 0.125),  # qb
-            (1.0, 2.6/1.4),  # g
+            (1.0, 2.6 / 1.4),  # g
             (1.0, 2.0),  # redshift
             (0.0, np.inf),  # d
             (0, 90)  # inc
             ),
 
-        },
+    },
 
     3: {
         1: ((0.06, 0.24),  # mdot1      ***
@@ -202,7 +203,7 @@ prior_bounds = {
             (0.01, np.inf),  # f_b      ***
             (0.01, np.inf),  # f_p      ***
             ),
-        },
+    },
 
     6: {
         1: ((0.08, 0.24),  # mdot1
@@ -271,7 +272,7 @@ prior_bounds = {
             (0.01, 10),  # f_b
             (0.01, 10),  # f_p
             ),
-        },
+    },
 
     7: {
         1: ((0.1, 0.24),  # mdot1
@@ -319,7 +320,7 @@ prior_bounds = {
             (0.1, 0.24),  # mdot3
             (0.65, 0.75),  # x
             (0.0025, 0.0125),  # z
-            (1., 2.6/1.4),  # g
+            (1., 2.6 / 1.4),  # g
             (1.2, 1.4),  # redshift
             (0.01, 10),  # f_b
             (0.01, 10),  # f_p
@@ -349,7 +350,7 @@ prior_bounds = {
             (0.1, 0.22),  # mdot3
             (0.65, 0.73),  # x
             (0.0025, 0.0075),  # z
-            (1.7/1.4, 2.3/1.4),  # g
+            (1.7 / 1.4, 2.3 / 1.4),  # g
             (1.2, 1.4),  # redshift
             (0.01, 10),  # f_b
             (0.01, 10),  # f_p
@@ -365,15 +366,15 @@ prior_bounds = {
             (0.01, 10),  # f_p
             ),
         10: ((0.1, 0.22),  # mdot1
-            (0.1, 0.22),  # mdot2
-            (0.1, 0.22),  # mdot3
-            (0.7, 0.73),  # x
-            (0.0025, 0.0075),  # z
-            (1.7 / 1.4, 2.3 / 1.4),  # g
-            (1.2, 1.6),  # redshift
-            (0.01, 10),  # f_b
-            (0.01, 10),  # f_p
-            ),
+             (0.1, 0.22),  # mdot2
+             (0.1, 0.22),  # mdot3
+             (0.7, 0.73),  # x
+             (0.0025, 0.0075),  # z
+             (1.7 / 1.4, 2.3 / 1.4),  # g
+             (1.2, 1.4),  # redshift
+             (0.01, 10),  # f_b
+             (0.01, 10),  # f_p
+             ),
     },
 
     8: {
@@ -389,7 +390,7 @@ prior_bounds = {
             (0.1, 0.22),  # mdot3
             (0.65, 0.72),  # x
             (0.0025, 0.0075),  # z
-            (1.7/1.4, 2.3/1.4),  # g
+            (1.7 / 1.4, 2.3 / 1.4),  # g
             (1.2, 1.4),  # redshift
             (0.01, 10),  # f
             ),
@@ -525,7 +526,6 @@ version_defaults = {
         },
 }
 
-
 version_definitions = {
     'interpolator':
         {
@@ -634,11 +634,11 @@ version_definitions = {
             'biggrid1': {},
             'biggrid2':
                 {
-                  63: ('rate', 'fluence', 'peak'),
-                  64: 63,
-                  65: 63,
-                  66: 63,
-                  67: 63,
+                    63: ('rate', 'fluence', 'peak'),
+                    64: 63,
+                    65: 63,
+                    66: 63,
+                    67: 63,
                 },
             'grid4': {
             },
@@ -928,4 +928,3 @@ def get_parameter(source, version, parameter):
         return version_definitions[parameter][source][out]
     else:
         return out
-
