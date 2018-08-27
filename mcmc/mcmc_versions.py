@@ -882,6 +882,7 @@ version_definitions = {
         },
 }
 
+
 class McmcVersion:
     """Class for holding different mcmc versions
     """
@@ -892,8 +893,8 @@ class McmcVersion:
         if source not in version_defaults['param_keys']:
             raise ValueError(f'source ({source}) not defined in mcmc_versions')
         elif version not in version_definitions['interpolator'][source]:
-            raise ValueError(f'version {version} of source {source} ' +
-                             'is not defined in mcmc_versions')
+            print(f'version {version} of source {source} ' +
+                  'not defined in mcmc_versions. Using default values')
 
         self.source = source
         self.version = version
