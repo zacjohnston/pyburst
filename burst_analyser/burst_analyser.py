@@ -362,7 +362,7 @@ class BurstRun(object):
         self.get_burst_starts()
         self.get_burst_ends()
         self.check_n_bursts()
-        
+
         self.identify_short_wait_bursts()
         self.bursts.reset_index(inplace=True, drop=True)
 
@@ -494,7 +494,10 @@ class BurstRun(object):
             if rise_steps < 50 or (burst.peak / burst.lum_pre) < self.parameters['peak_frac']:
                 self.printv(f'Removing micro-burst at t={burst.t_peak:.0f} s '
                             + f'({burst.t_peak/3600:.1f} hr)')
-                self.delete_burst(burst.Index)
+                try:
+                    self.delete_burst(burst.Index)
+                except NoBursts:
+                    return
                 continue
 
             lum_slice = self.lum[burst.t_pre_i:burst.t_peak_i]
@@ -533,7 +536,10 @@ class BurstRun(object):
             if len(intersection) == 0:
                 if burst.Index == self.bursts.index[-1]:
                     self.printv('File ends during burst. Discarding final burst')
-                    self.delete_burst(burst.Index)
+                    try:
+                        self.delete_burst(burst.Index)
+                    except NoBursts:
+                        return
                     continue
                 else:
                     raise RuntimeError(f'Failed to find end of burst {burst.Index + 1}, '
@@ -552,6 +558,9 @@ class BurstRun(object):
         self.bursts = self.bursts.drop(burst_i)
         self.n_bursts -= 1
 
+        if self.n_bursts == 0:  # have deleted last burst
+            self.print_warn('Discarded only burst')
+            raise NoBursts
         if burst_i == 0:    # if deleting first burst, second burst has undefined dt
             self.bursts.loc[1, 'dt'] = np.nan
 
