@@ -38,7 +38,7 @@ def load_dump(cycle, run, batch, source='biggrid2', basename='xrb',
     filename = get_dump_filename(cycle, run, basename, prefix=prefix)
 
     filepath = os.path.join(MODELS_PATH, batch_str, run_str, filename)
-    return kepdump.load(filepath)
+    return kepdump.load(filepath, graphical=False)
 
 
 def get_profile(dump):
@@ -132,6 +132,7 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='', l
     cycles,runs,batches,sources are arrays of length N, where the i'th entry
         correspond to a single model to plot
     """
+    runs, batches, sources = expand_lists(cycles, runs, batches, sources)
     fig, ax = plt.subplots()
     dump = None
     for i, cycle in enumerate(cycles):
@@ -296,6 +297,17 @@ def plot_saxj(x_units='time', dumptimes=True, cycles=None):
         ax.plot(lc[cycles, 0], lc[cycles, 1], marker='o', ls='none')
 
     plt.show(block=False)
+
+
+def expand_lists(cycles, runs, batches, sources):
+    lists = []
+    n_cyc = len(cycles)
+    for i, var in enumerate([runs, batches, sources]):
+        if len(var) == 1:
+            lists += [np.full(n_cyc, var[0])]
+        else:
+            lists += [var]
+    return lists
 
 
 def get_prefix(index, prefix):
