@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import os
 import astropy.units as u
 import astropy.constants as const
-from scipy.stats import norm
 import pickle
 from matplotlib.ticker import NullFormatter
 
@@ -82,8 +81,10 @@ class BurstFit:
 
         self.obs_data = None
         self.extract_obs_values()
+
         self.z_prior = None
         self.f_ratio_prior = None
+        self.inc_prior = None
         self.setup_priors()
 
     def printv(self, string, **kwargs):
@@ -104,8 +105,9 @@ class BurstFit:
 
     def setup_priors(self):
         self.debug.start_function('setup_priors')
-        self.z_prior = norm(loc=-0.5, scale=0.25).pdf  # log10-space [z/solar]
-        self.f_ratio_prior = norm(loc=2.2, scale=0.2).pdf
+        self.z_prior = self.mcmc_version.prior_pdfs['z']
+        self.f_ratio_prior = self.mcmc_version.prior_pdfs['f_ratio']
+        self.inc_prior = self.mcmc_version.prior_pdfs['inc']
         self.debug.end_function()
 
     def extract_obs_values(self):
@@ -346,12 +348,11 @@ class BurstFit:
         prior_lhood = np.log(self.z_prior(np.log10(z / z_sun)))
 
         if self.has_two_f:
-            # f_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
-            # prior_lhood += np.log(self.f_ratio_prior(f_ratio))
-            pass
+            f_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
+            prior_lhood += np.log(self.f_ratio_prior(f_ratio))
         elif self.has_inc:
             inc = params[self.param_idxs['inc']]
-            prior_lhood += np.log(np.sin(inc * u.deg)).value
+            prior_lhood += np.log(self.inc_prior(inc * u.deg)).value
 
         self.debug.variable('prior_lhood', prior_lhood, 'f')
         self.debug.end_function()
