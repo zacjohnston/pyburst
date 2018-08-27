@@ -1,6 +1,6 @@
 # standard
 import numpy as np
-from scipy.interpolate import LinearNDInterpolator, RegularGridInterpolator
+from scipy.interpolate import LinearNDInterpolator
 import os
 import time
 import pickle
