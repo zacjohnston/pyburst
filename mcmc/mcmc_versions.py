@@ -399,6 +399,10 @@ prior_bounds = {
 }
 
 # ===== Define prior pdfs for parameters =====
+def flat_prior(x):
+    return 1
+
+
 prior_pdfs = {
     'z': {
         1: norm(loc=-0.5, scale=0.25).pdf,  # log10-space [z/solar]
@@ -406,7 +410,7 @@ prior_pdfs = {
 
     'f_ratio': {
         1: norm(loc=2.3, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
-        2: lambda x: 1,                   # flat prior
+        2: flat_prior,                   # flat prior
     },
 
     'inc': {
