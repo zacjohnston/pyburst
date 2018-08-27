@@ -36,10 +36,13 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
 
     if nuc_heat:
         qnuc1 = """
-o qnuc {1.31 + 6.95 * x + 1.92 * x ** 2} def
-o qnuc {1.6e-6} *
+c Convert qnuc from MeV/nucleon to erg/g
+c (Note accrate is in Msun/yr)
+c o qnuc {1.31 + 6.95 * x + 1.92 * x ** 2} def
+o qnuc {5.} def
+o qnuc {1.602e-6} *
 o qnuc {accrate} *
-o qnuc {2.e33 * 6.7e23 / 3.15e7} *
+o qnuc {1.99e33 * 5.979e23 / 3.156e7} *
 p xheatl {qnuc}
 p xheatym 1.e21
 p xheatdm 2.e20"""
