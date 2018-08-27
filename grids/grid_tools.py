@@ -440,6 +440,28 @@ def check_finished(batches, source, efficiency=True, show='all',
             print(string)
 
 
+def print_params_summary(table, show=None):
+    """Print summary of unique params in a given table
+
+    parameters
+    ----------
+    table : pandas.DataFrame
+        table of models to summarise (subset of self.params)
+    show : [str] (optional)
+        specify parameters to show.
+        defaults to ['accrate', 'x', 'z', 'qb', 'mass']
+    """
+    if type(table) != pd.core.frame.DataFrame:
+        raise TypeError('table must be pandas.DataFrame')
+
+    if show is None:
+        show = ['accrate', 'x', 'z', 'qb', 'mass']
+
+    for param in show:
+        unique = np.unique(table[param])
+        print(f'{param} = {unique}')
+
+
 def printv(string, verbose):
     if verbose:
         print(string)

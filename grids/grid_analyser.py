@@ -666,28 +666,7 @@ class Kgrid:
         print(out_string)
 
     def print_unique_params(self):
-        self.print_params_summary(self.params)
-
-    def print_params_summary(self, table, show=None):
-        """Print summary of unique params in a given table
-
-        parameters
-        ----------
-        table : pandas.DataFrame
-            table of models to summarise (subset of self.params)
-        show : [str] (optional)
-            specify parameters to show.
-            defaults to ['accrate', 'x', 'z', 'qb', 'mass']
-        """
-        if type(table) != pd.core.frame.DataFrame:
-            raise TypeError('table must be pandas.DataFrame')
-
-        if show is None:
-            show = ['accrate', 'x', 'z', 'qb', 'mass']
-
-        for param in show:
-            unique = np.unique(table[param])
-            print(f'{param} = {unique}')
+        grid_tools.print_params_summary(self.params)
 
     def print_batch_summary(self, batch, batch_n=None, show=None):
         """Pretty print a summary of params in a batch
