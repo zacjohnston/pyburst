@@ -254,6 +254,8 @@ def plot_slope(cycles, source, params, linear=True, display=True):
 
 
 def get_slopes(cycles, table, source):
+    """Returns slopes of base temperature change (K/s), for given model table
+    """
     slopes = []
     for row in table.itertuples():
         d0 = load_dump(cycles[0], run=row.run, batch=row.batch, source=source)
