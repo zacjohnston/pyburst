@@ -3,9 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import subprocess
+import astropy.units as u
+from scipy.stats import linregress
 
+#kepler
 import kepdump
-from pygrids.grids import grid_strings, grid_tools
+
+#pygrids
+from pygrids.grids import grid_analyser, grid_strings, grid_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -38,7 +43,7 @@ def load_dump(cycle, run, batch, source='biggrid2', basename='xrb',
     filename = get_dump_filename(cycle, run, basename, prefix=prefix)
 
     filepath = os.path.join(MODELS_PATH, batch_str, run_str, filename)
-    return kepdump.load(filepath, graphical=False)
+    return kepdump.load(filepath, graphical=False, silent=True)
 
 
 def get_profile(dump):
@@ -228,6 +233,35 @@ def plot_base_temp(cycles, run, batch, source='biggrid2', basename='xrb', title=
     return slope
 
 
+def plot_slope(cycles, source, params, linear=True, display=True):
+    kgrid = grid_analyser.Kgrid(source)
+    subset = kgrid.get_params(params=params)
+    slopes = get_slopes(cycles, table=subset, source=source)
+
+    fig, ax = plt.subplots()
+    x = subset['accrate'].iloc[[0, -1]]
+    ax.plot(subset['accrate'], slopes, ls='none', marker='o')
+    ax.plot(x, [0, 0], color='black')
+
+    if linear:
+        linr = linregress(subset['accrate'], slopes)
+        ax.plot(x, x * linr[0] + linr[1])
+        print(f'{linr[0]:.3f}   {linr[1]:.2f}')
+    if display:
+        plt.show(block=False)
+    else:
+        plt.close()
+
+
+def get_slopes(cycles, table, source):
+    slopes = []
+    for row in table.itertuples():
+        d0 = load_dump(cycles[0], run=row.run, batch=row.batch, source=source)
+        d1 = load_dump(cycles[1], run=row.run, batch=row.batch, source=source)
+        slopes += [(d1.tn[1] - d0.tn[1]) / (d1.time - d0.time)]
+    return np.array(slopes)
+
+
 def get_qnuc(cycles, run, batch, source):
     """Return energy generation per mass averaged over model (erg/g)
     cycles: length 2 array
@@ -242,8 +276,10 @@ def get_qnuc(cycles, run, batch, source):
 
     mass_diff = dumps[1].qparm('xmacc') - dumps[0].qparm('xmacc')
     energy_diff = dumps[1].qparm('epro') - dumps[0].qparm('epro')
-
-    return energy_diff / mass_diff
+    rate = energy_diff / mass_diff
+    rate_mev = rate * (u.erg/u.g).to(u.MeV/u.M_p)
+    print(f'{rate_mev:.2f}  MeV/nucleon')
+    return rate
 
 
 def save_temps(cycles, run, batch, source, zero_times=True):
