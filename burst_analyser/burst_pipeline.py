@@ -40,12 +40,12 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
     if collect:
         print_title('Collecting results')
         if auto_last_batch:
-            kgrid = grid_analyser.Kgrid(source, load_concord_summ=False, exclude_defaults=True,
+            kgrid = grid_analyser.Kgrid(source, exclude_defaults=True,
                                         powerfits=False, burst_analyser=True)
             last_batch = int(kgrid.params.iloc[-1]['batch'])
         else:
             last_batch = batches[-1]
-            
+
         burst_tools.combine_batch_summaries(np.arange(last_batch) + 1, source)
 
 

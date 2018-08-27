@@ -27,8 +27,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 # TODO: rewrite docstrings
 
 
-def load_grid_table(tablename, source, con_ver=None,
-                    verbose=True, burst_analyser=False):
+def load_grid_table(tablename, source, verbose=True, burst_analyser=False):
     """Returns file of model parameters as pandas DataFrame
     
     tablename  = str   : table name (e.g. 'params', 'summ')
@@ -36,21 +35,13 @@ def load_grid_table(tablename, source, con_ver=None,
     """
     source = grid_strings.source_shorthand(source)
 
-    if tablename == 'concord_summ':
-        if con_ver is None:
-            raise ValueError('must provide con_ver (concord version)')
-        else:
-            cv = f'_C{con_ver:02}'  # concord_summ needs concord version
-    else:
-        cv = ''
-
     if burst_analyser and tablename == 'summ':
         param_path = grid_strings.get_source_subdir(source, 'burst_analysis')
         filename = f'burst_analysis_{source}.txt'
         filepath = os.path.join(param_path, filename)
     else:
         param_path = grid_strings.get_source_subdir(source, tablename)
-        filename = f'{tablename}_{source}{cv}.txt'
+        filename = f'{tablename}_{source}.txt'
         filepath = os.path.join(param_path, filename)
 
     printv(f'Loading {tablename} table: {filepath}', verbose)

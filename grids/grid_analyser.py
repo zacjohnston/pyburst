@@ -13,9 +13,6 @@ import os
 from . import grid_tools
 from . import grid_strings
 
-# concord
-import con_versions
-import ctools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -52,10 +49,10 @@ class Kgrid:
     An object for interracting with large model grids
     """
 
-    def __init__(self, source, basename='xrb', con_ver=6,
+    def __init__(self, source, basename='xrb',
                  load_lc=False, verbose=True,
                  powerfits=False, exclude_defaults=True,
-                 load_concord_summ=False, burst_analyser=True, **kwargs):
+                 burst_analyser=True, **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
         basename =  str  : basename of individual models (e.g. xrb)
@@ -68,7 +65,6 @@ class Kgrid:
         self.source_path = grid_strings.get_source_path(source)
         self.source = source
         self.basename = basename
-        self.con_ver = con_ver
         self.verbose = verbose
         self.burst_analyser = burst_analyser
 
@@ -84,16 +80,11 @@ class Kgrid:
         for v in self.params.columns[2:]:
             self.unique_params[v] = np.unique(self.params[v])
 
-        if load_concord_summ:
-            self.concord_summ = grid_tools.load_grid_table(tablename='concord_summ',
-                                                           source=source, con_ver=con_ver, verbose=verbose)
         self.n_models = len(self.params)
-
         self.printv('=' * 40)
         self.printv('Loaded')
         self.printv(f'Source: {source}')
         self.printv(f'Models in grid: {self.n_models}')
-        self.printv(f'Concord config: {con_ver}')
 
         self.powerfits = None
         if powerfits:
@@ -160,42 +151,6 @@ class Kgrid:
                                  exclude=exclude)
         idxs = subset.index.values
         return self.summ.iloc[idxs]
-
-    def get_concord_sum(self, batch=None, run=None, params=None):
-        """
-        Get concord results of given triplet/run/params
-        """
-        # TODO: move to define_sources
-        base_mdot = {'gs1826': 0.0796, '4u1820': 0.226}[self.source]
-        if params is None:
-            params = dict()
-        params['accrate'] = base_mdot
-
-        subset = self.get_params(batch=batch, run=run, params=params)
-        idxs = np.array([])
-        for i in subset.index:
-            batch = subset.get_value(i, 'batch')
-            run = subset.get_value(i, 'run')
-
-            batch_idxs = np.where(self.concord_summ['triplet'] == batch)[0]
-            run_idxs = np.where(self.concord_summ['run'] == run)[0]
-            idx = np.intersect1d(batch_idxs, run_idxs)
-            idxs = np.concatenate([idxs, idx])
-
-        return self.concord_summ.loc[idxs]
-
-    def get_lhood(self, triplet, run):
-        """Returns lhood value of given triplet-run
-        """
-        # TODO: smarter way to do this intersection?
-        if triplet not in self.concord_summ['triplet'].values:
-            return np.nan
-
-        idxs1 = np.where(self.concord_summ['triplet'] == triplet)[0]
-        idx2 = np.where(self.concord_summ.iloc[idxs1]['run'] == run)[0][0]
-        idx = idxs1[idx2]
-
-        return self.concord_summ.iloc[idx]['lhood']
 
     def get_powerfits(self):
         """Calculate power-law fits to burst properties (only dt currently)
@@ -648,15 +603,6 @@ class Kgrid:
                                                  save=True, show=False, **kwargs)
                 plt.close('all')
 
-    def plot_matched_lightcurves(self, triplet, run):
-        """Plots matched lightcurves for given run of batch (triplet)
-        """
-        self.printv(f'Plotting matched lightcurves for batch={triplet}, run={run}')
-        self.print_params(batch=triplet, run=run)
-        self.printv(triplet)
-        ctools.plot_lightcurves(run=run, batches=triplet, con_ver=self.con_ver,
-                                source=self.source)
-
     def print_params(self, batch, run):
         """Prints essential params for given batch-run
         """
@@ -685,7 +631,7 @@ class Kgrid:
             batches = np.arange(batch, batch_n+1)
 
         batch_params = self.get_combined_params(batches)
-        self.print_params_summary(batch_params, show=show)
+        grid_tools.print_params_summary(batch_params, show=show)
 
     def get_combined_params(self, batches):
         """Returns sub-table of self.params with specified batches
@@ -696,34 +642,6 @@ class Kgrid:
             table = table.append(batch_params, ignore_index=True)
 
         return table
-
-    def best_concord_lhood(self, params={}, plot=False):
-        """Returns model with highest likelihood (from given params)
-        """
-        if len(params) == 0:
-            concord_summ = self.concord_summ
-        else:
-            concord_summ = self.get_concord_sum(params=params)
-
-        lhoods = concord_summ['lhood'].values
-        best_idx = np.nanargmax(lhoods)
-        best_concord = concord_summ.iloc[best_idx]
-
-        batch = int(best_concord['triplet'])
-        run = int(best_concord['run'])
-        model = self.get_params(batch=batch, run=run)
-
-        if plot:
-            self.plot_matched_lightcurves(triplet=batch, run=run)
-
-        return model, best_concord
-
-
-def check_kgrid(kgrid, source):
-    if kgrid is None:
-        kgrid = Kgrid(source, load_concord_summ=False, exclude_test_batches=False,
-                      powerfits=False)
-    return kgrid
 
 
 def printv(string, verbose):

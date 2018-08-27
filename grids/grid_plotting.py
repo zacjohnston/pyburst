@@ -5,7 +5,6 @@ import os
 
 # kepler_grids
 from . import grid_analyser
-from . import grid_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
@@ -23,9 +22,8 @@ def show_plot(fig, save, savepath, savename):
 def save_grid_params(source, param_list=('x', 'z', 'qb', 'mass')):
     """Iterates over grid parameters and plots grid points
     """
-    kgrid = grid_analyser.Kgrid(source=source, load_concord_summ=False,
-                                exclude_test_batches=False, powerfits=False,
-                                verbose=False)
+    kgrid = grid_analyser.Kgrid(source=source, exclude_test_batches=False,
+                                powerfits=False, verbose=False)
     unique = kgrid.unique_params
     savepath = os.path.join(GRIDS_PATH, 'sources', source, 'plots', 'grid')
 
