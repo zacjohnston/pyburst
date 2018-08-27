@@ -364,6 +364,16 @@ prior_bounds = {
             (0.01, 10),  # f_b
             (0.01, 10),  # f_p
             ),
+        10: ((0.1, 0.22),  # mdot1
+            (0.1, 0.22),  # mdot2
+            (0.1, 0.22),  # mdot3
+            (0.7, 0.73),  # x
+            (0.0025, 0.0075),  # z
+            (1.7 / 1.4, 2.3 / 1.4),  # g
+            (1.2, 1.6),  # redshift
+            (0.01, 10),  # f_b
+            (0.01, 10),  # f_p
+            ),
     },
 
     8: {
@@ -453,6 +463,8 @@ initial_position = {
          0.68, 0.004, 1.4, 1.3, 0.65, 1.6),
     26: (0.18, 0.15, 0.11,
          0.71, 0.004, 1.4, 1.35, 1.),
+    27: (0.20, 0.16, 0.12,
+         0.71, 0.004, 1.4, 1.3, 0.65, 1.6),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -471,12 +483,14 @@ version_defaults = {
             'biggrid2': param_keys[2],
             'sim_test': param_keys[1],
             'sim10': param_keys[6],
+            'grid4': param_keys[7],
         },
 
     'bprops':
         {
             'biggrid1': ('dt', 'fluence', 'peak'),
             'biggrid2': ('dt', 'fluence', 'peak'),
+            'grid4': ('rate', 'fluence', 'peak'),
         },
     'disc_model':
         {
@@ -484,18 +498,21 @@ version_defaults = {
             'biggrid2': 'he16_d',
             'sim_test': 'he16_a',
             'sim10': 'he16_a',
+            'grid4': 'he16_a',
         },
 
     'interpolator':
         {
             'biggrid1': 1,
             'biggrid2': 1,
+            'grid4': 1,
         },
 
     'prior_bounds':
         {
             'biggrid1': {},
             'biggrid2': prior_bounds[2][2],
+            'grid4': prior_bounds[7][10],
         },
 
     'initial_position':
@@ -504,8 +521,8 @@ version_defaults = {
             'biggrid2': initial_position[4],
             'sim_test': initial_position[3],
             'sim10': initial_position[12],
+            'grid4': initial_position[27],
         },
-
 }
 
 
@@ -607,6 +624,9 @@ version_definitions = {
                 6: 15,
                 7: 15,
             },
+            'grid4': {
+                1: 1,
+            },
         },
 
     'bprops':
@@ -620,6 +640,8 @@ version_definitions = {
                   66: 63,
                   67: 63,
                 },
+            'grid4': {
+            },
         },
     'param_keys':
         {
@@ -677,6 +699,8 @@ version_definitions = {
                 5: 4,
                 6: 4,
                 7: 4,
+            },
+            'grid4': {
             },
         },
 
@@ -761,7 +785,9 @@ version_definitions = {
                 4: prior_bounds[2][6],
                 5: prior_bounds[2][7],
                 6: 5,
-                7: 5,
+                7: 5
+            },
+            'grid4': {
             },
         },
     'initial_position':
@@ -818,7 +844,8 @@ version_definitions = {
                 6: initial_position[20],
                 7: initial_position[21],
             },
-
+            'grid4': {
+            },
         },
 
     'disc_model':
@@ -850,9 +877,10 @@ version_definitions = {
             },
             'sim_test': {},
             'sim10': {},
+            'grid4': {
+            },
         },
 }
-
 
 class McmcVersion:
     """Class for holding different mcmc versions
