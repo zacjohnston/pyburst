@@ -168,7 +168,6 @@ def create_batch(batch, dv, source,
 
     # ===== Write table of model parameters (MODELS.txt)=====
     write_model_table(n=n, params=params_full, lburn=lburn, path=batch_model_path)
-    print('passed')
     # ==== Write any notes relevant to the grid, for future reference ====
     filepath = os.path.join(batch_model_path, 'NOTES.txt')
     with open(filepath, 'w') as f:
@@ -406,7 +405,7 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
     p['lburn'] = lburn_list
 
     col_order = ['run', 'z', 'y', 'x', 'qb', 'accrate',
-                 'tshift', 'xi', 'qb_delay', 'mass', 'lburn']
+                 'tshift', 'xi', 'qb_delay', 'mass', 'lburn', 'accmass', 'accdepth']
     ptable = pd.DataFrame(p)
     ptable = ptable[col_order]  # Fix column order
 
