@@ -361,7 +361,8 @@ class BurstRun(object):
         self.get_recurrence_times()
         self.get_burst_starts()
         self.get_burst_ends()
-
+        self.check_n_bursts()
+        
         self.identify_short_wait_bursts()
         self.bursts.reset_index(inplace=True, drop=True)
 
@@ -451,8 +452,15 @@ class BurstRun(object):
 
         peaks = np.array(peaks)
         self.n_bursts = len(peaks)
+        self.check_n_bursts()
+        self.bursts['t_peak'] = peaks[:, 0]  # times of burst peaks (s)
+        self.bursts['t_peak_i'] = np.searchsorted(self.lum[:, 0], self.bursts['t_peak'])
+        self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
 
-        if self.n_bursts < 2:
+    def check_n_bursts(self):
+        if self.flags['too_few_bursts'] or self.flags['regress_too_few_bursts']:
+            pass
+        elif self.n_bursts < 2:
             self.flags['too_few_bursts'] = True
             self.flags['regress_too_few_bursts'] = True
             message = {0: 'No bursts in this model',
@@ -461,10 +469,6 @@ class BurstRun(object):
 
             if self.n_bursts == 0:
                 raise NoBursts
-
-        self.bursts['t_peak'] = peaks[:, 0]  # times of burst peaks (s)
-        self.bursts['t_peak_i'] = np.searchsorted(self.lum[:, 0], self.bursts['t_peak'])
-        self.bursts['peak'] = peaks[:, 1]  # Peak luminosities (erg/s)
 
     def get_recurrence_times(self):
         """Finds recurence times (dt (s), time between bursts)
