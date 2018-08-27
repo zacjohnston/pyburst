@@ -6,18 +6,21 @@ version_defaults = {
             'gs1826': ['accrate', 'x', 'z', 'qb', 'mass'],
             'biggrid1': ['accrate', 'x', 'z', 'qb', 'mass'],
             'biggrid2': ['accrate', 'x', 'z', 'qb', 'mass'],
+            'grid4': ['accrate', 'x', 'z', 'mass'],
         },
     'bprops':
         {
             'gs1826': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
             'biggrid1': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
             'biggrid2': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+            'grid4': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         },
     'batches_exclude':
         {
             'gs1826': {},
             'biggrid1': {'batch': [255, 256, 257, 258, 259, 260, 471, 472, 473, 418, 419, 420]},
             'biggrid2': {},
+            'grid4': {},
         },
 
     'params_exclude':
@@ -38,6 +41,7 @@ version_defaults = {
                     'qb': [.075],
                     'mass': [0.8, 3.2],
                 },
+            'grid4': {},
         },
 }
 
@@ -62,6 +66,7 @@ version_definitions = {
                     25: 16,
                     26: 16,
                 },
+            'grid4': {},
         },
 
     'bprops':
@@ -73,6 +78,7 @@ version_definitions = {
                     25: ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
                     26: 25
                 },
+            'grid4': {},
         },
 
     'batches_exclude':
@@ -88,6 +94,7 @@ version_definitions = {
                 {
                 1: {},
                 },
+            'grid4': {},
         },
 
     'params_exclude':
@@ -165,6 +172,7 @@ version_definitions = {
                 25: 23,
                 26: 23,
                 },
+            'grid4': {},
         },
 }
 
