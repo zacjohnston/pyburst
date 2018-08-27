@@ -17,3 +17,9 @@ Version     Note
 24          same as 23 but forced 2% uncertainties
 25          Use burst rate (rate) in place of recurrent time (dt)
 26          same as 25, but with bprops 10% smaller, to test qnuc heating models
+
+Source: grid4
+----------------
+Version     Note
+----------------
+1           preliminary new grid using qnuc burn-in heat
