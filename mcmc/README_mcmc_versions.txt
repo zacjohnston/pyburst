@@ -14,3 +14,10 @@ Version     Note
 64          using only one f-factor (i.e. f_p=f_b)
 65          same as 63 but using f-factor ratio priors
 66          increasing redshift bound to 1.6
+
+Source: grid4
+---------------
+Version     Note
+----------------
+1           initial test of new grid with qnuc burn-in heating
+2           same as 2, but without f_ratio prior
