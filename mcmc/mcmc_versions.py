@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import norm
 
 # kepler_grids
 from pygrids.grids import grid_strings
@@ -397,6 +398,22 @@ prior_bounds = {
     },
 }
 
+# ===== Define prior pdfs for parameters =====
+prior_pdfs = {
+    'z': {
+        1: norm(loc=-0.5, scale=0.25).pdf,  # log10-space [z/solar]
+    },
+
+    'f_ratio': {
+        1: norm(loc=2.3, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
+        2: lambda x: 1,                   # flat prior
+    },
+
+    'inc': {
+        1: np.sin,
+    },
+}
+
 # ===== Defines order/number of params provided to BurstFit =====
 # TODO: Ensure correspond to prior_bounds
 param_keys = {
@@ -514,6 +531,20 @@ version_defaults = {
             'biggrid1': {},
             'biggrid2': prior_bounds[2][2],
             'grid4': prior_bounds[7][10],
+        },
+
+    'prior_pdfs':
+        {
+          'biggrid2': {
+              'z': prior_pdfs['z'][1],
+              'f_ratio': prior_pdfs['f_ratio'][1],
+              'inc': prior_pdfs['inc'][1],
+          },
+          'grid4': {
+              'z': prior_pdfs['z'][1],
+              'f_ratio': prior_pdfs['f_ratio'][1],
+              'inc': prior_pdfs['inc'][1],
+          }
         },
 
     'initial_position':
@@ -790,6 +821,14 @@ version_definitions = {
             'grid4': {
             },
         },
+
+    'prior_pdfs': {
+        'biggrid2': {},
+        'grid4': {
+            2: prior_pdfs['f_ratio'][2],
+        },
+    },
+
     'initial_position':
         {
             'biggrid1': {},
@@ -903,6 +942,7 @@ class McmcVersion:
         self.interpolator = get_parameter(source, version, 'interpolator')
         self.prior_bounds = np.array(get_parameter(source, version, 'prior_bounds'))
         self.initial_position = get_parameter(source, version, 'initial_position')
+        self.prior_pdfs = get_prior_pdfs(source, version)
 
         if 'inc' in self.param_keys:
             self.disc_model = get_parameter(source, version, 'disc_model')
@@ -923,8 +963,23 @@ class McmcVersion:
 def get_parameter(source, version, parameter):
     source = grid_strings.check_synth_source(source)
     default = version_defaults[parameter][source]
-    out = version_definitions[parameter][source].get(version, default)
-    if (parameter != 'interpolator') and type(out) is int:
-        return version_definitions[parameter][source][out]
+    output = version_definitions[parameter][source].get(version, default)
+
+    if (parameter != 'interpolator') and type(output) is int:
+        return version_definitions[parameter][source][output]
     else:
-        return out
+        return output
+
+
+def get_prior_pdfs(source, version):
+    pdfs = {}
+    for var in prior_pdfs:
+        default = version_defaults['prior_pdfs'][source][var]
+        value = version_definitions['prior_pdfs'][source].get(version, default)
+
+        if type(value) is int:  # allow pointing to previous versions
+            pdfs[var] = version_definitions['prior_pdfs'][source].get(value, default)
+        else:
+            pdfs[var] = value
+
+    return pdfs
