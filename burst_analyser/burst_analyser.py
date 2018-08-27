@@ -497,6 +497,7 @@ class BurstRun(object):
                 try:
                     self.delete_burst(burst.Index)
                 except NoBursts:
+                    self.bursts['lum_start'] = np.nan
                     return
                 continue
 
@@ -539,6 +540,7 @@ class BurstRun(object):
                     try:
                         self.delete_burst(burst.Index)
                     except NoBursts:
+                        self.bursts['lum_end'] = np.nan
                         return
                     continue
                 else:
