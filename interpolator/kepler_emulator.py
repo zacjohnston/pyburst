@@ -126,7 +126,7 @@ class Kemulator:
             # if key[0] == 'u':
             #     values[:, i] = 0.02 * self.summ[key.strip('u_')]
             # else:
-            values[:, i] = self.summ[key]
+            values[:, i] = self.summ[key]  # * 0.9
             # !!!
         self.interpolator = LinearNDInterpolator(points, values)
         t1 = time.time()
