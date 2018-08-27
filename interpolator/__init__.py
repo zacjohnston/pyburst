@@ -1,6 +1,6 @@
-from . import kepler_emulator
+from . import interpolator
 from . import interp_versions
 
-__all__ = ['kepler_emulator',
+__all__ = ['interpolator',
            'interp_versions'
            ]

@@ -8,7 +8,7 @@ import pickle
 from matplotlib.ticker import NullFormatter
 
 # kepler_grids
-from pygrids.interpolator import kepler_emulator
+from pygrids.interpolator import interpolator
 from .mcmc_versions import McmcVersion
 from pygrids.mcmc.mcmc_tools import print_params
 from pygrids.misc import pyprint
@@ -22,6 +22,7 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 source_map = {
     'biggrid1': 'gs1826',  # alias for the source being modelled
     'biggrid2': 'gs1826',
+    'grid4': 'gs1826',
     'sim_test': 'biggrid2',
     'sim10': 'biggrid2',
               }
@@ -67,10 +68,10 @@ class BurstFit:
         self.bprops = self.mcmc_version.bprops
         self.lhood_factor = lhood_factor
         self.priors_only = priors_only
-        self.kemulator = kepler_emulator.Kemulator(source=source,
-                                                   version=self.mcmc_version.interpolator,
-                                                   re_interp=re_interp,
-                                                   **kwargs)
+        self.kemulator = interpolator.Kemulator(source=source,
+                                                version=self.mcmc_version.interpolator,
+                                                re_interp=re_interp,
+                                                **kwargs)
         concord_source = source_map.get(source, source)
         self.obs = ctools.load_obs(concord_source)
         self.n_epochs = len(self.obs)
