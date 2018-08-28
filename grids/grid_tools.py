@@ -250,20 +250,14 @@ def copy_paramfiles(batches, source):
         subprocess.run(['cp', model_table_filepath, params_filepath])
 
 
-def rewrite_column(batch, source):
-    """Replaces column header 'id' with 'run' in MODELS.txt file
+def rename_model_column(batch, source, col_old, col_new):
+    """Renames a column in MODELS.txt file
     """
-    # TODO: change to rename_column(), pass old/new column names
     source = grid_strings.source_shorthand(source=source)
-    model_table_filepath = grid_strings.get_model_table_filepath(batch, source)
-
-    with open(model_table_filepath) as f:
-        lines = f.readlines()
-        lines[0] = lines[0].replace('id ', 'run')
-
-    with open(model_table_filepath, 'w') as f:
-        for line in lines:
-            f.write(line)
+    filepath = grid_strings.get_model_table_filepath(batch, source)
+    table = load_model_table(batch, source)
+    table = table.rename(index=str, columns={col_old: col_new})
+    write_pandas_table(table, filepath)
 
 
 def ensure_np_list(variable):
