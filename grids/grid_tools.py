@@ -28,6 +28,15 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 # TODO: rewrite docstrings
 
 
+def write_pandas_table(table, filepath):
+    """Write a given pandas table to file
+    """
+    print(f'Writing: {filepath}')
+    table_str = table.to_string(index=False, formatters=FORMATTERS)
+    with open(filepath, 'w') as f:
+        f.write(table_str)
+
+
 def load_grid_table(tablename, source, verbose=True, burst_analyser=False):
     """Returns file of model parameters as pandas DataFrame
     
@@ -130,12 +139,8 @@ def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'
         table = load_model_table(batch, source=source, filename=filename)
         table[col_name] = col_value
 
-        table_str = table.to_string(index=False, formatters=FORMATTERS)
         filepath = grid_strings.get_model_table_filepath(batch, source, filename=filename)
-        print(f'Writing: {filepath}')
-
-        with open(filepath, 'w') as f:
-            f.write(table_str)
+        write_pandas_table(table, filepath)
 
 
 def reduce_table(table, params, exclude=None, verbose=True):
@@ -329,13 +334,9 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
 
     # ===== Ensure column order =====
     table_out = table_out[cols]
-    table_str = table_out.to_string(index=False, justify='left', formatters=FORMATTERS)
-
     filename = grid_strings.get_source_filename(source, table_basename, extension='.txt')
     filepath = os.path.join(table_path, filename)
-
-    with open(filepath, 'w') as f:
-        f.write(table_str)
+    write_pandas_table(table_out, filepath)
 
 
 def check_finished_multi(batch1, batch2, source, **kwargs):
