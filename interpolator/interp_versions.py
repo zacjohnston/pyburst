@@ -41,7 +41,10 @@ version_defaults = {
                     'qb': [.075],
                     'mass': [0.8, 3.2],
                 },
-            'grid4': {},
+            'grid4':
+                {
+                'accrate': [0.22],
+                },
         },
 }
 
