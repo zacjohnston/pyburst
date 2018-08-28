@@ -404,10 +404,11 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
     p['run'] = runlist
     p['lburn'] = lburn_list
 
-    col_order = ['run', 'z', 'y', 'x', 'qb', 'accrate',
-                 'tshift', 'xi', 'qb_delay', 'mass', 'lburn', 'accmass', 'accdepth']
+    cols = ['run', 'z', 'y', 'x', 'qb', 'accrate',
+            'tshift', 'xi', 'qb_delay', 'mass', 'lburn',
+            'accmass', 'accdepth']
     ptable = pd.DataFrame(p)
-    ptable = ptable[col_order]  # Fix column order
+    ptable = ptable[cols]  # Fix column order
 
     table_str = ptable.to_string(index=False, justify='left', formatters=FORMATTERS)
 
