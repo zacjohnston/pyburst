@@ -89,6 +89,7 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
 
                 ax[j, i].errorbar(x=x, y=y, yerr=yerr, ls='none',
                                   marker='o', capsize=3, color=colors[ref])
+    ax[0, 0].set_title(params, fontsize=11)
     plt.tight_layout()
     plt.show(block=False)
 
