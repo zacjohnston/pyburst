@@ -114,6 +114,7 @@ def load_model_table(batch, source, filename='MODELS.txt'):
     """
     source = grid_strings.source_shorthand(source=source)
     filepath = grid_strings.get_model_table_filepath(batch, source, filename)
+    print(f'Loading: {filepath}')
     model_table = pd.read_table(filepath, delim_whitespace=True)
     return model_table
 
