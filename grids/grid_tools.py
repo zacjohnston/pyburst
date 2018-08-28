@@ -16,9 +16,10 @@ import kepdump
 
 flt2 = '{:.2f}'.format
 flt4 = '{:.4f}'.format
+exp2 = '{:.2e}'.format
 FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
               'tshift': flt2, 'qb': flt4, 'xi': flt2, 'qb_delay': flt2,
-              'mass': flt2}
+              'mass': flt2, 'accmass': exp2, 'accdepth': exp2}
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -106,6 +107,35 @@ def load_model_table(batch, source, filename='MODELS.txt'):
     filepath = grid_strings.get_model_table_filepath(batch, source, filename)
     model_table = pd.read_table(filepath, delim_whitespace=True)
     return model_table
+
+
+def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'):
+    """Adds a column to model table(s) file.
+    Note: can also be used to rewrite column values
+
+    parameters
+    ----------
+    batches : int|array
+    source : str
+    col_name : str
+    col_value : int|float|array
+        contents of new column. If a single value, will fill whole column.
+        If array-like, must be correct length
+    filename : str
+    """
+    print(f'Adding column: {col_name}')
+    batches = ensure_np_list(batches)
+
+    for batch in batches:
+        table = load_model_table(batch, source=source, filename=filename)
+        table[col_name] = col_value
+
+        table_str = table.to_string(index=False, formatters=FORMATTERS)
+        filepath = grid_strings.get_model_table_filepath(batch, source, filename=filename)
+        print(f'Writing: {filepath}')
+
+        with open(filepath, 'w') as f:
+            f.write(table_str)
 
 
 def reduce_table(table, params, exclude=None, verbose=True):
@@ -218,6 +248,7 @@ def copy_paramfiles(batches, source):
 def rewrite_column(batch, source):
     """Replaces column header 'id' with 'run' in MODELS.txt file
     """
+    # TODO: change to rename_column(), pass old/new column names
     source = grid_strings.source_shorthand(source=source)
     model_table_filepath = grid_strings.get_model_table_filepath(batch, source)
 
@@ -335,7 +366,6 @@ def check_finished(batches, source, efficiency=True, show='all',
     timeused gets reset when a model is resumed,
         resulting in unreliable values in efficiency
     """
-
     def progress_string(batch, basename, run, progress, elapsed, remaining,
                         eff_str, eff2_str):
         string = [f'{batch}    {basename}{run:02}  {progress:.0f}%   ' +
