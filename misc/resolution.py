@@ -27,53 +27,65 @@ y_units = {'dt': 'hr',
 reference_params = {'accmass': 1e16,
                     'accdepth': 1e20}
 
+other_param = {'accmass': 'accdepth',
+               'accdepth': 'accmass'}
 x_bounds = {'accmass': [1e15, 1e17],
             'accdepth': [1e19, 1e21]}
 
-def plot(params, sources, res_param, bprops=('rate', 'fluence', 'peak', 'length'),
-         figsize=(6, 10), shaded=True):
+colors = {True: 'C1',
+          False: 'C0'}
+
+def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length'),
+         figsize=(10, 10), shaded=False):
     """Plot burst properties for given resolution parameter
 
     parameters
     ----------
     params : {}
-    res_param : str
-        resolution parameter to plot on x-axis. One of [accmass, accrate]
+    ref_source : str
+        source from which the reference model comes
     sources: [str]
         list of source(s) to get models from
     bprops : [str]
     figsize : [int, int]
     shaded : bool
+        shade between y_values of reference model
     """
     check_params(params)
-    ref = reference_params[res_param]
-    grids, sub_summ, sub_params = get_multi_subgrids(params=params, sources=sources)
     n = len(bprops)
-    fig, ax = plt.subplots(n, 1, sharex=True, figsize=figsize)
+    fig, ax = plt.subplots(n, 2, sharex=False, figsize=figsize)
 
-    for i, bprop in enumerate(bprops):
-        u_bprop = f'u_{bprop}'
-        y_label = f'{y_labels[bprop]} ({y_units[bprop]})'
-        y_factor = y_factors.get(bprop, 1)
-        set_axes(ax[i], ylabel=y_label, xscale='log',
-                 xlabel=res_param if i == n-1 else '')
+    for i, res_param in enumerate(reference_params):
+        ref_value = reference_params[res_param]
+        other = other_param[res_param]
+        full_params = dict(params)
+        full_params[other] = reference_params[other]
+        grids, sub_summ, sub_params = get_multi_subgrids(params=full_params, sources=sources)
 
-        for source in sources:
-            x = sub_params[source][res_param]
-            y = sub_summ[source][bprop] / y_factor
-            yerr = sub_summ[source][u_bprop] / y_factor
+        for j, bprop in enumerate(bprops):
+            u_bprop = f'u_{bprop}'
+            y_label = f'{y_labels[bprop]} ({y_units[bprop]})'
+            y_factor = y_factors.get(bprop, 1)
+            set_axes(ax[j, i], xscale='log',
+                     ylabel=y_label if i == 0 else '',
+                     xlabel=res_param if j == n-1 else '')
 
-            if shaded:
-                idx = np.where(x == ref)[0]
-                if len(idx) == 1:
+            for source in sources:
+                ref = source == ref_source
+                x = sub_params[source][res_param]
+                y = sub_summ[source][bprop] / y_factor
+                yerr = sub_summ[source][u_bprop] / y_factor
+
+                if shaded and ref:
+                    idx = np.where(x == ref_value)[0]
                     y_ref = y.iloc[idx]
                     yerr_ref = yerr.iloc[idx]
-                    ax[i].fill_between(x_bounds[res_param],
-                                       np.full(2, y_ref + yerr_ref),
-                                       np.full(2, y_ref - yerr_ref), color='0.8')
+                    ax[j, i].fill_between(x_bounds[res_param],
+                                          np.full(2, y_ref + yerr_ref),
+                                          np.full(2, y_ref - yerr_ref), color='0.85')
 
-            ax[i].errorbar(x=x, y=y, yerr=yerr, ls='none',
-                           marker='o', capsize=3, color='C0')
+                ax[j, i].errorbar(x=x, y=y, yerr=yerr, ls='none',
+                                  marker='o', capsize=3, color=colors[ref])
     plt.tight_layout()
     plt.show(block=False)
 
