@@ -36,7 +36,7 @@ colors = {True: 'C1',
           False: 'C0'}
 
 def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length'),
-         figsize=(10, 10), shaded=False):
+         figsize=(9, 10), shaded=False):
     """Plot burst properties for given resolution parameter
 
     parameters
@@ -54,13 +54,14 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
     check_params(params)
     n = len(bprops)
     fig, ax = plt.subplots(n, 2, sharex=False, figsize=figsize)
+    grids = get_multigrids(sources)
 
     for i, res_param in enumerate(reference_params):
         ref_value = reference_params[res_param]
         other = other_param[res_param]
         full_params = dict(params)
         full_params[other] = reference_params[other]
-        grids, sub_summ, sub_params = get_multi_subgrids(params=full_params, sources=sources)
+        sub_summ, sub_params = get_subgrids(grids, params=full_params)
 
         for j, bprop in enumerate(bprops):
             u_bprop = f'u_{bprop}'
@@ -68,7 +69,9 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
             y_factor = y_factors.get(bprop, 1)
             set_axes(ax[j, i], xscale='log',
                      ylabel=y_label if i == 0 else '',
-                     xlabel=res_param if j == n-1 else '')
+                     xlabel=res_param if j == n-1 else '',
+                     # title=params if (i==0 and j==0) else '',
+                     yticks=True if i == 0 else False)
 
             for source in sources:
                 ref = source == ref_source
@@ -90,22 +93,35 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
     plt.show(block=False)
 
 
-def get_multi_subgrids(params, sources):
+def get_multigrids(sources):
+    grids = {}
+    for source in sources:
+        grids[source] = grid_analyser.Kgrid(source)
+    return grids
+
+def get_subgrids(grids, params):
     """Returns subgrids of multiple given sources
     """
-    grids = {}
     sub_params = {}
     sub_summ = {}
 
-    for source in sources:
-        grids[source] = grid_analyser.Kgrid(source)
+    for source in grids:
         sub_params[source] = grids[source].get_params(params=params)
         sub_summ[source] = grids[source].get_summ(params=params)
 
-    return grids, sub_summ, sub_params
+    return sub_summ, sub_params
 
 
-def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear', fontsize=14):
+def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
+             fontsize=14, yticks=True, xticks=True):
+    if not yticks:
+        # ax.yaxis.set_ticks_position('none')
+        # ax.yaxis.set_ticks([])
+        ax.axes.tick_params(axis='both', left='off', labelleft='off')
+    if not xticks:
+        ax.xaxis.set_ticks_position('none')
+        ax.xaxis.set_ticks([])
+
     ax.set_title(title, fontsize=fontsize)
     ax.set_xlabel(xlabel, fontsize=fontsize)
     ax.set_ylabel(ylabel, fontsize=fontsize)
