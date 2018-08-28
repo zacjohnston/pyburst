@@ -239,7 +239,7 @@ def plot_slope(cycles, source, params, linear=True, display=True):
     slopes = get_slopes(cycles, table=subset, source=source)
 
     fig, ax = plt.subplots()
-    x = subset['accrate'].iloc[[0, -1]]
+    x = np.array((np.min(subset['accrate']), np.max(subset['accrate'])))
     ax.plot(subset['accrate'], slopes, ls='none', marker='o')
     ax.plot(x, [0, 0], color='black')
 
