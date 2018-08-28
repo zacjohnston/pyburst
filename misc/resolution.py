@@ -24,7 +24,14 @@ y_units = {'dt': 'hr',
            'length': 's',
            }
 
-def plot(params, res_param, sources, bprop='rate'):
+reference_params = {'accmass': 1e16,
+                    'accdepth': 1e20}
+
+x_bounds = {'accmass': [1e15, 1e17],
+            'accdepth': [1e19, 1e21]}
+
+def plot(params, sources, res_param, bprops=('rate', 'fluence', 'peak', 'length'),
+         figsize=(6, 10), shaded=True):
     """Plot burst properties for given resolution parameter
 
     parameters
@@ -34,23 +41,40 @@ def plot(params, res_param, sources, bprop='rate'):
         resolution parameter to plot on x-axis. One of [accmass, accrate]
     sources: [str]
         list of source(s) to get models from
-    bprop : str
+    bprops : [str]
+    figsize : [int, int]
+    shaded : bool
     """
     check_params(params)
-    u_bprop = f'u_{bprop}'
+    ref = reference_params[res_param]
     grids, sub_summ, sub_params = get_multi_subgrids(params=params, sources=sources)
-    fig, ax = plt.subplots()
+    n = len(bprops)
+    fig, ax = plt.subplots(n, 1, sharex=True, figsize=figsize)
 
-    y_label = f'{y_labels[bprop]} ({y_units[bprop]})'
-    y_factor = y_factors.get(bprop, 1)
+    for i, bprop in enumerate(bprops):
+        u_bprop = f'u_{bprop}'
+        y_label = f'{y_labels[bprop]} ({y_units[bprop]})'
+        y_factor = y_factors.get(bprop, 1)
+        set_axes(ax[i], ylabel=y_label, xscale='log',
+                 xlabel=res_param if i == n-1 else '')
 
-    for source in sources:
-        ax.errorbar(x=sub_params[source][res_param],
-                    y=sub_summ[source][bprop] / y_factor,
-                    yerr=sub_summ[source][u_bprop] / y_factor,
-                    ls='none', marker='o', capsize=3, color='C0')
+        for source in sources:
+            x = sub_params[source][res_param]
+            y = sub_summ[source][bprop] / y_factor
+            yerr = sub_summ[source][u_bprop] / y_factor
 
-    set_axes(ax, xlabel=res_param, ylabel=y_label, xscale='log')
+            if shaded:
+                idx = np.where(x == ref)[0]
+                if len(idx) == 1:
+                    y_ref = y.iloc[idx]
+                    yerr_ref = yerr.iloc[idx]
+                    ax[i].fill_between(x_bounds[res_param],
+                                       np.full(2, y_ref + yerr_ref),
+                                       np.full(2, y_ref - yerr_ref), color='0.8')
+
+            ax[i].errorbar(x=x, y=y, yerr=yerr, ls='none',
+                           marker='o', capsize=3, color='C0')
+    plt.tight_layout()
     plt.show(block=False)
 
 
