@@ -46,7 +46,7 @@ def load_dump(cycle, run, batch, source='biggrid2', basename='xrb',
     return kepdump.load(filepath, graphical=False, silent=True)
 
 
-def get_dumplist(run, batch, source):
+def get_cycles(run, batch, source):
     """Returns list of dump cycles available for given model
     """
     path = grid_strings.get_model_path(run, batch, source=source)
@@ -247,10 +247,10 @@ def plot_base_temp(cycles, run, batch, source='biggrid2', basename='xrb', title=
     return slope
 
 
-def plot_slope(cycles, source, params, linear=True, display=True):
+def plot_slope(source, params, cycles=None, linear=True, display=True):
     kgrid = grid_analyser.Kgrid(source)
     subset = kgrid.get_params(params=params)
-    slopes = get_slopes(cycles, table=subset, source=source)
+    slopes = get_slopes(table=subset, source=source, cycles=cycles)
 
     fig, ax = plt.subplots()
     x = np.array((np.min(subset['accrate']), np.max(subset['accrate'])))
@@ -267,14 +267,19 @@ def plot_slope(cycles, source, params, linear=True, display=True):
         plt.close()
 
 
-def get_slopes(cycles, table, source):
+def get_slopes(table, source, cycles=None):
     """Returns slopes of base temperature change (K/s), for given model table
     """
     slopes = []
+    load_cycles = cycles is None
     for row in table.itertuples():
+        if load_cycles:
+            cycles = get_cycles(row.run, row.batch, source=source)
+        print(row.batch, row.run, cycles[0], cycles[-1])
         d0 = load_dump(cycles[0], run=row.run, batch=row.batch, source=source)
-        d1 = load_dump(cycles[1], run=row.run, batch=row.batch, source=source)
+        d1 = load_dump(cycles[-1], run=row.run, batch=row.batch, source=source)
         slopes += [(d1.tn[1] - d0.tn[1]) / (d1.time - d0.time)]
+
     return np.array(slopes)
 
 
@@ -284,10 +289,6 @@ def get_qnuc(cycles, run, batch, source):
     """
     dumps = []
     for i, cycle in enumerate(cycles):
-        # between two dumps:
-        #   get energy produced (q epro)
-        #   get mass accreted (q xmacc)
-        #   calculate energy per mass accreted (erg/g)
         dumps += [load_dump(cycle, run=run, batch=batch, source=source)]
 
     mass_diff = dumps[1].qparm('xmacc') - dumps[0].qparm('xmacc')
