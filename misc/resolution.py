@@ -58,7 +58,8 @@ def save_all_plots(sources, ref_source, params=('x', 'z', 'mass', 'accrate'), **
              grids=grids, save=True, display=False, title=False, **kwargs)
 
 def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length'),
-         figsize=(9, 10), shaded=False, display=True, save=False, grids=None, title=True):
+         figsize=(9, 10), shaded=False, display=True, save=False, grids=None,
+         title=True, show_nbursts=True):
     """Plot burst properties for given resolution parameter
 
     parameters
@@ -101,6 +102,14 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
                 x = sub_params[source][res_param]
                 y = sub_summ[source][bprop] / y_factor
                 yerr = sub_summ[source][u_bprop] / y_factor
+
+                if show_nbursts:
+                    n_bursts = sub_summ[source]['n_used']
+                    for k in range(len(n_bursts)):
+                        x_offset = 1.15
+                        nb = n_bursts.iloc[k]
+                        ax[j, i].text(x.iloc[k] * x_offset, y.iloc[k], f'{nb}',
+                                      verticalalignment='center')
 
                 if shaded and ref:
                     idx = np.where(x == ref_value)[0]
