@@ -57,7 +57,7 @@ def get_cycles(run, batch, source):
         if '#' in file:
             idx = file.find('#')
             cycles += [int(file[idx+1:])]
-    return cycles
+    return np.sort(cycles)
 
 
 def get_profile(dump):
