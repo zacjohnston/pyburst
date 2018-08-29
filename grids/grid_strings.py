@@ -82,6 +82,9 @@ def batch_analysis_path(batch, source):
     return os.path.join(analysis_path, batch_str)
 
 
+def plots_path(source):
+    return get_source_subdir(source, 'plots')
+
 def get_source_subdir(source, dir_):
     source = check_synth_source(source)
     source_path = get_source_path(source)
