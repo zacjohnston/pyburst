@@ -11,52 +11,56 @@ class Best:
     """Testing comparisons of LC from 'best' MCMC sample,
     against observed LC
     """
-    def __init__(self, source='biggrid2', version=48):
-        self.grid = grid_analyser.Kgrid('test_bg2', load_lc=True)
+    def __init__(self, source='grid4', source2='grid4', version=1,
+                 runs=(9, 10, 11), batches=(5, 5, 5), n_walkers=960, n_steps=1000):
+        self.grid = grid_analyser.Kgrid(source2)
         self.bfit = burstfit.BurstFit(source, version, re_interp=False)
-
+        self.runs = runs
+        self.batches = batches
         self.best_params = mcmc_tools.get_max_lhood_params(source, version=version,
-                                                           n_walkers=960, n_steps=10000)
+                                                           n_walkers=n_walkers,
+                                                           n_steps=n_steps)
         red_idx = self.bfit.param_idxs['redshift']
         fb_idx = self.bfit.param_idxs['f_b']
         self.redshift = self.best_params[red_idx]
         self.f_b = self.best_params[fb_idx]
 
-        self.n_bursts = len(self.grid.mean_lc[1])
-        self.shifted_lc = None
-        self.interp_lc = None
+        self.n_epochs = len(runs)
+        self.shifted_lc = {}
+        self.interp_lc = {}
         self.t_shifts = None
 
         self.extract_lc()
         self.get_all_tshifts()
 
     def extract_lc(self):
-        # NOTE: this overwrites mean_lc. Need to do deep copy
-        shifted_lc = self.grid.mean_lc[1]
-        lc_interp = {}
-
         lum_to_flux = self.redshift * 4 * np.pi * self.f_b * 1e45
-        # tshifts = [8, 8, 8]
 
-        for burst in range(1, self.n_bursts+1):
-            shifted_lc[burst][:, 0] *= self.redshift
-            # shifted_lc[burst][:, 0] += tshifts[burst-1]
-            shifted_lc[burst][:, 1] *= 1 / lum_to_flux
-            shifted_lc[burst][:, 2] *= 1 / lum_to_flux
+        for batch in np.unique(self.batches):
+            self.grid.load_mean_lightcurves(batch)
 
-            lc_interp[burst] = {}
-            lc_interp[burst]['flux'] = interp1d(shifted_lc[burst][:, 0], shifted_lc[burst][:, 1])
-            lc_interp[burst]['flux_err'] = interp1d(shifted_lc[burst][:, 0], shifted_lc[burst][:, 2])
+        for i in range(self.n_epochs):
+            epoch = i+1
+            run = self.runs[i]
+            batch = self.batches[i]
+            self.shifted_lc[epoch] = np.array(self.grid.mean_lc[batch][run])
+            self.shifted_lc[epoch][:, 0] *= self.redshift
+            self.shifted_lc[epoch][:, 1:3] *= 1 / lum_to_flux
 
-        self.shifted_lc = shifted_lc
-        self.interp_lc = lc_interp
+            t = self.shifted_lc[epoch][:, 0]
+            flux = self.shifted_lc[epoch][:, 1]
+            flux_err = self.shifted_lc[epoch][:, 2]
+
+            self.interp_lc[epoch] = {}
+            self.interp_lc[epoch]['flux'] = interp1d(t, flux)
+            self.interp_lc[epoch]['flux_err'] = interp1d(t, flux_err)
 
     def get_all_tshifts(self):
         """Gets best t_shift for all bursts
         """
-        t_shifts = np.full(self.n_bursts, np.nan)
+        t_shifts = np.full(self.n_epochs, np.nan)
 
-        for i in range(self.n_bursts):
+        for i in range(self.n_epochs):
             t_shifts[i] = self.fit_tshift(burst=i)
 
         self.t_shifts = t_shifts
@@ -96,9 +100,9 @@ class Best:
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
     def plot(self, residuals=True):
-        fig, ax = plt.subplots(self.n_bursts, 2, sharex=True, figsize=(20, 12))
+        fig, ax = plt.subplots(self.n_epochs, 2, sharex=True, figsize=(20, 12))
 
-        for burst in range(self.n_bursts):
+        for burst in range(self.n_epochs):
             obs_burst = self.bfit.obs[burst]
             obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)
             obs_y = np.array(obs_burst.flux)
