@@ -52,8 +52,10 @@ class Best:
             flux_err = self.shifted_lc[epoch][:, 2]
 
             self.interp_lc[epoch] = {}
-            self.interp_lc[epoch]['flux'] = interp1d(t, flux)
-            self.interp_lc[epoch]['flux_err'] = interp1d(t, flux_err)
+            self.interp_lc[epoch]['flux'] = interp1d(t, flux, bounds_error=False,
+                                                     fill_value=0)
+            self.interp_lc[epoch]['flux_err'] = interp1d(t, flux_err, bounds_error=False,
+                                                         fill_value=0)
 
     def get_all_tshifts(self):
         """Gets best t_shift for all bursts
@@ -70,12 +72,13 @@ class Best:
         """
         obs = self.bfit.obs[burst]
         model = self.shifted_lc[burst + 1]
-
-        min_tshift = (obs.time[-1].value + 0.5*obs.dt[-1].value
-                      - model[-1, 0])
-        max_tshift = (obs.time[0].value + 0.5*obs.dt[0].value
-                      - model[0, 0])
-
+        # TODO: Bug when model LC shorter than obs LC
+        # min_tshift = (obs.time[-1].value + 0.5*obs.dt[-1].value
+        #               - model[-1, 0])
+        # max_tshift = (obs.time[0].value + 0.5*obs.dt[0].value
+        #               - model[0, 0])
+        min_tshift = -60
+        max_tshift = 60
         t = np.linspace(min_tshift, max_tshift, n_points)
         chi2 = np.zeros_like(t)
 
