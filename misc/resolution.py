@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
-from pygrids.grids import grid_analyser
+from pygrids.grids import grid_analyser, grid_strings, grid_tools
 
 # resolution tests
 
@@ -35,16 +36,37 @@ x_bounds = {'accmass': [1e15, 1e17],
 colors = {True: 'C1',
           False: 'C0'}
 
+# TODO add save plot, iterate over params
+
+def save_all_plots(sources, ref_source, params=('x', 'z', 'mass', 'accrate'), **kwargs):
+    grids = get_multigrids(sources)
+    source = get_not(sources, ref_source)
+    unique_all = grids[source].unique_params
+    unique_subset = {}
+    for p in params:
+        unique_subset[p] = unique_all[p]
+
+    params_full = grid_tools.enumerate_params(unique_subset)
+
+    n = len(params_full[params[0]])
+
+    for i in range(n):
+        params_sub = {}
+        for p in params:
+            params_sub[p] = params_full[p][i]
+        plot(params=params_sub, sources=sources, ref_source=ref_source,
+             grids=grids, save=True, display=False, title=False, **kwargs)
+
 def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length'),
-         figsize=(9, 10), shaded=False):
+         figsize=(9, 10), shaded=False, display=True, save=False, grids=None, title=True):
     """Plot burst properties for given resolution parameter
 
     parameters
     ----------
-    params : {}
+    params : dict
     ref_source : str
         source from which the reference model comes
-    sources: [str]
+    sources: set(str)
         list of source(s) to get models from
     bprops : [str]
     figsize : [int, int]
@@ -54,7 +76,9 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
     check_params(params)
     n = len(bprops)
     fig, ax = plt.subplots(n, 2, sharex=False, figsize=figsize)
-    grids = get_multigrids(sources)
+
+    if grids is None:
+        grids = get_multigrids(sources)
 
     for i, res_param in enumerate(reference_params):
         ref_value = reference_params[res_param]
@@ -70,7 +94,6 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
             set_axes(ax[j, i], xscale='log',
                      ylabel=y_label if i == 0 else '',
                      xlabel=res_param if j == n-1 else '',
-                     # title=params if (i==0 and j==0) else '',
                      yticks=True if i == 0 else False)
 
             for source in sources:
@@ -89,10 +112,34 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
 
                 ax[j, i].errorbar(x=x, y=y, yerr=yerr, ls='none',
                                   marker='o', capsize=3, color=colors[ref])
-    ax[0, 0].set_title(params, fontsize=11)
+    if title:
+        ax[0, 0].set_title(params, fontsize=11)
     plt.tight_layout()
-    plt.show(block=False)
 
+    if save:
+        source = get_not(sources, ref_source)
+        precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1, 'accrate': 2}
+        fixed_str = ''
+        for p, v in params.items():
+            precision = precisions.get(p, 3)
+            fixed_str += f'_{p}={v:.{precision}f}'
+
+        filename = f'resolution_{source}{fixed_str}.png'
+        path = os.path.join(grid_strings.plots_path(source), 'resolution')
+        filepath = os.path.join(path, filename)
+        print(f'Saving {filepath}')
+        plt.savefig(filepath)
+        plt.close(fig)
+    else:
+        plt.show(block=False)
+
+
+def get_not(array, var):
+    """Returns value in length-2 'array' that is not 'var'
+    """
+    copy = list(array)
+    copy.remove(var)
+    return copy[0]
 
 def get_multigrids(sources):
     grids = {}
@@ -116,12 +163,9 @@ def get_subgrids(grids, params):
 def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
              fontsize=14, yticks=True, xticks=True):
     if not yticks:
-        # ax.yaxis.set_ticks_position('none')
-        # ax.yaxis.set_ticks([])
         ax.axes.tick_params(axis='both', left='off', labelleft='off')
     if not xticks:
-        ax.xaxis.set_ticks_position('none')
-        ax.xaxis.set_ticks([])
+        ax.axes.tick_params(axis='both', bottom='off', labelbottom='off')
 
     ax.set_title(title, fontsize=fontsize)
     ax.set_xlabel(xlabel, fontsize=fontsize)
