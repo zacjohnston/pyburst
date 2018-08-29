@@ -46,6 +46,20 @@ def load_dump(cycle, run, batch, source='biggrid2', basename='xrb',
     return kepdump.load(filepath, graphical=False, silent=True)
 
 
+def get_dumplist(run, batch, source):
+    """Returns list of dump cycles available for given model
+    """
+    path = grid_strings.get_model_path(run, batch, source=source)
+    file_list = os.listdir(path)
+
+    cycles = []
+    for file in file_list:
+        if '#' in file:
+            idx = file.find('#')
+            cycles += [int(file[idx+1:])]
+    return cycles
+
+
 def get_profile(dump):
     """Extracts key profile quantities of given dump
     """
