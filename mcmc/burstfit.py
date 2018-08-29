@@ -47,7 +47,7 @@ class BurstFit:
 
     def __init__(self, source, version, verbose=True,
                  lhood_factor=1, debug=False, priors_only=False,
-                 re_interp=False, **kwargs):
+                 re_interp=False, u_fper_frac=0.05, **kwargs):
 
         self.source = source
         self.version = version
@@ -64,6 +64,7 @@ class BurstFit:
         if 'sim' in self.source:
             source = 'biggrid2'  # from here on effectively treat as biggrid2
 
+        self.u_fper_frac = u_fper_frac
         self.bprops = self.mcmc_version.bprops
         self.lhood_factor = lhood_factor
         self.priors_only = priors_only
@@ -153,7 +154,6 @@ class BurstFit:
             whether to plot the comparison
         """
         self.debug.start_function('lhood')
-        u_fper_frac = 0.03
         if self.debug.debug:
             print_params(params, source=self.source, version=self.version)
 
@@ -216,7 +216,7 @@ class BurstFit:
 
         # ===== compare predicted persistent flux with observed =====
         fper = self.shift_to_observer(values=self._mdots, bprop='fper', params=params)
-        u_fper = fper * u_fper_frac  # Assign uncertainty to model persistent flux
+        u_fper = fper * self.u_fper_frac  # Assign uncertainty to model persistent flux
 
         lh += self.compare(model=fper, u_model=u_fper, label='fper',
                            obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'])
