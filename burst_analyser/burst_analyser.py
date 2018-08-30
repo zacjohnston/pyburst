@@ -840,7 +840,7 @@ class BurstRun(object):
         y_scales = {'tDel': 3600, 'dt': 3600,
                     'fluence': 1e39, 'peak': 1e38}
 
-        fig, ax = plt.subplots(len(bprops), 1, figsize=(6, 8))
+        fig, ax = plt.subplots(len(bprops), 1, figsize=(6, 8), sharex=True)
         bursts = self.clean_bursts()
 
         bursts_discard = self.clean_bursts(exclude_discard=True)
