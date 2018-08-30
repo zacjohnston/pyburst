@@ -476,7 +476,7 @@ def get_table_subset(table, batches):
     return table.iloc[idxs]
 
 
-def sync_model_restarts(short_model_table, source, basename='xrb', verbose=False,
+def sync_model_restarts(short_model_table, source, basename='xrb', verbose=True,
                         sync_model_files=True, sync_jobscripts=True, sync_model_tables=True,
                         dry_run=False, modelfiles=('.cmd', '.lc', 'z1')):
     """Sync kepler models to cluster for resuming extended runs
