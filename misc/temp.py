@@ -176,12 +176,14 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     plt.show(block=False)
 
 
-def plot_temp(cycles, run, batch, source='biggrid2', basename='xrb', title='',
+def plot_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title='',
               display=True, prefix='', fontsize=14):
     """Plot temperature profile at given cycle (timestep)
     """
     fig, ax = plt.subplots()
 
+    if cycles is None:
+        cycles = get_cycles(run, batch, source)
     for cycle in cycles:
         dump = load_dump(cycle, run, batch, source=source, basename=basename, prefix=prefix)
         ax.plot(dump.y[1:-1], dump.tn[1:-1], label=f'#{cycle}')  # color='C3')
@@ -263,7 +265,6 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
     plt.tight_layout()
     if display:
         plt.show(block=False)
-
 
 
 def plot_slope(source, params, cycles=None, linear=True, display=True):
