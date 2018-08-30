@@ -215,9 +215,22 @@ def plot_temp(cycles, run, batch, source='biggrid2', basename='xrb', title='',
     return fig
 
 
-def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title='',
-                   display=True, prefix=''):
+def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True):
     fig, ax = plt.subplots()
+
+    n = len(runs)
+    for i in range(n):
+        plot_base_temp(run=runs[i], batch=batches[i], source=sources[i],
+                       cycles=cycles, ax=ax, display=False, legend=legend, title=False)
+    if legend:
+        ax.legend(loc='center left')
+    plt.show(block=False)
+
+
+def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title=True,
+                   display=True, prefix='', ax=None, legend=False):
+    if ax is None:
+        fig, ax = plt.subplots()
     dump = None
 
     if cycles is None:
@@ -238,20 +251,19 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
     temp1 = dump.tn[1]
     slope = (temp1 - temp0) / (t1 - t0)
     days = 1e8 / (24 * np.abs(slope))
-    print(f'{run}     {slope:.2e} (K/hr)     {days:.1f} (days)')
-    ax.plot(times/3600, temps, marker='o')
-    # ax.set_yscale('log')
+
+    model_str = grid_strings.get_model_string(run, batch, source)
+    ax.plot(times/3600, temps, marker='o', label=model_str)
     ax.set_ylabel(r'T (K)')
     ax.set_xlabel('time (hr)')
-    # ax.set_ylim([2e8, 4e8])
-    ax.set_title(f'{source}_{batch}_{run}')
+
+    print(f'{run}     {slope:.2e} (K/hr)     {days:.1f} (days)')
+    if title:
+        ax.set_title(f'{source}_{batch}_{run}')
     plt.tight_layout()
     if display:
         plt.show(block=False)
-    else:
-        plt.close()
 
-    return slope
 
 
 def plot_slope(source, params, cycles=None, linear=True, display=True):
