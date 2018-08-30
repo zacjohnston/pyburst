@@ -38,7 +38,8 @@ colors = {True: 'C1',
 
 # TODO add save plot, iterate over params
 
-def save_all_plots(sources, ref_source, params=('x', 'z', 'mass', 'accrate'), **kwargs):
+def save_all_plots(sources, ref_source, params=('x', 'z', 'mass', 'accrate'),
+                   **kwargs):
     grids = get_multigrids(sources)
     source = get_not(sources, ref_source)
     unique_all = grids[source].unique_params
@@ -83,9 +84,9 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
 
     for i, res_param in enumerate(reference_params):
         ref_value = reference_params[res_param]
-        other = other_param[res_param]
+        other_res_param = other_param[res_param]
         full_params = dict(params)
-        full_params[other] = reference_params[other]
+        full_params[other_res_param] = reference_params[other_res_param]
         sub_summ, sub_params = get_subgrids(grids, params=full_params)
 
         for j, bprop in enumerate(bprops):
