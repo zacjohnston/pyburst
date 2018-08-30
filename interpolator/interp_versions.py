@@ -181,7 +181,10 @@ version_definitions = {
                     'x': 0.72,
                     'z': 0.005,
                     'mass': 2.0,
-                    }
+                    },
+                2: {'accrate': 0.22,
+                    'mass': 2.0,
+                    },
                 },
         },
 }
