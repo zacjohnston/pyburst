@@ -661,6 +661,8 @@ version_definitions = {
             },
             'grid4': {
                 1: 1,
+                3: 2,
+                4: 2,
             },
         },
 
@@ -826,12 +828,14 @@ version_definitions = {
             },
         },
 
-    'prior_pdfs': {
-        'biggrid2': {},
-        'grid4': {
+    'prior_pdfs':
+        {
+         'biggrid2': {},
+         'grid4': {
             2: prior_pdfs['f_ratio'][2],
+            4: prior_pdfs['f_ratio'][2],
+                 },
         },
-    },
 
     'initial_position':
         {
