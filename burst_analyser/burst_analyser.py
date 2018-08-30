@@ -64,6 +64,7 @@ class BurstRun(object):
                            'min_regress': 20,  # min num of bursts to do linear regression
                            'n_bimodal': 20,  # n_bursts to check for bimodality
                            'bimodal_sigma': 3,  # number of std's modes are separated by
+                           'outlier_distance': 1.5,  # fraction of IQR above Q3
                            }
 
         self.plot_colours = {'bursts': 'C1',
@@ -608,7 +609,8 @@ class BurstRun(object):
             return
 
         clean_dt = self.clean_bursts(exclude_outliers=False)['dt']
-        percentiles = burst_tools.get_quartiles(clean_dt)
+        percentiles = burst_tools.get_quartiles(clean_dt,
+                                                iqr_frac=self.parameters['outlier_distance'])
 
         outliers = (self.bursts['dt'] < percentiles[0]) | (self.bursts['dt'] > percentiles[-1])
         outliers[:self.parameters['min_discard']] = True
