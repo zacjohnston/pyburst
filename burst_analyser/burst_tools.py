@@ -254,7 +254,7 @@ def calculate_burst_rate(dt, u_dt):
     return rate, u_rate
 
 
-def get_quartiles(x):
+def get_quartiles(x, iqr_frac=1.5):
     """Returns quartile values for given array
 
     parameters
@@ -270,8 +270,8 @@ def get_quartiles(x):
     q2 = np.percentile(x, 50)
     q3 = np.percentile(x, 75)
     iqr = q3 - q1
-    lower = q1 - 1.5*iqr
-    upper = q3 + 1.5*iqr
+    lower = q1 - iqr_frac*iqr
+    upper = q3 + iqr_frac*iqr
 
     return lower, q1, q2, q3, upper
 
