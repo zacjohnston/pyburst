@@ -5,6 +5,7 @@ from . import comp
 from . import mcmc_test
 from . import best_lc
 from . import converge
+from . import resolution
 
 __all__ = ['pyprint',
            'misc',
@@ -13,4 +14,5 @@ __all__ = ['pyprint',
            'mcmc_test',
            'best_lc',
            'converge',
+           'resolution',
            ]
