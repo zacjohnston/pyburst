@@ -22,33 +22,32 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     """Attempts to load pre-extracted luminosity data, or load raw binary.
     Returns [time (s), luminosity (erg/s)]
     """
+    def load_save(load_filepath, save_filepath):
+        lum_loaded = load_binary(filepath=load_filepath, silent=silent)
+        if save:
+            save_ascii(lum=lum_loaded, filepath=save_filepath)
+        return lum_loaded
+
     pyprint.print_dashes()
     batch_str = grid_strings.get_batch_string(batch, source)
-
     analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
     input_path = os.path.join(analysis_path, batch_str, 'input')
-    grid_tools.try_mkdir(input_path, skip=True)  # TODO: allow skipping altogether
 
-    presaved_file = f'{batch_str}_{run}.txt'
-    presaved_filepath = os.path.join(input_path, presaved_file)
-
+    presaved_filepath = os.path.join(input_path, f'{batch_str}_{run}.txt')
     run_str = grid_strings.get_run_string(run, basename)
     model_path = grid_strings.get_model_path(run, batch, source, basename)
-    lc_filename = f'{run_str}.lc'
-    lc_filepath = os.path.join(model_path, lc_filename)
+    binary_filepath = os.path.join(model_path, f'{run_str}.lc')
 
     if reload:
         print('Deleting presaved file, reloading binary file')
         subprocess.run(['rm', '-f', presaved_filepath])
-        lum = load_binary(filepath=lc_filepath, silent=silent)
-        if save:
-            save_ascii(lum=lum, filepath=presaved_filepath)
+        lum = load_save(binary_filepath, presaved_filepath)
     else:
         try:
             lum = load_ascii(presaved_filepath)
         except FileNotFoundError:
             print('No presaved file found. Reloading binary')
-            lum = load_binary(filepath=lc_filepath, silent=silent)
+            lum = load_save(binary_filepath, presaved_filepath)
 
     # TODO: check for non-monotonic timesteps
     pyprint.print_dashes()
