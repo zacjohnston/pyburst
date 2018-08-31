@@ -18,7 +18,7 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
 def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
-             silent=False):
+             silent=False, check_monotonic=True):
     """Attempts to load pre-extracted luminosity data, or load raw binary.
     Returns [time (s), luminosity (erg/s)]
     """
@@ -49,7 +49,12 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
             print('No presaved file found. Reloading binary')
             lum = load_save(binary_filepath, presaved_filepath)
 
-    # TODO: check for non-monotonic timesteps
+    if check_monotonic:
+        dt = np.diff(lum[:, 0])
+        if True in (dt < 0):
+            pyprint.print_warning('Lightcurve timesteps are not in order. '
+                                  + 'Something has gone horribly wrong!', n=80)
+            raise RuntimeError
     pyprint.print_dashes()
     return lum
 

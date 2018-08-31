@@ -379,15 +379,16 @@ class BurstRun(object):
         old_candidates = [0]
         candidates = self.get_lum_maxima()
         count = 0
+
         while not np.array_equal(old_candidates, candidates):
             old_candidates = candidates
             self.remove_shocks(candidates)
             candidates = self.get_lum_maxima()
-            count += 1
 
+            count += 1
             if count == self.parameters['max_shock_iterations']:
                 self.print_warn('Reached maximum iterations of shock-removal, '
-                                + 'lightcurve should be checked')
+                                + 'lightcurve should be verified')
                 break
 
         print(f'Shock removal iterations: {count}')
