@@ -190,31 +190,31 @@ class Kgrid:
         nan_mask = np.array(np.isnan(linear_rate['m']))  # Remove nans
         self.linear_rate = linear_rate.iloc[~nan_mask]
 
-    def predict_recurrence(self, x, z, qb, mdot, mass):
+    def predict_recurrence(self, accrate, params):
         """Predict recurrence time for given params
         
-        mdot    =  flt : accretion rate (Edd)
+        accrate : flt
+            accretion rate (fraction of Eddington)
+        params : dict
+            specify model parameters (x, z, qb, mass)
         """
-        params = {'z': z, 'x': x, 'qb': qb, 'mass': mass}  # TODO: make this a parameter
         idx = grid_tools.reduce_table_idx(table=self.linear_rate, params=params)
 
-        # ===== check if params not in powerfits =====
         if len(idx) == 0:
-            self.printv(f'CAUTION: ' +
-                        f'dt not predicted for z={z}, x={x}, qb={qb}, ' +
-                        f'mass={mass:.1f}; Using closest values:')
+            self.printv(f'dt not predicted for {params}. Using closest values:')
             sub_table = self.linear_rate.copy()
             for param, val in params.items():
                 closest_idx = (np.abs(sub_table[param].values - val)).argmin()
                 closest_val = sub_table[param].values[closest_idx]
                 sub_table = grid_tools.reduce_table(table=sub_table,
-                                                    params={param: closest_val}, verbose=False)
+                                                    params={param: closest_val},
+                                                    verbose=False)
                 params[param] = closest_val
                 self.printv(f'{param}={params[param]}')
         else:
             sub_table = grid_tools.reduce_table(table=self.linear_rate, params=params)
 
-        rate = mdot * float(sub_table['m']) + float(sub_table['y0'])
+        rate = accrate * float(sub_table['m']) + float(sub_table['y0'])
         day_hrs = 24
         return day_hrs / rate
 

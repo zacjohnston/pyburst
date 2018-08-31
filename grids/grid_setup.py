@@ -235,13 +235,11 @@ def create_batch(batch, dv, source,
 
         if auto_t_end:
             mdot = params_full['accrate'][i] * params_full['xi'][i]
-            z = params_full['z'][i]
-            x = params_full['x'][i]
-            qb = params_full['qb'][i]
-            mass = params_full['mass'][i]
-
+            rate_params = {}
+            for param in ('x', 'z', 'qb', 'mass'):
+                rate_params[param] = params_full[param][i]
             fudge = 0.5  # extra time to ensure complete final burst
-            tdel = kgrid.predict_recurrence(z=z, x=x, qb=qb, mdot=mdot, mass=mass)
+            tdel = kgrid.predict_recurrence(accrate=mdot, params=rate_params)
             t_end = (nbursts + fudge) * tdel
 
         run = i + 1
