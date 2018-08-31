@@ -21,6 +21,7 @@ def load(run, batch, source, basename='xrb', reload=False, save=True,
          silent=False):
     """Attempts to load pre-saved lumfile, or load binary. Returns luminosity [t, lum]
     """
+    pyprint.print_dashes()
     batch_str = grid_strings.get_batch_string(batch, source)
 
     analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
@@ -37,15 +38,10 @@ def load(run, batch, source, basename='xrb', reload=False, save=True,
 
     # ===== Try loading pre-saved data =====
     try:
-        print(f'Looking for pre-saved luminosity file: {presaved_filepath}')
-        lum = np.loadtxt(presaved_filepath, skiprows=1)
-        print('Pre-saved data found, loaded.')
-
+        lum = load_presaved(presaved_filepath)
     except FileNotFoundError:
         print('No presaved file found. Reloading binary')
-        pyprint.print_dashes()
         lum = load_binary(run, batch, source, basename=basename, silent=silent)
-        pyprint.print_dashes()
 
         if save:
             print(f'Saving data for faster loading in: {presaved_filepath}')
@@ -55,6 +51,13 @@ def load(run, batch, source, basename='xrb', reload=False, save=True,
     # TODO: check for non-monotonic timesteps
     pyprint.print_dashes()
     return lum
+
+
+def load_presaved(filepath):
+    """Loads pre-extracted .txt file of [time, lum]
+    """
+    print(f'Loading pre-saved luminosity file: {filepath}')
+    return np.loadtxt(filepath, skiprows=1)
 
 
 def load_binary(run, batch, source, basename='xrb', silent=False):
