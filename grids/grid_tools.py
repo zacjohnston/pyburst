@@ -486,12 +486,12 @@ def get_xbar(accrate, x0, z, dt, radius=10):
     x_ignition = get_x_ignition(accrate, x0=x0, z=z, dt=dt, radius=radius)
     return 0.5 * (x0 + x_ignition)
 
+
 def get_x_ignition(accrate, x0, z, dt, radius=10):
     """Returns hydrogen fraction at ignition depth
     """
     y_ignition = get_y_ignition(dt, accrate, radius=radius)
     y_depletion = get_y_depletion(accrate, x0, z)
-
     return x0 * (1 - y_ignition/y_depletion)
 
 

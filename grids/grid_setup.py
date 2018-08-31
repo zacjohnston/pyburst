@@ -241,6 +241,12 @@ def create_batch(batch, dv, source,
             fudge = 0.5  # extra time to ensure complete final burst
             tdel = kgrid.predict_recurrence(accrate=mdot, params=rate_params)
             t_end = (nbursts + fudge) * tdel
+            print(f'Using predicted dt={tdel/3600:.1f} hr')
+            if nuc_heat:
+                xbar = grid_tools.get_xbar(mdot, x0=x0, z=params_full['z'][i], dt=tdel)
+                print(f'Using predicted xbar={xbar:.3f}')
+            else:
+                xbar = None
 
         run = i + 1
         print(f'Writing genfile for xrb{run}')
@@ -252,6 +258,8 @@ def create_batch(batch, dv, source,
                   " models accreting hydrogen")
 
         print(f'Using accdepth = {accdepth:.1e}')
+
+
         kepler_files.write_genfile(h1=params_full['x'][i],
                                    he4=params_full['y'][i],
                                    n14=params_full['z'][i],
@@ -270,7 +278,8 @@ def create_batch(batch, dv, source,
                                    nsdump=nsdump,
                                    nuc_heat=nuc_heat,
                                    setup_test=setup_test,
-                                   cnv=0)
+                                   cnv=0,
+                                   xbar=xbar)
 
 
 def print_grid_params(params):
