@@ -7,7 +7,9 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import linregress
 import os
+
 
 # kepler_grids
 from . import grid_tools
@@ -52,7 +54,7 @@ class Kgrid:
 
     def __init__(self, source, basename='xrb',
                  load_lc=False, verbose=True,
-                 powerfits=False, exclude_defaults=True,
+                 linregress_burst_rate=False, exclude_defaults=True,
                  burst_analyser=True, **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
@@ -87,13 +89,13 @@ class Kgrid:
         self.printv(f'Source: {source}')
         self.printv(f'Models in grid: {self.n_models}')
 
-        self.powerfits = None
-        if powerfits:
-            self.get_powerfits()
-
         # ===== exclude misc params from plotting, etc. =====
         self.exclude_defaults = exclude_defaults
         self.params_exclude = params_exclude.get(source, {})
+
+        self.linear_rate = None
+        if linregress_burst_rate:
+            self.linregress_burst_rate()
 
         # ===== Load mean lightcurve data =====
         self.mean_lc = {'columns': ['Time', 'L', 'u(L)', 'R', 'u(R)']}
@@ -153,55 +155,40 @@ class Kgrid:
         idxs = subset.index.values
         return self.summ.iloc[idxs]
 
-    def get_powerfits(self):
-        """Calculate power-law fits to burst properties (only dt currently)
+    def linregress_burst_rate(self):
+        """Calculate linear fits to burst rate versus accretion rate
         """
-        dt_label = {False: {'var': 'tDel', 'u_var': 'uTDel'},
-                    True: {'var': 'dt', 'u_var': 'u_dt'},
-                    }.get(self.burst_analyser)
+        param_list = ('x', 'z', 'mass', 'qb')
+        params = {}
+        for param in param_list:
+            params[param] = self.unique_params[param]
 
-        qb_list = self.unique_params['qb']
-        z_list = self.unique_params['z']
-        x_list = self.unique_params['x']
-        mass_list = self.unique_params['mass']
-
-        params = {'z': z_list, 'qb': qb_list, 'x': x_list, 'mass': mass_list}
-
+        linear_rate = pd.DataFrame()
         enum_params = grid_tools.enumerate_params(params)
-        N = len(enum_params['qb'])
-        powerfits = pd.DataFrame()
-
+        n = len(enum_params[param_list[0]])
         for p in params:
-            powerfits[p] = enum_params[p]
+            linear_rate[p] = enum_params[p]
 
         for key in ['m', 'y0']:
-            powerfits[key] = np.full(N, np.nan)
+            linear_rate[key] = np.full(n, np.nan)
 
-        for i in range(N):
-            qb = powerfits.iloc[i]['qb']
-            z = powerfits.iloc[i]['z']
-            x = powerfits.iloc[i]['x']
-            mass = powerfits.iloc[i]['mass']
-            idxs = grid_tools.reduce_table_idx(table=self.params, verbose=False,
-                                               params={'qb': qb, 'z': z, 'x': x, 'mass': mass})
+        for row in linear_rate.itertuples():
+            i = row.Index
+            sub_params = {'qb': row.qb, 'z': row.z, 'x': row.x, 'mass': row.mass}
+            table_params = self.get_params(params=sub_params)
+            table_summ = self.get_summ(params=sub_params)
 
-            if len(idxs) < 2:
+            if len(table_params) < 2:
                 continue
             else:
-                sub_params = self.params.iloc[idxs]
-                sub_summ = self.summ.iloc[idxs]
+                accrate = table_params['accrate'].values * table_params['xi'].values
+                rate = table_summ['rate'].values
+                m, y0, _, _, _ = linregress(x=accrate, y=rate)
+                linear_rate.loc[i, 'm'] = m
+                linear_rate.loc[i, 'y0'] = y0
 
-                mdot = sub_params['accrate'].values * sub_params['xi'].values
-                tdel = sub_summ[dt_label['var']].values
-                u_tdel = sub_summ[dt_label['u_var']].values
-
-                # noinspection PyTupleAssignmentBalance
-                m, y0 = np.polyfit(x=np.log(mdot), y=np.log(tdel), w=np.log(1 / u_tdel), deg=1)
-                powerfits['m'][i] = m
-                powerfits['y0'][i] = y0
-
-        nan_mask = np.array(np.isnan(powerfits['m']))  # Remove nans
-        self.powerfits = powerfits.iloc[~nan_mask]
+        nan_mask = np.array(np.isnan(linear_rate['m']))  # Remove nans
+        self.linear_rate = linear_rate.iloc[~nan_mask]
 
     def predict_recurrence(self, x, z, qb, mdot, mass):
         """Predict recurrence time for given params
