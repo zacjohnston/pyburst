@@ -35,14 +35,15 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     if reload:
         print('Deleting presaved file, reloading binary file')
         subprocess.run(['rm', '-f', presaved_filepath])
-
-    try:
-        lum = load_ascii(presaved_filepath)
-    except FileNotFoundError:
-        print('No presaved file found. Reloading binary')
         lum = load_binary(run, batch, source, basename=basename, silent=silent)
         if save:
             save_ascii(lum=lum, filepath=presaved_filepath)
+    else:
+        try:
+            lum = load_ascii(presaved_filepath)
+        except FileNotFoundError:
+            print('No presaved file found. Reloading binary')
+            lum = load_binary(run, batch, source, basename=basename, silent=silent)
 
     # TODO: check for non-monotonic timesteps
     pyprint.print_dashes()
