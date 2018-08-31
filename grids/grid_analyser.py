@@ -195,15 +195,15 @@ class Kgrid:
         
         mdot    =  flt : accretion rate (Edd)
         """
-        params = {'z': z, 'x': x, 'qb': qb, 'mass': mass}
-        idx = grid_tools.reduce_table_idx(table=self.powerfits, params=params)
+        params = {'z': z, 'x': x, 'qb': qb, 'mass': mass}  # TODO: make this a parameter
+        idx = grid_tools.reduce_table_idx(table=self.linear_rate, params=params)
 
         # ===== check if params not in powerfits =====
-        if (len(idx) == 0):
+        if len(idx) == 0:
             self.printv(f'CAUTION: ' +
-                        f'tDel not predicted for z={z}, x={x}, qb={qb}, ' +
+                        f'dt not predicted for z={z}, x={x}, qb={qb}, ' +
                         f'mass={mass:.1f}; Using closest values:')
-            sub_table = self.powerfits.copy()
+            sub_table = self.linear_rate.copy()
             for param, val in params.items():
                 closest_idx = (np.abs(sub_table[param].values - val)).argmin()
                 closest_val = sub_table[param].values[closest_idx]
@@ -212,20 +212,11 @@ class Kgrid:
                 params[param] = closest_val
                 self.printv(f'{param}={params[param]}')
         else:
-            sub_table = grid_tools.reduce_table(table=self.powerfits,
-                                                params=params)
+            sub_table = grid_tools.reduce_table(table=self.linear_rate, params=params)
 
-        m = float(sub_table['m'])
-        y0 = float(sub_table['y0'])
-        dt = (np.exp(1) ** y0) * (mdot ** m)
-        return dt
-
-    # def get_nruns_params(self, params):
-    #     """Returns the total number of runs in some slice of parameter space
-    #     """
-    #     # TOD
-    #     total = 0
-    #     pass
+        rate = mdot * float(sub_table['m']) + float(sub_table['y0'])
+        day_hrs = 24
+        return day_hrs / rate
 
     def plot_mean_lc(self, batch, run, show=True):
         """Plots mean lightcurve for given batch model
