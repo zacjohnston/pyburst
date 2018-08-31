@@ -12,7 +12,7 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
                   accmass=1.0e18, zonermax=10, zonermin=-1,
                   accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
-                  setup_test=False):
+                  setup_test=False, xbar=None):
     """========================================================
     Creates a model generator file with the given params inserted
     ========================================================
@@ -33,17 +33,20 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
     qnuc1 = ''
     qnuc2 = ''
     kill_setup = ''
-
     if nuc_heat:
-        qnuc1 = """
+        if xbar is None:
+            xbar = h1
+
+        qnuc1 = f"""
 c Convert qnuc from MeV/nucleon to erg/g
 c (Note accrate is in Msun/yr)
-c o qnuc {1.31 + 6.95 * x + 1.92 * x ** 2} def
-o qnuc {5.} def
-o qnuc {1.602e-6} *
-o qnuc {accrate} *
-o qnuc {1.99e33 * 5.979e23 / 3.156e7} *
-p xheatl {qnuc}
+o xbar {xbar:.2f} def
+o qnuc {{1.31 + 6.95 * xbar + 1.92 * xbar ** 2}} def
+c o qnuc {{5.}} def
+o qnuc {{1.602e-6}} *
+o qnuc {{accrate}} *
+o qnuc {{1.99e33 * 5.979e23 / 3.156e7}} *
+p xheatl {{qnuc}}
 p xheatym 1.e21
 p xheatdm 2.e20"""
         qnuc2 = "p xheatl 0."
