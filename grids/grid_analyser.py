@@ -191,7 +191,7 @@ class Kgrid:
         self.linear_rates = linear_rate.iloc[~nan_mask]
 
     def predict_recurrence(self, accrate, params):
-        """Predict recurrence time for given params
+        """Predict recurrence time (s) for given params
         
         accrate : flt
             accretion rate (fraction of Eddington)
@@ -215,8 +215,8 @@ class Kgrid:
             sub_table = grid_tools.reduce_table(table=self.linear_rates, params=params)
 
         rate = accrate * float(sub_table['m']) + float(sub_table['y0'])
-        day_hrs = 24
-        return day_hrs / rate
+        day_sec = 24*3600
+        return day_sec / rate
 
     def plot_mean_lc(self, batch, run, show=True):
         """Plots mean lightcurve for given batch model
