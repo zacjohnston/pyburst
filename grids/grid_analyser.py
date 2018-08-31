@@ -360,7 +360,6 @@ class Kgrid:
         var, fixed = self.check_var_fixed(var=var, fixed=fixed)
 
         if self.source == 'biggrid2':
-            # accrate_unique = np.arange(8, 25, 2)/100
             accrate_unique = np.arange(8, 25)/100
         else:
             accrate_unique = self.unique_params['accrate']

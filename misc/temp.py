@@ -276,7 +276,8 @@ def plot_slope(source, params, cycles=None, linear=True, display=True):
     x = np.array((np.min(subset['accrate']), np.max(subset['accrate'])))
     ax.plot(subset['accrate'], slopes, ls='none', marker='o')
     ax.plot(x, [0, 0], color='black')
-
+    set_axes(ax, xlabel='accrate (/Edd)', ylabel='dT/dt (K s$^{-1}$)',
+             title=params)
     if linear:
         linr = linregress(subset['accrate'], slopes)
         ax.plot(x, x * linr[0] + linr[1])
@@ -403,3 +404,17 @@ def get_dump_filename(cycle, run, basename, prefix='re_'):
 
 def dashes():
     print('=' * 40)
+
+
+def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
+             fontsize=14, yticks=True, xticks=True):
+    if not yticks:
+        ax.axes.tick_params(axis='both', left='off', labelleft='off')
+    if not xticks:
+        ax.axes.tick_params(axis='both', bottom='off', labelbottom='off')
+
+    ax.set_title(title, fontsize=fontsize)
+    ax.set_xlabel(xlabel, fontsize=fontsize)
+    ax.set_ylabel(ylabel, fontsize=fontsize)
+    ax.set_xscale(xscale)
+    ax.set_yscale(yscale)
