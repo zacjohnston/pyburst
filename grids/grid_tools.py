@@ -480,6 +480,18 @@ def print_params_summary(table, show=None):
         print(f'{param} = {unique}')
 
 
+def get_y_depletion(accrate, x0, z):
+    """Returns column density (y, g/cm^2) of hydrogen depletion
+
+    Equation: Cumming & Bildsten (2000)
+    """
+    return 6.8e8 * (accrate/0.1) * (0.01/z) * (x0/0.71)
+
+
+def get_x_ignition(x0, ):
+    pass
+
+
 def get_y_ignition(dt, accrate, radius=10):
     """Returns column density (y, g/cm^2) at ignition
 
@@ -490,11 +502,16 @@ def get_y_ignition(dt, accrate, radius=10):
     radius : float
         radius of neutron star (km)
     """
-    accrate_edd = 1.75e-8 * units.M_sun.to(units.g) / units.year.to(units.s)
     r_cm = radius * units.km.to(units.cm)
-    accrate_gram_sec = accrate * accrate_edd
+    accrate_gram_sec = convert_accrate(accrate)
     return (dt * accrate_gram_sec) / (4 * np.pi * r_cm**2)
 
+
+def convert_accrate(accrate):
+    """Returns accrate in g/s, when given as Eddington fraction
+    """
+    accrate_edd = 1.75e-8 * units.M_sun.to(units.g) / units.year.to(units.s)
+    return accrate * accrate_edd
 
 def printv(string, verbose):
     if verbose:
