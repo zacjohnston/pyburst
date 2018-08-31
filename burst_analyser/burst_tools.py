@@ -34,11 +34,8 @@ def load(run, batch, source, basename='xrb', reload=False, save=True,
     # ===== Force reload =====
     if reload:
         print('Force-reloading binary file: ')
-        try:
-            print('Deleting old presaved file')
-            subprocess.run(['rm', presaved_filepath])
-        except:
-            pass
+        print('Deleting old presaved file')
+        subprocess.run(['rm', '-f', presaved_filepath])
 
     # ===== Try loading pre-saved data =====
     try:
