@@ -19,7 +19,8 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 def load(run, batch, source, basename='xrb', reload=False, save=True,
          silent=False):
-    """Attempts to load pre-saved lumfile, or load binary. Returns luminosity [t, lum]
+    """Attempts to load pre-extracted luminosity data, or load raw binary.
+    Returns [time (s), luminosity (erg/s)]
     """
     pyprint.print_dashes()
     batch_str = grid_strings.get_batch_string(batch, source)
@@ -38,26 +39,30 @@ def load(run, batch, source, basename='xrb', reload=False, save=True,
 
     # ===== Try loading pre-saved data =====
     try:
-        lum = load_presaved(presaved_filepath)
+        lum = load_ascii(presaved_filepath)
     except FileNotFoundError:
         print('No presaved file found. Reloading binary')
         lum = load_binary(run, batch, source, basename=basename, silent=silent)
-
         if save:
-            print(f'Saving data for faster loading in: {presaved_filepath}')
-            header = 'time (s),             luminosity (erg/s)'
-            np.savetxt(presaved_filepath, lum, header=header)
+            save_ascii(lum=lum, filepath=presaved_filepath)
 
     # TODO: check for non-monotonic timesteps
     pyprint.print_dashes()
     return lum
 
 
-def load_presaved(filepath):
+def load_ascii(filepath):
     """Loads pre-extracted .txt file of [time, lum]
     """
     print(f'Loading pre-saved luminosity file: {filepath}')
     return np.loadtxt(filepath, skiprows=1)
+
+
+def save_ascii(lum, filepath):
+    """Saves extracted [time, lum]"""
+    print(f'Saving data for faster loading in: {filepath}')
+    header = 'time (s),             luminosity (erg/s)'
+    np.savetxt(filepath, lum, header=header)
 
 
 def load_binary(run, batch, source, basename='xrb', silent=False):
