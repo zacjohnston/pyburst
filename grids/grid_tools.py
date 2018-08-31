@@ -480,6 +480,12 @@ def print_params_summary(table, show=None):
         print(f'{param} = {unique}')
 
 
+def get_xbar(accrate, x0, z, dt, radius=10):
+    """Returns average hydrogen mass fraction (Xbar) at burst ignition
+    """
+    x_ignition = get_x_ignition(accrate, x0=x0, z=z, dt=dt, radius=radius)
+    return 0.5 * (x0 + x_ignition)
+
 def get_x_ignition(accrate, x0, z, dt, radius=10):
     """Returns hydrogen fraction at ignition depth
     """
@@ -498,7 +504,7 @@ def get_y_depletion(accrate, x0, z):
 
 
 def get_y_ignition(dt, accrate, radius=10):
-    """Returns column density (y, g/cm^2) at ignition
+    """Returns column density (y, g/cm^2) at ignition depth
 
     dt : float
         recurrence time (s)
