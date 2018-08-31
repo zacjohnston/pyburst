@@ -54,7 +54,7 @@ class Kgrid:
 
     def __init__(self, source, basename='xrb',
                  load_lc=False, verbose=True,
-                 linregress_burst_rate=False, exclude_defaults=True,
+                 linregress_burst_rate=True, exclude_defaults=True,
                  burst_analyser=True, **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
