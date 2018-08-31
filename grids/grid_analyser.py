@@ -93,7 +93,7 @@ class Kgrid:
         self.exclude_defaults = exclude_defaults
         self.params_exclude = params_exclude.get(source, {})
 
-        self.linear_rate = None
+        self.linear_rates = None
         if linregress_burst_rate:
             self.linregress_burst_rate()
 
@@ -188,7 +188,7 @@ class Kgrid:
                 linear_rate.loc[i, 'y0'] = y0
 
         nan_mask = np.array(np.isnan(linear_rate['m']))  # Remove nans
-        self.linear_rate = linear_rate.iloc[~nan_mask]
+        self.linear_rates = linear_rate.iloc[~nan_mask]
 
     def predict_recurrence(self, accrate, params):
         """Predict recurrence time for given params
@@ -198,11 +198,11 @@ class Kgrid:
         params : dict
             specify model parameters (x, z, qb, mass)
         """
-        idx = grid_tools.reduce_table_idx(table=self.linear_rate, params=params)
+        idx = grid_tools.reduce_table_idx(table=self.linear_rates, params=params)
 
         if len(idx) == 0:
             self.printv(f'dt not predicted for {params}. Using closest values:')
-            sub_table = self.linear_rate.copy()
+            sub_table = self.linear_rates.copy()
             for param, val in params.items():
                 closest_idx = (np.abs(sub_table[param].values - val)).argmin()
                 closest_val = sub_table[param].values[closest_idx]
@@ -212,7 +212,7 @@ class Kgrid:
                 params[param] = closest_val
                 self.printv(f'{param}={params[param]}')
         else:
-            sub_table = grid_tools.reduce_table(table=self.linear_rate, params=params)
+            sub_table = grid_tools.reduce_table(table=self.linear_rates, params=params)
 
         rate = accrate * float(sub_table['m']) + float(sub_table['y0'])
         day_hrs = 24
@@ -348,7 +348,7 @@ class Kgrid:
         self.printv('')
 
     def plot_burst_property(self, bprop, var, fixed, save=False, show=True,
-                            powerfits=False, interpolate=True, fix_axis=True,
+                            linear_rates=False, interpolate=True, fix_axis=True,
                             shaded=True):
         """Plots given burst property against accretion rate
         
@@ -448,28 +448,20 @@ class Kgrid:
             if rate:
                 u_y = u_y * (24 / prop_y**2)
                 prop_y = 24 / prop_y
-
             if shaded:
                 ax.fill_between(mdot_x, prop_y+u_y, prop_y-u_y, alpha=0.3)
 
             ax.errorbar(x=mdot_x, y=prop_y, yerr=u_y, marker='o',
                         label=label, capsize=3, ls='-' if interpolate else 'none')
-
             del (params['accrate'])
 
-        # ===== plot power laws =====
-        # TODO: only plot powerfits for plotted vars (e.g. X)
-        if powerfits:
+        if linear_rates:
             ax.set_prop_cycle(None)  # reset color cycle
-            x = np.linspace(0.01, 1.0, 100)
-            n = len(self.powerfits)
-
-            for i in range(n):
-                m = self.powerfits.iloc[i]['m']
-                y0 = self.powerfits.iloc[i]['y0']
-                y = (np.exp(1) ** y0) * (x ** m) / 3600
-                label = f'{m:.2f}'
-                ax.plot(x, y, label=label)
+            x = np.array((0.01, 1.0))
+            linear = grid_tools.reduce_table(self.linear_rates, params=fixed)
+            for row in linear.itertuples():
+                rate = row.m * x + row.y0
+                ax.plot(x, rate)
 
         ax.legend(fontsize=fontsize-2)
         plt.tight_layout()
