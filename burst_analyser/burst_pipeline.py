@@ -72,7 +72,8 @@ def extract_batches(batches, source, save_plots=True, multithread=True,
             with mp.Pool(processes=8) as pool:
                 pool.starmap(extract_runs, args)
         else:
-            extract_runs(runs, batch, source, save_plots=save_plots)
+            extract_runs(runs, batch, source, reload=reload, save_plots=save_plots,
+                         load_bursts=load_bursts)
 
         burst_tools.combine_run_summaries(batch, source)
 
