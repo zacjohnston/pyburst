@@ -54,16 +54,16 @@ def print_squiggles(n=40):
     print('~' * n)
 
 
-def print_title(string='', n=80):
-    line = '=' * n
+def print_title(string='', n=80, character='='):
+    line = f'{character}' * n
     print(line)
     if string != '':
         print(string)
         print(line)
 
 
-def print_warning(n=40):
-    print('X' * n)
+def print_warning(string='', n=40):
+    print_title(string=f'WARNING: {string}', n=n, character='X')
 
 
 def print_stars(n=40):
