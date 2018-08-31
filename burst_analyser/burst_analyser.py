@@ -66,6 +66,7 @@ class BurstRun(object):
                            'n_bimodal': 20,  # n_bursts to check for bimodality
                            'bimodal_sigma': 3,  # number of std's modes are separated by
                            'outlier_distance': 1.5,  # fraction of IQR above Q3
+                           'max_shock_iterations': 100,  # max cycles in get_burst_candidates()
                            }
 
         self.plot_colours = {'bursts': 'C1',
@@ -383,6 +384,11 @@ class BurstRun(object):
             self.remove_shocks(candidates)
             candidates = self.get_lum_maxima()
             count += 1
+
+            if count == self.parameters['max_shock_iterations']:
+                self.print_warn('Reached maximum iterations of shock-removal, '
+                                + 'lightcurve should be checked')
+                break
 
         print(f'Shock removal iterations: {count}')
         self.candidates = candidates
