@@ -5,6 +5,7 @@ import os
 import itertools
 import subprocess
 from astropy.io import ascii
+import astropy.units as units
 from functools import reduce
 
 # kepler_grids
@@ -477,6 +478,22 @@ def print_params_summary(table, show=None):
     for param in show:
         unique = np.unique(table[param])
         print(f'{param} = {unique}')
+
+
+def get_y_ignition(dt, accrate, radius=10):
+    """Returns column density (y, g/cm^2) at ignition
+
+    dt : float
+        recurrence time (s)
+    accrate : float
+        accretion rate (fraction of Eddington rate)
+    radius : float
+        radius of neutron star (km)
+    """
+    accrate_edd = 1.75e-8 * units.M_sun.to(units.g) / units.year.to(units.s)
+    r_cm = radius * units.km.to(units.cm)
+    accrate_gram_sec = accrate * accrate_edd
+    return (dt * accrate_gram_sec) / (4 * np.pi * r_cm**2)
 
 
 def printv(string, verbose):
