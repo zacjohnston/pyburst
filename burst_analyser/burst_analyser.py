@@ -30,7 +30,7 @@ class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, save_lum=True, analyse=True, plot=False,
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
-                 load_bursts=False, load_summary=False):
+                 load_bursts=False, load_summary=False, try_mkdir_plots=False):
         self.flags = {'loaded': False,
                       'analysed': False,
                       'too_few_bursts': False,
@@ -47,6 +47,7 @@ class BurstRun(object):
                         'save_lum': save_lum,
                         'exclude_outliers': exclude_outliers,
                         'exclude_short_wait': exclude_short_wait,
+                        'try_mkdir_plots': try_mkdir_plots,
                         }
 
         self.parameters = {'lum_cutoff': 1e36,  # luminosity cutoff for burst detection
@@ -1070,7 +1071,8 @@ class BurstRun(object):
             filepath = os.path.join(path, filename)
 
             self.printv(f'Saving figure: {filepath}')
-            grid_tools.try_mkdir(path, skip=True)
+            if self.options['try_mkdir_plots']:
+                grid_tools.try_mkdir(path, skip=True)
             fig.savefig(filepath)
 
         if display:
