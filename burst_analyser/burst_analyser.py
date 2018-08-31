@@ -148,9 +148,10 @@ class BurstRun(object):
     def load_lum_file(self):
         """Load luminosity data from kepler simulation
         """
-        self.lum = burst_tools.load(run=self.run, batch=self.batch, source=self.source,
-                                    basename=self.basename, save=self.options['save_lum'],
-                                    reload=self.options['reload'])
+        self.lum = burst_tools.load_lum(run=self.run, batch=self.batch,
+                                        source=self.source, basename=self.basename,
+                                        save=self.options['save_lum'],
+                                        reload=self.options['reload'])
 
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
         self.flags['loaded'] = True

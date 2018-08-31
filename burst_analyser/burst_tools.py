@@ -17,8 +17,8 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
-def load(run, batch, source, basename='xrb', reload=False, save=True,
-         silent=False):
+def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
+             silent=False):
     """Attempts to load pre-extracted luminosity data, or load raw binary.
     Returns [time (s), luminosity (erg/s)]
     """
@@ -32,12 +32,10 @@ def load(run, batch, source, basename='xrb', reload=False, save=True,
     presaved_file = f'{batch_str}_{run}.txt'
     presaved_filepath = os.path.join(input_path, presaved_file)
 
-    # ===== Force reload =====
     if reload:
         print('Deleting presaved file, reloading binary file')
         subprocess.run(['rm', '-f', presaved_filepath])
 
-    # ===== Try loading pre-saved data =====
     try:
         lum = load_ascii(presaved_filepath)
     except FileNotFoundError:
@@ -72,13 +70,12 @@ def load_binary(run, batch, source, basename='xrb', silent=False):
     model_path = grid_strings.get_model_path(run, batch, source, basename)
     lc_filename = f'{run_str}.lc'
     lc_filepath = os.path.join(model_path, lc_filename)
-    lum = None
-    if os.path.exists(lc_filepath):
-        lum_temp = lcdata.load(lc_filepath, silent=silent)
-        n = len(lum_temp.time)
-        lum = np.full((n, 2), np.nan)
-        lum[:, 0] = lum_temp.time
-        lum[:, 1] = lum_temp.xlum
+
+    lum_temp = lcdata.load(lc_filepath, silent=silent)
+    n = len(lum_temp.time)
+    lum = np.full((n, 2), np.nan)
+    lum[:, 0] = lum_temp.time
+    lum[:, 1] = lum_temp.xlum
 
     return lum
 
@@ -91,7 +88,7 @@ def batch_save(batch, source, runs=None, basename='xrb', reload=True, **kwargs):
     runs = grid_tools.expand_runs(runs)
 
     for run in runs:
-        load(run, batch, source, basename=basename, reload=reload, **kwargs)
+        load_lum(run, batch, source, basename=basename, reload=reload, **kwargs)
 
 
 def multi_batch_save(batches, source, multithread=True, **kwargs):
@@ -129,7 +126,7 @@ def multi_save(table, source, basename='xrb'):
         for run in runs:
             args.append((run, batch, source, basename, True))
         with mp.Pool(processes=8) as pool:
-            pool.starmap(load, args)
+            pool.starmap(load_lum, args)
 
     t1 = time.time()
     dt = t1 - t0
