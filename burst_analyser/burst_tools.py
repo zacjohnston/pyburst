@@ -27,15 +27,20 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
 
     analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
     input_path = os.path.join(analysis_path, batch_str, 'input')
-    grid_tools.try_mkdir(input_path, skip=True)  # TODO
+    grid_tools.try_mkdir(input_path, skip=True)  # TODO: allow skipping altogether
 
     presaved_file = f'{batch_str}_{run}.txt'
     presaved_filepath = os.path.join(input_path, presaved_file)
 
+    run_str = grid_strings.get_run_string(run, basename)
+    model_path = grid_strings.get_model_path(run, batch, source, basename)
+    lc_filename = f'{run_str}.lc'
+    lc_filepath = os.path.join(model_path, lc_filename)
+
     if reload:
         print('Deleting presaved file, reloading binary file')
         subprocess.run(['rm', '-f', presaved_filepath])
-        lum = load_binary(run, batch, source, basename=basename, silent=silent)
+        lum = load_binary(filepath=lc_filepath, silent=silent)
         if save:
             save_ascii(lum=lum, filepath=presaved_filepath)
     else:
@@ -43,7 +48,7 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
             lum = load_ascii(presaved_filepath)
         except FileNotFoundError:
             print('No presaved file found. Reloading binary')
-            lum = load_binary(run, batch, source, basename=basename, silent=silent)
+            lum = load_binary(filepath=lc_filepath, silent=silent)
 
     # TODO: check for non-monotonic timesteps
     pyprint.print_dashes()
@@ -64,19 +69,14 @@ def save_ascii(lum, filepath):
     np.savetxt(filepath, lum, header=header)
 
 
-def load_binary(run, batch, source, basename='xrb', silent=False):
+def load_binary(filepath, silent=False):
     """Loads kepler binary lightcurve file (.lc)
     """
-    run_str = grid_strings.get_run_string(run, basename)
-    model_path = grid_strings.get_model_path(run, batch, source, basename)
-    lc_filename = f'{run_str}.lc'
-    lc_filepath = os.path.join(model_path, lc_filename)
-
-    lum_temp = lcdata.load(lc_filepath, silent=silent)
-    n = len(lum_temp.time)
+    lumfile = lcdata.load(filepath, silent=silent)
+    n = len(lumfile.time)
     lum = np.full((n, 2), np.nan)
-    lum[:, 0] = lum_temp.time
-    lum[:, 1] = lum_temp.xlum
+    lum[:, 0] = lumfile.time
+    lum[:, 1] = lumfile.xlum
 
     return lum
 
