@@ -59,8 +59,9 @@ def extract_batches(batches, source, save_plots=True, multithread=True,
         print_title(f'Batch {batch}')
 
         analysis_path = grid_strings.batch_analysis_path(batch, source)
-        output_path = os.path.join(analysis_path, 'output')
-        grid_tools.try_mkdir(output_path, skip=True)
+        for folder in ['input', 'output']:
+            path = os.path.join(analysis_path, folder)
+            grid_tools.try_mkdir(path, skip=True)
 
         n_runs = grid_tools.get_nruns(batch, source)
         runs = np.arange(n_runs) + 1
