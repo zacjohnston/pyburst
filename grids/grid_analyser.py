@@ -348,8 +348,8 @@ class Kgrid:
         self.printv('')
 
     def plot_burst_property(self, bprop, var, fixed, save=False, show=True,
-                            linear_rates=False, interpolate=True, fix_axis=True,
-                            shaded=True):
+                            linear_rates=False, interpolate=True,
+                            shaded=True, xlims=(0.075, 0.245)):
         """Plots given burst property against accretion rate
         
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
@@ -371,7 +371,7 @@ class Kgrid:
         uncertainty_keys = {False: {'tDel': 'uTDel', 'fluence': 'uFluence',
                                     'peakLum': 'uPeakLum'},
                             True: {'dt': 'u_dt', 'fluence': 'u_fluence',
-                                   'peak': 'u_peak'},
+                                   'peak': 'u_peak', 'rate': 'u_rate'},
                             }.get(self.burst_analyser)
 
         y_label = {'dt': r'$\Delta t$ (hr)',
@@ -380,27 +380,19 @@ class Kgrid:
                    'rate': 'Burst rate (day$^{-1}$)'
                    }.get(bprop)
 
-        unit_f = {'tDel': 3600, 'dt': 3600, 'rate': 3600,
+        unit_f = {'tDel': 3600, 'dt': 3600,
                   'fluence': 1e39, 'peak': 1e38}.get(bprop, 1.0)
-
-        # TODO: Make work natively with rate from burst table
-        rate = (bprop == 'rate')
-        if rate:
-            bprop = 'dt'
 
         u_prop = uncertainty_keys.get(bprop)
 
-        # ===== Axis properties =====
         fig, ax = plt.subplots(figsize=(6, 4))
         title = ''
         for p, pv in fixed.items():
             precision = precisions.get(p, 3)
             title += f'{p}={pv:.{precision}f}, '
 
-        if fix_axis:
-            ax.set_xlim([0.075, 0.245])
-
         fontsize = 14
+        ax.set_xlim(xlims)
         ax.set_xlabel(r'$\dot{M} / \dot{M}_\mathrm{Edd}$', fontsize=fontsize)
         ax.set_ylabel(y_label, fontsize=fontsize)
         ax.set_title(title, fontsize=14)
@@ -445,9 +437,6 @@ class Kgrid:
             else:
                 label = f'{var}={v:.{precision}f}'
 
-            if rate:
-                u_y = u_y * (24 / prop_y**2)
-                prop_y = 24 / prop_y
             if shaded:
                 ax.fill_between(mdot_x, prop_y+u_y, prop_y-u_y, alpha=0.3)
 
@@ -457,11 +446,10 @@ class Kgrid:
 
         if linear_rates:
             ax.set_prop_cycle(None)  # reset color cycle
-            x = np.array((0.01, 1.0))
             linear = grid_tools.reduce_table(self.linear_rates, params=fixed)
             for row in linear.itertuples():
-                rate = row.m * x + row.y0
-                ax.plot(x, rate)
+                rate = row.m * np.array(xlims) + row.y0
+                ax.plot(xlims, rate)
 
         ax.legend(fontsize=fontsize-2)
         plt.tight_layout()
@@ -480,7 +468,7 @@ class Kgrid:
 
             self.printv(f'Saving {filepath}')
             plt.savefig(filepath)
-
+        print(bprop)
         return ax
 
     def plot_grid_params(self, var, fixed, show=True):
