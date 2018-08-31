@@ -25,16 +25,14 @@ def load(run, batch, source, basename='xrb', reload=False, save=True,
 
     analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
     input_path = os.path.join(analysis_path, batch_str, 'input')
-    grid_tools.try_mkdir(input_path, skip=True)
+    grid_tools.try_mkdir(input_path, skip=True)  # TODO
 
     presaved_file = f'{batch_str}_{run}.txt'
-    run_str = grid_strings.get_run_string(run, basename)
     presaved_filepath = os.path.join(input_path, presaved_file)
 
     # ===== Force reload =====
     if reload:
-        print('Force-reloading binary file: ')
-        print('Deleting old presaved file')
+        print('Deleting presaved file, reloading binary file')
         subprocess.run(['rm', '-f', presaved_filepath])
 
     # ===== Try loading pre-saved data =====
@@ -46,28 +44,34 @@ def load(run, batch, source, basename='xrb', reload=False, save=True,
     except FileNotFoundError:
         print('No presaved file found. Reloading binary')
         pyprint.print_dashes()
-        model_path = grid_strings.get_model_path(run, batch, source, basename)
-        lc_filename = f'{run_str}.lc'
-        lc_filepath = os.path.join(model_path, lc_filename)
+        lum = load_binary(run, batch, source, basename=basename, silent=silent)
+        pyprint.print_dashes()
 
-        if os.path.exists(lc_filepath):
-            lum_temp = lcdata.load(lc_filepath, silent=silent)
-            n = len(lum_temp.time)
+        if save:
+            print(f'Saving data for faster loading in: {presaved_filepath}')
+            header = 'time (s),             luminosity (erg/s)'
+            np.savetxt(presaved_filepath, lum, header=header)
 
-            lum = np.full((n, 2), np.nan)
-            lum[:, 0] = lum_temp.time
-            lum[:, 1] = lum_temp.xlum
-
-            pyprint.print_dashes()
-            if save:
-                print(f'Saving data for faster loading in: {presaved_filepath}')
-                header = 'time (s),             luminosity (erg/s)'
-                np.savetxt(presaved_filepath, lum, header=header)
-        else:
-            print(f'File not found: {lc_filepath}')
-            lum = np.array([np.nan])
-
+    # TODO: check for non-monotonic timesteps
     pyprint.print_dashes()
+    return lum
+
+
+def load_binary(run, batch, source, basename='xrb', silent=False):
+    """Loads kepler binary lightcurve file (.lc)
+    """
+    run_str = grid_strings.get_run_string(run, basename)
+    model_path = grid_strings.get_model_path(run, batch, source, basename)
+    lc_filename = f'{run_str}.lc'
+    lc_filepath = os.path.join(model_path, lc_filename)
+    lum = None
+    if os.path.exists(lc_filepath):
+        lum_temp = lcdata.load(lc_filepath, silent=silent)
+        n = len(lum_temp.time)
+        lum = np.full((n, 2), np.nan)
+        lum[:, 0] = lum_temp.time
+        lum[:, 1] = lum_temp.xlum
+
     return lum
 
 
