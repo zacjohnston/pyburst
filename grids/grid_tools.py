@@ -179,7 +179,7 @@ def reduce_table_idx(table, params, exclude=None, verbose=True):
     return subset_idxs
 
 
-def get_rows(table, params, verbose):
+def get_rows(table, params, verbose=True):
     """Returns indices of table rows that satify all given params
     """
     idxs = {}
@@ -208,15 +208,15 @@ def exclude_params(table, params):
     Returns table with blacklisted parameters removed
         NOTE: only one excluded parameter must be satisfied to be removed
     
-    params = {} : dict of parameter values to exclude/remove from table
+    params : dict
+        parameters to exclude from table. key specifies parameter name, and value
+        can be a scalar or list of values
     """
     params = ensure_np_list(params)
-    idxs_exclude = []
-    for key, vals in params.items():
-        for val in vals:
-            idxs_exclude += list(np.where(table[key] == val)[0])
-
-    return exclude_rows(table=table, idxs=idxs_exclude)
+    mask = np.full(len(table), True)
+    for param, values in params.items():
+        mask = mask & ~table[param].isin(values)
+    return table[mask]
 
 
 def enumerate_params(params_full):
