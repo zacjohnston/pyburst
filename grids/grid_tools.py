@@ -199,8 +199,8 @@ def exclude_rows(table, idxs):
     
     idxs = [] : list of row indexes to exclude/remove from table
     """
-    mask = table.index.isin(idxs)
-    return table[~mask]
+    mask = ~table.index.isin(idxs)
+    return table[mask]
 
 
 def exclude_params(table, params):
@@ -212,11 +212,21 @@ def exclude_params(table, params):
         parameters to exclude from table. key specifies parameter name, and value
         can be a scalar or list of values
     """
+    mask = param_mask_any(table, params)
+    return table[~mask]
+
+
+def param_mask_any(table, params):
+    """Returns boolean mask of table where any of the specified params are satisfied
+
+    table : pandas.DataFrame
+    params : dict
+    """
     params = ensure_np_list(params)
-    mask = np.full(len(table), True)
+    mask = np.full(len(table), False)
     for param, values in params.items():
-        mask = mask & ~table[param].isin(values)
-    return table[mask]
+        mask = mask | table[param].isin(values)
+    return mask
 
 
 def enumerate_params(params_full):
