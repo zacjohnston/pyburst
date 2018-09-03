@@ -160,26 +160,16 @@ def reduce_table(table, params, exclude=None):
     return sub_table
 
 
-def reduce_table_idx(table, params, exclude=None, verbose=True):
+def reduce_table_idx(table, params, exclude=None):
     """Returns the subset of table indices that satisfy the specified variables
     
     table   =  pd.DataFrame  : table to reduce (pandas object)
     params  =  {}            : params that must be satisfied
     exclude =  {}            : params to exclude/blacklist completely
     """
-    subset_idxs = get_rows(table=table, params=params)
-
-    if exclude is not None:
-        exclude = ensure_np_list(exclude)
-        for key, vals in exclude.items():
-            for val in vals:
-                idxs_exclude = np.where(table[key] == val)[0]
-                to_delete = np.intersect1d(idxs_exclude, subset_idxs)
-
-                for i_del in to_delete:
-                    subset_idxs = np.delete(subset_idxs, np.where(subset_idxs == i_del))
-
-    return subset_idxs
+    table_copy = table.reset_index()
+    sub_table = reduce_table(table_copy, params=params, exclude=exclude)
+    return np.array(sub_table.index)
 
 
 def get_rows(table, params):

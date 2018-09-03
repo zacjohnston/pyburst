@@ -208,8 +208,7 @@ class Kgrid:
                 closest_idx = (np.abs(sub_table[param].values - val)).argmin()
                 closest_val = sub_table[param].values[closest_idx]
                 sub_table = grid_tools.reduce_table(table=sub_table,
-                                                    params={param: closest_val},
-                                                    verbose=False)
+                                                    params={param: closest_val})
                 params[param] = closest_val
                 self.printv(f'{param}={params[param]}')
         else:
