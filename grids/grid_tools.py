@@ -5,8 +5,6 @@ import os
 import itertools
 import subprocess
 from astropy.io import ascii
-import astropy.units as units
-from functools import reduce
 
 # kepler_grids
 from pygrids.misc.pyprint import print_dashes
@@ -145,7 +143,7 @@ def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'
         write_pandas_table(table, filepath)
 
 
-def reduce_table(table, params, exclude=None):
+def reduce_table(table, params, exclude=None, exclude_all=None):
     """Returns the subset of a table that satisfy the specified variables
 
     table : pd.DataFrame
@@ -162,6 +160,8 @@ def reduce_table(table, params, exclude=None):
 
     if exclude is not None:
         sub_table = exclude_params(sub_table, params=exclude, logic='any')
+    if exclude_all is not None:
+        sub_table = exclude_params(sub_table, params=exclude_all, logic='all')
     return sub_table
 
 
