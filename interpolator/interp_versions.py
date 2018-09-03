@@ -46,6 +46,15 @@ version_defaults = {
                 'accrate': [0.22],
                 },
         },
+    'exclude_all':
+        {
+            'gs1826': [{}],
+            'biggrid1': [{}],
+            'biggrid2': [{}],
+            'grid4': [{'x': 0.72, 'accdepth': 1e20},
+                      {'x': 0.73, 'accdepth': 1e20},
+                      ],
+        },
 }
 
 
@@ -187,6 +196,12 @@ version_definitions = {
                     },
                 },
         },
+    'exclude_all':
+        {
+            'biggrid2': {},
+            'grid4': {},
+            'res1': {},
+        }
 }
 
 
@@ -200,6 +215,7 @@ class InterpVersion:
         self.bprops = get_parameter(source, version, 'bprops')
         self.batches_exclude = get_parameter(source, version, 'batches_exclude')
         self.params_exclude = get_parameter(source, version, 'params_exclude')
+        self.exclude_all = get_parameter(source, version, 'exclude_all')
 
     def __repr__(self):
         return (f'MCMC version definitions for {self.source} V{self.version}'
