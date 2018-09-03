@@ -160,7 +160,7 @@ def reduce_table(table, params, exclude=None, exclude_all=None):
 
     if exclude not in [None, {}]:
         sub_table = exclude_params(sub_table, params=exclude, logic='any')
-    if exclude_all not in [None, {}]:
+    if exclude_all not in [None, {}, []]:
         sub_table = exclude_params(sub_table, params=exclude_all, logic='all')
     return sub_table
 
@@ -201,13 +201,22 @@ def exclude_params(table, params, logic):
         boolean logic to use:
             'any' - models will be excluded when ANY parameters match
             'all' - model will only be excluded if ALL parameters match (must be scalars)
+        If 'all', params can be a single set of parameters as a dict, or a list of
+            dicts specifying multiple sets of parameter combinations
     """
     if logic == 'any':
         mask = param_mask_any(table, params)
+
     elif logic == 'all':
-        mask = param_mask_all(table, params)
+        if type(params) == list:
+            mask = np.full(len(table), False)
+            for param_set in params:
+                mask = mask | param_mask_all(table, param_set)
+        else:
+            mask = param_mask_all(table, params)
     else:
         raise ValueError("'logic' must be one of ['any', 'all']")
+
     return table[~mask]
 
 
