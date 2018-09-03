@@ -158,9 +158,9 @@ def reduce_table(table, params, exclude=None, exclude_all=None):
     mask = param_mask_all(table, params)
     sub_table = table[mask].copy()
 
-    if exclude is not None:
+    if exclude not in [None, {}]:
         sub_table = exclude_params(sub_table, params=exclude, logic='any')
-    if exclude_all is not None:
+    if exclude_all not in [None, {}]:
         sub_table = exclude_params(sub_table, params=exclude_all, logic='all')
     return sub_table
 
