@@ -190,17 +190,6 @@ def get_rows(table, params):
     return np.array(table_copy[mask].index)
 
 
-def exclude_rows(table, idxs):
-    """
-    Returns table with specified rows removed
-        NOTE: uses pandas.dataframe indices, not raw indices
-    
-    idxs = [] : list of row indexes to exclude/remove from table
-    """
-    mask = ~table.index.isin(idxs)
-    return table[mask]
-
-
 def exclude_params(table, params):
     """
     Returns table with blacklisted parameters removed
