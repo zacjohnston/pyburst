@@ -145,16 +145,19 @@ def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'
         write_pandas_table(table, filepath)
 
 
-def reduce_table(table, params, exclude=None, verbose=True):
+def reduce_table(table, params, exclude=None):
     """Returns the subset of a table that satisfy the specified variables
     
     table   =  pd.DataFrame  : table to reduce (pandas object)
     params  =  {}            : params that must be satisfied
     exclude = {}             : params to exclude/blacklist completely
     """
-    subset_idxs = reduce_table_idx(table=table, params=params,
-                                   exclude=exclude, verbose=verbose)
-    return table.iloc[subset_idxs]
+    mask = param_mask_all(table, params)
+    sub_table = table[mask].copy()
+
+    if exclude is not None:
+        sub_table = exclude_params(sub_table, params=exclude)
+    return sub_table
 
 
 def reduce_table_idx(table, params, exclude=None, verbose=True):
@@ -228,6 +231,7 @@ def param_mask_any(table, params):
         mask = mask | table[param].isin(values)
     return mask
 
+
 def param_mask_all(table, params):
     """Returns boolean mask of table where ALL of the specified params are satisfied
     """
@@ -236,6 +240,7 @@ def param_mask_all(table, params):
     for param, value in params.items():
         mask = mask & (table[param] == value)
     return mask
+
 
 def enumerate_params(params_full):
     """Enumerates parameters into a set of all models

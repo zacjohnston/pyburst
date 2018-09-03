@@ -33,7 +33,8 @@ params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
                                'x': [0.5, 0.6, 0.75, 0.77, 0.8], 'mass': [0.8, 1.4, 3.2, 2.6],
                                'accrate': np.concatenate((np.arange(5, 10)/100,
                                                           np.arange(11, 24, 2)/100))},
-                  'res1': {'accdepth': 1e21}
+                  'res1': {'accdepth': 1e21},
+                  # 'grid4': {'batch': [10, 11, 12]},
                   }
 
 
@@ -144,7 +145,7 @@ class Kgrid:
             exclude = {**exclude, **self.params_exclude}
 
         models = grid_tools.reduce_table(table=self.params, params=params_full,
-                                         exclude=exclude, verbose=self.verbose)
+                                         exclude=exclude)
         return models
 
     def get_summ(self, batch=None, run=None, params=None, exclude=None):
@@ -557,7 +558,7 @@ class Kgrid:
                 if do_bprops:
                     for bprop in bprops:
                         self.plot_burst_property(bprop=bprop, var=var,
-                                                 powerfits=False, fixed=fixed_input,
+                                                 fixed=fixed_input,
                                                  save=True, show=False, **kwargs)
                 plt.close('all')
 
