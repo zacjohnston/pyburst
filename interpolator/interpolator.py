@@ -51,7 +51,7 @@ class Kemulator:
 
         if exclude_tests:
             exclude = {**batches_exclude, **params_exclude}
-            params = grid_tools.exclude_params(table=params, params=exclude)
+            params = grid_tools.exclude_params(table=params, params=exclude, logic='any')
             idxs_kept = params.index
             summ = summ.loc[idxs_kept]
 

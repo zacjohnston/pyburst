@@ -154,12 +154,14 @@ def reduce_table(table, params, exclude=None):
         params that must all be satisfied (each value must be scalar)
     exclude : dict
         params to exclude/blacklist completely (can be arrays for multiple values)
+    exclude_all : dict
+        similar to exclude, but every parameter value must be satisfied to exclude
     """
     mask = param_mask_all(table, params)
     sub_table = table[mask].copy()
 
     if exclude is not None:
-        sub_table = exclude_params(sub_table, params=exclude)
+        sub_table = exclude_params(sub_table, params=exclude, logic='any')
     return sub_table
 
 
@@ -187,16 +189,25 @@ def get_rows(table, params):
     return np.array(table_copy[mask].index)
 
 
-def exclude_params(table, params):
+def exclude_params(table, params, logic):
     """
-    Returns table with blacklisted parameters removed
+    Returns table with blacklisted parameters excluded
         NOTE: only one excluded parameter must be satisfied to be removed
     
     params : dict
-        parameters to exclude from table. key specifies parameter name, and value
-        can be a scalar or list of values
+        parameters to exclude from table.
+        Each key specifies parameter name, and its value can be a scalar or array
+    logic : ['any', 'all']
+        boolean logic to use:
+            'any' - models will be excluded when ANY parameters match
+            'all' - model will only be excluded if ALL parameters match (must be scalars)
     """
-    mask = param_mask_any(table, params)
+    if logic == 'any':
+        mask = param_mask_any(table, params)
+    elif logic == 'all':
+        mask = param_mask_all(table, params)
+    else:
+        raise ValueError("'logic' must be one of ['any', 'all']")
     return table[~mask]
 
 
@@ -223,6 +234,14 @@ def param_mask_all(table, params):
     return mask
 
 
+def check_scalars(params):
+    """Check if all items in parameter dictionary are scalars and not arrays
+    """
+    for key, value in params.items():
+        if hasattr(value, '__len__') and (not isinstance(value, str)):
+            raise TypeError("values in params must be scalars")
+
+
 def enumerate_params(params_full):
     """Enumerates parameters into a set of all models
     
@@ -242,14 +261,6 @@ def enumerate_params(params_full):
             all_models[k] = np.append(all_models[k], [p[k]])  # append each model to param lists
 
     return all_models
-
-
-def check_scalars(params):
-    """Check if all items in parameter dictionary are scalars and not arrays
-    """
-    for key, value in params.items():
-        if hasattr(value, '__len__') and (not isinstance(value, str)):
-            raise TypeError("values in params must be scalars")
 
 
 def copy_paramfiles(batches, source):
