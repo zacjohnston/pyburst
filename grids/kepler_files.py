@@ -41,8 +41,8 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
 c Convert qnuc from MeV/nucleon to erg/g
 c (Note accrate is in Msun/yr)
 o xbar {xbar:.3f} def
-o qnuc {{1.31 + 6.95 * xbar + 1.92 * xbar ** 2}} def
-c o qnuc {{5.}} def
+c o qnuc {{1.31 + 6.95 * xbar + 1.92 * xbar ** 2}} def
+o qnuc {{5.}} def
 o qnuc {{1.602e-6}} *
 o qnuc {{accrate}} *
 o qnuc {{1.99e33 * 5.979e23 / 3.156e7}} *
