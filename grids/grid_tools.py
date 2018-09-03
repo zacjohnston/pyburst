@@ -167,7 +167,7 @@ def reduce_table_idx(table, params, exclude=None, verbose=True):
     params  =  {}            : params that must be satisfied
     exclude =  {}            : params to exclude/blacklist completely
     """
-    subset_idxs = get_rows(table=table, params=params, verbose=verbose)
+    subset_idxs = get_rows(table=table, params=params)
 
     if exclude is not None:
         exclude = ensure_np_list(exclude)
@@ -182,17 +182,12 @@ def reduce_table_idx(table, params, exclude=None, verbose=True):
     return subset_idxs
 
 
-def get_rows(table, params, verbose=True):
+def get_rows(table, params):
     """Returns indices of table rows that satify all given params
     """
-    idxs = {}
-    for key, val in params.items():
-        idxs[key] = np.where(table[key] == val)[0]
-
-        if len(idxs[key]) == 0:
-            printv(f'No row contains {key}={val}', verbose)
-
-    return reduce(np.intersect1d, list(idxs.values()))
+    table_copy = table.reset_index()
+    mask = param_mask_all(table_copy, params)
+    return np.array(table_copy[mask].index)
 
 
 def exclude_rows(table, idxs):
