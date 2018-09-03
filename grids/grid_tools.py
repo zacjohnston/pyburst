@@ -228,6 +228,14 @@ def param_mask_any(table, params):
         mask = mask | table[param].isin(values)
     return mask
 
+def param_mask_all(table, params):
+    """Returns boolean mask of table where ALL of the specified params are satisfied
+    """
+    check_scalars(params)
+    mask = np.full(len(table), True)
+    for param, value in params.items():
+        mask = mask & (table[param] == value)
+    return mask
 
 def enumerate_params(params_full):
     """Enumerates parameters into a set of all models
@@ -248,6 +256,14 @@ def enumerate_params(params_full):
             all_models[k] = np.append(all_models[k], [p[k]])  # append each model to param lists
 
     return all_models
+
+
+def check_scalars(params):
+    """Check if all items in parameter dictionary are scalars and not arrays
+    """
+    for key, value in params.items():
+        if hasattr(value, '__len__') and (not isinstance(value, str)):
+            raise TypeError("values in params must be scalars")
 
 
 def copy_paramfiles(batches, source):
