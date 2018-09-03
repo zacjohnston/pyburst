@@ -165,7 +165,7 @@ def reduce_table(table, params, exclude=None, exclude_all=None):
     return sub_table
 
 
-def reduce_table_idx(table, params, exclude=None):
+def reduce_table_idx(table, params, exclude=None, exclude_all=None):
     """Returns the subset of table indices that satisfy the specified variables
         Same as reduce_table(), but returns indices instead of table
     
@@ -177,7 +177,7 @@ def reduce_table_idx(table, params, exclude=None):
         params to exclude/blacklist completely (can be arrays for multiple values)
     """
     table_copy = table.reset_index()
-    sub_table = reduce_table(table_copy, params=params, exclude=exclude)
+    sub_table = reduce_table(table_copy, params, exclude=exclude, exclude_all=exclude_all)
     return np.array(sub_table.index)
 
 
