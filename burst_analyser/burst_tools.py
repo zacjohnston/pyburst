@@ -54,7 +54,7 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
         if True in (dt < 0):
             pyprint.print_warning('Lightcurve timesteps are not in order. '
                                   + 'Something has gone horribly wrong!', n=80)
-            raise RuntimeError
+            raise RuntimeError('Lightcurve timesteps are not in order')
     pyprint.print_dashes()
     return lum
 
