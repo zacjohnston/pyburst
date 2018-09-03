@@ -9,6 +9,7 @@ from . import kepler_files
 from . import grid_tools
 from . import grid_strings
 from pygrids.misc.pyprint import print_title, print_dashes
+from pygrids.physics import burning
 
 # Concord
 import define_sources
@@ -233,6 +234,7 @@ def create_batch(batch, dv, source,
             accrate0 = params_full['accrate'][i]
             accrate1_str = ''
 
+        xbar = None
         if auto_t_end:
             mdot = params_full['accrate'][i] * params_full['xi'][i]
             rate_params = {}
@@ -243,10 +245,8 @@ def create_batch(batch, dv, source,
             t_end = (nbursts + fudge) * tdel
             print(f'Using predicted dt={tdel/3600:.1f} hr')
             if nuc_heat:
-                xbar = grid_tools.get_xbar(mdot, x0=x0, z=params_full['z'][i], dt=tdel)
+                xbar = burning.get_xbar(mdot, x0=x0, z=params_full['z'][i], dt=tdel)
                 print(f'Using predicted xbar={xbar:.3f}')
-            else:
-                xbar = None
 
         run = i + 1
         print(f'Writing genfile for xrb{run}')
@@ -258,8 +258,6 @@ def create_batch(batch, dv, source,
                   " models accreting hydrogen")
 
         print(f'Using accdepth = {accdepth:.1e}')
-
-
         kepler_files.write_genfile(h1=params_full['x'][i],
                                    he4=params_full['y'][i],
                                    n14=params_full['z'][i],
