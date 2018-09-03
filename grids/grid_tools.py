@@ -147,10 +147,13 @@ def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'
 
 def reduce_table(table, params, exclude=None):
     """Returns the subset of a table that satisfy the specified variables
-    
-    table   =  pd.DataFrame  : table to reduce (pandas object)
-    params  =  {}            : params that must be satisfied
-    exclude = {}             : params to exclude/blacklist completely
+
+    table : pd.DataFrame
+      table to reduce (pandas table)
+    params : dict
+        params that must all be satisfied (each value must be scalar)
+    exclude : dict
+        params to exclude/blacklist completely (can be arrays for multiple values)
     """
     mask = param_mask_all(table, params)
     sub_table = table[mask].copy()
@@ -162,10 +165,14 @@ def reduce_table(table, params, exclude=None):
 
 def reduce_table_idx(table, params, exclude=None):
     """Returns the subset of table indices that satisfy the specified variables
+        Same as reduce_table(), but returns indices instead of table
     
-    table   =  pd.DataFrame  : table to reduce (pandas object)
-    params  =  {}            : params that must be satisfied
-    exclude =  {}            : params to exclude/blacklist completely
+    table : pd.DataFrame
+      table to reduce (pandas table)
+    params : dict
+        params that must all be satisfied (each value must be scalar)
+    exclude : dict
+        params to exclude/blacklist completely (can be arrays for multiple values)
     """
     table_copy = table.reset_index()
     sub_table = reduce_table(table_copy, params=params, exclude=exclude)
