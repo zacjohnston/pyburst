@@ -296,7 +296,6 @@ def get_slopes(table, source, cycles=None):
     for row in table.itertuples():
         if load_cycles:
             cycles = get_cycles(row.run, row.batch, source=source)
-        print(row.batch, row.run, cycles[0], cycles[-1])
         d0 = load_dump(cycles[0], run=row.run, batch=row.batch, source=source)
         d1 = load_dump(cycles[-1], run=row.run, batch=row.batch, source=source)
         slopes += [(d1.tn[1] - d0.tn[1]) / (d1.time - d0.time)]
