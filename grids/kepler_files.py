@@ -10,7 +10,7 @@ import os
 def write_genfile(h1, he4, n14, qb, xi, lburn,
                   geemult, path, lumdata, header, qnuc=5.,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
-                  accmass=1.0e18, zonermax=10, zonermin=-1,
+                  accmass=1.0e18, zonermax=10, zonermin=-1, nstop=10000000,
                   accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
                   setup_test=False):
     """========================================================
@@ -20,6 +20,7 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
     he4      = flt   : helium    "    "
     z        = flt   : metals    "    "
     qb       = flt   : base heating (MeV/nucleon)
+    nstop    = int   : max number of timesteps (cycles)
     qnuc     = flt   : nuclear heating (MeV/nucleon, for thermal setup)
     lburn    = int   : switch for full network energy generation (0/1  = off/on)
     lumdata  = int   : switch for time-dependent base-flux (0/1 = off/on)
@@ -199,7 +200,7 @@ p xlum0 {{xip}} *
 c -------------------------
 c get model in equilibrium
 p ncnvout 0
-p nstop 1000000000
+p nstop {nstop:.0f}
 p tnucmin 1.d10
 p tnumin 1.d7
 p accmass 1.d13
