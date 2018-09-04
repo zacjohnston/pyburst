@@ -19,15 +19,20 @@ version_defaults = {
 
         'res1': {
             'accdepth': 1e21
-        }
+        },
+
+        'heat': {},
     },
 
     'exclude_all': {
         'biggrid2': [{}],
+
         'grid4': [
             {'x': 0.72, 'accdepth': 1e20},
             {'x': 0.73, 'accdepth': 1e20},
          ],
+
+        'heat': [{}],
     },
 }
 
@@ -37,11 +42,13 @@ version_definitions = {
         {
             'biggrid2': {},
             'grid4': {},
+            'heat': {},
         },
     'exclude_all':
         {
             'biggrid2': {},
             'grid4': {},
+            'heat': {},
         }
 }
 
