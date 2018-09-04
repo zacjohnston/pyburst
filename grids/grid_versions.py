@@ -3,7 +3,7 @@ import numpy as np
 # Defines various versions/subsets of model grids
 
 version_defaults = {
-    'params_exclude': {
+    'exclude_any': {
         'biggrid2': {
             'accrate': np.concatenate((np.arange(5, 10)/100, np.arange(11, 24, 2)/100)),
             'qb': [0.025, 0.075, 0.125, 0.2],
@@ -38,7 +38,7 @@ version_defaults = {
 
 
 version_definitions = {
-    'params_exclude':
+    'exclude_any':
         {
             'biggrid2': {},
             'grid4': {},
@@ -59,12 +59,12 @@ class GridVersion:
     def __init__(self, source, version):
         self.source = source
         self.version = version
-        self.params_exclude = get_parameter(source, version, 'params_exclude')
+        self.exclude_any = get_parameter(source, version, 'exclude_any')
         self.exclude_all = get_parameter(source, version, 'exclude_all')
 
     def __repr__(self):
         return (f'Grid version definitions for {self.source} V{self.version}'
-                + f'\nparams_exclude : {self.params_exclude}'
+                + f'\nexclude_any : {self.exclude_any}'
                 + f'\nexclude_all : {self.exclude_all}'
                 )
 
