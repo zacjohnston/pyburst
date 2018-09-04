@@ -23,7 +23,7 @@ version_defaults = {
             'grid4': {},
         },
 
-    'params_exclude':
+    'exclude_any':
         {
             'gs1826':
                 {
@@ -109,7 +109,7 @@ version_definitions = {
             'grid4': {},
         },
 
-    'params_exclude':
+    'exclude_any':
         {
             'gs1826':
                 {
@@ -214,7 +214,7 @@ class InterpVersion:
         self.param_keys = get_parameter(source, version, 'param_keys')
         self.bprops = get_parameter(source, version, 'bprops')
         self.batches_exclude = get_parameter(source, version, 'batches_exclude')
-        self.params_exclude = get_parameter(source, version, 'params_exclude')
+        self.exclude_any = get_parameter(source, version, 'exclude_any')
         self.exclude_all = get_parameter(source, version, 'exclude_all')
 
     def __repr__(self):
@@ -222,7 +222,7 @@ class InterpVersion:
                 + f'\nparam keys     : {self.param_keys}'
                 + f'\nbprops         : {self.bprops}'
                 + f'\nbatches exclude: {self.batches_exclude}'
-                + f'\nparams_exclude : {self.params_exclude}'
+                + f'\nexclude_any : {self.exclude_any}'
                 )
 
 
