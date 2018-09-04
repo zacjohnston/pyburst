@@ -40,8 +40,7 @@ class Kgrid:
     """
 
     def __init__(self, source, basename='xrb', grid_version=0,
-                 load_lc=False, verbose=True,
-                 linregress_burst_rate=True, exclude_defaults=True,
+                 load_lc=False, verbose=True, linregress_burst_rate=True,
                  burst_analyser=True, **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
@@ -57,6 +56,7 @@ class Kgrid:
         self.basename = basename
         self.verbose = verbose
         self.burst_analyser = burst_analyser
+        self.grid_version = grid_versions.GridVersion(source, grid_version)
 
         # ==== Load tables of models attributes ====
         self.printv('Loading kgrid')
@@ -75,10 +75,6 @@ class Kgrid:
         self.printv('Loaded')
         self.printv(f'Source: {source}')
         self.printv(f'Models in grid: {self.n_models}')
-
-        # ===== exclude misc params from plotting, etc. =====
-        self.grid_version = grid_versions.GridVersion(source, grid_version)
-        self.exclude_defaults = exclude_defaults
 
         self.linear_rates = None
         if linregress_burst_rate:
@@ -125,10 +121,9 @@ class Kgrid:
         if params is not None:
             params_full = {**params_full, **params}
 
-        if self.exclude_defaults:
-            if exclude_any is None:
-                exclude_any = {}
-            exclude_any = {**exclude_any, **self.grid_version.exclude_any}
+        if exclude_any is None:
+            exclude_any = {}
+        exclude_any = {**exclude_any, **self.grid_version.exclude_any}
 
         models = grid_tools.reduce_table(table=self.params, params=params_full,
                                          exclude_any=exclude_any,
