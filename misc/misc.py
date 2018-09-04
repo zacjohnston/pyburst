@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import os
 import sys
 import matplotlib.pyplot as plt
@@ -121,3 +122,49 @@ def check_n_bursts(batches, source, kgrid):
 
         np.savetxt(filepath, mismatch)
     return mismatch
+
+
+def convert_adelle_table(filename='allruns_attribs.txt',
+                         path='/c/zac/backups/kepler/adelle_1',
+                         savename='MODELS.txt'):
+    """Loads model table of Adelle's grid, and converts to kepler_grids format
+    """
+    col_order = ['run', 'z', 'y', 'x', 'qb', 'accrate', 'tshift', 'xi',
+                 'qb_delay', 'mass', 'lburn']
+
+    col_rename = {'Qbvalue': 'qb',
+                  'X': 'x',
+                  'massvalue': 'mass',
+                  'numbursts': 'num',
+                  'runid': 'run'}
+
+    col_missing = {'tshift': 0.0,
+                   'xi': 1.0,
+                   'qb_delay': 0.0,
+                   'lburn': 1}
+
+    col_convert = {'run': int}
+
+    filepath = os.path.join(path, filename)
+    savepath = os.path.join(path, savename)
+    table = pd.read_table(filepath, delim_whitespace=True)
+    # ===== rename columns =====
+    table = table.rename(index=str, columns=col_rename)
+
+    # ===== add missing columns =====
+    for col, value in col_missing.items():
+        table[col] = value
+
+    # ===== convert some cols to int =====
+    for col, dtype in col_convert.items():
+        table[col] = table[col].astype(dtype)
+
+    table['y'] = 1 - table['x'] - table['z']
+
+    table_str = table.to_string(index=False)
+
+    with open(savepath, 'w') as f:
+        f.write(table_str)
+
+    return table[col_order]
+
