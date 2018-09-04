@@ -121,8 +121,7 @@ class Kgrid:
         if params is not None:
             params_full = {**params_full, **params}
 
-        if exclude_any is None:
-            exclude_any = {}
+        exclude_any = {} if (exclude_any is None) else exclude_any
         exclude_any = {**exclude_any, **self.grid_version.exclude_any}
 
         models = grid_tools.reduce_table(table=self.params, params=params_full,
