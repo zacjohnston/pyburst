@@ -191,7 +191,7 @@ version_definitions = {
                     'z': 0.005,
                     'mass': 2.0,
                     },
-                2: {'accrate': 0.22,
+                2: {'accrate': [0.08, 0.22],
                     'mass': 2.0,
                     },
                 },
@@ -218,7 +218,7 @@ class InterpVersion:
         self.exclude_all = get_parameter(source, version, 'exclude_all')
 
     def __repr__(self):
-        return (f'MCMC version definitions for {self.source} V{self.version}'
+        return (f'Interpolator version definitions for {self.source} V{self.version}'
                 + f'\nparam keys     : {self.param_keys}'
                 + f'\nbprops         : {self.bprops}'
                 + f'\nbatches exclude: {self.batches_exclude}'
