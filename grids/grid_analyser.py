@@ -80,6 +80,7 @@ class Kgrid:
         self.grid_version = grid_versions.GridVersion(source, grid_version)
         self.exclude_defaults = exclude_defaults
         self.params_exclude = self.grid_version.params_exclude
+        self.exclude_all = self.grid_version.exclude_all
 
         self.linear_rates = None
         if linregress_burst_rate:
@@ -132,7 +133,7 @@ class Kgrid:
             exclude = {**exclude, **self.params_exclude}
 
         models = grid_tools.reduce_table(table=self.params, params=params_full,
-                                         exclude=exclude)
+                                         exclude=exclude, exclude_all=self.exclude_all)
         return models
 
     def get_summ(self, batch=None, run=None, params=None, exclude=None):
