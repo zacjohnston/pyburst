@@ -234,7 +234,6 @@ def create_batch(batch, dv, source,
             accrate0 = params_full['accrate'][i]
             accrate1_str = ''
 
-        xbar = None
         if auto_t_end:
             mdot = params_full['accrate'][i] * params_full['xi'][i]
             rate_params = {}
@@ -276,8 +275,7 @@ def create_batch(batch, dv, source,
                                    nsdump=nsdump,
                                    nuc_heat=nuc_heat,
                                    setup_test=setup_test,
-                                   cnv=0,
-                                   xbar=xbar)
+                                   cnv=0)
 
 
 def print_grid_params(params):
