@@ -12,8 +12,7 @@ import os
 
 
 # kepler_grids
-from . import grid_tools
-from . import grid_strings
+from . import grid_tools, grid_strings, grid_versions
 
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -22,20 +21,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 # -----------------------------------
 # TODO:
 #       - plot mean lightcurve for given params
-#       -
 # -----------------------------------
-# Parameters which have been discontinued from the grid
-# TODO: make this into an option/setting. Reform into "include"
-params_exclude = {'gs1826': {'qb': [0.3, 0.5, 0.7, 0.9], 'z': [0.001, 0.003]},
-                  # 'biggrid2': {'qb': [0.075], 'z': [0.001], 'x': [0.5, 0.6, 0.8]}
-                  # 'biggrid2': {'qb': [0.075], 'z': [0.001, 0.0015], 'x': [0.5, 0.6, 0.8],
-                  'biggrid2': {'qb': [0.025, 0.075, 0.125, 0.2], 'z': [0.001, 0.0175],
-                               'x': [0.5, 0.6, 0.75, 0.77, 0.8], 'mass': [0.8, 1.4, 3.2, 2.6],
-                               'accrate': np.concatenate((np.arange(5, 10)/100,
-                                                          np.arange(11, 24, 2)/100))},
-                  'res1': {'accdepth': 1e21},
-                  # 'grid4': {'batch': [10, 11, 12]},
-                  }
 
 
 def default_plt_options():
@@ -53,7 +39,7 @@ class Kgrid:
     An object for interracting with large model grids
     """
 
-    def __init__(self, source, basename='xrb',
+    def __init__(self, source, basename='xrb', grid_version=0,
                  load_lc=False, verbose=True,
                  linregress_burst_rate=True, exclude_defaults=True,
                  burst_analyser=True, **kwargs):
@@ -91,8 +77,9 @@ class Kgrid:
         self.printv(f'Models in grid: {self.n_models}')
 
         # ===== exclude misc params from plotting, etc. =====
+        self.grid_version = grid_versions.GridVersion(source, grid_version)
         self.exclude_defaults = exclude_defaults
-        self.params_exclude = params_exclude.get(source, {})
+        self.params_exclude = self.grid_version.params_exclude
 
         self.linear_rates = None
         if linregress_burst_rate:
