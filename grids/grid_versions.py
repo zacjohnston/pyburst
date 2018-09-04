@@ -65,6 +65,9 @@ class GridVersion:
 def get_parameter(source, version, parameter):
     default = version_defaults[parameter][source]
     out = version_definitions[parameter][source].get(version, default)
+
+    if out == default:
+        print(f'{parameter} not defined, using default')
     if type(out) is int:
         return version_definitions[parameter][source][out]
     else:
