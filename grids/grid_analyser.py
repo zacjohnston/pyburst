@@ -96,7 +96,8 @@ class Kgrid:
         """
         return len(self.get_params(batch=batch))
 
-    def get_params(self, batch=None, run=None, params=None, exclude_any=None):
+    def get_params(self, batch=None, run=None, params=None, exclude_any=None,
+                   exclude_all=None):
         """Returns models with given batch/run/params
         
         params  = {}      : params that must be satisfied
@@ -107,6 +108,11 @@ class Kgrid:
             - get_params(batch=2): returns all models in batch 2
             - get_params(params={'z':0.01}): returns all models with z=0.01
         """
+        def add_optional(parameter, empty):
+            """Includes optional extra values if provided
+            """
+            return empty if (parameter is None) else parameter
+
         if all(x is None for x in (batch, run, params, exclude_any)):
             raise ValueError('Must specify at least one argument')
 
@@ -121,19 +127,23 @@ class Kgrid:
         if params is not None:
             params_full = {**params_full, **params}
 
-        exclude_any = {} if (exclude_any is None) else exclude_any
+        exclude_any = add_optional(exclude_any, empty={})
         exclude_any = {**exclude_any, **self.grid_version.exclude_any}
+
+        exclude_all = add_optional(exclude_all, empty=[])
+        exclude_all = exclude_all + self.grid_version.exclude_all
 
         models = grid_tools.reduce_table(table=self.params, params=params_full,
                                          exclude_any=exclude_any,
-                                         exclude_all=self.grid_version.exclude_all)
+                                         exclude_all=exclude_all)
         return models
 
-    def get_summ(self, batch=None, run=None, params=None, exclude_any=None):
+    def get_summ(self, batch=None, run=None, params=None,
+                 exclude_any=None, exclude_all=None):
         """Get summary of given batch/run/params
         """
         subset = self.get_params(batch=batch, run=run, params=params,
-                                 exclude_any=exclude_any)
+                                 exclude_any=exclude_any, exclude_all=exclude_all)
         idxs = subset.index.values
         return self.summ.iloc[idxs]
 
