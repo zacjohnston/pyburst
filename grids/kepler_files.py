@@ -7,12 +7,12 @@ import os
 # ========================================================
 
 
-def write_genfile(h1, he4, n14, qb, xi, lburn,
+def write_genfile(h1, he4, n14, qb, xi, lburn, qnuc,
                   geemult, path, lumdata, header,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
                   accmass=1.0e18, zonermax=10, zonermin=-1,
                   accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
-                  setup_test=False, xbar=None):
+                  setup_test=False):
     """========================================================
     Creates a model generator file with the given params inserted
     ========================================================
@@ -20,6 +20,7 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
     he4      = flt   : helium    "    "
     z        = flt   : metals    "    "
     qb       = flt   : base heating (MeV/nucleon)
+    qnuc     = flt   : nuclear heating (MeV/nucleon, for thermal setup)
     lburn    = int   : switch for full network energy generation (0/1  = off/on)
     lumdata  = int   : switch for time-dependent base-flux (0/1 = off/on)
     accrate0 = flt   : accretion rate at model start (as fraction of Eddington),
@@ -30,26 +31,21 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
     ========================================================"""
     genpath = os.path.join(path, 'xrb_g')
 
-    qnuc1 = ''
-    qnuc2 = ''
+    qnuc_str1 = ''
+    qnuc_str2 = ''
     kill_setup = ''
     if nuc_heat:
-        if xbar is None:
-            xbar = h1
-
-        qnuc1 = f"""
+        qnuc_str1 = f"""
 c Convert qnuc from MeV/nucleon to erg/g
 c (Note accrate is in Msun/yr)
-o xbar {xbar:.3f} def
-c o qnuc {{1.31 + 6.95 * xbar + 1.92 * xbar ** 2}} def
-o qnuc {{5.}} def
+o qnuc {qnuc:.2f} def
 o qnuc {{1.602e-6}} *
 o qnuc {{accrate}} *
 o qnuc {{1.99e33 * 5.979e23 / 3.156e7}} *
 p xheatl {{qnuc}}
 p xheatym 1.e21
 p xheatdm 2.e20"""
-        qnuc2 = "p xheatl 0."
+        qnuc_str2 = "p xheatl 0."
 
     if setup_test:
         kill_setup = "end\n"
@@ -225,11 +221,11 @@ p 52 20
 p accdepth 1.d99
 p iterbarm 999999
 c .........................
-{qnuc1}
+{qnuc_str1}
 
 c =================================
 @time>1.d17
-{qnuc2}
+{qnuc_str2}
 p ncnvout {cnv}
 
 c overwrites accreted composition (if need to change)
@@ -287,6 +283,7 @@ p abunlim 0.01
 {kill_setup}
 
 @time>{t_end:.3e}
+d #
 end""")
 
 
@@ -324,84 +321,3 @@ g    0  1  fecomp
 g   50  1  fecomp
 g   51  1  hcomp
 g   60  1  hcomp""")
-
-
-def base(qb=0.3, acc_file='outburst.acc', qb_delay=0,
-         save_file='outburst.lum'):
-    """=================================================
-    Creates a base luminosity file from an accretion rate file
-    =================================================
-    acc_file : output from accrise()
-    qb_delay: time delay added between accretion and baselum curve (hrs, observer frame)
-    ================================================="""
-    # TODO: NOTE: this has not been touched/used in a long time:
-    red = 1.259
-    path = '/home/zacpetej/projects/codes/mdot'
-    pull_path = os.path.join(path, 'tmp', acc_file)
-    target = os.path.join(path, 'tmp', save_file)
-
-    xlum0 = 1.0642929e+36  # Base luminosity (erg/s) for 1MeV/nuc at Eddington
-    xlum0 *= qb  # MeV/nuc
-
-    mdot_edd = 1.75e-8  # Eddington rate Msun/yr
-    mdot_edd *= Msun / (8.64e4 * 365.25)  # g/s
-
-    Qb = np.loadtxt(pull_path, skiprows=2)
-    Qb[:, 0] += qb_delay * 3600 / red  # Add time delay to base luminosity
-    Qb[:, 1] *= 1 / mdot_edd  # Fraction of eddington accretion
-    Qb[:, 1] *= xlum0  # Base erg/s
-
-    n = len(Qb[:, 0])
-    head = f'# Qb (erg/s) from {qb:.3f} MeV/nuc, +{qb_delay} hr delay from accretion \n{n}'
-
-    print(f'Saving ({qb} MeV):  {target}')
-    np.savetxt(target, Qb, fmt='%25.17E%25.17E', header=head, comments='')
-
-
-def accrise(tshift, plot=False, save_file='outburst.acc', rise_file='rise_spline2.txt',
-            pca_file='pca_GR.acc'):
-    """=================================================
-    Appends accretion rise curve/spline to PCA data (already redshifted)
-    ================================================="""
-    # TODO: NOTE: this has not been touched/used in a long time:
-    red = 1.259
-    path = '/home/zacpetej/projects/codes/mdot'
-    pull_path = os.path.join(path, 'files/', )
-    pull_rise = os.path.join(pull_path, rise_file)
-    pull_pca = os.path.join(pull_path, pca_file)
-    target = os.path.join(path, 'tmp/', save_file)
-    print(f'Loading {rise_file} and {pca_file} from:  {pull_path}')
-
-    # ARRAYS: [time (s), mdot (g/s)]
-    # Time zeroed to 10 days (observer frame) prior to PCA data
-    start = np.array([0, 8.86e11], ndmin=2)  # First point
-    spline = np.loadtxt(pull_rise, skiprows=1)  # Accretion onset/rise
-    pca = np.loadtxt(pull_pca, skiprows=4)  # PCA accretion
-
-    dt = tshift / red  # Amount to shift onset forward (hr)
-    spline_old = np.array(spline)
-
-    print(f'Shifting spline later by {tshift:.2f} hrs (observer frame)')
-
-    spline[:, 0] += dt * 3600  # apply time shift
-    keep = spline[:, 0] < pca[0, 0]  # Only keep points still prior to PCA data
-    spline = spline[keep]
-    throwaway = np.sum(np.invert(keep))  # No. of points discarded
-
-    print('Discarding {throwaway} overlapping points from spline')
-    acc = np.concatenate((start, spline, pca))
-
-    tf = 8.64e4
-
-    if plot:
-        plt.figure()
-        plt.plot(acc[:, 0] * red / tf, acc[:, 1])
-        plt.plot(spline_old[:, 0] * red / tf, spline_old[:, 1])
-        plt.plot(spline_old[[0, -1], 0] * red / tf, spline_old[[0, -1], 1])
-        plt.show(block=False)
-
-    n = len(acc[:, 0])
-    head = f'# Accretion rate (g/s) with spline onset, shifted by {tshift:.2f} hrs (observer frame)\n{n}'
-
-    print(f'Saving:   {target}')
-    np.savetxt(target, acc, fmt='%25.17E%25.17E', header=head, comments='')
