@@ -200,7 +200,7 @@ p xlum0 {{xip}} *
 c -------------------------
 c get model in equilibrium
 p ncnvout 0
-p nstop {nstop:.0f}
+p nstop 1000000000
 p tnucmin 1.d10
 p tnumin 1.d7
 p accmass 1.d13
@@ -280,6 +280,7 @@ p pbound {{6.67259e-8 * zm(0) * xm(0) / (4. * 3.14159 * rn(0) ^ 4 ) * 0.5}}
 p 132 11
 p nsdump {nsdump:.0f}
 
+p nstop {nstop:.0f}
 p abunlim 0.01
 {kill_setup}
 
