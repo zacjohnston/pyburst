@@ -143,7 +143,7 @@ def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'
         write_pandas_table(table, filepath)
 
 
-def reduce_table(table, params, exclude=None, exclude_all=None):
+def reduce_table(table, params, exclude_any=None, exclude_all=None):
     """Returns the subset of a table that satisfy the specified variables
 
     table : pd.DataFrame
@@ -158,14 +158,14 @@ def reduce_table(table, params, exclude=None, exclude_all=None):
     mask = param_mask_all(table, params)
     sub_table = table[mask].copy()
 
-    if exclude not in [None, {}]:
-        sub_table = exclude_params(sub_table, params=exclude, logic='any')
-    if type(exclude_all) not in [type(None), dict, list]:
+    if exclude_any not in [None, {}]:
+        sub_table = exclude_params(sub_table, params=exclude_any, logic='any')
+    if exclude_all not in [None, {}, [], [{}]]:
         sub_table = exclude_params(sub_table, params=exclude_all, logic='all')
     return sub_table
 
 
-def reduce_table_idx(table, params, exclude=None, exclude_all=None):
+def reduce_table_idx(table, params, exclude_any=None, exclude_all=None):
     """Returns the subset of table indices that satisfy the specified variables
         Same as reduce_table(), but returns indices instead of table
     
@@ -177,7 +177,8 @@ def reduce_table_idx(table, params, exclude=None, exclude_all=None):
         params to exclude/blacklist completely (can be arrays for multiple values)
     """
     table_copy = table.reset_index()
-    sub_table = reduce_table(table_copy, params, exclude=exclude, exclude_all=exclude_all)
+    sub_table = reduce_table(table_copy, params, exclude_any=exclude_any,
+                             exclude_all=exclude_all)
     return np.array(sub_table.index)
 
 

@@ -102,7 +102,7 @@ class Kgrid:
         """
         return len(self.get_params(batch=batch))
 
-    def get_params(self, batch=None, run=None, params=None, exclude=None):
+    def get_params(self, batch=None, run=None, params=None, exclude_any=None):
         """Returns models with given batch/run/params
         
         params  = {}      : params that must be satisfied
@@ -113,7 +113,7 @@ class Kgrid:
             - get_params(batch=2): returns all models in batch 2
             - get_params(params={'z':0.01}): returns all models with z=0.01
         """
-        if all(x is None for x in (batch, run, params, exclude)):
+        if all(x is None for x in (batch, run, params, exclude_any)):
             raise ValueError('Must specify at least one argument')
 
         params_full = {}
@@ -128,19 +128,20 @@ class Kgrid:
             params_full = {**params_full, **params}
 
         if self.exclude_defaults:
-            if exclude is None:
-                exclude = {}
-            exclude = {**exclude, **self.params_exclude}
+            if exclude_any is None:
+                exclude_any = {}
+            exclude_any = {**exclude_any, **self.params_exclude}
 
         models = grid_tools.reduce_table(table=self.params, params=params_full,
-                                         exclude=exclude, exclude_all=self.exclude_all)
+                                         exclude_any=exclude_any,
+                                         exclude_all=self.exclude_all)
         return models
 
-    def get_summ(self, batch=None, run=None, params=None, exclude=None):
+    def get_summ(self, batch=None, run=None, params=None, exclude_any=None):
         """Get summary of given batch/run/params
         """
         subset = self.get_params(batch=batch, run=run, params=params,
-                                 exclude=exclude)
+                                 exclude_any=exclude_any)
         idxs = subset.index.values
         return self.summ.iloc[idxs]
 
