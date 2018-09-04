@@ -46,7 +46,7 @@ version_definitions = {
 }
 
 
-class InterpVersion:
+class GridVersion:
     """Class for defining different interpolator versions
     """
     def __init__(self, source, version):
@@ -56,7 +56,7 @@ class InterpVersion:
         self.exclude_all = get_parameter(source, version, 'exclude_all')
 
     def __repr__(self):
-        return (f'MCMC version definitions for {self.source} V{self.version}'
+        return (f'Grid version definitions for {self.source} V{self.version}'
                 + f'\nparams_exclude : {self.params_exclude}'
                 + f'\nexclude_all : {self.exclude_all}'
                 )
