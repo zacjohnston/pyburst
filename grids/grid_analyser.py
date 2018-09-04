@@ -388,11 +388,8 @@ class Kgrid:
             # ===== check if any models exist =====
             params[var] = v
             subset = self.get_params(params=params)
-
             if len(subset) == 0:
                 continue
-            # if exclude_defaults and (v in self.params_exclude[var]):
-            #     continue
 
             mdot_x = []
             prop_y = []
@@ -456,36 +453,6 @@ class Kgrid:
             plt.savefig(filepath)
         print(bprop)
         return ax
-
-    def plot_grid_params(self, var, fixed, show=True):
-        """Visualises the models that exist in the grid by parameter
-        
-        var   = [2x str]  : list of the two parameters to plot on the axes
-        fixed = {}        : specify the constant values of the remaining three
-                                paramters
-        """
-        if len(var) != 2:
-            raise ValueError("'var' must specify two parameters to plot on axes")
-
-        if len(fixed) != 3:
-            raise ValueError("'fixed' must specify three paramters to hold constant")
-
-        fig, ax = plt.subplots()
-        subset = self.get_params(params=fixed)
-
-        # TODO: check only one unique value of all other params
-        x = subset[var[0]]
-        y = subset[var[1]]
-        ax.plot(x, y, marker='o', ls='none')
-
-        ax.set_xlabel(var[0])
-        ax.set_ylabel(var[1])
-        title = ''
-        for f in fixed:
-            title += f'{f}={fixed[f]}, '
-        ax.set_title(title)
-
-        plt.show(block=False)
 
     def check_var_fixed(self, var, fixed):
         if var in fixed:
