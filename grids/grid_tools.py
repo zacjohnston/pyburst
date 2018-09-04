@@ -160,7 +160,7 @@ def reduce_table(table, params, exclude=None, exclude_all=None):
 
     if exclude not in [None, {}]:
         sub_table = exclude_params(sub_table, params=exclude, logic='any')
-    if exclude_all not in [None, {}, []]:
+    if type(exclude_all) not in [type(None), dict, list]:
         sub_table = exclude_params(sub_table, params=exclude_all, logic='all')
     return sub_table
 
