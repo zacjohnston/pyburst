@@ -3,32 +3,32 @@ import numpy as np
 # Defines various versions/subsets of model grids
 
 version_defaults = {
-    'params_exclude':
-        {
-            'biggrid2':
-                {
-                    'accrate': np.append(np.arange(5, 10) / 100, np.arange(11, 24, 2) / 100),
-                    'x': [0.5, 0.6, 0.8],
-                    'z': [0.001],
-                    'qb': [.075],
-                    'mass': [0.8, 3.2],
-                },
-            'grid4':
-                {
-                    'accrate': [0.22],
-                    'mass': [2.0],
-                },
+    'params_exclude': {
+        'biggrid2': {
+            'accrate': np.concatenate((np.arange(5, 10)/100, np.arange(11, 24, 2)/100)),
+            'qb': [0.025, 0.075, 0.125, 0.2],
+            'z': [0.001, 0.0175],
+            'x': [0.5, 0.6, 0.75, 0.77, 0.8],
+            'mass': [0.8, 1.4, 3.2, 2.6],
         },
 
-    'exclude_all':
-        {
-            'biggrid2': [{}],
-            'grid4':
-                [
-                    {'x': 0.72, 'accdepth': 1e20},
-                    {'x': 0.73, 'accdepth': 1e20},
-                ],
+        'grid4': {
+            'accrate': [0.22],
+            'mass': [2.0],
         },
+
+        'res1': {
+            'accdepth': 1e21
+        }
+    },
+
+    'exclude_all': {
+        'biggrid2': [{}],
+        'grid4': [
+            {'x': 0.72, 'accdepth': 1e20},
+            {'x': 0.73, 'accdepth': 1e20},
+         ],
+    },
 }
 
 
