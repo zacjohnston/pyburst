@@ -246,10 +246,10 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
         times[i] = dump.time
         temps[i] = dump.tn[1]
         if i == 0:
-            t0 = dump.time/3600
+            t0 = dump.time
             temp0 = dump.tn[1]
 
-    t1 = dump.time/3600
+    t1 = dump.time
     temp1 = dump.tn[1]
     slope = (temp1 - temp0) / (t1 - t0)
     days = 1e8 / (24 * np.abs(slope))
@@ -259,7 +259,7 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
     ax.set_ylabel(r'T (K)')
     ax.set_xlabel('time (hr)')
 
-    print(f'{run}     {slope:.2e} (K/hr)     {days:.1f} (days)')
+    print(f'{run}     {slope:.2f} (K/hr)     {days:.1f} (days)')
     if title:
         ax.set_title(f'{source}_{batch}_{run}')
     plt.tight_layout()
