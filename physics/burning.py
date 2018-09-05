@@ -1,6 +1,18 @@
 import numpy as np
 import astropy.units as units
 
+
+def predict_qnuc(accrate, x0, z, dt, radius=10):
+    xbar = get_xbar(accrate, x0=x0, z=z, dt=dt, radius=radius)
+    return adelle_qnuc(xbar)
+
+
+def adelle_qnuc(xbar):
+    """Returns Qnuc (MeV/nucleon) according to Adelle et al. (2018)
+    """
+    return 1.305 + (6.9511 * xbar) - (1.9218 * xbar**2)
+
+
 def get_xbar(accrate, x0, z, dt, radius=10):
     """Returns average hydrogen mass fraction (Xbar) at burst ignition
     """
