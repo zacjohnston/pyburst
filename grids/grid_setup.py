@@ -460,6 +460,35 @@ end"""
                                                       walltime=walltime, restart=True)
 
 
+def add_to_cmd(run, batch, source, add_line, basename='xrb'):
+    """Prepends command to model .cmd file, for changing params on restart
+    """
+    filepath = grid_strings.cmd_filepath(run, batch, source=source, basename=basename)
+    print(f'Writing: {filepath}')
+    with open(filepath) as f:
+        lines = f.readlines()
+
+    lines = [f'{add_line}\n'] + lines
+    with open(filepath, 'w') as f:
+        f.writelines(lines)
+
+
+def overwrite_cmd(run, batch, source, lines, basename='xrb'):
+    """Overwrites model .cmd file with given lines
+
+    lines : [str]
+        list of lines to write. Will automatically include endline characters
+    """
+    for i, line in enumerate(lines):
+        if '\n' not in line:
+            lines[i] += '\n'
+
+    filepath = grid_strings.cmd_filepath(run, batch, source=source, basename=basename)
+    print(f'Writing: {filepath}')
+    with open(filepath, 'w') as f:
+        f.writelines(lines)
+
+
 def get_short_models(model_table, n_bursts):
     """Returns table of models with less than n_bursts
     """
