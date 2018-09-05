@@ -425,27 +425,20 @@ def extend_runs(summ_table, source, nbursts=40, basename='xrb',
     """Modifies existing models (in summ_table) for resuming, to simulate more bursts
     """
     source = grid_strings.source_shorthand(source)
-    batches = np.unique(summ_table['batch'])
+    mask = summ_table['num'] < nbursts
+    short_table = summ_table[mask]
 
-    for batch in batches:
-        print(f'===== Batch {batch} =====')
-        batch_summ = grid_tools.reduce_table(summ_table, params={'batch': batch})
-        idxs = np.where(batch_summ['num'] < nbursts)[0]
+    if do_cmd_files:
+        for model in short_table.itertuples():
+            t_end = (nbursts + 0.75) * model.dt
+            lines = [f'p nsdump {nsdump}', f'@time>{t_end:.3e}', 'end']
+            overwrite_cmd(model.run, model.batch, source=source, lines=lines, basename=basename)
 
-        if do_cmd_files:
-            print('Re-writing .cmd files:')
-            for i in idxs:
-                run = batch_summ['run'].values[i]
-                num = batch_summ['num'].values[i]
-                print(f'{run} nb={num} ({num/nbursts*100:.0f}%)')
-
-                dt = batch_summ['dt'].values[i]
-                t_end = (nbursts + 0.75) * dt
-                lines = [f'p nsdump {nsdump}', f'@time>{t_end:.3e}', 'end']
-                overwrite_cmd(run, batch, source=source, lines=lines, basename=basename)
-
-        if do_jobscripts:
-            runs = np.array(batch_summ['run'].iloc[idxs])
+    if do_jobscripts:
+        batches = np.unique(short_table['batch'])
+        for batch in batches:
+            batch_table = grid_tools.reduce_table(short_table, params={'batch': batch})
+            runs = np.array(batch_table['run'])
             kepler_jobscripts.write_submission_script(batch, run0=runs[0], run1=runs[-1],
                                                       runs=runs, source=source,
                                                       walltime=walltime, restart=True)
