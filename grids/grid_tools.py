@@ -431,8 +431,11 @@ def check_finished(batches, source, efficiency=True, show='all',
                 with open(cmd_filepath) as f:
                     lines = f.readlines()
 
-                t_end_str = lines[-2].strip()
-                t_end = float(t_end_str.strip('@time>'))
+                marker = '@time>'
+                for line in lines[-10:]:
+                    if marker in line:
+                        t_end = float(line.strip('@time>').strip())
+                        break
 
                 kmodel = kepdump.load(filepath)
                 progress = kmodel.time / t_end
