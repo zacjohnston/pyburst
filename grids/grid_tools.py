@@ -368,17 +368,6 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
     write_pandas_table(table_out, filepath)
 
 
-def check_finished_multi(batch1, batch2, source, **kwargs):
-    """Iterator of check_finished()
-    """
-    source = grid_strings.source_shorthand(source=source)
-    n_epochs = {'gs1826': 3, '4u1820': 2}
-    n = n_epochs.get(source, 1)
-
-    for batch in range(batch1, batch2 + 1, n):
-        check_finished(batches=batch, source=source, **kwargs)
-
-
 def check_finished(batches, source, efficiency=True, show='all',
                    basename='xrb', extension='z1', **kwargs):
     """Checks which running models are finished
