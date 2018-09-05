@@ -36,8 +36,8 @@ def get_batch_string(batch, source, b_tag=''):
     return f'{source}_{b_tag}{batch}'
 
 
-def get_run_string(run, basename='xrb'):
-    return f'{basename}{run}'
+def get_run_string(run, basename='xrb', extension=''):
+    return f'{basename}{run}{extension}'
 
 
 def get_model_string(run, batch, source, b_tag='', r_tag=''):
@@ -122,6 +122,12 @@ def get_source_filename(source, prefix, extension=''):
 
 def get_model_table_filepath(batch, source, filename='MODELS.txt'):
     path = get_batch_models_path(batch, source)
+    return os.path.join(path, filename)
+
+
+def cmd_filepath(run, batch, source, basename='xrb'):
+    path = get_model_path(run, batch, source=source, basename=basename)
+    filename = get_run_string(run, basename, extension='.cmd')
     return os.path.join(path, filename)
 
 
