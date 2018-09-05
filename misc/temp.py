@@ -56,7 +56,11 @@ def get_cycles(run, batch, source):
     for file in file_list:
         if '#' in file:
             idx = file.find('#')
-            cycles += [int(file[idx+1:])]
+            cyc = file[idx+1:]
+            if cyc == 'nstop':
+                continue
+            else:
+                cycles += [int(cyc)]
     return np.sort(cycles)
 
 
