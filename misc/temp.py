@@ -267,19 +267,23 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
         plt.show(block=False)
 
 
-def plot_slope(source, params, cycles=None, linear=True, display=True):
+def plot_slope(source, params, xaxis='accrate', cycles=None, linear=True, display=True):
+    """xaxis : ['accrate', 'qnuc']
+    """
+    xlabel = {'accrate': '$\dot{M} / \dot{M}_\mathrm{Edd}$',
+              'qnuc': '$Q_\mathrm{nuc}$'}.get(xaxis, xaxis)
     kgrid = grid_analyser.Kgrid(source)
     subset = kgrid.get_params(params=params)
     slopes = get_slopes(table=subset, source=source, cycles=cycles)
 
     fig, ax = plt.subplots()
-    x = np.array((np.min(subset['accrate']), np.max(subset['accrate'])))
-    ax.plot(subset['accrate'], slopes, ls='none', marker='o')
+    ax.plot(subset[xaxis], slopes, ls='none', marker='o')
+    x = np.array((np.min(subset[xaxis]), np.max(subset[xaxis])))
     ax.plot(x, [0, 0], color='black')
-    set_axes(ax, xlabel='accrate (/Edd)', ylabel='dT/dt (K s$^{-1}$)',
-             title=params)
+    set_axes(ax, xlabel=xlabel, ylabel='dT/dt (K s$^{-1}$)', title=params)
+
     if linear:
-        linr = linregress(subset['accrate'], slopes)
+        linr = linregress(subset[xaxis], slopes)
         ax.plot(x, x * linr[0] + linr[1])
         print(f'{linr[0]:.3f}   {linr[1]:.2f}')
     if display:
