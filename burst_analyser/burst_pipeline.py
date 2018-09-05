@@ -22,7 +22,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 def run_analysis(batches, source, copy_params=True, reload=True, multithread=True,
                  analyse=True, save_plots=True, collect=True, load_bursts=False,
-                 auto_last_batch=True, basename='xrb'):
+                 load_summary=False, auto_last_batch=True, basename='xrb'):
     """Run all analysis steps for burst models
     """
     # TODO: copy generators
@@ -35,7 +35,8 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
     if analyse:
         print_title('Extracting burst properties from models')
         extract_batches(batches, source, save_plots=save_plots, load_bursts=load_bursts,
-                        multithread=multithread, reload=reload, basename=basename)
+                        multithread=multithread, reload=reload, basename=basename,
+                        load_summary=load_summary)
 
     if collect:
         print_title('Collecting results')
@@ -50,7 +51,7 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
 
 
 def extract_batches(batches, source, save_plots=True, multithread=True,
-                    reload=False, load_bursts=False, basename='xrb'):
+                    reload=False, load_bursts=False, load_summary=False, basename='xrb'):
     """Do burst analysis on arbitrary number of batches"""
     t0 = time.time()
     batches = grid_tools.ensure_np_list(batches)
@@ -70,12 +71,13 @@ def extract_batches(batches, source, save_plots=True, multithread=True,
             args = []
             for run in runs:
                 args.append((run, batch, source, save_plots, reload, load_bursts,
-                             basename))
+                             load_summary, basename))
             with mp.Pool(processes=8) as pool:
                 pool.starmap(extract_runs, args)
         else:
             extract_runs(runs, batch, source, reload=reload, save_plots=save_plots,
-                         load_bursts=load_bursts, basename=basename)
+                         load_bursts=load_bursts, load_summary=load_summary,
+                         basename=basename)
 
         burst_tools.combine_run_summaries(batch, source)
 
@@ -85,7 +87,7 @@ def extract_batches(batches, source, save_plots=True, multithread=True,
 
 
 def extract_runs(runs, batch, source, save_plots=True, reload=False, load_bursts=False,
-                 basename='xrb'):
+                 load_summary=False, basename='xrb'):
     """Do burst analysis on run(s) from a single batch and save results
     """
     runs = grid_tools.ensure_np_list(runs)
@@ -93,7 +95,7 @@ def extract_runs(runs, batch, source, save_plots=True, reload=False, load_bursts
         print_title(f'Run {run}')
         model = burst_analyser.BurstRun(run, batch, source, analyse=True,
                                         reload=reload, load_bursts=load_bursts,
-                                        basename=basename)
+                                        basename=basename, load_summary=load_summary)
         model.save_burst_table()
         model.save_summary_table()
 
