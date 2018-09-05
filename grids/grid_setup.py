@@ -420,16 +420,16 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
         f.write(table_str)
 
 
-def extend_runs(model_table, source, nbursts=40, basename='xrb',
+def extend_runs(summ_table, source, nbursts=40, basename='xrb',
                 nsdump=1000, walltime=96, do_cmd_files=True, do_jobscripts=True):
-    """Modifies existing models (in model_table) for resuming, to simulate more bursts
+    """Modifies existing models (in summ_table) for resuming, to simulate more bursts
     """
     source = grid_strings.source_shorthand(source)
-    batches = np.unique(model_table['batch'])
+    batches = np.unique(summ_table['batch'])
 
     for batch in batches:
         print(f'===== Batch {batch} =====')
-        batch_summ = grid_tools.reduce_table(model_table, params={'batch': batch})
+        batch_summ = grid_tools.reduce_table(summ_table, params={'batch': batch})
         idxs = np.where(batch_summ['num'] < nbursts)[0]
 
         if do_cmd_files:
@@ -480,11 +480,11 @@ def overwrite_cmd(run, batch, source, lines, basename='xrb'):
         f.writelines(lines)
 
 
-def get_short_models(model_table, n_bursts):
+def get_short_models(summ_table, n_bursts):
     """Returns table of models with less than n_bursts
     """
-    idxs = np.where(model_table['num'] < n_bursts)[0]
-    short_table = model_table.iloc[idxs]
+    idxs = np.where(summ_table['num'] < n_bursts)[0]
+    short_table = summ_table.iloc[idxs]
     return short_table
 
 
