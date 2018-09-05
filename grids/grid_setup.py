@@ -80,11 +80,11 @@ def create_epoch_grid(batch0, dv, params, source, kgrid=None,
 def create_batch(batch, dv, source,
                  params={'x': [0.6, 0.8], 'z': [0.01, 0.02],
                          'tshift': [0.0], 'accrate': [0.05],
-                         'qb': [0.125], 'xi': [1.0],
+                         'qb': [0.125], 'xi': [1.0], 'qnuc': 5.0,
                          'qb_delay': [0.0], 'mass': [1.4],
                          'accmass': [1e16], 'accdepth': [1e20]},
                  lburn=1, t_end=1.3e5, exclude={}, basename='xrb',
-                 walltime=96, qos='general',
+                 walltime=96, qos='general', nstop=10000000,
                  check_params=False, nsdump=1000,
                  file_sourcepath='/home/zacpetej/projects/codes/mdot/tmp/',
                  auto_t_end=True, notes='No notes given', debug=False,
@@ -116,8 +116,6 @@ def create_batch(batch, dv, source,
     """
     # TODO: - WRITE ALL PARAM DESCRIPTIONS
     # TODO  - set default values for params
-    # NOTE: Different mass/radius (1+z) are not yet accounted for in .acc file or accrise
-
     source = grid_strings.source_shorthand(source=source)
     mass_ref = 1.4  # reference NS mass (in Msun)
     print_batch(batch=batch, source=source)
@@ -262,6 +260,7 @@ def create_batch(batch, dv, source,
                                    n14=params_full['z'][i],
                                    qb=params_full['qb'][i],
                                    xi=params_full['xi'][i],
+                                   qnuc=params_full['qnuc'][i],
                                    lburn=lburn,
                                    geemult=params_full['geemult'][i],
                                    path=run_path,
@@ -273,6 +272,7 @@ def create_batch(batch, dv, source,
                                    accmass=params_full['accmass'][i],
                                    lumdata=lumdata,
                                    nsdump=nsdump,
+                                   nstop=nstop,
                                    nuc_heat=nuc_heat,
                                    setup_test=setup_test,
                                    cnv=0)
@@ -407,13 +407,13 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
     p['run'] = runlist
     p['lburn'] = lburn_list
 
-    cols = ['run', 'z', 'y', 'x', 'qb', 'accrate',
+    cols = ['run', 'z', 'y', 'x', 'accrate', 'qb', 'qnuc',
             'tshift', 'xi', 'qb_delay', 'mass', 'lburn',
             'accmass', 'accdepth']
     ptable = pd.DataFrame(p)
     ptable = ptable[cols]  # Fix column order
 
-    table_str = ptable.to_string(index=False, justify='left', formatters=FORMATTERS)
+    table_str = ptable.to_string(index=False, formatters=FORMATTERS)
 
     filepath = os.path.join(path, filename)
     with open(filepath, 'w') as f:
