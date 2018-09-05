@@ -21,7 +21,7 @@ version_defaults = {
             'accdepth': 1e21
         },
 
-        'heat': {},
+        'heat': {'batch': 1},
     },
 
     'exclude_all': {
