@@ -429,29 +429,20 @@ def extend_runs(model_table, source, nbursts=40, basename='xrb',
 
     for batch in batches:
         print(f'===== Batch {batch} =====')
-        batch_path = grid_strings.get_batch_models_path(batch, source)
         batch_summ = grid_tools.reduce_table(model_table, params={'batch': batch})
         idxs = np.where(batch_summ['num'] < nbursts)[0]
 
-        # ===== edit model.cmd files =====
         if do_cmd_files:
             print('Re-writing .cmd files:')
             for i in idxs:
                 run = batch_summ['run'].values[i]
                 num = batch_summ['num'].values[i]
-                dt = batch_summ['dt'].values[i]
-                t_end = (nbursts + 0.75) * dt
                 print(f'{run} nb={num} ({num/nbursts*100:.0f}%)')
 
-                cmd_str = f"""p nsdump {nsdump}
-@time>{t_end:.3e}
-end"""
-                run_str = grid_strings.get_run_string(run, basename)
-                filename = f'{run_str}.cmd'
-                filepath = os.path.join(batch_path, run_str, filename)
-                print(filepath)
-                with open(filepath, 'w') as f:
-                    f.write(cmd_str)
+                dt = batch_summ['dt'].values[i]
+                t_end = (nbursts + 0.75) * dt
+                lines = [f'p nsdump {nsdump}', f'@time>{t_end:.3e}', 'end']
+                overwrite_cmd(run, batch, source=source, lines=lines, basename=basename)
 
         if do_jobscripts:
             runs = np.array(batch_summ['run'].iloc[idxs])
