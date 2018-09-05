@@ -292,6 +292,25 @@ def plot_slope(source, params, xaxis='accrate', cycles=None, linear=True, displa
         plt.close()
 
 
+def solve_qnuc(source, params, cycles=None):
+    """Returns predicted Qnuc that gives zero slope in base temperature
+    """
+    param_list = ('x', 'z', 'accrate', 'mass')
+    for p in param_list:
+        if p not in params:
+            raise ValueError(f'Missing "{p}" from "params"')
+
+    kgrid = grid_analyser.Kgrid(source)
+    subset = kgrid.get_params(params=params)
+    slopes = get_slopes(table=subset, source=source, cycles=cycles)
+
+    linr = linregress(subset['qnuc'], slopes)
+    x0 = -linr[1]/linr[0]  # x0 = -y0/m
+    u_x0 = (linr[4] / linr[0]) * x0
+
+    return x0, u_x0
+
+
 def get_slopes(table, source, cycles=None):
     """Returns slopes of base temperature change (K/s), for given model table
     """
