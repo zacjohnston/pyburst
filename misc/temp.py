@@ -329,6 +329,23 @@ def solve_qnuc(source, params, cycles=None):
     return x0, u_x0
 
 
+def iterate_solve_qnuc(source, ref_table, cycles=None):
+    """Iterates over solve_qnuc for a table of params
+    """
+    param_list = ['x', 'z', 'accrate', 'qb', 'accdepth', 'accmass', 'mass']
+    ref_table = ref_table.reset_index()
+    qnuc = np.zeros(len(ref_table))
+
+    for row in ref_table.itertuples():
+        params = {'x': row.x, 'z': row.z, 'accrate': row.accrate, 'mass': row.mass}
+        qnuc[row.Index] = solve_qnuc(source=source, params=params, cycles=cycles)[0]
+
+    qnuc_table = ref_table.copy()[param_list]
+    qnuc_table['qnuc'] = qnuc
+
+    return qnuc_table
+
+
 def get_slopes(table, source, cycles=None):
     """Returns slopes of base temperature change (K/s), for given model table
     """
