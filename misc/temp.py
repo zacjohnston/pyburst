@@ -200,8 +200,6 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
         dump = load_dump(cyc, run, batch, source=source, basename=basename, prefix=prefix)
         temp[i] = dump.tn[1]
 
-    print(f'{temp[1]/temp[0]:.3f}')
-
     y0 = dump.y[1]   # column depth at inner zone
     y1 = dump.y[-3]  # outer zone
 
@@ -283,7 +281,6 @@ def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=T
     if linear:
         linr = linregress(subset[xaxis], slopes)
         ax.plot(x, x * linr[0] + linr[1])
-        print(f'{linr[0]:.3f}   {linr[1]:.2f}')
     if display:
         plt.show(block=False)
     else:
@@ -360,7 +357,8 @@ def get_slopes(table, source, cycles=None, basename='xrb'):
 
         temps = extract_base_temps(row.run, row.batch, source,
                                    cycles=cycles, basename=basename)
-        slopes += [(temps[-1, 1] - temps[0, 1]) / (temps[-1, 0] - temps[0, 0])]
+        linr = linregress(temps[:, 0], temps[:, 1])
+        slopes += [linr[0]]
     return np.array(slopes)
 
 
@@ -396,8 +394,7 @@ def save_temps(cycles, run, batch, source, zero_times=True):
     for i, cycle in enumerate(cycles):
         print(f'Cycle {cycle}')
         title = f'cycle={cycle},  t={times[i]:.6f}'
-        fig = plot_temp([cycle], run, batch, source=source,
-                        title=title, display=False)
+        fig = plot_temp([cycle], run, batch, source=source, title=title, display=False)
 
         filename = f'temp_{source}_{batch}_{run}_{i:02}.png'
         filepath = os.path.join(path, filename)
