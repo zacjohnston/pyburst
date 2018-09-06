@@ -217,11 +217,10 @@ def plot_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title=
 
     if display:
         plt.show(block=False)
-
     return fig
 
 
-def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True):
+def plot_base_temp_multi(cycles, runs, batches, sources, legend=True):
     fig, ax = plt.subplots()
 
     n = len(runs)
@@ -294,6 +293,21 @@ def plot_slope(source, params, xaxis='accrate', cycles=None, linear=True, displa
         plt.show(block=False)
     else:
         plt.close()
+
+
+def plot_bprops(source, params, bprop='dt'):
+    """Plots burst property versus qnuc
+    """
+    kgrid = grid_analyser.Kgrid(source)
+    sub_p = kgrid.get_params(params=params)
+    sub_s = kgrid.get_summ(params=params)
+
+    fig, ax = plt.subplots()
+    ax.errorbar(sub_p['qnuc'], sub_s[bprop], yerr=sub_s[f'u_{bprop}'],
+                ls='None', marker='o', capsize=3)
+    ax.set_xlabel('$Q_\mathrm{nuc}$')
+    ax.set_ylabel(bprop)
+    plt.show(block=False)
 
 
 def solve_qnuc(source, params, cycles=None):
