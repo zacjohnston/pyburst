@@ -350,18 +350,17 @@ def save_qnuc_table(table, source):
         f.write(table_str)
 
 
-def get_slopes(table, source, cycles=None):
+def get_slopes(table, source, cycles=None, basename='xrb'):
     """Returns slopes of base temperature change (K/s), for given model table
     """
     slopes = []
-    load_cycles = cycles is None
     for row in table.itertuples():
-        if load_cycles:
+        if cycles is None:
             cycles = get_cycles(row.run, row.batch, source=source)
-        d0 = load_dump(cycles[0], run=row.run, batch=row.batch, source=source)
-        d1 = load_dump(cycles[-1], run=row.run, batch=row.batch, source=source)
-        slopes += [(d1.tn[1] - d0.tn[1]) / (d1.time - d0.time)]
 
+        temps = extract_base_temps(row.run, row.batch, source,
+                                   cycles=cycles, basename=basename)
+        slopes += [(temps[-1, 1] - temps[0, 1]) / (temps[-1, 0] - temps[0, 0])]
     return np.array(slopes)
 
 
