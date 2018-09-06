@@ -270,7 +270,7 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
         plt.show(block=False)
 
 
-def plot_slope(source, params, xaxis='accrate', cycles=None, linear=True, display=True):
+def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=True):
     """xaxis : ['accrate', 'qnuc']
     """
     xlabel = {'accrate': '$\dot{M} / \dot{M}_\mathrm{Edd}$',
@@ -281,7 +281,7 @@ def plot_slope(source, params, xaxis='accrate', cycles=None, linear=True, displa
 
     fig, ax = plt.subplots()
     ax.plot(subset[xaxis], slopes, ls='none', marker='o')
-    x = np.array((np.min(subset[xaxis]), np.max(subset[xaxis])))
+    x = np.array((3, 10))
     ax.plot(x, [0, 0], color='black')
     set_axes(ax, xlabel=xlabel, ylabel='dT/dt (K s$^{-1}$)', title=params)
 
