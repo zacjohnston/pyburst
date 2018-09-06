@@ -21,6 +21,7 @@ def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
                    prefix=''):
     """Iterates over dump cycles and extracts profiles and tables
     """
+    # TODO: is prefix still necessary?
     save_times(cycles, run, batch, source=source, basename=basename, prefix=prefix)
     copy_lightcurve(run, batch, source=source, basename=basename)
 
@@ -269,6 +270,19 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
     if display:
         plt.show(block=False)
 
+
+def extract_base_temps(run, batch, source, cycles=None, basename='xrb', ):
+    """Extracts base temperature versus time from mode dumps. Returns as [t (s), T (K)]
+    """
+    base_zone = 1
+    if cycles is None:
+        cycles = get_cycles(run, batch, source)
+
+    temps = np.zeros((len(cycles), 2))
+    for i, cycle in enumerate(cycles):
+        dump = load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
+        temps[i] = np.array((dump.time, dump.tn[base_zone]))
+    return temps
 
 def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=True):
     """xaxis : ['accrate', 'qnuc']
