@@ -234,32 +234,16 @@ def plot_base_temp_multi(cycles, runs, batches, sources, legend=True):
 
 
 def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title=True,
-                   display=True, prefix='', ax=None, legend=False):
+                   display=True, ax=None):
     if ax is None:
         fig, ax = plt.subplots()
-    dump = None
 
-    if cycles is None:
-        cycles = get_cycles(run, batch, source)
-
-    temps = np.zeros_like(cycles)
-    times = np.zeros_like(cycles)
-
-    for i, cycle in enumerate(cycles):
-        dump = load_dump(cycle, run, batch, source=source, basename=basename, prefix=prefix)
-        times[i] = dump.time
-        temps[i] = dump.tn[1]
-        if i == 0:
-            t0 = dump.time
-            temp0 = dump.tn[1]
-
-    t1 = dump.time
-    temp1 = dump.tn[1]
-    slope = (temp1 - temp0) / (t1 - t0)
+    temps = extract_base_temps(run, batch, source, cycles=cycles, basename=basename)
+    slope = (temps[-1, 1] - temps[0, 1]) / (temps[-1, 0] - temps[0, 0])
     days = 1e8 / (24 * np.abs(slope))
 
     model_str = grid_strings.get_model_string(run, batch, source)
-    ax.plot(times/3600, temps, marker='o', label=model_str)
+    ax.plot(temps[:, 0]/3600, temps[:, 1], marker='o', label=model_str)
     ax.set_ylabel(r'T (K)')
     ax.set_xlabel('time (hr)')
 
