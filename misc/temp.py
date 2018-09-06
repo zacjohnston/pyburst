@@ -342,8 +342,17 @@ def iterate_solve_qnuc(source, ref_table, cycles=None):
 
     qnuc_table = ref_table.copy()[param_list]
     qnuc_table['qnuc'] = qnuc
-
     return qnuc_table
+
+
+def save_qnuc_table(table, source):
+    path = grid_strings.get_source_subdir(source, 'qnuc')
+    filename = grid_strings.get_source_filename(source, prefix='qnuc', extension='.txt')
+    filepath = os.path.join(path, filename)
+
+    table_str = table.to_string(index=False)
+    with open(filepath, 'w') as f:
+        f.write(table_str)
 
 
 def get_slopes(table, source, cycles=None):
