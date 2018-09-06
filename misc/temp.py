@@ -181,7 +181,7 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     plt.show(block=False)
 
 
-def plot_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title='',
+def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
               display=True, prefix='', fontsize=14):
     """Plot temperature profile at given cycle (timestep)
     """
@@ -227,7 +227,7 @@ def plot_base_temp_multi(cycles, runs, batches, sources, legend=True):
     n = len(runs)
     for i in range(n):
         plot_base_temp(run=runs[i], batch=batches[i], source=sources[i],
-                       cycles=cycles, ax=ax, display=False, legend=legend, title=False)
+                       cycles=cycles, ax=ax, display=False, title=False)
     if legend:
         ax.legend(loc='center left')
     plt.show(block=False)
@@ -239,15 +239,11 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
         fig, ax = plt.subplots()
 
     temps = extract_base_temps(run, batch, source, cycles=cycles, basename=basename)
-    slope = (temps[-1, 1] - temps[0, 1]) / (temps[-1, 0] - temps[0, 0])
-    days = 1e8 / (24 * np.abs(slope))
-
     model_str = grid_strings.get_model_string(run, batch, source)
     ax.plot(temps[:, 0]/3600, temps[:, 1], marker='o', label=model_str)
     ax.set_ylabel(r'T (K)')
     ax.set_xlabel('time (hr)')
 
-    print(f'{run}     {slope:.2f} (K/hr)     {days:.1f} (days)')
     if title:
         ax.set_title(f'{source}_{batch}_{run}')
     plt.tight_layout()
@@ -267,6 +263,7 @@ def extract_base_temps(run, batch, source, cycles=None, basename='xrb', ):
         dump = load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
         temps[i] = np.array((dump.time, dump.tn[base_zone]))
     return temps
+
 
 def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=True):
     """xaxis : ['accrate', 'qnuc']
