@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+from astropy import units
 import subprocess
 from scipy.stats import linregress
 
@@ -293,16 +294,6 @@ def plot_qnuc(source, mass, linear=True):
     plt.show(block=False)
 
 
-def extract_qnuc_table(source, ref_table, cycles=None):
-    """Extracts optimal Qnuc across parameters
-
-    ref_table : pd.DataFrame
-        table covering all unique parameters (x, z, accrate, mass)
-    """
-    qnuc_table = qnuc_tools.iterate_solve_qnuc(source, ref_table, cycles=cycles)
-    qnuc_tools.save_qnuc_table(qnuc_table, source)
-
-
 def save_temps(cycles, run, batch, source, zero_times=True):
     """Iterate through cycles and save temperature profile plots
     """
@@ -353,6 +344,22 @@ def plot_saxj(x_units='time', dumptimes=True, cycles=None):
         ax.plot(lc[cycles, 0], lc[cycles, 1], marker='o', ls='none')
 
     plt.show(block=False)
+
+
+def get_mean_qnuc(cycles, run, batch, source):
+    """Return energy generation per mass averaged over model (erg/g)
+    cycles: length 2 array
+    """
+    dumps = []
+    for i, cycle in enumerate(cycles):
+        dumps += [kepler_tools.load_dump(cycle, run=run, batch=batch, source=source)]
+
+    mass_diff = dumps[1].qparm('xmacc') - dumps[0].qparm('xmacc')
+    energy_diff = dumps[1].qparm('epro') - dumps[0].qparm('epro')
+    rate = energy_diff / mass_diff
+    rate_mev = rate * (units.erg/units.g).to(units.MeV/units.M_p)
+    print(f'{rate_mev:.2f}  MeV/nucleon')
+    return rate
 
 
 def expand_lists(cycles, runs, batches, sources):
