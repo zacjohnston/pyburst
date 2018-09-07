@@ -220,7 +220,7 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
     return fig
 
 
-def plot_base_temp_multi(cycles, runs, batches, sources, legend=True):
+def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True):
     fig, ax = plt.subplots()
 
     n = len(runs)
@@ -347,6 +347,23 @@ def iterate_solve_qnuc(source, ref_table, cycles=None):
     qnuc_table = ref_table.copy()[param_list]
     qnuc_table['qnuc'] = qnuc
     return qnuc_table
+
+
+def plot_qnuc(source, mass):
+    table = load_qnuc_table(source)
+    table = grid_tools.reduce_table(table, params={'mass': mass})
+    acc_unique = np.unique(table['accrate'])
+    sub_params = grid_tools.reduce_table(table, params={'accrate': acc_unique[0]})
+
+    fig, ax = plt.subplots()
+    for row in sub_params.itertuples():
+        models = grid_tools.reduce_table(table, params={'x': row.x, 'z': row.z})
+        ax.plot(models['accrate'], models['qnuc'], marker='o',
+                label=f'x={row.x:.2f}, z={row.z:.4f}')
+
+    ax.set_title(f'mass={mass:.1f}')
+    ax.legend()
+    plt.show(block=False)
 
 
 def extract_qnuc_table(source, ref_table, cycles=None):
