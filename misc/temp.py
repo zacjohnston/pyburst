@@ -38,13 +38,13 @@ def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
 
 
 def load_dump(cycle, run, batch, source, basename='xrb',
-              prefix=''):
+              prefix='', verbose=False):
     batch_str = get_batch_string(batch, source)
     run_str = get_run_string(run, basename)
     filename = get_dump_filename(cycle, run, basename, prefix=prefix)
 
     filepath = os.path.join(MODELS_PATH, batch_str, run_str, filename)
-    print(f'Loading: {filepath}')
+    printv(f'Loading: {filepath}', verbose=verbose)
     return kepdump.load(filepath, graphical=False, silent=True)
 
 
@@ -224,6 +224,9 @@ def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True):
     fig, ax = plt.subplots()
 
     n = len(runs)
+    if len(sources) == 1:
+        sources = np.full(n, sources[0])  # assume all same source
+
     for i in range(n):
         plot_base_temp(run=runs[i], batch=batches[i], source=sources[i],
                        cycles=cycles, ax=ax, display=False, title=False)
@@ -488,6 +491,9 @@ def get_dump_filename(cycle, run, basename, prefix='re_'):
 def dashes():
     print('=' * 40)
 
+def printv(string, verbose):
+    if verbose:
+        print(string)
 
 def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
              fontsize=14, yticks=True, xticks=True):
