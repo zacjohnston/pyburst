@@ -333,11 +333,6 @@ def solve_qnuc(source, params, cycles=None):
     return x0, u_x0
 
 
-def get_qnuc_table(source, ref_table, cycles=None):
-    qnuc_table = iterate_solve_qnuc(source, ref_table, cycles=cycles)
-    save_qnuc_table(qnuc_table, source)
-
-
 def iterate_solve_qnuc(source, ref_table, cycles=None):
     """Iterates over solve_qnuc for a table of params
     """
@@ -352,6 +347,11 @@ def iterate_solve_qnuc(source, ref_table, cycles=None):
     qnuc_table = ref_table.copy()[param_list]
     qnuc_table['qnuc'] = qnuc
     return qnuc_table
+
+
+def extract_qnuc_table(source, ref_table, cycles=None):
+    qnuc_table = iterate_solve_qnuc(source, ref_table, cycles=cycles)
+    save_qnuc_table(qnuc_table, source)
 
 
 def load_qnuc_table(source):
