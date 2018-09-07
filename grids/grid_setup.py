@@ -85,10 +85,9 @@ def create_batch(batch, dv, source,
                  lburn=1, t_end=1.3e5, exclude={}, basename='xrb',
                  walltime=96, qos='general', nstop=10000000,
                  check_params=False, nsdump=1000,
-                 file_sourcepath='/home/zacpetej/projects/codes/mdot/tmp/',
                  auto_t_end=True, notes='No notes given', debug=False,
                  nbursts=20, parallel=False, ntasks=8, kgrid=None,
-                 nuc_heat=False, setup_test=False, **kwargs):
+                 nuc_heat=False, setup_test=False, predict_qnuc=True, **kwargs):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -113,8 +112,9 @@ def create_batch(batch, dv, source,
     kgrid : Kgrid
         pre-loaded Kgrid object, optional (avoids reloading)
     """
-    # TODO: - WRITE ALL PARAM DESCRIPTIONS
-    # TODO  - set default values for params
+    # TODO: WRITE ALL PARAM DESCRIPTIONS
+    # TODO: set default values for params
+    # TODO: Overhaul/tidy up
     source = grid_strings.source_shorthand(source=source)
     mass_ref = 1.4  # reference NS mass (in Msun)
     print_batch(batch=batch, source=source)
@@ -147,12 +147,6 @@ def create_batch(batch, dv, source,
             if cont == 'n' or cont == 'N':
                 sys.exit()
 
-    # ==== Time dependent accretion rate switch ====
-    if params['accrate'][0] == -1:
-        timedep = True
-    else:
-        timedep = False
-
     params_full['y'] = 1 - params_full['x'] - params_full['z']  # helium-4 values
     params_full['geemult'] = params_full['mass'] / mass_ref  # Gravity multiplier
 
@@ -164,9 +158,8 @@ def create_batch(batch, dv, source,
     logpath = grid_strings.get_source_subdir(batch_model_path, 'logs')
     grid_tools.try_mkdir(logpath)
 
-    # ===== Write table of model parameters (MODELS.txt)=====
+    # ===== Write parameter table MODELS.txt and NOTES.txt=====
     write_model_table(n=n, params=params_full, lburn=lburn, path=batch_model_path)
-    # ==== Write any notes relevant to the grid, for future reference ====
     filepath = os.path.join(batch_model_path, 'NOTES.txt')
     with open(filepath, 'w') as f:
         f.write(notes)
@@ -186,7 +179,8 @@ def create_batch(batch, dv, source,
             kepler_jobscripts.write_submission_script(run0=runs[0], run1=runs[1],
                                                       restart=restart, batch=batch,
                                                       source=source, basename=basename,
-                                                      path=logpath, qos=qos, walltime=walltime,
+                                                      path=logpath, qos=qos,
+                                                      walltime=walltime,
                                                       parallel=parallel, debug=debug)
 
     # ===== Directories and templates for each model =====
@@ -194,42 +188,20 @@ def create_batch(batch, dv, source,
         # ==== Create directory tree ====
         print_dashes()
         model = i + 1
-        run_str = grid_strings.get_run_string(model, basename)
         run_path = grid_strings.get_model_path(model, batch, source, basename=basename)
 
         # ==== Create task directory ====
         grid_tools.try_mkdir(run_path)
 
-        # ==== Copy time-dependent input files ====
-        if timedep:
-            print('Copying time-dependent files (.acc, .lum)')
-            for ext in ['acc', 'lum']:
-                sourcefile = f'outburst.{ext}'
-                sourcepath = os.path.join(file_sourcepath, sourcefile)
-
-                targetfile = f'{run_str}.{ext}'
-                targetpath = os.path.join(run_path, targetfile)
-
-                subprocess.run(['cp', sourcepath, targetpath], check=True)
-
         # ==== Write burn file, set initial composition ====
-        if timedep:
-            x0 = 0.0  # Pure helium for time-dependent 1808 setup
-        else:
-            x0 = params_full['x'][i]
-
+        x0 = params_full['x'][i]
         z0 = params_full['z'][i]
         kepler_files.write_rpabg(x0, z0, run_path)
 
         # ==== Create model generator file ====
-        if timedep:
-            lumdata = 1
-            accrate0 = 5.7E-04  # average accrate for SAXJ1808
-            accrate1_str = 'p accrate -1.0'
-        else:
-            lumdata = 0
-            accrate0 = params_full['accrate'][i]
-            accrate1_str = ''
+        lumdata = 0
+        accrate0 = params_full['accrate'][i]
+        accrate1_str = ''
 
         if auto_t_end:
             mdot = params_full['accrate'][i] * params_full['xi'][i]
@@ -254,27 +226,15 @@ def create_batch(batch, dv, source,
                   " models accreting hydrogen")
 
         print(f'Using accdepth = {accdepth:.1e}')
-        kepler_files.write_genfile(h1=params_full['x'][i],
-                                   he4=params_full['y'][i],
-                                   n14=params_full['z'][i],
-                                   qb=params_full['qb'][i],
-                                   xi=params_full['xi'][i],
-                                   qnuc=params_full['qnuc'][i],
-                                   lburn=lburn,
-                                   geemult=params_full['geemult'][i],
-                                   path=run_path,
-                                   t_end=t_end,
-                                   header=header,
-                                   accrate0=accrate0,
-                                   accrate1_str=accrate1_str,
-                                   accdepth=accdepth,
-                                   accmass=params_full['accmass'][i],
-                                   lumdata=lumdata,
-                                   nsdump=nsdump,
-                                   nstop=nstop,
-                                   nuc_heat=nuc_heat,
-                                   setup_test=setup_test,
-                                   cnv=0)
+        kepler_files.write_genfile(h1=params_full['x'][i], he4=params_full['y'][i],
+                                   n14=params_full['z'][i], qb=params_full['qb'][i],
+                                   xi=params_full['xi'][i], qnuc=params_full['qnuc'][i],
+                                   lburn=lburn, geemult=params_full['geemult'][i],
+                                   path=run_path, t_end=t_end, header=header,
+                                   accrate0=accrate0, accrate1_str=accrate1_str,
+                                   accdepth=accdepth, accmass=params_full['accmass'][i],
+                                   lumdata=lumdata, nsdump=nsdump, nstop=nstop,
+                                   nuc_heat=nuc_heat, setup_test=setup_test, cnv=0)
 
 
 def print_grid_params(params):
