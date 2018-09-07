@@ -132,7 +132,8 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     for i, cycle in enumerate(cycles):
         dump = kepler_tools.load_dump(cycle, runs[i], batches[i], source=sources[i],
                                       basename=basename, prefix=prefix)
-        ax.plot(dump.y[1:-2], dump.tn[1:-2], label=f'{sources[i]}_{batches[i]}_{runs[i]}_#{cycle}')
+        ax.plot(dump.y[1:-2], dump.tn[1:-2],
+                label=f'{sources[i]}_{batches[i]}_{runs[i]}_#{cycle}')
 
     ax.set_yscale('log')
     ax.set_xscale('log')
@@ -154,18 +155,20 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
     """Plot temperature profile at given cycle (timestep)
     """
     fig, ax = plt.subplots()
-
+    dump = None
     if cycles is None:
         cycles = kepler_tools.get_cycles(run, batch, source)
     for cycle in cycles:
-        dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename, prefix=prefix)
+        dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
+                                      prefix=prefix)
         ax.plot(dump.y[1:-1], dump.tn[1:-1], label=f'#{cycle}')  # color='C3')
 
     bookends = cycles[[0, -1]]
     temp = [0, 0]
 
     for i, cyc in enumerate(bookends):
-        dump = kepler_tools.load_dump(cyc, run, batch, source=source, basename=basename, prefix=prefix)
+        dump = kepler_tools.load_dump(cyc, run, batch, source=source, basename=basename,
+                                      prefix=prefix)
         temp[i] = dump.tn[1]
 
     y0 = dump.y[1]   # column depth at inner zone
@@ -207,7 +210,7 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
     if ax is None:
         fig, ax = plt.subplots()
     xscale = 3600
-    temps = extract_base_temps(run, batch, source, cycles=cycles, basename=basename)
+    temps = kepler_tools.extract_base_temps(run, batch, source, cycles=cycles, basename=basename)
     model_str = grid_strings.get_model_string(run, batch, source)
     ax.plot(temps[:, 0]/xscale, temps[:, 1], marker='o', label=model_str)
 
@@ -228,27 +231,13 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
         plt.show(block=False)
 
 
-def extract_base_temps(run, batch, source, cycles=None, basename='xrb', ):
-    """Extracts base temperature versus time from mode dumps. Returns as [t (s), T (K)]
-    """
-    base_zone = 1
-    if cycles is None:
-        cycles = kepler_tools.get_cycles(run, batch, source)
-
-    temps = np.zeros((len(cycles), 2))
-    for i, cycle in enumerate(cycles):
-        dump = kepler_tools.load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
-        temps[i] = np.array((dump.time, dump.tn[base_zone]))
-    return temps
-
-
 def get_slopes(table, source, cycles=None, basename='xrb'):
     """Returns slopes of base temperature change (K/s), for given model table
     """
     slopes = []
     for row in table.itertuples():
-        temps = extract_base_temps(row.run, row.batch, source,
-                                   cycles=cycles, basename=basename)
+        temps = kepler_tools.extract_base_temps(row.run, row.batch, source,
+                                                cycles=cycles, basename=basename)
 
         i0 = 1 if len(temps) > 2 else 0  # skip first dump if possible
         linr = linregress(temps[i0:, 0], temps[i0:, 1])

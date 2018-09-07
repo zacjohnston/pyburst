@@ -42,3 +42,20 @@ def get_cycles(run, batch, source):
             else:
                 cycles += [int(cyc)]
     return np.sort(cycles)
+
+
+def extract_base_temps(run, batch, source, cycles=None, basename='xrb', ):
+    """Extracts base temperature versus time from mode dumps. Returns as [t (s), T (K)]
+
+    cycles : [int] (optional)
+        specifiy which dump cycles to load. If None, load all available
+    """
+    base_zone = 1
+    if cycles is None:
+        cycles = get_cycles(run, batch, source)
+
+    temps = np.zeros((len(cycles), 2))
+    for i, cycle in enumerate(cycles):
+        dump = load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
+        temps[i] = np.array((dump.time, dump.tn[base_zone]))
+    return temps
