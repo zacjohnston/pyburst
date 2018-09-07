@@ -8,7 +8,7 @@ import os
 
 
 def write_genfile(h1, he4, n14, qb, xi, lburn,
-                  geemult, path, lumdata, header, qnuc=5.,
+                  geemult, path, header, lumdata=0, qnuc=5.,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
                   accmass=1.0e18, zonermax=10, zonermin=-1, nstop=10000000,
                   accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
