@@ -22,7 +22,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 def run_analysis(batches, source, copy_params=True, reload=True, multithread=True,
                  analyse=True, save_plots=True, collect=True, load_bursts=False,
-                 load_summary=False, auto_last_batch=True, basename='xrb'):
+                 load_summary=False, auto_last_batch=False, basename='xrb'):
     """Run all analysis steps for burst models
     """
     # TODO: copy generators
@@ -45,7 +45,7 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
                                         powerfits=False, burst_analyser=True)
             last_batch = int(kgrid.params.iloc[-1]['batch'])
         else:
-            last_batch = batches[-1]
+            last_batch = batches[-1]  # Assumes last batch is the last for whole grid
 
         burst_tools.combine_batch_summaries(np.arange(last_batch) + 1, source)
 
