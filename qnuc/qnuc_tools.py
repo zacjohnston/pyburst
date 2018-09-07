@@ -8,18 +8,46 @@ from pygrids.grids import grid_tools, grid_analyser, grid_strings
 from pygrids.kepler import kepler_tools
 
 
-def predict_qnuc(accrate, mass, source):
+def predict_qnuc(params, source):
     """Predict optimal Qnuc for given accrate and mass
     """
+    params = params.copy()
+    accrate = params.pop('accrate')
+
     linr_table = linregress_qnuc(source)
-    row = linr_table[linr_table['mass'] == mass]
+    row = grid_tools.reduce_table(linr_table, params=params)
+
     if len(row) == 0:
         raise ValueError(f'Qnuc not available for mass={mass:.1f}')
+    elif len(row) > 1:
+        raise ValueError(f'Qnuc not uniquely defined for given params')
+
     return accrate * row.m.values[0] + row.y0.values[0]
 
 
+def linregress_qnuc(source):
+    """Returns table of linear fits to optimal Qnuc's (versus accretion rate)
+    """
+    full_table = load_qnuc_table(source)
+    accrates = np.unique(full_table['accrate'])  # assumes all parameter-sets have this accrate
+    param_table = grid_tools.reduce_table(full_table, params={'accrate': accrates[0]})
+
+    param_list = ['x', 'z', 'qb', 'accdepth', 'accmass', 'mass']
+    linr_table = param_table.reset_index()[param_list]
+
+    for i in range(len(linr_table)):
+        params = linr_table.loc[i][param_list].to_dict()
+        sub_table = grid_tools.reduce_table(full_table, params=params)
+        linr = linregress(sub_table['accrate'], sub_table['qnuc'])
+
+        linr_table.loc[i, 'm'] = linr[0]
+        linr_table.loc[i, 'y0'] = linr[1]
+
+    return linr_table
+
+
 def extract_qnuc_table(source, ref_batch, cycles=None):
-    """Extracts optimal Qnuc across parameters
+    """Extracts optimal Qnuc across all parameters
 
     ref_batch : int
         batch that represents all unique parameters (x, z, accrate, mass)
@@ -45,22 +73,6 @@ def save_qnuc_table(table, source):
     table_str = table.to_string(index=False)
     with open(filepath, 'w') as f:
         f.write(table_str)
-
-
-def linregress_qnuc(source):
-    """Returns table of linear fits to optimal Qnuc's (over Newtonian mass)
-    """
-    linr_table = pd.DataFrame()
-    table = load_qnuc_table(source)
-    masses = np.unique(table['mass'])
-    linr_table['mass'] = masses
-
-    for row in linr_table.itertuples():
-        sub_table = grid_tools.reduce_table(table, params={'mass': row.mass})
-        linr = linregress(sub_table['accrate'], sub_table['qnuc'])
-        linr_table.loc[row.Index, 'm'] = linr[0]
-        linr_table.loc[row.Index, 'y0'] = linr[1]
-    return linr_table
 
 
 def get_slopes(table, source, cycles=None, basename='xrb'):
@@ -94,7 +106,7 @@ def iterate_solve_qnuc(source, ref_table, cycles=None):
 
 
 def solve_qnuc(source, params, cycles=None):
-    """Returns predicted Qnuc that gives zero slope in base temperature
+    """Returns predicted Qnuc that gives stable base temperature
     """
     param_list = ('x', 'z', 'accrate', 'mass')
     for p in param_list:
