@@ -44,6 +44,7 @@ def load_dump(cycle, run, batch, source, basename='xrb',
     filename = get_dump_filename(cycle, run, basename, prefix=prefix)
 
     filepath = os.path.join(MODELS_PATH, batch_str, run_str, filename)
+    print(f'Loading: {filepath}')
     return kepdump.load(filepath, graphical=False, silent=True)
 
 
@@ -263,6 +264,18 @@ def extract_base_temps(run, batch, source, cycles=None, basename='xrb', ):
     return temps
 
 
+def get_slopes(table, source, cycles=None, basename='xrb'):
+    """Returns slopes of base temperature change (K/s), for given model table
+    """
+    slopes = []
+    for row in table.itertuples():
+        temps = extract_base_temps(row.run, row.batch, source,
+                                   cycles=cycles, basename=basename)
+        linr = linregress(temps[:, 0], temps[:, 1])
+        slopes += [linr[0]]
+    return np.array(slopes)
+
+
 def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=True):
     """xaxis : ['accrate', 'qnuc']
     """
@@ -317,7 +330,6 @@ def solve_qnuc(source, params, cycles=None):
     linr = linregress(subset['qnuc'], slopes)
     x0 = -linr[1]/linr[0]  # x0 = -y0/m
     u_x0 = (linr[4] / linr[0]) * x0
-
     return x0, u_x0
 
 
@@ -350,21 +362,6 @@ def save_qnuc_table(table, source):
     table_str = table.to_string(index=False)
     with open(filepath, 'w') as f:
         f.write(table_str)
-
-
-def get_slopes(table, source, cycles=None, basename='xrb'):
-    """Returns slopes of base temperature change (K/s), for given model table
-    """
-    slopes = []
-    for row in table.itertuples():
-        if cycles is None:
-            cycles = get_cycles(row.run, row.batch, source=source)
-
-        temps = extract_base_temps(row.run, row.batch, source,
-                                   cycles=cycles, basename=basename)
-        linr = linregress(temps[:, 0], temps[:, 1])
-        slopes += [linr[0]]
-    return np.array(slopes)
 
 
 def get_qnuc(cycles, run, batch, source):
