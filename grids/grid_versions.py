@@ -12,6 +12,8 @@ version_defaults = {
             'mass': [0.8, 1.4, 3.2, 2.6],
         },
 
+        'biggrid3': {},
+
         'grid4': {
             'accrate': [0.22],
             'mass': [2.0],
@@ -21,12 +23,12 @@ version_defaults = {
             'accdepth': 1e21
         },
 
-        'heat': {'batch': 1},
+        'heat': {'batch': [1, 8]},
     },
 
     'exclude_all': {
         'biggrid2': [{}],
-
+        'biggrid3': [{}],
         'grid4': [
             {'x': 0.72, 'accdepth': 1e20},
             {'x': 0.73, 'accdepth': 1e20},
@@ -41,12 +43,14 @@ version_definitions = {
     'exclude_any':
         {
             'biggrid2': {},
+            'biggrid3': {},
             'grid4': {},
             'heat': {},
         },
     'exclude_all':
         {
             'biggrid2': {},
+            'biggrid3': {},
             'grid4': {},
             'heat': {},
         }
