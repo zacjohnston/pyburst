@@ -354,6 +354,13 @@ def iterate_solve_qnuc(source, ref_table, cycles=None):
     return qnuc_table
 
 
+def load_qnuc_table(source):
+    path = grid_strings.get_source_subdir(source, 'qnuc')
+    filename = grid_strings.get_source_filename(source, prefix='qnuc', extension='.txt')
+    filepath = os.path.join(path, filename)
+    return pd.read_table(filepath, delim_whitespace=True)
+
+
 def save_qnuc_table(table, source):
     path = grid_strings.get_source_subdir(source, 'qnuc')
     filename = grid_strings.get_source_filename(source, prefix='qnuc', extension='.txt')
