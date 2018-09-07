@@ -245,8 +245,8 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
     ax.plot(temps[:, 0]/xscale, temps[:, 1], marker='o', label=model_str)
 
     if linear:
-        # ax.set_prop_cycle(None)
-        linr = linregress(temps[:, 0], temps[:, 1])
+        i0 = 1 if len(temps) > 2 else 0  # skip first dump if possible
+        linr = linregress(temps[i0:, 0], temps[i0:, 1])
         x = np.array([temps[0, 0], temps[-1, 0]])
         y = linr[0] * x + linr[1]
         ax.plot(x/xscale, y)
@@ -282,8 +282,11 @@ def get_slopes(table, source, cycles=None, basename='xrb'):
     for row in table.itertuples():
         temps = extract_base_temps(row.run, row.batch, source,
                                    cycles=cycles, basename=basename)
-        linr = linregress(temps[:, 0], temps[:, 1])
+
+        i0 = 1 if len(temps) > 2 else 0  # skip first dump if possible
+        linr = linregress(temps[i0:, 0], temps[i0:, 1])
         slopes += [linr[0]]
+
     return np.array(slopes)
 
 
