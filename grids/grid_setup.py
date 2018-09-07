@@ -228,6 +228,9 @@ def create_batch(batch, dv, source,
             tdel = kgrid.predict_recurrence(accrate=mdot, params=rate_params)
             t_end = (nbursts + fudge) * tdel
             print(f'Using predicted dt={tdel/3600:.1f} hr')
+            if t_end < 0:
+                print('WARN! negative dt predicted. Defaulting n * 1.5hr')
+                t_end =nbursts * 1.5
 
         run = i + 1
         print(f'Writing genfile for xrb{run}')
