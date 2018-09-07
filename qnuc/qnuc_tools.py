@@ -18,9 +18,9 @@ def predict_qnuc(params, source):
     row = grid_tools.reduce_table(linr_table, params=params)
 
     if len(row) == 0:
-        raise ValueError(f'Qnuc not available for mass={mass:.1f}')
+        raise ValueError(f'Qnuc not available for {params}')
     elif len(row) > 1:
-        raise ValueError(f'Qnuc not uniquely defined for given params')
+        raise ValueError(f'Qnuc not uniquely defined for given params (underdefined)')
 
     return accrate * row.m.values[0] + row.y0.values[0]
 
@@ -42,7 +42,6 @@ def linregress_qnuc(source):
 
         linr_table.loc[i, 'm'] = linr[0]
         linr_table.loc[i, 'y0'] = linr[1]
-
     return linr_table
 
 
