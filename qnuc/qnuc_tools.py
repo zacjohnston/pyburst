@@ -8,6 +8,14 @@ from pygrids.grids import grid_tools, grid_analyser, grid_strings
 from pygrids.kepler import kepler_tools
 
 
+def predict_qnuc(accrate, mass, source):
+    """Predict optimal Qnuc for given accrate and mass
+    """
+    linr_table = linregress_qnuc(source)
+    row = linr_table[linr_table['mass'] == mass]
+    return accrate * row.m.values[0] + row.y0.values[0]
+
+
 def extract_qnuc_table(source, ref_batch, cycles=None):
     """Extracts optimal Qnuc across parameters
 
