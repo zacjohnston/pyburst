@@ -2,7 +2,7 @@ import os, sys
 import subprocess
 
 # kepler_grids
-from . import grid_strings
+from pygrids.grids import grid_strings
 
 # ========================================================
 # Functions for writing job submission scripts on cluster (e.g. monarch, ICER)

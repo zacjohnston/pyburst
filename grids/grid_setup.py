@@ -4,10 +4,10 @@ import subprocess, sys, os
 
 # kepler_grids
 from . import grid_analyser
-from . import kepler_jobscripts
 from . import kepler_files
 from . import grid_tools
 from . import grid_strings
+from pygrids.kepler import kepler_jobscripts
 from pygrids.misc.pyprint import print_title, print_dashes
 from pygrids.physics import burning
 
