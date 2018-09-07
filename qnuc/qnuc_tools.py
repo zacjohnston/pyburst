@@ -7,12 +7,12 @@ from scipy.stats import linregress
 from pygrids.grids import grid_tools, grid_analyser, grid_strings
 from pygrids.kepler import kepler_tools
 
-param_list = ['x', 'z', 'qb', 'accdepth', 'accmass', 'mass']
 
 
 def add_qnuc_column(table, qnuc_source):
     """Iterates over parameters in table, and adds a predicted qnuc column
     """
+    param_list = ['x', 'z', 'qb', 'accdepth', 'accmass', 'mass']
     linr_table = linregress_qnuc(qnuc_source)
     for i in range(len(table)):
         params = table[param_list].iloc[i].to_dict()
@@ -46,6 +46,7 @@ def predict_qnuc(params, source, linr_table=None):
 def linregress_qnuc(source):
     """Returns table of linear fits to optimal Qnuc's (versus accretion rate)
     """
+    param_list = ['x', 'z', 'qb', 'accdepth', 'accmass', 'mass']
     full_table = load_qnuc_table(source)
     accrates = np.unique(full_table['accrate'])  # assumes all parameter-sets have this accrate
     param_table = grid_tools.reduce_table(full_table, params={'accrate': accrates[0]})
@@ -108,6 +109,7 @@ def get_slopes(table, source, cycles=None, basename='xrb'):
 def iterate_solve_qnuc(source, ref_table, cycles=None):
     """Iterates over solve_qnuc for a table of params
     """
+    param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
     ref_table = ref_table.reset_index()
     qnuc = np.zeros(len(ref_table))
 
