@@ -381,6 +381,11 @@ def plot_qnuc(source, mass):
 
 
 def extract_qnuc_table(source, ref_table, cycles=None):
+    """Extracts optimal Qnuc across parameters
+
+    ref_table : pd.DataFrame
+        table covering all unique parameters (x, z, accrate, mass)
+    """
     qnuc_table = iterate_solve_qnuc(source, ref_table, cycles=cycles)
     save_qnuc_table(qnuc_table, source)
 
