@@ -3,12 +3,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import subprocess
-import astropy.units as u
 from scipy.stats import linregress
 
 # pygrids
 from pygrids.grids import grid_analyser, grid_strings, grid_tools
 from pygrids.kepler import kepler_tools
+from pygrids.qnuc import qnuc_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -204,7 +204,7 @@ def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linea
         ax.legend(loc='center left')
     plt.show(block=False)
 
-# TODO: move Qnuc things to new package (under grids/ or own package?)
+
 def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title=True,
                    display=True, ax=None, linear=False):
     if ax is None:
@@ -231,21 +231,6 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
         plt.show(block=False)
 
 
-def get_slopes(table, source, cycles=None, basename='xrb'):
-    """Returns slopes of base temperature change (K/s), for given model table
-    """
-    slopes = []
-    for row in table.itertuples():
-        temps = kepler_tools.extract_base_temps(row.run, row.batch, source,
-                                                cycles=cycles, basename=basename)
-
-        i0 = 1 if len(temps) > 2 else 0  # skip first dump if possible
-        linr = linregress(temps[i0:, 0], temps[i0:, 1])
-        slopes += [linr[0]]
-
-    return np.array(slopes)
-
-
 def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=True):
     """xaxis : ['accrate', 'qnuc']
     """
@@ -253,7 +238,7 @@ def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=T
               'qnuc': '$Q_\mathrm{nuc}$'}.get(xaxis, xaxis)
     kgrid = grid_analyser.Kgrid(source)
     subset = kgrid.get_params(params=params)
-    slopes = get_slopes(table=subset, source=source, cycles=cycles)
+    slopes = qnuc_tools.get_slopes(table=subset, source=source, cycles=cycles)
 
     fig, ax = plt.subplots()
     ax.plot(subset[xaxis], slopes, ls='none', marker='o')
@@ -285,58 +270,8 @@ def plot_bprops(source, params, bprop='dt'):
     plt.show(block=False)
 
 
-def linregress_qnuc(source):
-    """Returns table of linear fit to optimal Qnuc's
-    """
-    linr_table = pd.DataFrame()
-    table = load_qnuc_table(source)
-    masses = np.unique(table['mass'])
-    linr_table['mass'] = masses
-
-    for row in linr_table.itertuples():
-        sub_table = grid_tools.reduce_table(table, params={'mass': row.mass})
-        linr = linregress(sub_table['accrate'], sub_table['qnuc'])
-        linr_table.loc[row.Index, 'm'] = linr[0]
-        linr_table.loc[row.Index, 'y0'] = linr[1]
-    return linr_table
-
-
-def solve_qnuc(source, params, cycles=None):
-    """Returns predicted Qnuc that gives zero slope in base temperature
-    """
-    param_list = ('x', 'z', 'accrate', 'mass')
-    for p in param_list:
-        if p not in params:
-            raise ValueError(f'Missing "{p}" from "params"')
-
-    kgrid = grid_analyser.Kgrid(source)
-    subset = kgrid.get_params(params=params)
-    slopes = get_slopes(table=subset, source=source, cycles=cycles)
-
-    linr = linregress(subset['qnuc'], slopes)
-    x0 = -linr[1]/linr[0]  # x0 = -y0/m
-    u_x0 = (linr[4] / linr[0]) * x0
-    return x0, u_x0
-
-
-def iterate_solve_qnuc(source, ref_table, cycles=None):
-    """Iterates over solve_qnuc for a table of params
-    """
-    param_list = ['x', 'z', 'accrate', 'qb', 'accdepth', 'accmass', 'mass']
-    ref_table = ref_table.reset_index()
-    qnuc = np.zeros(len(ref_table))
-
-    for row in ref_table.itertuples():
-        params = {'x': row.x, 'z': row.z, 'accrate': row.accrate, 'mass': row.mass}
-        qnuc[row.Index] = solve_qnuc(source=source, params=params, cycles=cycles)[0]
-
-    qnuc_table = ref_table.copy()[param_list]
-    qnuc_table['qnuc'] = qnuc
-    return qnuc_table
-
-
 def plot_qnuc(source, mass, linear=True):
-    table = load_qnuc_table(source)
+    table = qnuc_tools.load_qnuc_table(source)
     table = grid_tools.reduce_table(table, params={'mass': mass})
     acc_unique = np.unique(table['accrate'])
     sub_params = grid_tools.reduce_table(table, params={'accrate': acc_unique[0]})
@@ -347,7 +282,7 @@ def plot_qnuc(source, mass, linear=True):
         ax.plot(models['accrate'], models['qnuc'], marker='o',
                 label=f'x={row.x:.2f}, z={row.z:.4f}')
     if linear:
-        linr_table = linregress_qnuc(source)
+        linr_table = qnuc_tools.linregress_qnuc(source)
         row = linr_table[linr_table['mass'] == mass]
         x = np.array([0.1, 0.2])
         y = row.m.values[0] * x + row.y0.values[0]
@@ -364,41 +299,8 @@ def extract_qnuc_table(source, ref_table, cycles=None):
     ref_table : pd.DataFrame
         table covering all unique parameters (x, z, accrate, mass)
     """
-    qnuc_table = iterate_solve_qnuc(source, ref_table, cycles=cycles)
-    save_qnuc_table(qnuc_table, source)
-
-
-def load_qnuc_table(source):
-    path = grid_strings.get_source_subdir(source, 'qnuc')
-    filename = grid_strings.get_source_filename(source, prefix='qnuc', extension='.txt')
-    filepath = os.path.join(path, filename)
-    return pd.read_table(filepath, delim_whitespace=True)
-
-
-def save_qnuc_table(table, source):
-    path = grid_strings.get_source_subdir(source, 'qnuc')
-    filename = grid_strings.get_source_filename(source, prefix='qnuc', extension='.txt')
-    filepath = os.path.join(path, filename)
-
-    table_str = table.to_string(index=False)
-    with open(filepath, 'w') as f:
-        f.write(table_str)
-
-
-def get_qnuc(cycles, run, batch, source):
-    """Return energy generation per mass averaged over model (erg/g)
-    cycles: length 2 array
-    """
-    dumps = []
-    for i, cycle in enumerate(cycles):
-        dumps += [kepler_tools.load_dump(cycle, run=run, batch=batch, source=source)]
-
-    mass_diff = dumps[1].qparm('xmacc') - dumps[0].qparm('xmacc')
-    energy_diff = dumps[1].qparm('epro') - dumps[0].qparm('epro')
-    rate = energy_diff / mass_diff
-    rate_mev = rate * (u.erg/u.g).to(u.MeV/u.M_p)
-    print(f'{rate_mev:.2f}  MeV/nucleon')
-    return rate
+    qnuc_table = qnuc_tools.iterate_solve_qnuc(source, ref_table, cycles=cycles)
+    qnuc_tools.save_qnuc_table(qnuc_table, source)
 
 
 def save_temps(cycles, run, batch, source, zero_times=True):
