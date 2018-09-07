@@ -9,6 +9,17 @@ from pygrids.plotting.plotting_tools import set_axes
 
 
 def plot_qnuc(source, mass, linear=True):
+    """Plots optimised Qnuc versus accretion rate, for a given (Newtonian) mass
+
+    parameters
+    ----------
+    source : str
+        grid source (see grid_analyser.py)
+    mass : flt
+        Newtonian mass of models (as listed in grid params table)
+    linear : bool
+        plot linear regression line
+    """
     table = qnuc_tools.load_qnuc_table(source)
     table = grid_tools.reduce_table(table, params={'mass': mass})
     acc_unique = np.unique(table['accrate'])
