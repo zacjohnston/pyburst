@@ -26,9 +26,8 @@ def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
     dashes()
     print('Extracting profiles')
     for i, cycle in enumerate(cycles):
-        pre = get_prefix(i, prefix)
         dump = kepler_tools.load_dump(cycle, run, batch, source=source,
-                         basename=basename, prefix=pre)
+                                      basename=basename, prefix=prefix)
 
         table = get_profile(dump)
         save_table(table, table_name=f'{cycle}', run=run, batch=batch,
@@ -68,9 +67,8 @@ def extract_times(cycles, run, batch, source='biggrid2', basename='xrb',
     times = np.zeros_like(cycles, dtype=float)
 
     for i, cycle in enumerate(cycles):
-        pre = get_prefix(i, prefix)
         dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
-                         prefix=pre)
+                         prefix=prefix)
         times[i] = dump.time
 
     return times
@@ -133,7 +131,7 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     dump = None
     for i, cycle in enumerate(cycles):
         dump = kepler_tools.load_dump(cycle, runs[i], batches[i], source=sources[i],
-                         basename=basename, prefix=prefix)
+                                      basename=basename, prefix=prefix)
         ax.plot(dump.y[1:-2], dump.tn[1:-2], label=f'{sources[i]}_{batches[i]}_{runs[i]}_#{cycle}')
 
     ax.set_yscale('log')
@@ -453,12 +451,6 @@ def expand_lists(cycles, runs, batches, sources):
         else:
             lists += [var]
     return lists
-
-
-def get_prefix(index, prefix):
-    """Accounts for first cycle dump having no prefix
-    """
-    return {-1: ''}.get(index, prefix)
 
 
 def get_run_string(run, basename='xrb'):
