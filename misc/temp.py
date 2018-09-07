@@ -274,7 +274,7 @@ def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=T
 
     fig, ax = plt.subplots()
     ax.plot(subset[xaxis], slopes, ls='none', marker='o')
-    x = np.array((3, 10))
+    x = np.array((4, 9))
     ax.plot(x, [0, 0], color='black')
     set_axes(ax, xlabel=xlabel, ylabel='dT/dt (K s$^{-1}$)', title=params)
 
@@ -319,6 +319,11 @@ def solve_qnuc(source, params, cycles=None):
     u_x0 = (linr[4] / linr[0]) * x0
 
     return x0, u_x0
+
+
+def get_qnuc_table(source, ref_table, cycles=None):
+    qnuc_table = iterate_solve_qnuc(source, ref_table, cycles=cycles)
+    save_qnuc_table(qnuc_table, source)
 
 
 def iterate_solve_qnuc(source, ref_table, cycles=None):
