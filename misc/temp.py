@@ -9,7 +9,6 @@ from scipy.stats import linregress
 # pygrids
 from pygrids.grids import grid_analyser, grid_strings, grid_tools
 from pygrids.kepler import kepler_tools
-from pygrids.qnuc import qnuc_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -229,44 +228,6 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
     plt.tight_layout()
     if display:
         plt.show(block=False)
-
-
-def plot_bprops(source, params, bprop='dt'):
-    """Plots burst property versus qnuc
-    """
-    kgrid = grid_analyser.Kgrid(source)
-    sub_p = kgrid.get_params(params=params)
-    sub_s = kgrid.get_summ(params=params)
-
-    fig, ax = plt.subplots()
-    ax.errorbar(sub_p['qnuc'], sub_s[bprop], yerr=sub_s[f'u_{bprop}'],
-                ls='None', marker='o', capsize=3)
-    ax.set_xlabel('$Q_\mathrm{nuc}$')
-    ax.set_ylabel(bprop)
-    plt.show(block=False)
-
-
-def plot_qnuc(source, mass, linear=True):
-    table = qnuc_tools.load_qnuc_table(source)
-    table = grid_tools.reduce_table(table, params={'mass': mass})
-    acc_unique = np.unique(table['accrate'])
-    sub_params = grid_tools.reduce_table(table, params={'accrate': acc_unique[0]})
-
-    fig, ax = plt.subplots()
-    for row in sub_params.itertuples():
-        models = grid_tools.reduce_table(table, params={'x': row.x, 'z': row.z})
-        ax.plot(models['accrate'], models['qnuc'], marker='o',
-                label=f'x={row.x:.2f}, z={row.z:.4f}')
-    if linear:
-        linr_table = qnuc_tools.linregress_qnuc(source)
-        row = linr_table[linr_table['mass'] == mass]
-        x = np.array([0.1, 0.2])
-        y = row.m.values[0] * x + row.y0.values[0]
-        ax.plot(x, y, color='black', ls='--')
-
-    ax.set_title(f'mass={mass:.1f}')
-    ax.legend()
-    plt.show(block=False)
 
 
 def save_temps(cycles, run, batch, source, zero_times=True):
