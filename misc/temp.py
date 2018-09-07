@@ -68,7 +68,7 @@ def extract_times(cycles, run, batch, source='biggrid2', basename='xrb',
 
     for i, cycle in enumerate(cycles):
         dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
-                         prefix=prefix)
+                                      prefix=prefix)
         times[i] = dump.time
 
     return times
@@ -201,7 +201,7 @@ def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linea
         ax.legend(loc='center left')
     plt.show(block=False)
 
-
+# TODO: move Qnuc things to new package (under grids/ or own package?)
 def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title=True,
                    display=True, ax=None, linear=False):
     if ax is None:
@@ -294,6 +294,23 @@ def plot_bprops(source, params, bprop='dt'):
     ax.set_xlabel('$Q_\mathrm{nuc}$')
     ax.set_ylabel(bprop)
     plt.show(block=False)
+
+
+def linregress_qnuc(source):
+    """Returns table of linear fit to optimal Qnuc's
+    """
+    linr_table = pd.DataFrame()
+    table = load_qnuc_table(source)
+    masses = np.unique(table['mass'])
+    linr_table['mass'] = masses
+
+    for row in linr_table.itertuples():
+        sub_table = grid_tools.reduce_table(table, params={'mass': row.mass})
+        linr = linregress(sub_table['accrate'], sub_table['qnuc'])
+        linr_table.loc[row.Index, 'm'] = linr[0]
+        linr_table.loc[row.Index, 'y0'] = linr[1]
+
+    return linr_table
 
 
 def solve_qnuc(source, params, cycles=None):
