@@ -6,11 +6,9 @@ import subprocess
 import astropy.units as u
 from scipy.stats import linregress
 
-#kepler
-import kepdump
-
-#pygrids
+# pygrids
 from pygrids.grids import grid_analyser, grid_strings, grid_tools
+from pygrids.kepler.kepler_tools import load_dump
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -35,17 +33,6 @@ def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
         table = get_profile(dump)
         save_table(table, table_name=f'{cycle}', run=run, batch=batch,
                    source=source, basename=basename, subdir='profiles')
-
-
-def load_dump(cycle, run, batch, source, basename='xrb',
-              prefix='', verbose=False):
-    batch_str = get_batch_string(batch, source)
-    run_str = get_run_string(run, basename)
-    filename = get_dump_filename(cycle, run, basename, prefix=prefix)
-
-    filepath = os.path.join(MODELS_PATH, batch_str, run_str, filename)
-    printv(f'Loading: {filepath}', verbose=verbose)
-    return kepdump.load(filepath, graphical=False, silent=True)
 
 
 def get_cycles(run, batch, source):
@@ -112,7 +99,7 @@ def save_table(table, table_name, run, batch, source='biggrid2', basename='xrb',
     """Save provided table to oscillations project
     """
     source_path = os.path.join(PROJECT_PATH, source)
-    batch_str = get_batch_string(batch, source)
+    batch_str = grid_strings.get_batch_string(batch, source)
     run_str = get_run_string(run, basename)
 
     run_path = os.path.join(source_path, batch_str, run_str, subdir)
@@ -134,7 +121,7 @@ def copy_lightcurve(run, batch, source='biggrid2', basename='xrb'):
     print('Copying model lightcurve')
 
     path = grid_strings.get_source_subdir(source, 'burst_analysis')
-    batch_str = get_batch_string(batch, source)
+    batch_str = grid_strings.get_batch_string(batch, source)
     run_str = get_run_string(run, basename)
     model_string = grid_strings.get_model_string(run=run, batch=batch,
                                                  source=source)
@@ -426,7 +413,7 @@ def get_qnuc(cycles, run, batch, source):
 def save_temps(cycles, run, batch, source, zero_times=True):
     """Iterate through cycles and save temperature profile plots
     """
-    batch_str = get_batch_string(batch, source)
+    batch_str = grid_strings.get_batch_string(batch, source)
     path = grid_strings.get_source_subdir(source, 'plots')
     path = os.path.join(path, 'temp', batch_str, str(run))
     grid_tools.try_mkdir(path, skip=True)
@@ -492,24 +479,13 @@ def get_prefix(index, prefix):
     return {-1: ''}.get(index, prefix)
 
 
-def get_batch_string(batch, source):
-    return f'{source}_{batch}'
-
-
 def get_run_string(run, basename='xrb'):
     return f'{basename}{run}'
-
-
-def get_dump_filename(cycle, run, basename, prefix='re_'):
-    return f'{prefix}{basename}{run}#{cycle}'
 
 
 def dashes():
     print('=' * 40)
 
-def printv(string, verbose):
-    if verbose:
-        print(string)
 
 def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
              fontsize=14, yticks=True, xticks=True):
