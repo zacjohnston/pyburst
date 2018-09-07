@@ -9,6 +9,7 @@ from . import grid_strings
 from pygrids.kepler import kepler_jobscripts, kepler_files
 from pygrids.misc.pyprint import print_title, print_dashes
 from pygrids.physics import burning
+from pygrids.qnuc import qnuc_tools
 
 # Concord
 import define_sources
@@ -35,6 +36,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 # TODO: Rewrite docstrings
 # TODO: Allow enumerating over multiple parameters, create_batches()
 
+param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
 
 def print_batch(batch, source):
     print_title()
@@ -87,7 +89,8 @@ def create_batch(batch, dv, source,
                  check_params=False, nsdump=1000,
                  auto_t_end=True, notes='No notes given', debug=False,
                  nbursts=20, parallel=False, ntasks=8, kgrid=None,
-                 nuc_heat=False, setup_test=False, predict_qnuc=True, **kwargs):
+                 nuc_heat=False, setup_test=False, predict_qnuc=True,
+                 qnuc_source='heat', **kwargs):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -115,6 +118,7 @@ def create_batch(batch, dv, source,
     # TODO: WRITE ALL PARAM DESCRIPTIONS
     # TODO: set default values for params
     # TODO: Overhaul/tidy up
+    # TODO: use pd table instead of dicts of arrays
     source = grid_strings.source_shorthand(source=source)
     mass_ref = 1.4  # reference NS mass (in Msun)
     print_batch(batch=batch, source=source)
@@ -149,6 +153,20 @@ def create_batch(batch, dv, source,
 
     params_full['y'] = 1 - params_full['x'] - params_full['z']  # helium-4 values
     params_full['geemult'] = params_full['mass'] / mass_ref  # Gravity multiplier
+
+    # TODO: rewrite properly (use tables)
+    if predict_qnuc:
+        if len(params['qnuc']) > 1:
+            raise ValueError('Cannot provide multiple "qnuc" in params if predict_qnuc=True')
+
+        linr_qnuc = qnuc_tools.linregress_qnuc(qnuc_source)
+        for i in range(n):
+            params_qnuc = {}
+            for param in param_list:
+                params_qnuc[param] = params_full[param][i]
+            params_full['qnuc'][i] = qnuc_tools.predict_qnuc(params=params_qnuc,
+                                                             source=qnuc_source,
+                                                             linr_table=linr_qnuc)
 
     # ===== Create top grid folder =====
     batch_model_path = grid_strings.get_batch_models_path(batch, source)
@@ -199,9 +217,7 @@ def create_batch(batch, dv, source,
         kepler_files.write_rpabg(x0, z0, run_path)
 
         # ==== Create model generator file ====
-        lumdata = 0
         accrate0 = params_full['accrate'][i]
-        accrate1_str = ''
 
         if auto_t_end:
             mdot = params_full['accrate'][i] * params_full['xi'][i]
@@ -224,16 +240,17 @@ def create_batch(batch, dv, source,
         if (params_full['x'][i] > 0.0) and (accdepth > 1e20):
             print(f"!!!WARNING!!!: accdepth of {accdepth:.0e} may be too deep for" +
                   " models accreting hydrogen")
-
         print(f'Using accdepth = {accdepth:.1e}')
+
+
         kepler_files.write_genfile(h1=params_full['x'][i], he4=params_full['y'][i],
                                    n14=params_full['z'][i], qb=params_full['qb'][i],
                                    xi=params_full['xi'][i], qnuc=params_full['qnuc'][i],
                                    lburn=lburn, geemult=params_full['geemult'][i],
                                    path=run_path, t_end=t_end, header=header,
-                                   accrate0=accrate0, accrate1_str=accrate1_str,
-                                   accdepth=accdepth, accmass=params_full['accmass'][i],
-                                   lumdata=lumdata, nsdump=nsdump, nstop=nstop,
+                                   accrate0=accrate0, accdepth=accdepth,
+                                   accmass=params_full['accmass'][i],
+                                   nsdump=nsdump, nstop=nstop,
                                    nuc_heat=nuc_heat, setup_test=setup_test, cnv=0)
 
 
