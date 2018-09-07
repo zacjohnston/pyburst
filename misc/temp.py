@@ -220,7 +220,7 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
     return fig
 
 
-def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True):
+def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False):
     fig, ax = plt.subplots()
 
     n = len(runs)
@@ -229,20 +229,28 @@ def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True):
 
     for i in range(n):
         plot_base_temp(run=runs[i], batch=batches[i], source=sources[i],
-                       cycles=cycles, ax=ax, display=False, title=False)
+                       cycles=cycles, ax=ax, display=False, title=False, linear=linear)
     if legend:
         ax.legend(loc='center left')
     plt.show(block=False)
 
 
 def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title=True,
-                   display=True, ax=None):
+                   display=True, ax=None, linear=False):
     if ax is None:
         fig, ax = plt.subplots()
-
+    xscale = 3600
     temps = extract_base_temps(run, batch, source, cycles=cycles, basename=basename)
     model_str = grid_strings.get_model_string(run, batch, source)
-    ax.plot(temps[:, 0]/3600, temps[:, 1], marker='o', label=model_str)
+    ax.plot(temps[:, 0]/xscale, temps[:, 1], marker='o', label=model_str)
+
+    if linear:
+        # ax.set_prop_cycle(None)
+        linr = linregress(temps[:, 0], temps[:, 1])
+        x = np.array([temps[0, 0], temps[-1, 0]])
+        y = linr[0] * x + linr[1]
+        ax.plot(x/xscale, y)
+
     ax.set_ylabel(r'T (K)')
     ax.set_xlabel('time (hr)')
 
