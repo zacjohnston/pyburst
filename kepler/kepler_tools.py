@@ -6,7 +6,7 @@ import kepdump
 
 # kepler_grids
 from pygrids.grids import grid_strings
-from pygrids.grids.grid_strings import printv
+from pygrids.misc.pyprint import printv
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']

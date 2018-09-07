@@ -134,11 +134,6 @@ def cmd_filepath(run, batch, source, basename='xrb'):
 # ======================================================
 # Misc. prints
 # ======================================================
-def printv(string, verbose):
-    if verbose:
-        print(string)
-
-
 def print_warning(string):
     print('X' * 70)
     print(f'WARNING: {string}')
