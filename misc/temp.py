@@ -8,7 +8,7 @@ from scipy.stats import linregress
 
 # pygrids
 from pygrids.grids import grid_analyser, grid_strings, grid_tools
-from pygrids.kepler.kepler_tools import load_dump
+from pygrids.kepler import kepler_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -27,30 +27,12 @@ def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
     print('Extracting profiles')
     for i, cycle in enumerate(cycles):
         pre = get_prefix(i, prefix)
-        dump = load_dump(cycle, run, batch, source=source,
+        dump = kepler_tools.load_dump(cycle, run, batch, source=source,
                          basename=basename, prefix=pre)
 
         table = get_profile(dump)
         save_table(table, table_name=f'{cycle}', run=run, batch=batch,
                    source=source, basename=basename, subdir='profiles')
-
-
-def get_cycles(run, batch, source):
-    """Returns list of dump cycles available for given model
-    """
-    path = grid_strings.get_model_path(run, batch, source=source)
-    file_list = os.listdir(path)
-
-    cycles = []
-    for file in file_list:
-        if '#' in file:
-            idx = file.find('#')
-            cyc = file[idx+1:]
-            if cyc == 'nstop':
-                continue
-            else:
-                cycles += [int(cyc)]
-    return np.sort(cycles)
 
 
 def get_profile(dump):
@@ -87,7 +69,7 @@ def extract_times(cycles, run, batch, source='biggrid2', basename='xrb',
 
     for i, cycle in enumerate(cycles):
         pre = get_prefix(i, prefix)
-        dump = load_dump(cycle, run, batch, source=source, basename=basename,
+        dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
                          prefix=pre)
         times[i] = dump.time
 
@@ -150,7 +132,7 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     fig, ax = plt.subplots()
     dump = None
     for i, cycle in enumerate(cycles):
-        dump = load_dump(cycle, runs[i], batches[i], source=sources[i],
+        dump = kepler_tools.load_dump(cycle, runs[i], batches[i], source=sources[i],
                          basename=basename, prefix=prefix)
         ax.plot(dump.y[1:-2], dump.tn[1:-2], label=f'{sources[i]}_{batches[i]}_{runs[i]}_#{cycle}')
 
@@ -176,16 +158,16 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
     fig, ax = plt.subplots()
 
     if cycles is None:
-        cycles = get_cycles(run, batch, source)
+        cycles = kepler_tools.get_cycles(run, batch, source)
     for cycle in cycles:
-        dump = load_dump(cycle, run, batch, source=source, basename=basename, prefix=prefix)
+        dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename, prefix=prefix)
         ax.plot(dump.y[1:-1], dump.tn[1:-1], label=f'#{cycle}')  # color='C3')
 
     bookends = cycles[[0, -1]]
     temp = [0, 0]
 
     for i, cyc in enumerate(bookends):
-        dump = load_dump(cyc, run, batch, source=source, basename=basename, prefix=prefix)
+        dump = kepler_tools.load_dump(cyc, run, batch, source=source, basename=basename, prefix=prefix)
         temp[i] = dump.tn[1]
 
     y0 = dump.y[1]   # column depth at inner zone
@@ -253,11 +235,11 @@ def extract_base_temps(run, batch, source, cycles=None, basename='xrb', ):
     """
     base_zone = 1
     if cycles is None:
-        cycles = get_cycles(run, batch, source)
+        cycles = kepler_tools.get_cycles(run, batch, source)
 
     temps = np.zeros((len(cycles), 2))
     for i, cycle in enumerate(cycles):
-        dump = load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
+        dump = kepler_tools.load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
         temps[i] = np.array((dump.time, dump.tn[base_zone]))
     return temps
 
@@ -400,7 +382,7 @@ def get_qnuc(cycles, run, batch, source):
     """
     dumps = []
     for i, cycle in enumerate(cycles):
-        dumps += [load_dump(cycle, run=run, batch=batch, source=source)]
+        dumps += [kepler_tools.load_dump(cycle, run=run, batch=batch, source=source)]
 
     mass_diff = dumps[1].qparm('xmacc') - dumps[0].qparm('xmacc')
     energy_diff = dumps[1].qparm('epro') - dumps[0].qparm('epro')

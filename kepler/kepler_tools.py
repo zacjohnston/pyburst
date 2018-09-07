@@ -1,3 +1,4 @@
+import numpy as np
 import os
 
 # kepler
@@ -23,3 +24,21 @@ def load_dump(cycle, run, batch, source, basename='xrb',
 
 def get_dump_filename(cycle, run, basename, prefix=''):
     return f'{prefix}{basename}{run}#{cycle}'
+
+
+def get_cycles(run, batch, source):
+    """Returns list of dump cycles available for given model
+    """
+    path = grid_strings.get_model_path(run, batch, source=source)
+    file_list = os.listdir(path)
+
+    cycles = []
+    for file in file_list:
+        if '#' in file:
+            idx = file.find('#')
+            cyc = file[idx+1:]
+            if cyc == 'nstop':
+                continue
+            else:
+                cycles += [int(cyc)]
+    return np.sort(cycles)
