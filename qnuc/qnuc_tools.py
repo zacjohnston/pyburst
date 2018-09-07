@@ -13,6 +13,8 @@ def predict_qnuc(accrate, mass, source):
     """
     linr_table = linregress_qnuc(source)
     row = linr_table[linr_table['mass'] == mass]
+    if len(row) == 0:
+        raise ValueError(f'Qnuc not available for mass={mass:.1f}')
     return accrate * row.m.values[0] + row.y0.values[0]
 
 
