@@ -309,7 +309,6 @@ def linregress_qnuc(source):
         linr = linregress(sub_table['accrate'], sub_table['qnuc'])
         linr_table.loc[row.Index, 'm'] = linr[0]
         linr_table.loc[row.Index, 'y0'] = linr[1]
-
     return linr_table
 
 
@@ -347,7 +346,7 @@ def iterate_solve_qnuc(source, ref_table, cycles=None):
     return qnuc_table
 
 
-def plot_qnuc(source, mass):
+def plot_qnuc(source, mass, linear=True):
     table = load_qnuc_table(source)
     table = grid_tools.reduce_table(table, params={'mass': mass})
     acc_unique = np.unique(table['accrate'])
@@ -358,6 +357,12 @@ def plot_qnuc(source, mass):
         models = grid_tools.reduce_table(table, params={'x': row.x, 'z': row.z})
         ax.plot(models['accrate'], models['qnuc'], marker='o',
                 label=f'x={row.x:.2f}, z={row.z:.4f}')
+    if linear:
+        linr_table = linregress_qnuc(source)
+        row = linr_table[linr_table['mass'] == mass]
+        x = np.array([0.1, 0.2])
+        y = row.m.values[0] * x + row.y0.values[0]
+        ax.plot(x, y, color='black', ls='--')
 
     ax.set_title(f'mass={mass:.1f}')
     ax.legend()
