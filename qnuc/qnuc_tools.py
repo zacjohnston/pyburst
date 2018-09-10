@@ -77,7 +77,8 @@ def extract_qnuc_table(source, param_batch=None, param_table=None, cycles=None):
     elif param_batch is not None:
         raise ValueError('Can only specify one of "param_batch" and "param_table"')
 
-    qnuc_table = iterate_solve_qnuc(source, param_table=param_table, cycles=cycles)
+    qnuc_table = iterate_solve_qnuc(source, param_table=param_table,
+                                    cycles=cycles, kgrid=kgrid)
     save_qnuc_table(qnuc_table, source)
 
 
@@ -112,7 +113,7 @@ def get_slopes(table, source, cycles=None, basename='xrb'):
     return np.array(slopes)
 
 
-def iterate_solve_qnuc(source, param_table, cycles=None):
+def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None):
     """Iterates over solve_qnuc for a table of params
     """
     param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
@@ -121,14 +122,15 @@ def iterate_solve_qnuc(source, param_table, cycles=None):
 
     for row in param_table.itertuples():
         params = {'x': row.x, 'z': row.z, 'accrate': row.accrate, 'mass': row.mass}
-        qnuc[row.Index] = solve_qnuc(source=source, params=params, cycles=cycles)[0]
+        qnuc[row.Index] = solve_qnuc(source=source, params=params,
+                                     cycles=cycles, kgrid=kgrid)[0]
 
     qnuc_table = param_table.copy()[param_list]
     qnuc_table['qnuc'] = qnuc
     return qnuc_table
 
 
-def solve_qnuc(source, params, cycles=None):
+def solve_qnuc(source, params, cycles=None, kgrid=None):
     """Returns predicted Qnuc that gives stable base temperature
     """
     param_list = ('x', 'z', 'accrate', 'mass')
@@ -136,7 +138,9 @@ def solve_qnuc(source, params, cycles=None):
         if p not in params:
             raise ValueError(f'Missing "{p}" from "params"')
 
-    kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False)
+    if kgrid is None:
+        kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False)
+
     subset = kgrid.get_params(params=params)
     slopes = get_slopes(table=subset, source=source, cycles=cycles)
 
