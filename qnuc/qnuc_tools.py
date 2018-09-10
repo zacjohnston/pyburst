@@ -62,14 +62,21 @@ def linregress_qnuc(source):
     return linr_table
 
 
-def extract_qnuc_table(source, ref_batch, cycles=None):
+def extract_qnuc_table(source, param_batch=None, param_table=None, cycles=None):
     """Extracts optimal Qnuc across all parameters
 
     ref_batch : int
         batch that represents all unique parameters (x, z, accrate, mass)
     """
     kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False)
-    param_table = kgrid.get_params(batch=ref_batch)
+    if param_table is None:
+        if param_batch is None:
+            raise ValueError('Must specify one of "param_batch" or "param_table"')
+        else:
+            param_table = kgrid.get_params(batch=param_batch)
+    elif param_batch is not None:
+        raise ValueError('Can only specify one of "param_batch" and "param_table"')
+
     qnuc_table = iterate_solve_qnuc(source, param_table=param_table, cycles=cycles)
     save_qnuc_table(qnuc_table, source)
 
