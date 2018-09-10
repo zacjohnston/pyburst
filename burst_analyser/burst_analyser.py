@@ -104,12 +104,11 @@ class BurstRun(object):
         self.load_bursts = load_bursts
         self.load_summary = load_summary
 
-        self.bursts = pd.DataFrame()
+        self.bursts = pd.DataFrame(columns=self.cols)
         self.n_bursts = None
         self.n_short_wait = None
         self.n_outliers = None
         self.n_outliers_unique = None
-        self.bursts = pd.DataFrame()
 
         self.summary = {}
         self.candidates = None
@@ -710,7 +709,7 @@ class BurstRun(object):
     def test_bimodal(self):
         """Determines if the burst sequence is bimodal
         """
-        # TODO: check analysed
+        # TODO: check
         bursts = self.clean_bursts()
         n_bimodal = self.parameters['n_bimodal']
         if self.flags['too_few_bursts'] or len(bursts) < n_bimodal:
