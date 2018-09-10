@@ -69,7 +69,7 @@ def extract_qnuc_table(source, ref_batch, cycles=None):
     ref_batch : int
         batch that represents all unique parameters (x, z, accrate, mass)
     """
-    kgrid = grid_analyser.Kgrid(source)
+    kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False)
     ref_table = kgrid.get_params(batch=ref_batch)
     qnuc_table = iterate_solve_qnuc(source, ref_table, cycles=cycles)
     save_qnuc_table(qnuc_table, source)
@@ -130,7 +130,7 @@ def solve_qnuc(source, params, cycles=None):
         if p not in params:
             raise ValueError(f'Missing "{p}" from "params"')
 
-    kgrid = grid_analyser.Kgrid(source)
+    kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False)
     subset = kgrid.get_params(params=params)
     slopes = get_slopes(table=subset, source=source, cycles=cycles)
 
