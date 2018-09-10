@@ -709,7 +709,6 @@ class BurstRun(object):
     def test_bimodal(self):
         """Determines if the burst sequence is bimodal
         """
-        # TODO: check
         bursts = self.clean_bursts()
         n_bimodal = self.parameters['n_bimodal']
         if self.flags['too_few_bursts'] or len(bursts) < n_bimodal:
