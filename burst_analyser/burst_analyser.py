@@ -501,7 +501,7 @@ class BurstRun(object):
         for burst in self.bursts.itertuples():
             rise_steps = burst.t_peak_i - burst.t_pre_i
             if rise_steps < 50 or (burst.peak / burst.lum_pre) < self.parameters['peak_frac']:
-                self.printv(f'Removing micro-burst at t={burst.t_peak:.0f} s '
+                self.printv(f'Excluding micro-burst at t={burst.t_peak:.0f} s '
                             + f'({burst.t_peak/3600:.1f} hr)')
                 try:
                     self.delete_burst(burst.Index)
