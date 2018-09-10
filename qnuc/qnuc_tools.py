@@ -8,7 +8,6 @@ from pygrids.grids import grid_tools, grid_analyser, grid_strings
 from pygrids.kepler import kepler_tools
 
 
-
 def add_qnuc_column(table, qnuc_source):
     """Iterates over parameters in table, and adds a predicted qnuc column
     """
@@ -99,7 +98,7 @@ def get_slopes(table, source, cycles=None, basename='xrb'):
     for row in table.itertuples():
         temps = kepler_tools.extract_base_temps(row.run, row.batch, source,
                                                 cycles=cycles, basename=basename)
-        i0 = 1 if len(temps) > 2 else 0  # skip first dump if possible
+        i0 = 2 if len(temps) > 2 else 1  # skip first dumps if possible
         linr = linregress(temps[i0:, 0], temps[i0:, 1])
         slopes += [linr[0]]
 
