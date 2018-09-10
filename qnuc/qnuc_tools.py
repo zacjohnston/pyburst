@@ -69,8 +69,8 @@ def extract_qnuc_table(source, ref_batch, cycles=None):
         batch that represents all unique parameters (x, z, accrate, mass)
     """
     kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False)
-    ref_table = kgrid.get_params(batch=ref_batch)
-    qnuc_table = iterate_solve_qnuc(source, ref_table, cycles=cycles)
+    param_table = kgrid.get_params(batch=ref_batch)
+    qnuc_table = iterate_solve_qnuc(source, param_table=param_table, cycles=cycles)
     save_qnuc_table(qnuc_table, source)
 
 
@@ -105,18 +105,18 @@ def get_slopes(table, source, cycles=None, basename='xrb'):
     return np.array(slopes)
 
 
-def iterate_solve_qnuc(source, ref_table, cycles=None):
+def iterate_solve_qnuc(source, param_table, cycles=None):
     """Iterates over solve_qnuc for a table of params
     """
     param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
-    ref_table = ref_table.reset_index()
-    qnuc = np.zeros(len(ref_table))
+    param_table = param_table.reset_index()
+    qnuc = np.zeros(len(param_table))
 
-    for row in ref_table.itertuples():
+    for row in param_table.itertuples():
         params = {'x': row.x, 'z': row.z, 'accrate': row.accrate, 'mass': row.mass}
         qnuc[row.Index] = solve_qnuc(source=source, params=params, cycles=cycles)[0]
 
-    qnuc_table = ref_table.copy()[param_list]
+    qnuc_table = param_table.copy()[param_list]
     qnuc_table['qnuc'] = qnuc
     return qnuc_table
 

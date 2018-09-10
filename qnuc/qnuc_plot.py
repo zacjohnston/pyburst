@@ -53,7 +53,7 @@ def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=T
 
     fig, ax = plt.subplots()
     ax.plot(subset[xaxis], slopes, ls='none', marker='o')
-    x = np.array((4, 9))
+    x = np.array((0, 9))
     ax.plot(x, [0, 0], color='black')
     set_axes(ax, xlabel=xlabel, ylabel='dT/dt (K s$^{-1}$)', title=params)
 
