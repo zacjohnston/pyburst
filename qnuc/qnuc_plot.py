@@ -29,11 +29,11 @@ def plot_qnuc(source, mass, linear=True):
     for row in sub_params.itertuples():
         models = grid_tools.reduce_table(table, params={'x': row.x, 'z': row.z})
         ax.plot(models['accrate'], models['qnuc'], marker='o',
-                label=f'x={row.x:.2f}, z={row.z:.4f}')
+                label=f'x={row.x:.3f}, z={row.z:.4f}')
     if linear:
         linr_table = qnuc_tools.linregress_qnuc(source)
         row = linr_table[linr_table['mass'] == mass]
-        x = np.array([0.1, 0.2])
+        x = np.array([np.min(acc_unique), np.max(acc_unique)])
         y = row.m.values[0] * x + row.y0.values[0]
         ax.plot(x, y, color='black', ls='--')
 

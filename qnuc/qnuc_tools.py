@@ -136,6 +136,7 @@ def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None):
 def solve_qnuc(source, params, cycles=None, kgrid=None):
     """Returns predicted Qnuc that gives stable base temperature
     """
+    # TODO: add other methods (e.g. bisection)
     param_list = ('x', 'z', 'accrate', 'mass')
     for p in param_list:
         if p not in params:
