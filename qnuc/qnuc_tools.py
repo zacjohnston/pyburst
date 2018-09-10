@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import sys
 from scipy.stats import linregress
 
 # pygrids
@@ -118,13 +119,15 @@ def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None):
     """
     param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
     param_table = param_table.reset_index()
-    qnuc = np.zeros(len(param_table))
+    n = len(param_table)
+    qnuc = np.zeros(n)
 
     for row in param_table.itertuples():
+        sys.stdout.write(f'\rOptimising Qnuc for parameters: {row.Index+1}/{n}')
         params = {'x': row.x, 'z': row.z, 'accrate': row.accrate, 'mass': row.mass}
         qnuc[row.Index] = solve_qnuc(source=source, params=params,
                                      cycles=cycles, kgrid=kgrid)[0]
-
+    sys.stdout.write('\n')
     qnuc_table = param_table.copy()[param_list]
     qnuc_table['qnuc'] = qnuc
     return qnuc_table
