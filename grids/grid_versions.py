@@ -12,7 +12,7 @@ version_defaults = {
             'mass': [0.8, 1.4, 3.2, 2.6],
         },
 
-        'biggrid3': {},
+        'biggrid3': {'batch': [1]},
 
         'grid4': {
             'accrate': [0.22],
