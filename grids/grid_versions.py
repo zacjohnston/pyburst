@@ -45,7 +45,16 @@ version_definitions = {
             'biggrid2': {},
             'biggrid3': {},
             'grid4': {},
-            'heat': {},
+            'heat': {
+                1: {
+                    'batch': [1, 10, 11, 12, 14, 15, 16],  # gs1826 models
+                },
+
+                2: {
+                    'batch': [1, 2, 3, 4, 5, 6, 7, 8, 9, 13],  # 4u1820 models
+                    'accrate': 0.1,
+                },
+            },
         },
     'exclude_all':
         {
