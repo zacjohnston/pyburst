@@ -4,6 +4,8 @@ import numpy as np
 
 version_defaults = {
     'exclude_any': {
+        'adelle': {},
+
         'biggrid2': {
             'accrate': np.concatenate((np.arange(5, 10)/100, np.arange(11, 24, 2)/100)),
             'qb': [0.025, 0.075, 0.125, 0.2],
@@ -27,6 +29,7 @@ version_defaults = {
     },
 
     'exclude_all': {
+        'adelle': [{}],
         'biggrid2': [{}],
         'biggrid3': [{}],
         'grid4': [
@@ -42,6 +45,7 @@ version_defaults = {
 version_definitions = {
     'exclude_any':
         {
+            'adelle': {},
             'biggrid2': {},
             'biggrid3': {},
             'grid4': {},
@@ -58,6 +62,7 @@ version_definitions = {
         },
     'exclude_all':
         {
+            'adelle': {},
             'biggrid2': {},
             'biggrid3': {},
             'grid4': {},
