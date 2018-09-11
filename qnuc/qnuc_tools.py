@@ -9,19 +9,7 @@ from pygrids.grids import grid_tools, grid_analyser, grid_strings
 from pygrids.kepler import kepler_tools
 
 
-def add_qnuc_column(table, qnuc_source):
-    """Iterates over parameters in table, and adds a predicted qnuc column
-    """
-    param_list = ['x', 'z', 'qb', 'accdepth', 'accmass', 'mass']
-    linr_table = linregress_qnuc(qnuc_source)
-    for i in range(len(table)):
-        params = table[param_list].iloc[i].to_dict()
-        table.loc[i, 'qnuc'] = predict_qnuc(params=params, source=qnuc_source,
-                                            linr_table=linr_table)
-    return table
-
-
-def predict_qnuc(params, source, linr_table=None):
+def predict_qnuc(params, source, linr_table=None, grid_version=0):
     """Predict optimal Qnuc for given accrate and mass
 
     linr_table : pd.DataFrame (optional)
@@ -31,7 +19,7 @@ def predict_qnuc(params, source, linr_table=None):
     accrate = params.pop('accrate')
 
     if linr_table is None:
-        linr_table = linregress_qnuc(source)
+        linr_table = linregress_qnuc(source, grid_version)
 
     row = grid_tools.reduce_table(linr_table, params=params)
 
@@ -43,11 +31,11 @@ def predict_qnuc(params, source, linr_table=None):
     return accrate * row.m.values[0] + row.y0.values[0]
 
 
-def linregress_qnuc(source):
+def linregress_qnuc(source, grid_version=0):
     """Returns table of linear fits to optimal Qnuc's (versus accretion rate)
     """
     param_list = ['x', 'z', 'qb', 'accdepth', 'accmass', 'mass']
-    full_table = load_qnuc_table(source)
+    full_table = load_qnuc_table(source, grid_version)
     accrates = np.unique(full_table['accrate'])  # assumes all parameter-sets have this accrate
     param_table = grid_tools.reduce_table(full_table, params={'accrate': accrates[0]})
 
@@ -81,8 +69,8 @@ def extract_qnuc_table(source, grid_version=0, param_batch=None, param_table=Non
         raise ValueError('Can only specify one of "param_batch" and "param_table"')
 
     qnuc_table = iterate_solve_qnuc(source, param_table=param_table,
-                                    cycles=cycles, kgrid=kgrid)
-    save_qnuc_table(qnuc_table, source)
+                                    cycles=cycles, kgrid=kgrid, grid_version=grid_version)
+    save_qnuc_table(qnuc_table, source, grid_version)
 
 
 def load_qnuc_table(source, grid_version=0):
@@ -158,3 +146,16 @@ def solve_qnuc(source, params, cycles=None, kgrid=None, grid_version=0):
     x0 = -linr[1]/linr[0]  # x0 = -y0/m
     u_x0 = (linr[4] / linr[0]) * x0
     return x0, u_x0
+
+
+def add_qnuc_column(table, qnuc_source, grid_version=0):
+    """Iterates over parameters in table, and adds a predicted qnuc column
+    """
+    param_list = ['x', 'z', 'qb', 'accdepth', 'accmass', 'mass']
+    linr_table = linregress_qnuc(qnuc_source, grid_version)
+    for i in range(len(table)):
+        params = table[param_list].iloc[i].to_dict()
+        table.loc[i, 'qnuc'] = predict_qnuc(params=params, source=qnuc_source,
+                                            linr_table=linr_table,
+                                            grid_version=grid_version)
+    return table
