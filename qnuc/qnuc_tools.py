@@ -85,16 +85,18 @@ def extract_qnuc_table(source, grid_version=0, param_batch=None, param_table=Non
     save_qnuc_table(qnuc_table, source)
 
 
-def load_qnuc_table(source):
+def load_qnuc_table(source, grid_version=0):
     path = grid_strings.get_source_subdir(source, 'qnuc')
-    filename = grid_strings.get_source_filename(source, prefix='qnuc', extension='.txt')
+    prefix = f'qnuc_v{grid_version}'
+    filename = grid_strings.get_source_filename(source, prefix=prefix, extension='.txt')
     filepath = os.path.join(path, filename)
     return pd.read_table(filepath, delim_whitespace=True)
 
 
-def save_qnuc_table(table, source):
+def save_qnuc_table(table, source, grid_version=0):
     path = grid_strings.get_source_subdir(source, 'qnuc')
-    filename = grid_strings.get_source_filename(source, prefix='qnuc', extension='.txt')
+    prefix = f'qnuc_v{grid_version}'
+    filename = grid_strings.get_source_filename(source, prefix=prefix, extension='.txt')
     filepath = os.path.join(path, filename)
 
     table_str = table.to_string(index=False)
