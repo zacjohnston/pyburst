@@ -8,7 +8,7 @@ from pygrids.grids import grid_analyser, grid_tools
 from pygrids.plotting.plotting_tools import set_axes
 
 
-def plot_qnuc(source, mass, linear=True):
+def plot_qnuc(source, mass, grid_version, linear=True):
     """Plots optimised Qnuc versus accretion rate, for a given (Newtonian) mass
 
     parameters
@@ -17,10 +17,11 @@ def plot_qnuc(source, mass, linear=True):
         grid source (see grid_analyser.py)
     mass : flt
         Newtonian mass of models (as listed in grid params table)
+    grid_version : int
     linear : bool
         plot linear regression line
     """
-    table = qnuc_tools.load_qnuc_table(source)
+    table = qnuc_tools.load_qnuc_table(source, grid_version)
     table = grid_tools.reduce_table(table, params={'mass': mass})
     acc_unique = np.unique(table['accrate'])
     sub_params = grid_tools.reduce_table(table, params={'accrate': acc_unique[0]})
@@ -31,7 +32,7 @@ def plot_qnuc(source, mass, linear=True):
         ax.plot(models['accrate'], models['qnuc'], marker='o',
                 label=f'x={row.x:.3f}, z={row.z:.4f}')
     if linear:
-        linr_table = qnuc_tools.linregress_qnuc(source)
+        linr_table = qnuc_tools.linregress_qnuc(source, grid_version)
         row = linr_table[linr_table['mass'] == mass]
         x = np.array([np.min(acc_unique), np.max(acc_unique)])
         y = row.m.values[0] * x + row.y0.values[0]
@@ -66,10 +67,10 @@ def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=T
         plt.close()
 
 
-def plot_bprops(source, params, bprop='dt'):
+def plot_bprops(source, params, grid_version, bprop='dt'):
     """Plots burst property versus qnuc
     """
-    kgrid = grid_analyser.Kgrid(source)
+    kgrid = grid_analyser.Kgrid(source, grid_version=grid_version)
     sub_p = kgrid.get_params(params=params)
     sub_s = kgrid.get_summ(params=params)
 
