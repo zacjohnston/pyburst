@@ -63,13 +63,15 @@ def linregress_qnuc(source):
     return linr_table
 
 
-def extract_qnuc_table(source, param_batch=None, param_table=None, cycles=None):
+def extract_qnuc_table(source, grid_version=0, param_batch=None, param_table=None,
+                       cycles=None):
     """Extracts optimal Qnuc across all parameters
 
     ref_batch : int
         batch that represents all unique parameters (x, z, accrate, mass)
     """
-    kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False)
+    kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False,
+                                grid_version=grid_version)
     if param_table is None:
         if param_batch is None:
             raise ValueError('Must specify one of "param_batch" or "param_table"')
@@ -114,7 +116,7 @@ def get_slopes(table, source, cycles=None, basename='xrb'):
     return np.array(slopes)
 
 
-def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None):
+def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None, grid_version=0):
     """Iterates over solve_qnuc for a table of params
     """
     param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
@@ -126,14 +128,15 @@ def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None):
         sys.stdout.write(f'\rOptimising Qnuc for parameters: {row.Index+1}/{n}')
         params = {'x': row.x, 'z': row.z, 'accrate': row.accrate, 'mass': row.mass}
         qnuc[row.Index] = solve_qnuc(source=source, params=params,
-                                     cycles=cycles, kgrid=kgrid)[0]
+                                     cycles=cycles, kgrid=kgrid,
+                                     grid_version=grid_version)[0]
     sys.stdout.write('\n')
     qnuc_table = param_table.copy()[param_list]
     qnuc_table['qnuc'] = qnuc
     return qnuc_table
 
 
-def solve_qnuc(source, params, cycles=None, kgrid=None):
+def solve_qnuc(source, params, cycles=None, kgrid=None, grid_version=0):
     """Returns predicted Qnuc that gives stable base temperature
     """
     # TODO: add other methods (e.g. bisection)
@@ -143,7 +146,8 @@ def solve_qnuc(source, params, cycles=None, kgrid=None):
             raise ValueError(f'Missing "{p}" from "params"')
 
     if kgrid is None:
-        kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False)
+        kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False,
+                                    grid_version=grid_version)
 
     subset = kgrid.get_params(params=params)
     slopes = get_slopes(table=subset, source=source, cycles=cycles)
