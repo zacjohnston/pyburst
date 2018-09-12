@@ -55,9 +55,12 @@ def extract_qnuc_table(source, grid_version=0, param_batch=None, param_table=Non
                        cycles=None):
     """Extracts optimal Qnuc across all parameters
 
-    ref_batch : int
+    param_batch : int (optional)
         batch that represents all unique parameters (x, z, accrate, mass)
+    param_table : pd.DataFrame (optional)
+        alternative to param_batch. A table containing each unique set of paraemeters
     """
+    # TODO: make more automatic with grid_version (getting param_table)
     kgrid = grid_analyser.Kgrid(source, linregress_burst_rate=False,
                                 grid_version=grid_version)
     if param_table is None:
