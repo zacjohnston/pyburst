@@ -54,7 +54,7 @@ version_definitions = {
             'grid4': {},
             'heat': {
                 1: {
-                    'batch': [1, 10, 11, 12, 14, 15, 16],  # gs1826 models
+                    'batch': [1, 10, 11, 12, 14, 15, 16, 17],  # gs1826 models
                 },
 
                 2: {
