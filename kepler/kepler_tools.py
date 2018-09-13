@@ -44,7 +44,8 @@ def get_cycles(run, batch, source):
     return np.sort(cycles)
 
 
-def extract_temps(run, batch, source, cycles=None, basename='xrb', zone=86):
+def extract_temps(run, batch, source, cycles=None, basename='xrb',
+                  temp_zone=20):
     """Extracts base temperature versus time from mode dumps. Returns as [t (s), T (K)]
 
     cycles : [int] (optional)
@@ -52,11 +53,12 @@ def extract_temps(run, batch, source, cycles=None, basename='xrb', zone=86):
     zone : int
         zone (index) to extract temperature from
     """
+    # TODO: option to extract from approximate depth
     if cycles is None:
         cycles = get_cycles(run, batch, source)
 
     temps = np.zeros((len(cycles), 2))
     for i, cycle in enumerate(cycles):
         dump = load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
-        temps[i] = np.array((dump.time, dump.tn[zone]))
+        temps[i] = np.array((dump.time, dump.tn[temp_zone]))
     return temps
