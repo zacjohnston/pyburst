@@ -43,14 +43,16 @@ def plot_qnuc(source, mass, grid_version, linear=True):
     plt.show(block=False)
 
 
-def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=True):
+def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=True,
+               temp_zone=20):
     """xaxis : ['accrate', 'qnuc']
     """
     xlabel = {'accrate': '$\dot{M} / \dot{M}_\mathrm{Edd}$',
               'qnuc': '$Q_\mathrm{nuc}$'}.get(xaxis, xaxis)
     kgrid = grid_analyser.Kgrid(source)
     subset = kgrid.get_params(params=params)
-    slopes = qnuc_tools.get_slopes(table=subset, source=source, cycles=cycles)
+    slopes = qnuc_tools.get_slopes(table=subset, source=source, cycles=cycles,
+                                   temp_zone=temp_zone)
 
     fig, ax = plt.subplots()
     ax.plot(subset[xaxis], slopes, ls='none', marker='o')
