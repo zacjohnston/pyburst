@@ -90,7 +90,7 @@ def create_batch(batch, dv, source,
                  auto_t_end=True, notes='No notes given', debug=False,
                  nbursts=20, parallel=False, ntasks=8, kgrid=None,
                  nuc_heat=False, setup_test=False, predict_qnuc=True,
-                 qnuc_source='heat', **kwargs):
+                 grid_version=None, qnuc_source='heat', **kwargs):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -159,7 +159,7 @@ def create_batch(batch, dv, source,
         if len(params['qnuc']) > 1:
             raise ValueError('Cannot provide multiple "qnuc" in params if predict_qnuc=True')
 
-        linr_qnuc = qnuc_tools.linregress_qnuc(qnuc_source)
+        linr_qnuc = qnuc_tools.linregress_qnuc(qnuc_source, grid_version=grid_version)
         for i in range(n):
             params_qnuc = {}
             for param in param_list:
