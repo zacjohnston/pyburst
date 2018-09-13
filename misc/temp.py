@@ -189,7 +189,8 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
     return fig
 
 
-def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False):
+def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False,
+                         temp_zone=20):
     fig, ax = plt.subplots()
 
     n = len(runs)
@@ -198,18 +199,20 @@ def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linea
 
     for i in range(n):
         plot_base_temp(run=runs[i], batch=batches[i], source=sources[i],
-                       cycles=cycles, ax=ax, display=False, title=False, linear=linear)
+                       cycles=cycles, ax=ax, display=False, title=False, linear=linear,
+                       temp_zone=temp_zone)
     if legend:
         ax.legend(loc='center left')
     plt.show(block=False)
 
 
 def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title=True,
-                   display=True, ax=None, linear=False):
+                   display=True, ax=None, linear=False, temp_zone=20):
     if ax is None:
         fig, ax = plt.subplots()
     xscale = 3600
-    temps = kepler_tools.extract_temps(run, batch, source, cycles=cycles, basename=basename)
+    temps = kepler_tools.extract_temps(run, batch, source, cycles=cycles,
+                                       basename=basename, temp_zone=temp_zone)
     model_str = grid_strings.get_model_string(run, batch, source)
     ax.plot(temps[:, 0]/xscale, temps[:, 1], marker='o', label=model_str)
 
