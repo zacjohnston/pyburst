@@ -100,7 +100,7 @@ def get_slopes(table, source, cycles=None, basename='xrb'):
     """
     slopes = []
     for row in table.itertuples():
-        temps = kepler_tools.extract_base_temps(row.run, row.batch, source,
+        temps = kepler_tools.extract_temps(row.run, row.batch, source,
                                                 cycles=cycles, basename=basename)
         i0 = 2 if len(temps) > 2 else 1  # skip first dumps if possible
         linr = linregress(temps[i0:, 0], temps[i0:, 1])
