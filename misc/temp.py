@@ -149,7 +149,7 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     plt.show(block=False)
 
 
-def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
+def plot_temp(run, batch, source, cycles=None, basename='xrb', title=True,
               display=True, prefix='', fontsize=14, marker='', relative=False):
     """Plot temperature profile at given cycle (timestep)
     """
@@ -182,12 +182,14 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
                                       prefix=prefix)
         temp[i] = dump.tn[1]
 
-    ax.set_title(title)
+    if title:
+        ax.set_title(f'{source}_{batch}_{run}')o
     ax.set_yscale(yscale)
     ax.set_xscale('log')
     ax.set_xlabel(r'y (g cm$^{-2}$)', fontsize=fontsize)
     ax.set_ylabel(r'T - $T_{\#0}$ (K)', fontsize=fontsize)
     ax.legend()
+    plt.tight_layout()
 
     if display:
         plt.show(block=False)
