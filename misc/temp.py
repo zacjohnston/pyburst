@@ -150,17 +150,29 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
 
 
 def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
-              display=True, prefix='', fontsize=14, marker=''):
+              display=True, prefix='', fontsize=14, marker='', relative=False):
     """Plot temperature profile at given cycle (timestep)
     """
     fig, ax = plt.subplots()
-    dump = None
     if cycles is None:
         cycles = kepler_tools.get_cycles(run, batch, source)
+
+    if relative:
+        yscale = 'linear'
+        d0 = kepler_tools.load_dump(0, run, batch, source=source, basename=basename,
+                                    prefix=prefix)
+        t0 = d0.tn[1:-1]
+        i_end = len(t0) + 1
+    else:
+        yscale = 'log'
+        ax.set_ylim([5e7, 5e9])
+        t0 = 0.0
+        i_end = -1
+
     for cycle in cycles:
         dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
                                       prefix=prefix)
-        ax.plot(dump.y[1:-1], dump.tn[1:-1], label=f'#{cycle}', marker=marker)
+        ax.plot(dump.y[1:i_end], dump.tn[1:i_end]-t0, label=f'#{cycle}', marker=marker)
 
     bookends = cycles[[0, -1]]
     temp = [0, 0]
@@ -170,18 +182,11 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title='',
                                       prefix=prefix)
         temp[i] = dump.tn[1]
 
-    y0 = dump.y[1]   # column depth at inner zone
-    y1 = dump.y[-3]  # outer zone
-
     ax.set_title(title)
-    ax.set_yscale('log')
+    ax.set_yscale(yscale)
     ax.set_xscale('log')
-
-    ax.set_xlim([y1, y0])
-    ax.set_ylim([5e7, 5e9])
-
     ax.set_xlabel(r'y (g cm$^{-2}$)', fontsize=fontsize)
-    ax.set_ylabel(r'T (K)', fontsize=fontsize)
+    ax.set_ylabel(r'T - $T_{\#0}$ (K)', fontsize=fontsize)
     ax.legend()
 
     if display:
