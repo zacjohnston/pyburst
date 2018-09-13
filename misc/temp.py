@@ -209,7 +209,7 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
     if ax is None:
         fig, ax = plt.subplots()
     xscale = 3600
-    temps = kepler_tools.extract_base_temps(run, batch, source, cycles=cycles, basename=basename)
+    temps = kepler_tools.extract_temps(run, batch, source, cycles=cycles, basename=basename)
     model_str = grid_strings.get_model_string(run, batch, source)
     ax.plot(temps[:, 0]/xscale, temps[:, 1], marker='o', label=model_str)
 
@@ -246,7 +246,7 @@ def save_temps(cycles, run, batch, source, zero_times=True):
     for i, cycle in enumerate(cycles):
         print(f'Cycle {cycle}')
         title = f'cycle={cycle},  t={times[i]:.6f}'
-        fig = plot_temp([cycle], run, batch, source=source, title=title, display=False)
+        fig = plot_temp(run, batch, source=source, title=title, display=False)
 
         filename = f'temp_{source}_{batch}_{run}_{i:02}.png'
         filepath = os.path.join(path, filename)
