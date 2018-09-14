@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import os
 import sys
 
@@ -37,6 +38,26 @@ def load_dump(cycle, run, batch, source, basename='xrb',
 
 def get_dump_filename(cycle, run, basename, prefix=''):
     return f'{prefix}{basename}{run}#{cycle}'
+
+
+def extract_dump_table(run, batch, source, cycles=None, dumps=None, basename='xrb'):
+    """Returns pandas table of summary dump values
+
+    cycles : [int] (optional)
+        list of cycles to extract. If None, uses all available
+    dumps : {cycle: dump_object} (optional)
+        Pre-loaded dumpfiles
+    """
+    cycles = check_cycles(cycles=cycles, run=run, batch=batch, source=source)
+    if dumps is None:
+        dumps = load_dumps(run, batch=batch, source=source, cycles=cycles,
+                           basename=basename)
+    table = pd.DataFrame()
+    table['cycle'] = cycles
+
+    for row in table.itertuples():
+        table.loc[row.Index, 'time'] = dumps[row.cycle].time
+    return table
 
 
 def check_cycles(cycles, run, batch, source):
