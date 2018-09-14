@@ -10,6 +10,7 @@ from scipy.stats import linregress
 # kepler_grids
 from . import burst_tools
 from pygrids.grids import grid_tools, grid_strings
+from pygrids.kepler import kepler_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -75,6 +76,7 @@ class BurstRun(object):
                              'short_waits': 'C4',
                              'burst_stages': 'C2',
                              'shocks': 'C3',
+                             'dumps': 'C0',
                              }
 
         self.cols = ['n', 'dt', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
@@ -730,7 +732,7 @@ class BurstRun(object):
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
              short_wait=True, shocks=False, fontsize=14, title=True,
-             outliers=True, show_all=False):
+             outliers=True, show_all=False, dumps=False):
         """Plots overall model lightcurve, with detected bursts
         """
         if not self.flags['loaded']:
@@ -819,6 +821,13 @@ class BurstRun(object):
                 ax.plot(shock_slice[:, 0]/timescale, shock_slice[:, 1]/yscale,
                         c=self.plot_colours['shocks'],
                         label='shocks' if (i == 0) else '_nolegend_')
+
+        if dumps:
+            cycles = kepler_tools.get_cycles(self.run, self.batch, self.source)
+            times = kepler_tools.get_cycle_times(cycles, self.run, batch=self.batch,
+                                                 source=self.source)
+            ax.plot(times/timescale, np.full_like(times, 1e37), ls='none', marker='D',
+                    color=self.plot_colours['dumps'], label='dumps')
 
         if legend:
             ax.legend(loc=1, framealpha=1, edgecolor='0')
