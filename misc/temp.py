@@ -53,26 +53,12 @@ def save_times(cycles, run, batch, source, basename='xrb',
     print('Extracting cycle times')
     table = pd.DataFrame()
     table['timestep'] = cycles
-    table['time (s)'] = extract_times(cycles, run, batch, source=source,
-                                      basename=basename, prefix=prefix)
+    table['time (s)'] = kepler_tools.get_cycle_times(cycles, run, batch, source=source,
+                                                     basename=basename, prefix=prefix)
 
     save_table(table, table_name='timesteps', run=run, batch=batch,
                source=source, basename=basename)
     return table
-
-
-def extract_times(cycles, run, batch, source, basename='xrb', prefix=''):
-    """Returns timestep values (s) for given cycles
-    """
-    times = np.zeros(len(cycles))
-    for i, cycle in enumerate(cycles):
-        print_cycle_progress(cycle=cycle, cycles=cycles,
-                             i=i, prefix='Getting cycle times: ')
-        dump = kepler_tools.load_dump(cycle, run=run, batch=batch, source=source,
-                                      basename=basename, prefix=prefix)
-        times[i] = dump.time
-    sys.stdout.write('\n')
-    return times
 
 
 def save_table(table, table_name, run, batch, source, basename='xrb',
@@ -205,13 +191,14 @@ def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
     grid_tools.try_mkdir(path, skip=True)
 
     cycles = kepler_tools.check_cycles(cycles, run=run, batch=batch, source=source)
-    times = extract_times(cycles, run=run, batch=batch, source=source)
+    times = kepler_tools.get_cycle_times(cycles, run=run, batch=batch, source=source)
 
     if zero_times:
         times = times - times[0]
 
     for i, cycle in enumerate(cycles):
-        print_cycle_progress(cycle=cycle, cycles=cycles, i=i, prefix='Saving plots: ')
+        kepler_tools.print_cycle_progress(cycle=cycle, cycles=cycles, i=i,
+                                          prefix='Saving plots: ')
         title = f'cycle={cycle},  t={times[i]:.6f}'
         fig = plot_temp(cycles=[cycle], run=run, batch=batch, source=source, title=title,
                         display=False, **kwargs)
@@ -319,11 +306,6 @@ def expand_lists(cycles, runs, batches, sources):
         else:
             lists += [var]
     return lists
-
-
-def print_cycle_progress(cycle, cycles, i, prefix=''):
-    sys.stdout.write(f'\r{prefix}cycle {cycle}/{cycles[-1]} '
-                     f'({(i+1) / len(cycles) * 100:.1f}%)')
 
 
 def get_run_string(run, basename='xrb'):

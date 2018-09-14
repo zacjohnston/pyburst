@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import sys
 
 # kepler
 import kepdump
@@ -53,6 +54,20 @@ def get_cycles(run, batch, source):
     return np.sort(cycles)
 
 
+def get_cycle_times(cycles, run, batch, source, basename='xrb', prefix=''):
+    """Returns array of timestep values (s) for given cycles
+    """
+    times = np.zeros(len(cycles))
+    for i, cycle in enumerate(cycles):
+        print_cycle_progress(cycle=cycle, cycles=cycles,
+                             i=i, prefix='Getting cycle times: ')
+        dump = load_dump(cycle, run=run, batch=batch, source=source,
+                         basename=basename, prefix=prefix)
+        times[i] = dump.time
+    sys.stdout.write('\n')
+    return times
+
+
 def extract_temps(run, batch, source, cycles=None, basename='xrb',
                   temp_zone=20):
     """Extracts base temperature versus time from mode dumps. Returns as [t (s), T (K)]
@@ -71,3 +86,8 @@ def extract_temps(run, batch, source, cycles=None, basename='xrb',
         dump = load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
         temps[i] = np.array((dump.time, dump.tn[temp_zone]))
     return temps
+
+
+def print_cycle_progress(cycle, cycles, i, prefix=''):
+    sys.stdout.write(f'\r{prefix}cycle {cycle}/{cycles[-1]} '
+                     f'({(i+1) / len(cycles) * 100:.1f}%)')
