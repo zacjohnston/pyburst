@@ -31,7 +31,8 @@ class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
                  reload=False, save_lum=True, analyse=True, plot=False,
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
-                 load_bursts=False, load_summary=False, try_mkdir_plots=False):
+                 load_bursts=False, load_summary=False, try_mkdir_plots=False,
+                 load_dumpfiles=True):
         self.flags = {'loaded': False,
                       'analysed': False,
                       'too_few_bursts': False,
@@ -83,7 +84,8 @@ class BurstRun(object):
                      't_pre', 't_pre_i', 'lum_pre', 't_start', 't_start_i',
                      'lum_start', 't_end', 't_end_i', 'lum_end', 'slope_dt',
                      'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
-                     'slope_peak', 'slope_peak_err', 'short_wait', 'outlier', ]
+                     'slope_peak', 'slope_peak_err', 'short_wait', 'outlier',
+                     'cycle_start']
 
         self.paths = {'batch_models': grid_strings.get_batch_models_path(batch, source),
                       'source': grid_strings.get_source_path(source),
@@ -102,7 +104,6 @@ class BurstRun(object):
         self.lum = None
         self.lumf = None
         self.new_lum = None
-        self.load_lum = load_lum
         self.load_bursts = load_bursts
         self.load_summary = load_summary
 
@@ -116,17 +117,21 @@ class BurstRun(object):
         self.candidates = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.shocks = []
+        self.dumpfiles = {}
 
         # ====== linregress things ======
         self.regress_bprops = ['dt', 'fluence', 'peak']
         self.discard = None
 
         # ====== Loading things ======
-        if self.load_lum:
+        if load_lum:
             self.load_lum_file()
 
         if self.load_bursts:
             self.load_burst_table()
+
+        if load_dumpfiles:
+            self.load_dumpfiles()
 
         if self.load_summary:
             if not self.load_bursts:
@@ -195,6 +200,19 @@ class BurstRun(object):
         self.summary = summary_table.to_dict('list')
         for key, val in self.summary.items():
             self.summary[key] = val[0]  # don't store as arrays
+
+    def load_dumpfiles(self):
+        """Load available kepler dumpfiles
+        """
+        cycles = kepler_tools.get_cycles(self.run, batch=self.batch, source=self.source)
+        for i, cycle in enumerate(cycles):
+            kepler_tools.print_cycle_progress(cycle, cycles=cycles, i=i,
+                                              prefix=f'Loading dumpfiles: ')
+
+            self.dumpfiles[cycle] = kepler_tools.load_dump(cycle, self.run, self.batch,
+                                                           source=self.source,
+                                                           basename=self.basename,
+                                                           verbose=False)
 
     def analyse(self):
         """Performs complete analysis of model.
@@ -728,6 +746,11 @@ class BurstRun(object):
 
         separation = (mean_hi - mean_lo) / np.sqrt(std_hi**2 + std_lo**2)
         self.summary['bimodal'] = separation > self.parameters['bimodal_sigma']
+
+    def get_burst_dumps(self):
+        """Identifies which dumpfiles (if any) correspond to each burst start
+        """
+        pass
 
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
