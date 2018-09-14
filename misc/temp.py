@@ -7,13 +7,14 @@ import subprocess
 from scipy.stats import linregress
 
 # pygrids
-from pygrids.grids import grid_analyser, grid_strings, grid_tools
+from pygrids.grids import grid_strings, grid_tools
 from pygrids.kepler import kepler_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 PROJECT_PATH = '/home/zacpetej/projects/oscillations/'
 
+# TODO: implement module as proper pygrids module
 
 def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
                    prefix=''):
@@ -240,7 +241,7 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
         plt.show(block=False)
 
 
-def save_temps(cycles, run, batch, source, zero_times=True):
+def save_temps(run, batch, source, zero_times=True, cycles=None):
     """Iterate through cycles and save temperature profile plots
     """
     batch_str = grid_strings.get_batch_string(batch, source)
@@ -248,6 +249,8 @@ def save_temps(cycles, run, batch, source, zero_times=True):
     path = os.path.join(path, 'temp', batch_str, str(run))
     grid_tools.try_mkdir(path, skip=True)
 
+    if cycles is None:
+        cycles =
     times = extract_times(cycles, run, batch)
 
     if zero_times:
@@ -318,6 +321,14 @@ def expand_lists(cycles, runs, batches, sources):
             lists += [var]
     return lists
 
+
+def check_cycles(cycles, run, batch, source):
+    """Get available cycles if none provided
+    """
+    if cycles is None:
+        return kepler_tools.get_cycles(run=run, batch=batch, source=source)
+    else:
+        return cycles
 
 def get_run_string(run, basename='xrb'):
     return f'{basename}{run}'
