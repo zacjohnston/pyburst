@@ -848,13 +848,12 @@ class BurstRun(object):
                         c=self.plot_colours['shocks'],
                         label='shocks' if (i == 0) else '_nolegend_')
 
-        if dumps and self.load:
-            times = np.zeros(len(self.dumpfiles))
-            for i, dump in enumerate(self.dumpfiles.values()):
-                times[i] = dump.time
-
-            ax.plot(setimes/timescale, np.full_like(times, 1e37), ls='none', marker='D',
-                    color=self.plot_colours['dumps'], label='dumps')
+        if dumps:
+            if not self.flags['dumps_loaded']:
+                self.load_dumpfiles()
+            times = self.dump_table['time']
+            ax.plot(times/timescale, np.full_like(times, 1e37), ls='none',
+                    marker='D', color=self.plot_colours['dumps'], label='dumps')
 
         if legend:
             ax.legend(loc=1, framealpha=1, edgecolor='0')
