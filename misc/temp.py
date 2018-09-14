@@ -150,13 +150,12 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     plt.show(block=False)
 
 
-def plot_temp(run, batch, source, cycles=None, basename='xrb', title=True,
+def plot_temp(run, batch, source, cycles=None, basename='xrb', title=None,
               display=True, prefix='', fontsize=14, marker='', relative=False):
     """Plot temperature profile at given cycle (timestep)
     """
     fig, ax = plt.subplots()
-    if cycles is None:
-        cycles = kepler_tools.get_cycles(run, batch, source)
+    cycles = kepler_tools.check_cycles(cycles, run=run, batch=batch, source=source)
 
     if relative:
         yscale = 'linear'
@@ -175,16 +174,9 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title=True,
                                       prefix=prefix)
         ax.plot(dump.y[1:i_end], dump.tn[1:i_end]-t0, label=f'#{cycle}', marker=marker)
 
-    bookends = cycles[[0, -1]]
-    temp = [0, 0]
-
-    for i, cyc in enumerate(bookends):
-        dump = kepler_tools.load_dump(cyc, run, batch, source=source, basename=basename,
-                                      prefix=prefix)
-        temp[i] = dump.tn[1]
-
-    if title:
+    if title is None:
         ax.set_title(f'{source}_{batch}_{run}')
+
     ax.set_yscale(yscale)
     ax.set_xscale('log')
     ax.set_xlabel(r'y (g cm$^{-2}$)', fontsize=fontsize)
@@ -195,6 +187,31 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title=True,
     if display:
         plt.show(block=False)
     return fig
+
+
+def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
+    """Iterate through cycles and save temperature profile plots
+    """
+    batch_str = grid_strings.get_batch_string(batch, source)
+    path = os.path.join(grid_strings.plots_path(source), 'temp', batch_str, str(run))
+    grid_tools.try_mkdir(path, skip=True)
+
+    cycles = kepler_tools.check_cycles(cycles, run=run, batch=batch, source=source)
+    times = extract_times(cycles, run=run, batch=batch, source=source)
+
+    if zero_times:
+        times = times - times[0]
+
+    for i, cycle in enumerate(cycles):
+        print(f'Cycle {cycle}')
+        title = f'cycle={cycle},  t={times[i]:.6f}'
+        fig = plot_temp(cycles=[cycle], run=run, batch=batch, source=source, title=title,
+                        display=False, **kwargs)
+
+        filename = f'temp_{source}_{batch}_{run}_{i:02}.png'
+        filepath = os.path.join(path, filename)
+        fig.savefig(filepath)
+        plt.close('all')
 
 
 def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False,
@@ -240,30 +257,6 @@ def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', t
     if display:
         plt.show(block=False)
 
-
-def save_temps(run, batch, source, zero_times=True, cycles=None):
-    """Iterate through cycles and save temperature profile plots
-    """
-    batch_str = grid_strings.get_batch_string(batch, source)
-    path = grid_strings.get_source_subdir(source, 'plots')
-    path = os.path.join(path, 'temp', batch_str, str(run))
-    grid_tools.try_mkdir(path, skip=True)
-
-    cycles = kepler_tools.check_cycles(cycles, run=run, batch=batch, source=source)
-    times = extract_times(cycles, run, batch)
-
-    if zero_times:
-        times = times - times[0]
-
-    for i, cycle in enumerate(cycles):
-        print(f'Cycle {cycle}')
-        title = f'cycle={cycle},  t={times[i]:.6f}'
-        fig = plot_temp(run, batch, source=source, title=title, display=False)
-
-        filename = f'temp_{source}_{batch}_{run}_{i:02}.png'
-        filepath = os.path.join(path, filename)
-        fig.savefig(filepath)
-        plt.close('all')
 
 
 def plot_saxj(x_units='time', dumptimes=True, cycles=None):
