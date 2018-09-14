@@ -70,6 +70,7 @@ class BurstRun(object):
                            'bimodal_sigma': 3,  # number of std's modes are separated by
                            'outlier_distance': 1.5,  # fraction of IQR above Q3
                            'max_shock_iterations': 100,  # max cycles in get_burst_candidates()
+                           'dump_time_min': 1,  # min time (s) between t_start and dump time
                            }
 
         self.plot_colours = {'bursts': 'C1',
@@ -756,8 +757,9 @@ class BurstRun(object):
             self.load_dumpfiles()
         for burst in self.bursts.itertuples():
             idx = np.searchsorted(self.dump_table['time'], burst.t_start)[0]
-            cycle = self.dump_table['cycle'][idx]
-            self.bursts.loc[burst.Index, 'dump_start'] = cycle
+            cycle, time = self.dump_table.iloc[idx]
+            if (time - burst.t_start) < self.parameters['dump_time_min']:
+                self.bursts.loc[burst.Index, 'dump_start'] = cycle
 
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
