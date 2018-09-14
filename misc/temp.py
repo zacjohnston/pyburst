@@ -207,7 +207,6 @@ def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
         filepath = os.path.join(path, filename)
         fig.savefig(filepath)
         plt.close('all')
-    sys.stdout.write('\n')
 
 
 def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False,

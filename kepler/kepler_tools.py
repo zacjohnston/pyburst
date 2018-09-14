@@ -64,7 +64,6 @@ def get_cycle_times(cycles, run, batch, source, basename='xrb', prefix=''):
         dump = load_dump(cycle, run=run, batch=batch, source=source,
                          basename=basename, prefix=prefix)
         times[i] = dump.time
-    sys.stdout.write('\n')
     return times
 
 
@@ -91,3 +90,5 @@ def extract_temps(run, batch, source, cycles=None, basename='xrb',
 def print_cycle_progress(cycle, cycles, i, prefix=''):
     sys.stdout.write(f'\r{prefix}cycle {cycle}/{cycles[-1]} '
                      f'({(i+1) / len(cycles) * 100:.1f}%)')
+    if cycle == cycles[-1]:
+        sys.stdout.write('\n')
