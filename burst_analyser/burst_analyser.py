@@ -32,8 +32,9 @@ class BurstRun(object):
                  reload=False, save_lum=True, analyse=True, plot=False,
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
-                 load_dumpfiles=True):
-        self.flags = {'loaded': False,
+                 load_dumps=True):
+        self.flags = {'lum_loaded': False,
+                      'dumps_loaded': False,
                       'analysed': False,
                       'too_few_bursts': False,
                       'short_waits': False,
@@ -106,7 +107,7 @@ class BurstRun(object):
         self.new_lum = None
         self.load_bursts = load_bursts
         self.load_summary = load_summary
-
+        self.load_dumps = load_dumps
         self.bursts = pd.DataFrame(columns=self.cols)
         self.n_bursts = None
         self.n_short_wait = None
@@ -131,7 +132,7 @@ class BurstRun(object):
         if self.load_bursts:
             self.load_burst_table()
 
-        if load_dumpfiles:
+        if self.load_dumps:
             self.load_dumpfiles()
 
         if self.load_summary:
@@ -163,7 +164,7 @@ class BurstRun(object):
                                         reload=self.options['reload'])
 
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
-        self.flags['loaded'] = True
+        self.flags['lum_loaded'] = True
 
     def load_burst_table(self):
         """Load pre-extracted burst properties from file
@@ -208,11 +209,12 @@ class BurstRun(object):
         self.dumpfiles = kepler_tools.load_dumps(self.run, batch=self.batch,
                                                  source=self.source,
                                                  basename=self.basename)
-        
+
         self.dump_table = kepler_tools.extract_dump_table(self.run, batch=self.batch,
                                                           source=self.source,
                                                           basename=self.basename,
                                                           dumps=self.dumpfiles)
+        self.flags['dumps_loaded'] = True
 
     def analyse(self):
         """Performs complete analysis of model.
@@ -371,7 +373,7 @@ class BurstRun(object):
            4. Identify short-wait bursts (below some fraction of mean dt)
            5. Get start/end times (discard final burst if cut off)
         """
-        if not self.flags['loaded']:
+        if not self.flags['lum_loaded']:
             self.load_lum_file()
         self.printv('Identifying bursts')
         self.get_burst_candidates()
@@ -759,7 +761,7 @@ class BurstRun(object):
              outliers=True, show_all=False, dumps=False):
         """Plots overall model lightcurve, with detected bursts
         """
-        if not self.flags['loaded']:
+        if not self.flags['lum_loaded']:
             self.load_lum_file()
 
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
@@ -846,12 +848,12 @@ class BurstRun(object):
                         c=self.plot_colours['shocks'],
                         label='shocks' if (i == 0) else '_nolegend_')
 
-        if dumps:
+        if dumps and self.load:
             times = np.zeros(len(self.dumpfiles))
             for i, dump in enumerate(self.dumpfiles.values()):
                 times[i] = dump.time
 
-            ax.plot(times/timescale, np.full_like(times, 1e37), ls='none', marker='D',
+            ax.plot(setimes/timescale, np.full_like(times, 1e37), ls='none', marker='D',
                     color=self.plot_colours['dumps'], label='dumps')
 
         if legend:
