@@ -85,7 +85,7 @@ class BurstRun(object):
                      'lum_start', 't_end', 't_end_i', 'lum_end', 'slope_dt',
                      'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
                      'slope_peak', 'slope_peak_err', 'short_wait', 'outlier',
-                     'cycle_start']
+                     'dump_start']
 
         self.paths = {'batch_models': grid_strings.get_batch_models_path(batch, source),
                       'source': grid_strings.get_source_path(source),
@@ -204,15 +204,9 @@ class BurstRun(object):
     def load_dumpfiles(self):
         """Load available kepler dumpfiles
         """
-        cycles = kepler_tools.get_cycles(self.run, batch=self.batch, source=self.source)
-        for i, cycle in enumerate(cycles):
-            kepler_tools.print_cycle_progress(cycle, cycles=cycles, i=i,
-                                              prefix=f'Loading dumpfiles: ')
-
-            self.dumpfiles[cycle] = kepler_tools.load_dump(cycle, self.run, self.batch,
-                                                           source=self.source,
-                                                           basename=self.basename,
-                                                           verbose=False)
+        self.dumpfiles = kepler_tools.load_dumps(self.run, batch=self.batch,
+                                                 source=self.source,
+                                                 basename=self.basename)
 
     def analyse(self):
         """Performs complete analysis of model.
@@ -750,7 +744,8 @@ class BurstRun(object):
     def get_burst_dumps(self):
         """Identifies which dumpfiles (if any) correspond to each burst start
         """
-        pass
+        for burst in self.bursts.itertuples():
+            pass
 
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',

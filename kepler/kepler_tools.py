@@ -12,6 +12,18 @@ from pygrids.misc.pyprint import printv
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
+
+def load_dumps(run, batch, source, cycles=None, basename='xrb'):
+    """Returns dict of dumpfiles, in form {cycle: dump_object}
+    """
+    dumpfiles = {}
+    cycles = check_cycles(cycles=cycles, run=run, batch=batch, source=source)
+    for i, cycle in enumerate(cycles):
+        print_cycle_progress(cycle, cycles=cycles, i=i, prefix=f'Loading dumpfiles: ')
+        dumpfiles[cycle] = load_dump(cycle, run=run, batch=batch, source=source,
+                                     basename=basename, verbose=False)
+    return dumpfiles
+
 def load_dump(cycle, run, batch, source, basename='xrb',
               prefix='', verbose=False):
     batch_str = grid_strings.get_batch_string(batch, source)
