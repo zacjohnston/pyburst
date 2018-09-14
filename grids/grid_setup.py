@@ -395,7 +395,7 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
         f.write(table_str)
 
 
-def extend_runs(summ_table, source, nbursts=40, basename='xrb',
+def extend_runs(summ_table, source, nbursts=40, basename='xrb', nstop=9999999,
                 nsdump=1000, walltime=96, do_cmd_files=True, do_jobscripts=True):
     """Modifies existing models (in summ_table) for resuming, to simulate more bursts
     """
@@ -406,7 +406,8 @@ def extend_runs(summ_table, source, nbursts=40, basename='xrb',
     if do_cmd_files:
         for model in short_table.itertuples():
             t_end = (nbursts + 0.75) * model.dt
-            lines = [f'p nsdump {nsdump}', f'@time>{t_end:.3e}', 'end']
+            lines = [f'p nstop {nstop}', f'p nsdump {nsdump}',
+                     f'@time>{t_end:.3e}', 'end']
             overwrite_cmd(model.run, model.batch, source=source, lines=lines, basename=basename)
 
     if do_jobscripts:
