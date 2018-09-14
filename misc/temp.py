@@ -66,10 +66,12 @@ def extract_times(cycles, run, batch, source, basename='xrb', prefix=''):
     """
     times = np.zeros(len(cycles))
     for i, cycle in enumerate(cycles):
-        print_cycle_progress(cycle=cycle, cycles=cycles, i=i)
+        print_cycle_progress(cycle=cycle, cycles=cycles,
+                             i=i, prefix='Getting cycle times: ')
         dump = kepler_tools.load_dump(cycle, run=run, batch=batch, source=source,
                                       basename=basename, prefix=prefix)
         times[i] = dump.time
+    sys.stdout.write('\n')
     return times
 
 
@@ -207,16 +209,16 @@ def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
         times = times - times[0]
 
     for i, cycle in enumerate(cycles):
-        print_cycle_progress(cycle=cycle, cycles=cycles, i=i)
+        print_cycle_progress(cycle=cycle, cycles=cycles, i=i, prefix='Saving plots: ')
         title = f'cycle={cycle},  t={times[i]:.6f}'
         fig = plot_temp(cycles=[cycle], run=run, batch=batch, source=source, title=title,
                         display=False, **kwargs)
 
-        filename = f'temp_{source}_{batch}_{run}_{i:02}.png'
+        filename = f'temp_{source}_{batch}_{run}_{i:04}.png'
         filepath = os.path.join(path, filename)
         fig.savefig(filepath)
         plt.close('all')
-    sys.stdout.write('')
+    sys.stdout.write('\n')
 
 
 def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False,
@@ -317,8 +319,9 @@ def expand_lists(cycles, runs, batches, sources):
     return lists
 
 
-def print_cycle_progress(cycle, cycles, i):
-    sys.stdout.write(f'\rCycle {cycle}/{cycles[-1]} ({i/len(cycles)*100:.1f}%)')
+def print_cycle_progress(cycle, cycles, i, prefix=''):
+    sys.stdout.write(f'\r{prefix}cycle {cycle}/{cycles[-1]} '
+                     f'({(i+1) / len(cycles) * 100:.1f}%)')
 
 
 def get_run_string(run, basename='xrb'):
