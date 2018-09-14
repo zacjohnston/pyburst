@@ -150,7 +150,8 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
 
 
 def plot_temp(run, batch, source, cycles=None, basename='xrb', title=None,
-              display=True, prefix='', fontsize=14, marker='', relative=False):
+              display=True, prefix='', fontsize=14, marker='', relative=False,
+              base=False):
     """Plot temperature profile at given cycle (timestep)
     """
     fig, ax = plt.subplots()
@@ -167,6 +168,10 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title=None,
         ax.set_ylim([5e7, 5e9])
         t0 = 0.0
         i_end = -1
+
+    if base:
+        ax.set_ylim([1e8, 6e8])
+        ax.set_xlim([1e9, 2e12])
 
     for cycle in cycles:
         dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
