@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import sys
 from astropy import units
 import subprocess
 from scipy.stats import linregress
@@ -65,6 +66,7 @@ def extract_times(cycles, run, batch, source, basename='xrb', prefix=''):
     """
     times = np.zeros(len(cycles))
     for i, cycle in enumerate(cycles):
+        print_cycle_progress(cycle=cycle, cycles=cycles, i=i)
         dump = kepler_tools.load_dump(cycle, run=run, batch=batch, source=source,
                                       basename=basename, prefix=prefix)
         times[i] = dump.time
@@ -200,7 +202,7 @@ def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
         times = times - times[0]
 
     for i, cycle in enumerate(cycles):
-        print(f'Cycle {cycle}')
+        print_cycle_progress(cycle=cycle, cycles=cycles, i=i)
         title = f'cycle={cycle},  t={times[i]:.6f}'
         fig = plot_temp(cycles=[cycle], run=run, batch=batch, source=source, title=title,
                         display=False, **kwargs)
@@ -209,12 +211,12 @@ def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
         filepath = os.path.join(path, filename)
         fig.savefig(filepath)
         plt.close('all')
+    sys.stdout.write('')
 
 
 def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False,
                          temp_zone=20):
     fig, ax = plt.subplots()
-
     n = len(runs)
     if len(sources) == 1:
         sources = np.full(n, sources[0])  # assume all same source
@@ -253,7 +255,6 @@ def plot_base_temp(run, batch, source, cycles=None, basename='xrb', title=True,
     plt.tight_layout()
     if display:
         plt.show(block=False)
-
 
 
 def plot_saxj(x_units='time', dumptimes=True, cycles=None):
@@ -309,6 +310,10 @@ def expand_lists(cycles, runs, batches, sources):
         else:
             lists += [var]
     return lists
+
+
+def print_cycle_progress(cycle, cycles, i):
+    sys.stdout.write(f'\rCycle {cycle}/{cycles[-1]} ({i/len(cycles)*100:.1f}%)')
 
 
 def get_run_string(run, basename='xrb'):
