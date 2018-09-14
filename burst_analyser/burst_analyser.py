@@ -846,9 +846,10 @@ class BurstRun(object):
                         label='shocks' if (i == 0) else '_nolegend_')
 
         if dumps:
-            cycles = kepler_tools.get_cycles(self.run, self.batch, self.source)
-            times = kepler_tools.get_cycle_times(cycles, self.run, batch=self.batch,
-                                                 source=self.source)
+            times = np.zeros(len(self.dumpfiles))
+            for i, dump in enumerate(self.dumpfiles.values()):
+                times[i] = dump.time
+
             ax.plot(times/timescale, np.full_like(times, 1e37), ls='none', marker='D',
                     color=self.plot_colours['dumps'], label='dumps')
 
