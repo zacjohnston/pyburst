@@ -117,7 +117,8 @@ class BurstRun(object):
         self.candidates = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.shocks = []
-        self.dumpfiles = {}
+        self.dumpfiles = None
+        self.dump_table = None
 
         # ====== linregress things ======
         self.regress_bprops = ['dt', 'fluence', 'peak']
@@ -207,6 +208,11 @@ class BurstRun(object):
         self.dumpfiles = kepler_tools.load_dumps(self.run, batch=self.batch,
                                                  source=self.source,
                                                  basename=self.basename)
+        
+        self.dump_table = kepler_tools.extract_dump_table(self.run, batch=self.batch,
+                                                          source=self.source,
+                                                          basename=self.basename,
+                                                          dumps=self.dumpfiles)
 
     def analyse(self):
         """Performs complete analysis of model.
