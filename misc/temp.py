@@ -154,7 +154,7 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
 def plot_temp(run, batch, source, cycles=None, basename='xrb', title=None,
               display=True, prefix='', fontsize=14, marker='', relative=False,
               xlims=None, ylims=(5e7, 5e9), legend=True,
-              yscale='log'):
+              yscale='log', xscale='log'):
     """Plot temperature profile at given cycle (timestep)
     """
     fig, ax = plt.subplots()
@@ -166,10 +166,12 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title=None,
                                     prefix=prefix)
         t0 = d0.tn[1:-1]
         i_end = len(t0) + 1
+        ylabel = r'T - $T_{\#0}$ (K)'
     else:
         ax.set_ylim(ylims)
         t0 = 0.0
         i_end = -1
+        ylabel = r'T o(K)'
 
     for cycle in cycles:
         dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
@@ -183,9 +185,9 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title=None,
     if xlims is not None:
         ax.set_xlim(xlims)
     ax.set_yscale(yscale)
-    ax.set_xscale('log')
+    ax.set_xscale(xscale)
     ax.set_xlabel(r'y (g cm$^{-2}$)', fontsize=fontsize)
-    ax.set_ylabel(r'T - $T_{\#0}$ (K)', fontsize=fontsize)
+    ax.set_ylabel(ylabel, fontsize=fontsize)
     if legend:
         ax.legend()
     plt.tight_layout()
