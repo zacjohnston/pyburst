@@ -26,6 +26,15 @@ def get_dump_filename(cycle, run, basename, prefix=''):
     return f'{prefix}{basename}{run}#{cycle}'
 
 
+def check_cycles(cycles, run, batch, source):
+    """Get available cycles if none provided
+    """
+    if cycles is None:
+        return get_cycles(run=run, batch=batch, source=source)
+    else:
+        return cycles
+
+
 def get_cycles(run, batch, source):
     """Returns list of dump cycles available for given model
     """
