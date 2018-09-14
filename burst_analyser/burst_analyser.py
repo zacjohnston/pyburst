@@ -226,6 +226,7 @@ class BurstRun(object):
             self.get_fluences()
             self.identify_outliers()
             self.get_bprop_slopes()
+            self.get_burst_dumps()
 
         self.discard = self.get_discard()
         if not self.load_summary:
