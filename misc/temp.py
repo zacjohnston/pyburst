@@ -249,8 +249,7 @@ def save_temps(run, batch, source, zero_times=True, cycles=None):
     path = os.path.join(path, 'temp', batch_str, str(run))
     grid_tools.try_mkdir(path, skip=True)
 
-    if cycles is None:
-        cycles =
+    cycles = kepler_tools.check_cycles(cycles, run=run, batch=batch, source=source)
     times = extract_times(cycles, run, batch)
 
     if zero_times:
@@ -321,14 +320,6 @@ def expand_lists(cycles, runs, batches, sources):
             lists += [var]
     return lists
 
-
-def check_cycles(cycles, run, batch, source):
-    """Get available cycles if none provided
-    """
-    if cycles is None:
-        return kepler_tools.get_cycles(run=run, batch=batch, source=source)
-    else:
-        return cycles
 
 def get_run_string(run, basename='xrb'):
     return f'{basename}{run}'
