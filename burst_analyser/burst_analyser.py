@@ -752,8 +752,12 @@ class BurstRun(object):
     def get_burst_dumps(self):
         """Identifies which dumpfiles (if any) correspond to each burst start
         """
+        if not self.flags['dumps_loaded']:
+            self.load_dumpfiles()
         for burst in self.bursts.itertuples():
-            pass
+            idx = np.searchsorted(self.dump_table['time'], burst.t_start)[0]
+            cycle = self.dump_table['cycle'][idx]
+            self.bursts.loc[burst.Index, 'dump_start'] = cycle
 
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
