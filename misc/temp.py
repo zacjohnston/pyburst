@@ -183,7 +183,7 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title=True,
         temp[i] = dump.tn[1]
 
     if title:
-        ax.set_title(f'{source}_{batch}_{run}')o
+        ax.set_title(f'{source}_{batch}_{run}')
     ax.set_yscale(yscale)
     ax.set_xscale('log')
     ax.set_xlabel(r'y (g cm$^{-2}$)', fontsize=fontsize)
