@@ -16,7 +16,7 @@ PROJECT_PATH = '/home/zacpetej/projects/oscillations/'
 
 # TODO: implement module as proper pygrids module
 
-def extract_cycles(cycles, run, batch, source='biggrid2', basename='xrb',
+def extract_cycles(cycles, run, batch, source, basename='xrb',
                    prefix=''):
     """Iterates over dump cycles and extracts profiles and tables
     """
@@ -46,7 +46,7 @@ def get_profile(dump):
     return table
 
 
-def save_times(cycles, run, batch, source='biggrid2', basename='xrb',
+def save_times(cycles, run, batch, source, basename='xrb',
                prefix=''):
     dashes()
     print('Extracting cycle times')
@@ -60,21 +60,18 @@ def save_times(cycles, run, batch, source='biggrid2', basename='xrb',
     return table
 
 
-def extract_times(cycles, run, batch, source='biggrid2', basename='xrb',
-                  prefix=''):
+def extract_times(cycles, run, batch, source, basename='xrb', prefix=''):
     """Returns timestep values (s) for given cycles
     """
-    times = np.zeros_like(cycles, dtype=float)
-
+    times = np.zeros(len(cycles))
     for i, cycle in enumerate(cycles):
-        dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
-                                      prefix=prefix)
+        dump = kepler_tools.load_dump(cycle, run=run, batch=batch, source=source,
+                                      basename=basename, prefix=prefix)
         times[i] = dump.time
-
     return times
 
 
-def save_table(table, table_name, run, batch, source='biggrid2', basename='xrb',
+def save_table(table, table_name, run, batch, source, basename='xrb',
                subdir=''):
     """Save provided table to oscillations project
     """
@@ -94,7 +91,7 @@ def save_table(table, table_name, run, batch, source='biggrid2', basename='xrb',
         f.write(table_str)
 
 
-def copy_lightcurve(run, batch, source='biggrid2', basename='xrb'):
+def copy_lightcurve(run, batch, source, basename='xrb'):
     """Copies over full model lightcurve
     """
     dashes()
@@ -231,7 +228,7 @@ def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linea
     plt.show(block=False)
 
 
-def plot_base_temp(run, batch, source='biggrid2', cycles=None, basename='xrb', title=True,
+def plot_base_temp(run, batch, source, cycles=None, basename='xrb', title=True,
                    display=True, ax=None, linear=False, temp_zone=20):
     if ax is None:
         fig, ax = plt.subplots()
