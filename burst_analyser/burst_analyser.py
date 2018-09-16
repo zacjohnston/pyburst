@@ -370,7 +370,15 @@ class BurstRun(object):
     def dumps_starts(self):
         """Returns subset of dump_table identified as bursts.dump_starts
         """
-        pass
+        try:
+            self.check_dumpfiles()
+        except NoDumps:
+            return
+
+        mask = ~np.isnan(self.bursts['dump_start'])
+        cycles = self.bursts['dump_start'][mask]
+        table = self.dump_table.set_index('cycle')
+        return table.loc[cycles]
 
     # ===========================================================
     # Analysis
@@ -784,11 +792,12 @@ class BurstRun(object):
 
         Note: if time difference greater than dump_time_min, that burst is skipped
         """
+        self.bursts['dump_start'] = np.full(self.n_bursts, np.nan)
         try:
             self.check_dumpfiles()
         except NoDumps:
             return
-
+        
         last_dump_index = self.dump_table.index[-1]
         for burst in self.bursts.itertuples():
             idx = np.searchsorted(self.dump_table['time'], burst.t_start)[0]
