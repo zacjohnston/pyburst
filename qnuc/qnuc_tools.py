@@ -113,6 +113,14 @@ def get_slopes(table, source, cycles=None, basename='xrb', temp_zone=20):
     return slopes
 
 
+def get_burst_cycles(run, batch, source):
+    """Returns dump cycles that correspond to burst start times
+    """
+    burst_table = burst_tools.load_run_table(run, batch, source=source, table='bursts')
+    mask = ~np.isnan(burst_table['dump_start'])
+    return burst_table['dump_start'][mask].astype(int)
+
+
 def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None, grid_version=0,
                        temp_zone=20):
     """Iterates over solve_qnuc for a table of params
