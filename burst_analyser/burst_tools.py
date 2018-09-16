@@ -229,6 +229,14 @@ def copy_sample_plots(batches, source):
         subprocess.run(['cp', filepath, target_filepath])
 
 
+def get_burst_cycles(run, batch, source):
+    """Returns dump cycles that correspond to burst start times
+    """
+    burst_table = load_run_table(run, batch, source=source, table='bursts')
+    mask = ~np.isnan(burst_table['dump_start'])
+    return np.array(burst_table['dump_start'][mask].astype(int))
+
+
 def add_burst_rate(batches, source):
     """Calculates burst rate from dt and writes to analysis table
     """

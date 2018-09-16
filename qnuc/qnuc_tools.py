@@ -106,7 +106,7 @@ def get_slopes(table, source, cycles=None, basename='xrb', temp_zone=None):
 
     for row in table.itertuples():
         if none_cycles:
-            cycles = get_burst_cycles(row.run, row.batch, source=source)
+            cycles = burst_tools.get_burst_cycles(row.run, row.batch, source=source)
         temps = kepler_tools.extract_temps(row.run, row.batch, source,
                                            cycles=cycles, basename=basename,
                                            temp_zone=temp_zone)
@@ -115,14 +115,6 @@ def get_slopes(table, source, cycles=None, basename='xrb', temp_zone=None):
         slopes[row.Index] = linr[0]
 
     return slopes
-
-
-def get_burst_cycles(run, batch, source):
-    """Returns dump cycles that correspond to burst start times
-    """
-    burst_table = burst_tools.load_run_table(run, batch, source=source, table='bursts')
-    mask = ~np.isnan(burst_table['dump_start'])
-    return np.array(burst_table['dump_start'][mask].astype(int))
 
 
 def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None, grid_version=0,
