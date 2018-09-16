@@ -58,7 +58,7 @@ version_definitions = {
                 },
 
                 2: {
-                    'batch': [1, 2, 3, 4, 5, 6, 7, 8, 9, 13],  # 4u1820 models
+                    'batch': [1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 17],  # 4u1820 models
                     'accrate': 0.1,
                 },
             },
