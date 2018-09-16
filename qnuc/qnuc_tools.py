@@ -5,6 +5,7 @@ import sys
 from scipy.stats import linregress
 
 # pygrids
+from pygrids.burst_analyser import burst_tools
 from pygrids.grids import grid_tools, grid_analyser, grid_strings
 from pygrids.kepler import kepler_tools
 
@@ -99,16 +100,17 @@ def save_qnuc_table(table, source, grid_version=0):
 def get_slopes(table, source, cycles=None, basename='xrb', temp_zone=20):
     """Returns slopes of base temperature evolution(K/s), for given model table
     """
-    slopes = []
+    table = table.reset_index()
+    slopes = np.zeros(len(table))
     for row in table.itertuples():
         temps = kepler_tools.extract_temps(row.run, row.batch, source,
                                            cycles=cycles, basename=basename,
                                            temp_zone=temp_zone)
         i0 = 2 if len(temps) > 2 else 1  # skip first dumps if possible
         linr = linregress(temps[i0:, 0], temps[i0:, 1])
-        slopes += [linr[0]]
+        slopes[row.Index] = linr[0]
 
-    return np.array(slopes)
+    return slopes
 
 
 def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None, grid_version=0,
