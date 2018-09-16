@@ -102,7 +102,11 @@ def get_slopes(table, source, cycles=None, basename='xrb', temp_zone=20):
     """
     table = table.reset_index()
     slopes = np.zeros(len(table))
+    none_cycles = cycles is None
+
     for row in table.itertuples():
+        if none_cycles:
+            cycles = get_burst_cycles(row.run, row.batch, source=source)
         temps = kepler_tools.extract_temps(row.run, row.batch, source,
                                            cycles=cycles, basename=basename,
                                            temp_zone=temp_zone)
