@@ -376,7 +376,7 @@ class BurstRun(object):
             return
 
         mask = ~np.isnan(self.bursts['dump_start'])
-        cycles = self.bursts['dump_start'][mask]
+        cycles = self.bursts['dump_start'][mask].astype(int)
         table = self.dump_table.set_index('cycle')
         return table.loc[cycles]
 
@@ -797,7 +797,7 @@ class BurstRun(object):
             self.check_dumpfiles()
         except NoDumps:
             return
-        
+
         last_dump_index = self.dump_table.index[-1]
         for burst in self.bursts.itertuples():
             idx = np.searchsorted(self.dump_table['time'], burst.t_start)[0]
