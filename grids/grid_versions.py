@@ -41,6 +41,7 @@ version_defaults = {
          ],
 
         'heat': [{}],
+        'res1': [{}],
     },
 }
 
@@ -61,7 +62,13 @@ version_definitions = {
                     'batch': [1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 17],  # 4u1820 models
                     'accrate': 0.1,
                 },
+
+                3: {  # reduced gs1826
+                    'batch': list(np.concatenate((np.arange(1, 4), np.arange(7, 18)))),
+                    'accrate': [0.14]
+                },
             },
+            'res1': {}
         },
     'exclude_all':
         {
@@ -70,6 +77,7 @@ version_definitions = {
             'biggrid3': {},
             'grid4': {},
             'heat': {},
+            'res1': {},
         }
 }
 
