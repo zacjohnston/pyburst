@@ -26,6 +26,9 @@ plt.rc('font', family='serif')
 class NoBursts(Exception):
     pass
 
+class NoDumps(Exception):
+    pass
+
 
 class BurstRun(object):
     def __init__(self, run, batch, source, verbose=True, basename='xrb',
@@ -202,6 +205,7 @@ class BurstRun(object):
     def load_dumpfiles(self):
         """Load available kepler dumpfiles
         """
+        # TODO: what happens if there are no dumpfiles?
         self.dumpfiles = kepler_tools.load_dumps(self.run, batch=self.batch,
                                                  source=self.source,
                                                  basename=self.basename)
@@ -211,6 +215,16 @@ class BurstRun(object):
                                                           basename=self.basename,
                                                           dumps=self.dumpfiles)
         self.flags['dumps_loaded'] = True
+
+    def check_dumpfiles(self):
+        """Checks if dumpfiles are loaded, and whether they need to be
+        """
+        if not self.flags['dumps_loaded']:
+            if self.load_dumps:
+                self.load_dumpfiles()
+            else:
+                self.printv('Dumpfiles not loaded')
+                raise NoDumps
 
     def setup_summary(self):
         """Collects remaining model properties into dictionary
@@ -352,6 +366,11 @@ class BurstRun(object):
 
     def not_outliers(self):
         return self.bursts[np.invert(self.bursts['outlier'])]
+
+    def dumps_starts(self):
+        """Returns subset of dump_table identified as bursts.dump_starts
+        """
+        pass
 
     # ===========================================================
     # Analysis
@@ -765,12 +784,10 @@ class BurstRun(object):
 
         Note: if time difference greater than dump_time_min, that burst is skipped
         """
-        if not self.flags['dumps_loaded']:
-            if self.load_dumps:
-                self.load_dumpfiles()
-            else:
-                self.printv('Dumpfiles not loaded. Skipping get_burst_dumps()')
-                return
+        try:
+            self.check_dumpfiles()
+        except NoDumps:
+            return
 
         last_dump_index = self.dump_table.index[-1]
         for burst in self.bursts.itertuples():
