@@ -231,6 +231,9 @@ def plot_base_temp(run, batch, source, cycles=None, basename='xrb', title=True,
     if ax is None:
         fig, ax = plt.subplots()
     xscale = 3600
+    if cycles is None:
+        cycles = burst_tools.get_burst_cycles(run, batch=batch, source=source)
+
     temps = kepler_tools.extract_temps(run, batch, source, cycles=cycles,
                                        basename=basename, temp_zone=temp_zone)
     model_str = grid_strings.get_model_string(run, batch, source)
