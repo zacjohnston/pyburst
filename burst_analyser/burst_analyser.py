@@ -755,7 +755,12 @@ class BurstRun(object):
         """Identifies which dumpfiles (if any) correspond to each burst start
         """
         if not self.flags['dumps_loaded']:
-            self.load_dumpfiles()
+            if self.load_dumps:
+                self.load_dumpfiles()
+            else:
+                self.printv('Dumpfiles not loaded. Skipping get_burst_dumps()')
+                return
+
         for burst in self.bursts.itertuples():
             idx = np.searchsorted(self.dump_table['time'], burst.t_start)[0]
             cycle, time = self.dump_table.iloc[idx]
