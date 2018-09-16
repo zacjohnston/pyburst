@@ -23,7 +23,7 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     Returns [time (s), luminosity (erg/s)]
     """
     def load_save(load_filepath, save_filepath):
-        lum_loaded = load_binary(filepath=load_filepath, silent=silent)
+        lum_loaded = extract_lcdata(filepath=load_filepath, silent=silent)
         if save:
             save_ascii(lum=lum_loaded, filepath=save_filepath)
         return lum_loaded
@@ -73,8 +73,8 @@ def save_ascii(lum, filepath):
     np.savetxt(filepath, lum, header=header)
 
 
-def load_binary(filepath, silent=False):
-    """Loads kepler binary lightcurve file (.lc)
+def extract_lcdata(filepath, silent=False):
+    """Extracts luminosity versus time from kepler binary file (.lc)
     """
     lumfile = lcdata.load(filepath, silent=silent)
     n = len(lumfile.time)
