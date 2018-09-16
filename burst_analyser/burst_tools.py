@@ -228,7 +228,8 @@ def get_quartiles(x, iqr_frac=1.5):
     ----------
     x : array
         array to calculate quartiles from
-
+    iqr_frac : flt
+        distance from Q1/Q3 to define outliers, as fraction of interquartile range (IQR)
     returns
     -------
     lower outlier limit, q1, q2, q3, upper outlier limit
