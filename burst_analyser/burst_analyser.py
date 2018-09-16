@@ -752,7 +752,10 @@ class BurstRun(object):
         self.summary['bimodal'] = separation > self.parameters['bimodal_sigma']
 
     def get_burst_dumps(self):
-        """Identifies which dumpfiles (if any) correspond to each burst start
+        """Identifies the first dumpfile (if any) immediately following each
+            burst start time
+
+        Note: if time difference greater than dump_time_min, that burst is skipped
         """
         if not self.flags['dumps_loaded']:
             if self.load_dumps:
@@ -761,8 +764,11 @@ class BurstRun(object):
                 self.printv('Dumpfiles not loaded. Skipping get_burst_dumps()')
                 return
 
+        last_dump_index = self.dump_table.index[-1]
         for burst in self.bursts.itertuples():
             idx = np.searchsorted(self.dump_table['time'], burst.t_start)[0]
+            if idx > last_dump_index:
+                return
             cycle, time = self.dump_table.iloc[idx]
             if (time - burst.t_start) < self.parameters['dump_time_min']:
                 self.bursts.loc[burst.Index, 'dump_start'] = cycle
