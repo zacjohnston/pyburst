@@ -10,6 +10,7 @@ from scipy.stats import linregress
 # pygrids
 from pygrids.grids import grid_strings, grid_tools
 from pygrids.kepler import kepler_tools
+from pygrids.burst_analyser import burst_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -210,7 +211,7 @@ def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
 
 
 def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False,
-                         temp_zone=20):
+                         temp_zone=None):
     fig, ax = plt.subplots()
     n = len(runs)
     if len(sources) == 1:
@@ -226,7 +227,7 @@ def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linea
 
 
 def plot_base_temp(run, batch, source, cycles=None, basename='xrb', title=True,
-                   display=True, ax=None, linear=False, temp_zone=20):
+                   display=True, ax=None, linear=False, temp_zone=None):
     if ax is None:
         fig, ax = plt.subplots()
     xscale = 3600
