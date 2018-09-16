@@ -823,6 +823,7 @@ class BurstRun(object):
         time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
         markersize = 10
         markeredgecolor = '0'
+        dump_y = 1e37  # y-value to plot dump markers
 
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.set_xlabel(f'Time ({time_label})', fontsize=fontsize)
@@ -907,8 +908,14 @@ class BurstRun(object):
             if not self.flags['dumps_loaded']:
                 self.load_dumpfiles()
             times = self.dump_table['time']
-            ax.plot(times/timescale, np.full_like(times, 1e37), ls='none',
-                    marker='D', color=self.plot_colours['dumps'], label='dumps')
+            ax.scatter(times/timescale, np.full_like(times, dump_y), marker='D',
+                       color=self.plot_colours['dumps'], label='dumps')
+
+        if dump_start:
+            burst_dumps = self.dumps_starts()
+            times = burst_dumps['time']
+            ax.scatter(times/timescale, np.full_like(times, dump_y), marker='D',
+                       color='red', label='burst_dumps')
 
         if legend:
             ax.legend(loc=1, framealpha=1, edgecolor='0')
