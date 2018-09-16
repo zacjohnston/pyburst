@@ -148,14 +148,9 @@ class BurstRun(object):
         if plot:
             self.plot()
 
-    def printv(self, string):
-        if self.options['verbose']:
-            print(string)
-
-    def print_warn(self, string):
-        full_string = f"\nWARNING: {string}\n"
-        self.printv(full_string)
-
+    # ===========================================================
+    # Loading/setup
+    # ===========================================================
     def load_lum_file(self):
         """Load luminosity data from kepler simulation
         """
@@ -217,23 +212,6 @@ class BurstRun(object):
                                                           dumps=self.dumpfiles)
         self.flags['dumps_loaded'] = True
 
-    def analyse(self):
-        """Performs complete analysis of model.
-        """
-        self.ensure_analysed_is(False)
-        if not self.load_bursts:
-            self.identify_bursts()
-            self.get_fluences()
-            self.identify_outliers()
-            self.get_bprop_slopes()
-            self.get_burst_dumps()
-
-        self.discard = self.get_discard()
-        if not self.load_summary:
-            self.setup_summary()
-
-        self.flags['analysed'] = True
-
     def setup_summary(self):
         """Collects remaining model properties into dictionary
         """
@@ -248,6 +226,17 @@ class BurstRun(object):
         self.summary['n_short_waits'] = self.n_short_wait
         self.get_means()
         self.test_bimodal()
+
+    # ===========================================================
+    # Accessing data
+    # ===========================================================
+    def printv(self, string):
+        if self.options['verbose']:
+            print(string)
+
+    def print_warn(self, string):
+        full_string = f"\nWARNING: {string}\n"
+        self.printv(full_string)
 
     def print_summary(self):
         """Print summary of burst properties
@@ -363,6 +352,25 @@ class BurstRun(object):
 
     def not_outliers(self):
         return self.bursts[np.invert(self.bursts['outlier'])]
+
+    # ===========================================================
+    # Analysis
+    # ===========================================================
+    def analyse(self):
+        """Performs complete analysis of model.
+        """
+        self.ensure_analysed_is(False)
+        if not self.load_bursts:
+            self.identify_bursts()
+            self.get_fluences()
+            self.identify_outliers()
+            self.get_bprop_slopes()
+            self.get_burst_dumps()
+
+        self.discard = self.get_discard()
+        if not self.load_summary:
+            self.setup_summary()
+        self.flags['analysed'] = True
 
     def identify_bursts(self):
         """Extracts peaks, times, and recurrence times of bursts
@@ -773,10 +781,13 @@ class BurstRun(object):
             if (time - burst.t_start) < self.parameters['dump_time_min']:
                 self.bursts.loc[burst.Index, 'dump_start'] = cycle
 
+    # ===========================================================
+    # Plotting
+    # ===========================================================
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
              short_wait=True, shocks=False, fontsize=14, title=True,
-             outliers=True, show_all=False, dumps=False):
+             outliers=True, show_all=False, dumps=False, dump_start=False):
         """Plots overall model lightcurve, with detected bursts
         """
         if not self.flags['lum_loaded']:
