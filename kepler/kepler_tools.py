@@ -115,6 +115,7 @@ def extract_temps(run, batch, source, cycles=None, basename='xrb',
 
     temps = np.zeros((len(cycles), 2))
     for i, cycle in enumerate(cycles):
+        print_cycle_progress(cycle, cycles, i, prefix='Extracting temperature: ')
         dump = load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
         temps[i] = np.array((dump.time, dump.tn[temp_zone]))
     return temps
