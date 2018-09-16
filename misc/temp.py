@@ -149,7 +149,7 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title=None,
 
     if relative:
         yscale = 'linear'
-        d0 = kepler_tools.load_dump(0, run, batch, source=source, basename=basename,
+        d0 = kepler_tools.load_dump(cycles[0], run, batch, source=source, basename=basename,
                                     prefix=prefix)
         t0 = d0.tn[1:-1]
         i_end = len(t0) + 1
