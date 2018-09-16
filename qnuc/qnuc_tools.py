@@ -122,7 +122,7 @@ def get_burst_cycles(run, batch, source):
     """
     burst_table = burst_tools.load_run_table(run, batch, source=source, table='bursts')
     mask = ~np.isnan(burst_table['dump_start'])
-    return burst_table['dump_start'][mask].astype(int)
+    return np.array(burst_table['dump_start'][mask].astype(int))
 
 
 def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None, grid_version=0,
