@@ -101,7 +101,7 @@ def get_cycle_times(cycles, run, batch, source, basename='xrb', prefix=''):
 
 
 def extract_temps(run, batch, source, cycles=None, basename='xrb',
-                  temp_zone=20):
+                  temp_zone=None):
     """Extracts base temperature versus time from mode dumps. Returns as [t (s), T (K)]
 
     cycles : [int] (optional)
@@ -110,6 +110,10 @@ def extract_temps(run, batch, source, cycles=None, basename='xrb',
         zone (index) to extract temperature from
     """
     # TODO: option to extract from approximate depth
+    default_zone = 5
+    if temp_zone is None:
+        temp_zone = default_zone
+
     if cycles is None:
         cycles = get_cycles(run, batch, source)
 

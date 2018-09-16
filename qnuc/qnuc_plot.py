@@ -44,7 +44,7 @@ def plot_qnuc(source, mass, grid_version, linear=True):
 
 
 def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=True,
-               temp_zone=20):
+               temp_zone=None):
     """xaxis : ['accrate', 'qnuc']
     """
     xlabel = {'accrate': '$\dot{M} / \dot{M}_\mathrm{Edd}$',
