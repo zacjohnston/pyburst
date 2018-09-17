@@ -376,6 +376,16 @@ prior_bounds = {
              (0.01, 10),  # f_b
              (0.01, 10),  # f_p
              ),
+        11: ((0.1, 0.2),  # mdot1
+             (0.1, 0.2),  # mdot2
+             (0.1, 0.2),  # mdot3
+             (0.7, 0.73),  # x
+             (0.0025, 0.0075),  # z
+             (1.7 / 1.4, 2.3 / 1.4),  # g
+             (1.2, 1.4),  # redshift
+             (0.01, 10),  # f_b
+             (0.01, 10),  # f_p
+             ),
     },
 
     8: {
@@ -506,6 +516,7 @@ version_defaults = {
             'sim_test': param_keys[1],
             'sim10': param_keys[6],
             'grid4': param_keys[7],
+            'heat': param_keys[7],
         },
 
     'bprops':
@@ -513,6 +524,7 @@ version_defaults = {
             'biggrid1': ('dt', 'fluence', 'peak'),
             'biggrid2': ('dt', 'fluence', 'peak'),
             'grid4': ('rate', 'fluence', 'peak'),
+            'heat': ('rate', 'fluence', 'peak'),
         },
     'disc_model':
         {
@@ -521,6 +533,7 @@ version_defaults = {
             'sim_test': 'he16_a',
             'sim10': 'he16_a',
             'grid4': 'he16_a',
+            'heat': 'he16_a',
         },
 
     'interpolator':
@@ -528,6 +541,7 @@ version_defaults = {
             'biggrid1': 1,
             'biggrid2': 1,
             'grid4': 1,
+            'heat': 1,
         },
 
     'prior_bounds':
@@ -535,6 +549,7 @@ version_defaults = {
             'biggrid1': {},
             'biggrid2': prior_bounds[2][2],
             'grid4': prior_bounds[7][10],
+            'heat': prior_bounds[7][11],
         },
 
     'prior_pdfs':
@@ -548,7 +563,12 @@ version_defaults = {
               'z': prior_pdfs['z'][1],
               'f_ratio': prior_pdfs['f_ratio'][1],
               'inc': prior_pdfs['inc'][1],
-          }
+          },
+          'heat': {
+              'z': prior_pdfs['z'][1],
+              'f_ratio': prior_pdfs['f_ratio'][1],
+              'inc': prior_pdfs['inc'][1],
+          },
         },
 
     'initial_position':
@@ -558,6 +578,7 @@ version_defaults = {
             'sim_test': initial_position[3],
             'sim10': initial_position[12],
             'grid4': initial_position[27],
+            'heat': initial_position[27],
         },
 }
 
@@ -664,6 +685,8 @@ version_definitions = {
                 3: 2,
                 4: 2,
             },
+            'heat': {
+            },
         },
 
     'bprops':
@@ -678,6 +701,8 @@ version_definitions = {
                     67: 63,
                 },
             'grid4': {
+            },
+            'heat': {
             },
         },
     'param_keys':
@@ -738,6 +763,8 @@ version_definitions = {
                 7: 4,
             },
             'grid4': {
+            },
+            'heat': {
             },
         },
 
@@ -826,12 +853,18 @@ version_definitions = {
             },
             'grid4': {
             },
+            'heat': {
+            },
         },
 
     'prior_pdfs':
         {
          'biggrid2': {},
          'grid4': {
+            2: prior_pdfs['f_ratio'][2],
+            4: prior_pdfs['f_ratio'][2],
+                 },
+         'heat': {
             2: prior_pdfs['f_ratio'][2],
             4: prior_pdfs['f_ratio'][2],
                  },
@@ -893,6 +926,8 @@ version_definitions = {
             },
             'grid4': {
             },
+            'heat': {
+            },
         },
 
     'disc_model':
@@ -925,6 +960,8 @@ version_definitions = {
             'sim_test': {},
             'sim10': {},
             'grid4': {
+            },
+            'heat': {
             },
         },
 }
