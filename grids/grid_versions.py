@@ -25,6 +25,7 @@ version_defaults = {
         },
 
         'res1': {},
+        'test1': {},
 
         'heat': {'batch': [1]},
     },
@@ -40,6 +41,7 @@ version_defaults = {
 
         'heat': [{}],
         'res1': [{}],
+        'test1': [{}],
     },
 }
 
@@ -50,6 +52,7 @@ version_definitions = {
             'adelle': {},
             'biggrid2': {},
             'biggrid3': {},
+            'test1': {},
             'grid4': {},
             'heat': {
                 1: {
@@ -81,6 +84,7 @@ version_definitions = {
             'grid4': {},
             'heat': {},
             'res1': {},
+            'test1': {},
         }
 }
 
