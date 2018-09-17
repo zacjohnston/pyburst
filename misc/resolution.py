@@ -58,9 +58,9 @@ def save_all_plots(sources, ref_source, params=('x', 'z', 'mass', 'accrate'),
         plot(params=params_sub, sources=sources, ref_source=ref_source,
              grids=grids, save=True, display=False, title=False, **kwargs)
 
-def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length'),
-         figsize=(9, 10), shaded=False, display=True, save=False, grids=None,
-         title=True, show_nbursts=True):
+def plot(params, sources, ref_source, grid_version,
+         bprops=('rate', 'fluence', 'peak', 'length'), figsize=(9, 10), shaded=False,
+         display=True, save=False, grids=None, title=True, show_nbursts=True):
     """Plot burst properties for given resolution parameter
 
     parameters
@@ -80,7 +80,7 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
     fig, ax = plt.subplots(n, 2, sharex=False, figsize=figsize)
 
     if grids is None:
-        grids = get_multigrids(sources)
+        grids = get_multigrids(sources, grid_version=grid_version)
 
     for i, res_param in enumerate(reference_params):
         ref_value = reference_params[res_param]
@@ -109,7 +109,7 @@ def plot(params, sources, ref_source, bprops=('rate', 'fluence', 'peak', 'length
                     for k in range(len(n_bursts)):
                         x_offset = 1.15
                         nb = n_bursts.iloc[k]
-                        ax[j, i].text(x.iloc[k] * x_offset, y.iloc[k], f'{nb}',
+                        ax[j, i].text(x.iloc[k] * x_offset, y.iloc[k], f'{nb:.0f}',
                                       verticalalignment='center')
 
                 if shaded and ref:
@@ -151,10 +151,10 @@ def get_not(array, var):
     copy.remove(var)
     return copy[0]
 
-def get_multigrids(sources):
+def get_multigrids(sources, grid_version):
     grids = {}
     for source in sources:
-        grids[source] = grid_analyser.Kgrid(source)
+        grids[source] = grid_analyser.Kgrid(source, grid_version=grid_version)
     return grids
 
 def get_subgrids(grids, params):
