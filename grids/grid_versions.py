@@ -24,9 +24,7 @@ version_defaults = {
             'mass': [2.0],
         },
 
-        'res1': {
-            'accdepth': 1e21
-        },
+        'res1': {},
 
         'heat': {'batch': [1]},
     },
@@ -68,7 +66,12 @@ version_definitions = {
                     'accrate': [0.14]
                 },
             },
-            'res1': {}
+            'res1': {
+                1: {
+                    'accdepth': 1e21
+                },
+                2: {},
+            }
         },
     'exclude_all':
         {
