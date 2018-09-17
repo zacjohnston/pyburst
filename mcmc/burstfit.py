@@ -24,7 +24,8 @@ source_map = {
     'grid4': 'gs1826',
     'sim_test': 'biggrid2',
     'sim10': 'biggrid2',
-              }
+    'heat': 'gs1826',
+}
 
 c = const.c.to(u.cm / u.s)
 msunyer_to_gramsec = (u.M_sun / u.year).to(u.g / u.s)
