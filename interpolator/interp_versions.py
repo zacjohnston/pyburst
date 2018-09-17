@@ -45,7 +45,7 @@ version_defaults = {
 
             'grid4':
                 {
-                'accrate': [0.22],
+                    'accrate': [0.22],
                 },
 
             'heat': {},

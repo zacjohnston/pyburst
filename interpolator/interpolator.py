@@ -52,7 +52,6 @@ class Kemulator:
                                            logic='all')
         idxs_kept = params.index
         summ = summ.loc[idxs_kept]
-
         self.summ = summ
         self.params = params
 
