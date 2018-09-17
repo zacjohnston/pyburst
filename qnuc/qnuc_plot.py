@@ -51,7 +51,7 @@ def plot_slope(source, params, xaxis='qnuc', cycles=None, linear=True, display=T
               'qnuc': '$Q_\mathrm{nuc}$'}.get(xaxis, xaxis)
     kgrid = grid_analyser.Kgrid(source, grid_version=grid_version)
     subset = kgrid.get_params(params=params)
-    slopes = qnuc_tools.get_slopes(table=subset, source=source, cycles=cycles,
+    slopes = qnuc_tools.get_slopes(param_table=subset, source=source, cycles=cycles,
                                    temp_zone=temp_zone)
 
     fig, ax = plt.subplots()

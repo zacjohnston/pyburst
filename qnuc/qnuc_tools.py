@@ -97,14 +97,14 @@ def save_qnuc_table(table, source, grid_version=0):
         f.write(table_str)
 
 
-def get_slopes(table, source, cycles=None, basename='xrb', temp_zone=None):
+def get_slopes(param_table, source, cycles=None, basename='xrb', temp_zone=None):
     """Returns slopes of base temperature evolution(K/s), for given model table
     """
-    table = table.reset_index()
-    slopes = np.zeros(len(table))
+    param_table = param_table.reset_index()
+    slopes = np.zeros(len(param_table))
     none_cycles = cycles is None
 
-    for row in table.itertuples():
+    for row in param_table.itertuples():
         if none_cycles:
             cycles = burst_tools.get_burst_cycles(row.run, row.batch, source=source)
         temps = kepler_tools.extract_temps(row.run, row.batch, source,
@@ -153,7 +153,7 @@ def solve_qnuc(source, params, cycles=None, kgrid=None, grid_version=0, temp_zon
                                     grid_version=grid_version)
 
     subset = kgrid.get_params(params=params)
-    slopes = get_slopes(table=subset, source=source, cycles=cycles, temp_zone=temp_zone)
+    slopes = get_slopes(param_table=subset, source=source, cycles=cycles, temp_zone=temp_zone)
 
     linr = linregress(subset['qnuc'], slopes)
     x0 = -linr[1]/linr[0]  # x0 = -y0/m
