@@ -44,8 +44,9 @@ class Kemulator:
         self.version_def = interp_versions.InterpVersion(source, version)
         self.bprops = self.version_def.bprops
 
-        exclude = {**self.version_def.batches_exclude, **self.version_def.exclude_any}
-        params = grid_tools.exclude_params(table=params, params=exclude, logic='any')
+        params = grid_tools.exclude_params(table=params,
+                                           params=self.version_def.exclude_any,
+                                           logic='any')
         params = grid_tools.exclude_params(table=params,
                                            params=self.version_def.exclude_all,
                                            logic='all')

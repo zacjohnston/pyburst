@@ -1,5 +1,6 @@
 import numpy as np
 
+# TODO: outsource some of this to grid_versions?
 version_defaults = {
     'param_keys':
         {
@@ -7,6 +8,7 @@ version_defaults = {
             'biggrid1': ['accrate', 'x', 'z', 'qb', 'mass'],
             'biggrid2': ['accrate', 'x', 'z', 'qb', 'mass'],
             'grid4': ['accrate', 'x', 'z', 'mass'],
+            'heat': ['accrate', 'x', 'z', 'mass'],
         },
     'bprops':
         {
@@ -14,15 +16,8 @@ version_defaults = {
             'biggrid1': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
             'biggrid2': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
             'grid4': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+            'heat': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         },
-    'batches_exclude':
-        {
-            'gs1826': {},
-            'biggrid1': {'batch': [255, 256, 257, 258, 259, 260, 471, 472, 473, 418, 419, 420]},
-            'biggrid2': {},
-            'grid4': {},
-        },
-
     'exclude_any':
         {
             'gs1826':
@@ -32,7 +27,13 @@ version_defaults = {
                     'xi': [0.8, 0.9, 1.0, 1.1, 3.2],
                     'z': [0.001, 0.003],
                 },
-            'biggrid1': {},
+
+            'biggrid1':
+                {
+                    'batch': np.concatenate((np.arange(255, 261), np.arange(471, 474),
+                                             np.arange(418, 421))),
+                },
+
             'biggrid2':
                 {
                     'accrate': np.append(np.arange(5, 10) / 100, np.arange(11, 24, 2) / 100),
@@ -41,10 +42,14 @@ version_defaults = {
                     'qb': [.075],
                     'mass': [0.8, 3.2],
                 },
+
             'grid4':
                 {
                 'accrate': [0.22],
                 },
+
+            'heat': {},
+
         },
     'exclude_all':
         {
@@ -54,6 +59,7 @@ version_defaults = {
             'grid4': [{'x': 0.72, 'accdepth': 1e20},
                       {'x': 0.73, 'accdepth': 1e20},
                       ],
+            'heat': [{}],
         },
 }
 
@@ -79,8 +85,8 @@ version_definitions = {
                     26: 16,
                 },
             'grid4': {},
+            'heat': {},
         },
-
     'bprops':
         {
             'gs1826': {},
@@ -91,24 +97,8 @@ version_definitions = {
                     26: 25
                 },
             'grid4': {},
+            'heat': {},
         },
-
-    'batches_exclude':
-        {
-            'gs1826': {},
-            'biggrid1':
-                {
-                1:
-                    {
-                        'batch': [255, 256, 257, 258, 259, 260, 471, 472, 473, 418, 419, 420]},
-                    },
-            'biggrid2':
-                {
-                1: {},
-                },
-            'grid4': {},
-        },
-
     'exclude_any':
         {
             'gs1826':
@@ -118,18 +108,23 @@ version_definitions = {
                         'x': [0.6],
                         'xi': [0.8, 0.9, 1.0, 1.1, 3.2],
                         'z': [0.001, 0.003],
-                       },
+                    },
                 },
-            'biggrid1': {},
-            'biggrid2':
+            'biggrid1':
                 {
+                    1: {
+                        'batch': np.concatenate((np.arange(255, 261), np.arange(471, 474),
+                                             np.arange(418, 421))),
+                    },
+                },
+            'biggrid2': {
                 14: {
                     'accrate': np.append(np.arange(5, 8) / 100, np.arange(9, 24, 2) / 100),
                     'x': [0.5, 0.6, 0.8, 0.65, 0.77],
                     'z': [0.001],
                     'qb': [.075],
                     'mass': [0.8, 3.2],
-                    },
+                },
                 15: {
                     'accrate': np.append(np.arange(5, 8) / 100, np.arange(9, 24, 2) / 100),
                     'x': [0.5, 0.6, 0.8],
@@ -195,15 +190,26 @@ version_definitions = {
                     'mass': 2.0,
                     },
                 },
+            'heat': {
+                1: {  # gs1826 models
+                    'batch': np.concatenate((np.arange(1, 9), np.arange(10, 13),
+                                            np.arange(14, 20))),
+                },
+
+                2: {  # 4u1820 models
+                    'batch': np.concatenate((np.arange(1, 10), [13])),
+                    'accrate': 0.1,
+                    },
+                },
         },
     'exclude_all':
         {
             'biggrid2': {},
             'grid4': {},
             'res1': {},
+            'heat': {},
         }
 }
-
 
 class InterpVersion:
     """Class for defining different interpolator versions
@@ -213,7 +219,6 @@ class InterpVersion:
         self.version = version
         self.param_keys = get_parameter(source, version, 'param_keys')
         self.bprops = get_parameter(source, version, 'bprops')
-        self.batches_exclude = get_parameter(source, version, 'batches_exclude')
         self.exclude_any = get_parameter(source, version, 'exclude_any')
         self.exclude_all = get_parameter(source, version, 'exclude_all')
 
@@ -221,7 +226,6 @@ class InterpVersion:
         return (f'Interpolator version definitions for {self.source} V{self.version}'
                 + f'\nparam keys     : {self.param_keys}'
                 + f'\nbprops         : {self.bprops}'
-                + f'\nbatches exclude: {self.batches_exclude}'
                 + f'\nexclude_any : {self.exclude_any}'
                 )
 
