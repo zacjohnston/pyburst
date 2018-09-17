@@ -203,14 +203,21 @@ def exclude_params(table, params, logic):
         If 'all', params is a list of dicts specifying multiple sets
                     of parameter combinations
     """
+    def check_type(params_, logic_):
+        types = {'any': dict, 'all': list}
+        if type(params_) is not types[logic_]:
+            raise TypeError(f'for exclude_logic={logic_}, params must be type({types[logic_]})')
+
     mask_excluded = np.full(len(table), False)  # model to be excluded if True
 
     if logic == 'any':
         if params not in [None, {}]:
+            check_type(params, logic)
             mask_excluded = param_mask_any(table, params)
 
     elif logic == 'all':
         if params not in [None, {}, [], [{}]]:
+            check_type(params, logic)
             for param_set in params:
                 mask_excluded = mask_excluded | param_mask_all(table, param_set)
     else:
