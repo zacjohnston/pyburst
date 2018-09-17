@@ -16,9 +16,9 @@ from pygrids.grids import grid_strings, grid_tools
 MODELS_PATH = os.environ['KEPLER_MODELS']
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
-
+# TODO: Move to kepler_tools.py?
 def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
-             silent=False, check_monotonic=True):
+             silent=True, check_monotonic=True):
     """Attempts to load pre-extracted luminosity data, or load raw binary.
     Returns [time (s), luminosity (erg/s)]
     """
@@ -73,10 +73,10 @@ def save_ascii(lum, filepath):
     np.savetxt(filepath, lum, header=header)
 
 
-def extract_lcdata(filepath, silent=False):
+def extract_lcdata(filepath, silent=True):
     """Extracts luminosity versus time from kepler binary file (.lc)
     """
-    lumfile = lcdata.load(filepath, silent=silent)
+    lumfile = lcdata.load(filepath, silent=silent, graphical=False)
     n = len(lumfile.time)
     lum = np.full((n, 2), np.nan)
     lum[:, 0] = lumfile.time
