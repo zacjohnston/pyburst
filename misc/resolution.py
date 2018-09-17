@@ -38,11 +38,11 @@ colors = {True: 'C1',
 
 # TODO add save plot, iterate over params
 
-def save_all_plots(sources, ref_source, params=('x', 'z', 'mass', 'accrate'),
-                   **kwargs):
-    grids = get_multigrids(sources)
+def save_all_plots(sources, ref_source, grid_version,
+                   params=('x', 'z', 'mass', 'accrate'), **kwargs):
+    kgrids = get_multigrids(sources, grid_version=grid_version)
     source = get_not(sources, ref_source)
-    unique_all = grids[source].unique_params
+    unique_all = kgrids[source].unique_params
     unique_subset = {}
     for p in params:
         unique_subset[p] = unique_all[p]
@@ -56,11 +56,11 @@ def save_all_plots(sources, ref_source, params=('x', 'z', 'mass', 'accrate'),
         for p in params:
             params_sub[p] = params_full[p][i]
         plot(params=params_sub, sources=sources, ref_source=ref_source,
-             grids=grids, save=True, display=False, title=False, **kwargs)
+             kgrids=kgrids, save=True, display=False, title=False, **kwargs)
 
 def plot(params, sources, ref_source, grid_version,
          bprops=('rate', 'fluence', 'peak', 'length'), figsize=(9, 10), shaded=False,
-         display=True, save=False, grids=None, title=True, show_nbursts=True):
+         display=True, save=False, kgrids=None, title=True, show_nbursts=True):
     """Plot burst properties for given resolution parameter
 
     parameters
@@ -70,6 +70,8 @@ def plot(params, sources, ref_source, grid_version,
         source from which the reference model comes
     sources: set(str)
         list of source(s) to get models from
+    kgrids : {source: Kgrid}
+        dict of grid_analyser.Kgrid objects for each source
     bprops : [str]
     figsize : [int, int]
     shaded : bool
@@ -79,15 +81,15 @@ def plot(params, sources, ref_source, grid_version,
     n = len(bprops)
     fig, ax = plt.subplots(n, 2, sharex=False, figsize=figsize)
 
-    if grids is None:
-        grids = get_multigrids(sources, grid_version=grid_version)
+    if kgrids is None:
+        kgrids = get_multigrids(sources, grid_version=grid_version)
 
     for i, res_param in enumerate(reference_params):
         ref_value = reference_params[res_param]
         other_res_param = other_param[res_param]
         full_params = dict(params)
         full_params[other_res_param] = reference_params[other_res_param]
-        sub_summ, sub_params = get_subgrids(grids, params=full_params)
+        sub_summ, sub_params = get_subgrids(kgrids, params=full_params)
 
         for j, bprop in enumerate(bprops):
             u_bprop = f'u_{bprop}'
@@ -152,20 +154,20 @@ def get_not(array, var):
     return copy[0]
 
 def get_multigrids(sources, grid_version):
-    grids = {}
+    kgrids = {}
     for source in sources:
-        grids[source] = grid_analyser.Kgrid(source, grid_version=grid_version)
-    return grids
+        kgrids[source] = grid_analyser.Kgrid(source, grid_version=grid_version)
+    return kgrids
 
-def get_subgrids(grids, params):
-    """Returns subgrids of multiple given sources
+def get_subgrids(kgrids, params):
+    """Returns subkgrids of multiple given sources
     """
     sub_params = {}
     sub_summ = {}
 
-    for source in grids:
-        sub_params[source] = grids[source].get_params(params=params)
-        sub_summ[source] = grids[source].get_summ(params=params)
+    for source in kgrids:
+        sub_params[source] = kgrids[source].get_params(params=params)
+        sub_summ[source] = kgrids[source].get_summ(params=params)
 
     return sub_summ, sub_params
 
