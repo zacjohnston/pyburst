@@ -35,14 +35,14 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
 
     if analyse:
         print_title('Extracting burst properties from models')
-        extract_batches(batches, source, save_plots=save_plots, load_bursts=load_bursts,
-                        multithread=multithread, reload=reload, basename=basename,
-                        load_summary=load_summary)
+        extract_batches(batches=batches, source=source, save_plots=save_plots,
+                        load_bursts=load_bursts, multithread=multithread, reload=reload,
+                        basename=basename, load_summary=load_summary)
 
     if collect:
         print_title('Collecting results')
         if auto_last_batch:
-            # TODO: do more autimatically
+            # TODO: make more automatic
             kgrid = grid_analyser.Kgrid(source, exclude_defaults=True,
                                         powerfits=False, burst_analyser=True)
             last_batch = int(kgrid.params.iloc[-1]['batch'])
