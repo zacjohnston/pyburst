@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-import sys
 from astropy import units
 import subprocess
 from scipy.stats import linregress
@@ -143,27 +142,35 @@ def plot_temp(run, batch, source, cycles=None, basename='xrb', title=None,
               xlims=None, ylims=(5e7, 5e9), legend=True,
               yscale='log', xscale='log'):
     """Plot temperature profile at given cycle (timestep)
+
+    relative : bool
+        plot temps relative to first cycle (T-T0)
     """
     fig, ax = plt.subplots()
     cycles = kepler_tools.check_cycles(cycles, run=run, batch=batch, source=source)
+    i0 = 2
+    i1 = -3
+    interp0 = None
 
     if relative:
         yscale = 'linear'
-        d0 = kepler_tools.load_dump(cycles[0], run, batch, source=source, basename=basename,
-                                    prefix=prefix)
-        t0 = d0.tn[1:-1]
-        i_end = len(t0) + 1
+        dump0 = kepler_tools.load_dump(cycles[0], run, batch, source=source, basename=basename,
+                                       prefix=prefix)
+        interp0 = kepler_tools.interp_temp(dump=dump0)
         ylabel = r'T - $T_{\#0}$ (K)'
     else:
         ax.set_ylim(ylims)
-        t0 = 0.0
-        i_end = -1
         ylabel = r'T o(K)'
 
     for cycle in cycles:
         dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
                                       prefix=prefix)
-        ax.plot(dump.y[1:i_end], dump.tn[1:i_end]-t0, label=f'#{cycle}', marker=marker)
+        x = dump.y[i0:i1]
+        y = dump.tn[i0:i1]
+        if relative:
+            y = y - interp0(x)
+
+        ax.plot(x, y, label=f'#{cycle}', marker=marker)
 
     if title is None:
         title = f'{source}_{batch}_{run}'
