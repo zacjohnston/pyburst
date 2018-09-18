@@ -53,7 +53,7 @@ def linregress_qnuc(source, grid_version=0):
 
 
 def extract_qnuc_table(source, grid_version=0, param_batch=None, param_table=None,
-                       cycles=None, temp_zone=None):
+                       cycles=None, depth=None):
     """Extracts optimal Qnuc across all parameters
 
     param_batch : int (optional)
@@ -74,7 +74,7 @@ def extract_qnuc_table(source, grid_version=0, param_batch=None, param_table=Non
 
     qnuc_table = iterate_solve_qnuc(source, param_table=param_table,
                                     cycles=cycles, kgrid=kgrid, grid_version=grid_version,
-                                    temp_zone=temp_zone)
+                                    depth=depth)
     save_qnuc_table(qnuc_table, source, grid_version)
 
 
@@ -97,7 +97,7 @@ def save_qnuc_table(table, source, grid_version=0):
         f.write(table_str)
 
 
-def get_slopes(param_table, source, cycles=None, basename='xrb', temp_zone=None):
+def get_slopes(param_table, source, cycles=None, basename='xrb', depth=None):
     """Returns slopes of base temperature evolution(K/s), for given model table
     """
     param_table = param_table.reset_index()
@@ -109,7 +109,7 @@ def get_slopes(param_table, source, cycles=None, basename='xrb', temp_zone=None)
             cycles = burst_tools.get_burst_cycles(row.run, row.batch, source=source)
         temps = kepler_tools.extract_temps(row.run, row.batch, source,
                                            cycles=cycles, basename=basename,
-                                           temp_zone=temp_zone)
+                                           depths=depth)
         i0 = 2 if len(temps) > 2 else 1  # skip first dumps if possible
         linr = linregress(temps[i0:, 0], temps[i0:, 1])
         slopes[row.Index] = linr[0]
@@ -118,7 +118,7 @@ def get_slopes(param_table, source, cycles=None, basename='xrb', temp_zone=None)
 
 
 def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None, grid_version=0,
-                       temp_zone=None):
+                       depth=None):
     """Iterates over solve_qnuc for a table of params
     """
     param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
@@ -132,14 +132,14 @@ def iterate_solve_qnuc(source, param_table, cycles=None, kgrid=None, grid_versio
         qnuc[row.Index] = solve_qnuc(source=source, params=params,
                                      cycles=cycles, kgrid=kgrid,
                                      grid_version=grid_version,
-                                     temp_zone=temp_zone)[0]
+                                     depth=depth)[0]
     sys.stdout.write('\n')
     qnuc_table = param_table.copy()[param_list]
     qnuc_table['qnuc'] = qnuc
     return qnuc_table
 
 
-def solve_qnuc(source, params, cycles=None, kgrid=None, grid_version=0, temp_zone=None):
+def solve_qnuc(source, params, cycles=None, kgrid=None, grid_version=0, depth=None):
     """Returns predicted Qnuc that gives stable base temperature
     """
     # TODO: add other methods (e.g. bisection)
@@ -153,7 +153,7 @@ def solve_qnuc(source, params, cycles=None, kgrid=None, grid_version=0, temp_zon
                                     grid_version=grid_version)
 
     subset = kgrid.get_params(params=params)
-    slopes = get_slopes(param_table=subset, source=source, cycles=cycles, temp_zone=temp_zone)
+    slopes = get_slopes(param_table=subset, source=source, cycles=cycles, depth=depth)
 
     linr = linregress(subset['qnuc'], slopes)
     x0 = -linr[1]/linr[0]  # x0 = -y0/m

@@ -101,14 +101,14 @@ def get_cycle_times(cycles, run, batch, source, basename='xrb', prefix=''):
     return times
 
 
-def extract_temps(run, batch, source, cycles=None, basename='xrb',
-                  temp_zone=None, depths=(1e11,)):
-    """Extracts base temperature versus time from mode dumps. Returns as [t (s), T (K)]
+def extract_temps(run, batch, source, depths, cycles=None, basename='xrb'):
+    """Extracts temperature versus time from mode dumps (at given depth)
+        Returns as [t (s), T_1 .. T_n (K)], where n=len(depths)
 
     cycles : [int] (optional)
         specifiy which dump cycles to load. If None, load all available
-    zone : int
-        zone (index) to extract temperature from
+    depths : array
+        column depth(s) (g/cm^2) at which to extract temperatures
     """
     if cycles is None:
         cycles = get_cycles(run, batch, source)

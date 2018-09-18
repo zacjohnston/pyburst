@@ -211,7 +211,7 @@ def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
 
 
 def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False,
-                         temp_zone=None):
+                         depth=None):
     fig, ax = plt.subplots()
     n = len(runs)
     if len(sources) == 1:
@@ -220,14 +220,14 @@ def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linea
     for i in range(n):
         plot_base_temp(run=runs[i], batch=batches[i], source=sources[i],
                        cycles=cycles, ax=ax, display=False, title=False, linear=linear,
-                       temp_zone=temp_zone)
+                       depth=depth)
     if legend:
         ax.legend(loc='center left')
     plt.show(block=False)
 
 
 def plot_base_temp(run, batch, source, cycles=None, basename='xrb', title=True,
-                   display=True, ax=None, linear=False, temp_zone=None):
+                   display=True, ax=None, linear=False, depth=None):
     if ax is None:
         fig, ax = plt.subplots()
     xscale = 3600
@@ -235,7 +235,7 @@ def plot_base_temp(run, batch, source, cycles=None, basename='xrb', title=True,
         cycles = burst_tools.get_burst_cycles(run, batch=batch, source=source)
 
     temps = kepler_tools.extract_temps(run, batch, source, cycles=cycles,
-                                       basename=basename, temp_zone=temp_zone)
+                                       basename=basename, depths=depth)
     model_str = grid_strings.get_model_string(run, batch, source)
     ax.plot(temps[:, 0]/xscale, temps[:, 1], marker='o', label=model_str)
 
