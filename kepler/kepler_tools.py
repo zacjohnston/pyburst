@@ -125,8 +125,14 @@ def extract_temps(run, batch, source, depths, cycles=None, basename='xrb'):
 def get_depth_temps(dump, depths):
     """Returns temperature at given depth(s) (g/cm^2)
     """
-    linear = interp1d(dump.y[1:-2], dump.tn[1:-2])
+    linear = interp_temp(dump)
     return linear(depths)
+
+
+def interp_temp(dump, i0=1, i2=-2):
+    """Returns a linear interpolation function for given temperature profile
+    """
+    return interp1d(dump.y[i0:i2], dump.tn[i0:i2])
 
 
 def print_cycle_progress(cycle, cycles, i, prefix=''):
