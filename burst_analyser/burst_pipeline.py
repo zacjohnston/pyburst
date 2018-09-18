@@ -6,6 +6,7 @@ Wrapper for sequential burst analysis routines, such as:
     - collecting the results
 """
 import numpy as np
+import pandas as pd
 import multiprocessing as mp
 import os
 import time
@@ -51,11 +52,16 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
         burst_tools.combine_batch_summaries(np.arange(last_batch) + 1, source)
 
 
-def extract_batches(batches, source, save_plots=True, multithread=True,
-                    reload=False, load_bursts=False, load_summary=False, basename='xrb'):
+def extract_batches(source, batches=None, save_plots=True, multithread=True,
+                    reload=False, load_bursts=False, load_summary=False, basename='xrb',
+                    param_table=None):
     """Do burst analysis on arbitrary number of batches"""
     t0 = time.time()
-    batches = grid_tools.ensure_np_list(batches)
+    if param_table is not None:
+        print('Using models from table provided')
+        batches = np.unique(param_table['batch'])
+    else:
+        batches = grid_tools.ensure_np_list(batches)
 
     for batch in batches:
         print_title(f'Batch {batch}')
@@ -65,8 +71,12 @@ def extract_batches(batches, source, save_plots=True, multithread=True,
             path = os.path.join(analysis_path, folder)
             grid_tools.try_mkdir(path, skip=True)
 
-        n_runs = grid_tools.get_nruns(batch, source)
-        runs = np.arange(n_runs) + 1
+        if param_table is not None:
+            subset = grid_tools.reduce_table(param_table, params={'batch': batch})
+            runs = np.array(subset['run'])
+        else:
+            n_runs = grid_tools.get_nruns(batch, source)
+            runs = np.arange(n_runs) + 1
 
         if multithread:
             args = []
