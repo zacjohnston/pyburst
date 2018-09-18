@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import sys
+from scipy.interpolate import interp1d
 
 # kepler
 import kepdump
@@ -123,6 +124,13 @@ def extract_temps(run, batch, source, cycles=None, basename='xrb',
         dump = load_dump(cycle, run=run, batch=batch, source=source, basename=basename)
         temps[i] = np.array((dump.time, dump.tn[temp_zone]))
     return temps
+
+
+def get_depth_temps(dump, depths):
+    """Returns temperature at given depth(s) (g/cm^2)
+    """
+    linear = interp1d(dump.y[1:-2], dump.tn[1:-2])
+    return linear(depths)
 
 
 def print_cycle_progress(cycle, cycles, i, prefix=''):
