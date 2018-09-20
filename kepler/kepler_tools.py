@@ -61,6 +61,15 @@ def extract_dump_table(run, batch, source, cycles=None, dumps=None, basename='xr
     return table
 
 
+def dump_dict(dump):
+    """Returns dict of common profiles (radial quantities)
+    """
+    return {'y': dump.y,
+            'tn': dump.tn,
+            'xkn': dump.xkn,
+            }
+
+
 def check_cycles(cycles, run, batch, source):
     """Get available cycles if none provided
     """
