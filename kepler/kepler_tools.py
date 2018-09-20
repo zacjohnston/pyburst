@@ -129,6 +129,14 @@ def get_depth_temps(dump, depths):
     return linear(depths)
 
 
+def get_substrate_zone(dump):
+    """Returns column depth (g/cm^2) of transition to substrate
+    """
+    mass_coord = dump.ymb
+    substrate_mass = dump.parm('bmasslow')
+    idx = np.searchsorted(np.sort(mass_coord), substrate_mass)
+    return len(mass_coord) - idx
+
 def interp_temp(dump, i0=1, i2=-2):
     """Returns a linear interpolation function for given temperature profile
     """
