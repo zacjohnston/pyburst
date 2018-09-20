@@ -137,60 +137,6 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     plt.show(block=False)
 
 
-def plot_temp(run, batch, source, cycles=None, basename='xrb', title=None,
-              display=True, prefix='', fontsize=14, marker='', relative=False,
-              xlims=None, ylims=(5e7, 5e9), legend=True,
-              yscale='log', xscale='log'):
-    """Plot temperature profile at given cycle (timestep)
-
-    relative : bool
-        plot temps relative to first cycle (T-T0)
-    """
-    fig, ax = plt.subplots()
-    cycles = kepler_tools.check_cycles(cycles, run=run, batch=batch, source=source)
-    i0 = 2
-    i1 = -3
-    interp0 = None
-
-    if relative:
-        yscale = 'linear'
-        dump0 = kepler_tools.load_dump(cycles[0], run, batch, source=source, basename=basename,
-                                       prefix=prefix)
-        interp0 = kepler_tools.interp_temp(dump=dump0)
-        ylabel = r'T - $T_{\#0}$ (K)'
-    else:
-        ax.set_ylim(ylims)
-        ylabel = r'T o(K)'
-
-    for cycle in cycles:
-        dump = kepler_tools.load_dump(cycle, run, batch, source=source, basename=basename,
-                                      prefix=prefix)
-        x = dump.y[i0:i1]
-        y = dump.tn[i0:i1]
-        if relative:
-            y = y - interp0(x)
-
-        ax.plot(x, y, label=f'#{cycle}', marker=marker)
-
-    if title is None:
-        title = f'{source}_{batch}_{run}'
-    ax.set_title(title)
-
-    if xlims is not None:
-        ax.set_xlim(xlims)
-    ax.set_yscale(yscale)
-    ax.set_xscale(xscale)
-    ax.set_xlabel(r'y (g cm$^{-2}$)', fontsize=fontsize)
-    ax.set_ylabel(ylabel, fontsize=fontsize)
-    if legend:
-        ax.legend()
-    plt.tight_layout()
-
-    if display:
-        plt.show(block=False)
-    return fig
-
-
 def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
     """Iterate through cycles and save temperature profile plots
     """

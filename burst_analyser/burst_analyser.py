@@ -11,7 +11,7 @@ from scipy.stats import linregress
 from . import burst_tools
 from pygrids.grids import grid_tools, grid_strings
 from pygrids.kepler import kepler_tools
-from pygrids.misc import temp
+from pygrids.kepler import kepler_plot
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -1146,15 +1146,16 @@ class BurstRun(object):
         for burst in range(self.n_bursts):
             self.plot_lightcurves(burst, save=True, display=False, **kwargs)
 
-    def plot_temp_profile(self, discard=5, legend=False, relative=True, **kwargs):
+    def plot_temp_profile(self, discard=5, legend=False, relative=False, **kwargs):
         """Plots temperature profile at each dump_start
 
         discard : int
             number of initial burst dumps to discard
         """
         cycles = np.array(self.dumps_starts().index)
-        temp.plot_temp(run=self.run, batch=self.batch, source=self.source,
-                       cycles=cycles[discard:], legend=legend, relative=relative)
+        kepler_plot.plot_dump_profile(run=self.run, batch=self.batch, source=self.source,
+                                      cycles=cycles[discard:], legend=legend,
+                                      relative=relative, y_param='tn', **kwargs)
 
     def show_save_fig(self, fig, display, save, plot_name,
                       path=None, extra='', extension='png'):
