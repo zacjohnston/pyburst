@@ -12,7 +12,7 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
                   accmass=1.0e18, zonermax=10, zonermin=-1, nstop=10000000,
                   accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
-                  minzone=51, setup_test=False):
+                  minzone=51, thickfac=0.001, setup_test=False):
     """========================================================
     Creates a model generator file with the given params inserted
     ========================================================
@@ -90,6 +90,7 @@ p 46 .15
 p 47 3.e-3
 p 48 1.
 p 49 1.e+50
+p thickfac {thickfac:.2f}
 p 53 .1
 p 54  2.
 p 55  10.
