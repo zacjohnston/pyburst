@@ -110,7 +110,7 @@ def get_slopes(param_table, source, cycles=None, basename='xrb', depth=None):
         temps = kepler_tools.extract_temps(row.run, row.batch, source,
                                            cycles=cycles, basename=basename,
                                            depths=depth)
-        i0 = 2 if len(temps) > 2 else 1  # skip first dumps if possible
+        i0 = 5 if len(temps) > 5 else 1  # skip first dumps if possible
         linr = linregress(temps[i0:, 0], temps[i0:, 1])
         slopes[row.Index] = linr[0]
 
