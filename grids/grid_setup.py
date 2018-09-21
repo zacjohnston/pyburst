@@ -90,7 +90,7 @@ def create_batch(batch, dv, source,
                  auto_t_end=True, notes='No notes given', debug=False,
                  nbursts=20, parallel=False, ntasks=8, kgrid=None,
                  nuc_heat=False, setup_test=False, predict_qnuc=True,
-                 grid_version=None, qnuc_source='heat', **kwargs):
+                 grid_version=None, qnuc_source='heat', minzone=51, **kwargs):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -250,7 +250,8 @@ def create_batch(batch, dv, source,
                                    accrate0=accrate0, accdepth=accdepth,
                                    accmass=params_full['accmass'][i],
                                    nsdump=nsdump, nstop=nstop,
-                                   nuc_heat=nuc_heat, setup_test=setup_test, cnv=0)
+                                   nuc_heat=nuc_heat, setup_test=setup_test, cnv=0,
+                                   minzone=minzone)
 
 
 def print_grid_params(params):
