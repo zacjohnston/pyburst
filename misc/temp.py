@@ -8,7 +8,7 @@ from scipy.stats import linregress
 
 # pygrids
 from pygrids.grids import grid_strings, grid_tools
-from pygrids.kepler import kepler_tools
+from pygrids.kepler import kepler_tools, kepler_plot
 from pygrids.burst_analyser import burst_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -154,8 +154,9 @@ def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
         kepler_tools.print_cycle_progress(cycle=cycle, cycles=cycles, i=i,
                                           prefix='Saving plots: ')
         title = f'cycle={cycle},  t={times[i]:.6f}'
-        fig = plot_temp(cycles=[cycle], run=run, batch=batch, source=source, title=title,
-                        display=False, **kwargs)
+        fig = kepler_plot.plot_dump_profile(cycles=[cycle], run=run, batch=batch,
+                                            source=source, title=title, y_param='tn',
+                                            display=False, **kwargs)
 
         filename = f'temp_{source}_{batch}_{run}_{i:04}.png'
         filepath = os.path.join(path, filename)
@@ -193,7 +194,8 @@ def plot_base_temp(run, batch, source, cycles=None, basename='xrb', title=True,
     ax.plot(temps[:, 0]/xscale, temps[:, 1], marker='o', label=model_str)
 
     if linear:
-        i0 = 1 if len(temps) > 2 else 0  # skip first dump if possible
+        # i0 = 5 if len(temps) > 6 else 0  # skip first dump if possible
+        i0 = int(len(temps) / 2)
         linr = linregress(temps[i0:, 0], temps[i0:, 1])
         x = np.array([temps[0, 0], temps[-1, 0]])
         y = linr[0] * x + linr[1]
