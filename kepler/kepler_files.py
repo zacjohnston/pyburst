@@ -12,7 +12,7 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
                   accmass=1.0e18, zonermax=10, zonermin=-1, nstop=10000000,
                   accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
-                  minzone=51, thickfac=0.001, setup_test=False):
+                  minzone=51, thickfac=0.001, setup_test=False, substrate='fe54'):
     """========================================================
     Creates a model generator file with the given params inserted
     ========================================================
@@ -57,8 +57,8 @@ c {header}
 c ==============================================
 net 1 h1 he3 he4 n14 c12 o16 ne20 mg24
 net 1 si28 s32 ar36 ca40 ti44 cr48 fe52
-net 1 ni56 fe54 pn1 nt1
-m nstar 1.00 fe54
+net 1 ni56 {substrate} pn1 nt1
+m nstar 1.00 {substrate}
 c He star abundances
 m acret {h1:.4f} h1 {he4:.4f} he4 0.0 c12 {n14:.4f} n14 0. o16
 c THIS GRID FOR He ACCRETION
