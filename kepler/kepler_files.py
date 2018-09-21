@@ -12,7 +12,7 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
                   accmass=1.0e18, zonermax=10, zonermin=-1, nstop=10000000,
                   accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
-                  minzone=51, thickfac=0.001, setup_test=False, substrate='fe54'):
+                  minzone=51, thickfac=0.001, setup_test=False):
     """========================================================
     Creates a model generator file with the given params inserted
     ========================================================
@@ -57,8 +57,8 @@ c {header}
 c ==============================================
 net 1 h1 he3 he4 n14 c12 o16 ne20 mg24
 net 1 si28 s32 ar36 ca40 ti44 cr48 fe52
-net 1 ni56 {substrate} pn1 nt1
-m nstar 1.00 {substrate}
+net 1 ni56 fe54 pn1 nt1
+m nstar 1.00 fe54
 c He star abundances
 m acret {h1:.4f} h1 {he4:.4f} he4 0.0 c12 {n14:.4f} n14 0. o16
 c THIS GRID FOR He ACCRETION
@@ -293,7 +293,7 @@ d #
 end""")
 
 
-def write_rpabg(x, z, path):
+def write_rpabg(x, z, path, substrate='fe54'):
     """=================================================
     Writes burn generator file, rpabg. Sets initial grid structure
     =================================================
@@ -317,9 +317,9 @@ net 1   ne21  ne22
 net 1   na21  na22  na23  mg23  mg24  mg25  mg26
 net 1   al25  al26  al27  si27  si28  si29  si30
 net 1   p30   p31   s31   s32   s33   s34   s35   s36
-net 1   fe56
+net 1   {substrate}
 c define composition
-m fecomp    1.0e+00   fe56
+m fecomp    1.0e+00   {substrate}
 m hcomp     {x:.4f} h1  {y:.4f} he4 {z:.4f} n14
 c
 c specify grid composition

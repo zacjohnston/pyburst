@@ -216,7 +216,7 @@ def create_batch(batch, dv, source,
         # ==== Write burn file, set initial composition ====
         x0 = params_full['x'][i]
         z0 = params_full['z'][i]
-        kepler_files.write_rpabg(x0, z0, run_path)
+        kepler_files.write_rpabg(x0, z0, run_path, substrate=substrate)
 
         # ==== Create model generator file ====
         accrate0 = params_full['accrate'][i]
@@ -254,7 +254,7 @@ def create_batch(batch, dv, source,
                                    nsdump=nsdump, nstop=nstop,
                                    nuc_heat=nuc_heat, setup_test=setup_test, cnv=0,
                                    minzone=minzone, zonermax=zonermax, zonermin=zonermin,
-                                   thickfac=thickfac, substrate=substrate)
+                                   thickfac=thickfac)
 
 
 def print_grid_params(params):
