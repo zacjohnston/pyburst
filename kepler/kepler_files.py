@@ -12,7 +12,7 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
                   accmass=1.0e18, zonermax=10, zonermin=-1, nstop=10000000,
                   accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
-                  minzone=51, thickfac=0.001, setup_test=False):
+                  minzone=51, thickfac=0.001, setup_test=False, substrate_off=True):
     """========================================================
     Creates a model generator file with the given params inserted
     ========================================================
@@ -35,6 +35,8 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
     qnuc_str1 = ''
     qnuc_str2 = ''
     kill_setup = ''
+    bmasslow = 'p bmasslow 2.8000000199990d33'
+
     if nuc_heat:
         qnuc_str1 = f"""
 c Convert qnuc from MeV/nucleon to erg/g
@@ -50,6 +52,8 @@ p xheatdm 2.e20"""
 
     if setup_test:
         kill_setup = "end\n"
+    if not substrate_off:
+        bmasslow = ''
 
     with open(genpath, 'w') as f:
         f.write(f"""c ==============================================
@@ -143,7 +147,7 @@ p 64 1
 p 434 1
 p 443 2
 c p 419 2.80000019999895D33
-p bmasslow 2.8000000199990d33
+{bmasslow}
 p 147 1.
 p 146 1.
 p 233 1.d7
