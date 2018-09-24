@@ -6,6 +6,7 @@ from . import mcmc_test
 from . import best_lc
 from . import converge
 from . import resolution
+from . import reaclib
 
 __all__ = ['pyprint',
            'misc',
@@ -15,4 +16,5 @@ __all__ = ['pyprint',
            'best_lc',
            'converge',
            'resolution',
+           'reaclib',
            ]
