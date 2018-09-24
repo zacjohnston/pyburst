@@ -92,7 +92,8 @@ def create_batch(batch, dv, source,
                  nuc_heat=False, setup_test=False, predict_qnuc=True,
                  grid_version=None, qnuc_source='heat', minzone=51,
                  zonermax=10, zonermin=-1, thickfac=0.001,
-                 substrate='fe54', substrate_off=True, **kwargs):
+                 substrate='fe54', substrate_off=True, adapnet_filename=None,
+                 **kwargs):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -201,7 +202,8 @@ def create_batch(batch, dv, source,
                                                       source=source, basename=basename,
                                                       path=logpath, qos=qos,
                                                       walltime=walltime,
-                                                      parallel=parallel, debug=debug)
+                                                      parallel=parallel, debug=debug,
+                                                      adapnet_filename=adapnet_filename)
 
     # ===== Directories and templates for each model =====
     for i in range(n):
@@ -400,7 +402,8 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
 
 
 def extend_runs(summ_table, source, nbursts=40, basename='xrb', nstop=9999999,
-                nsdump=1000, walltime=96, do_cmd_files=True, do_jobscripts=True):
+                nsdump=1000, walltime=96, do_cmd_files=True, do_jobscripts=True,
+                adapnet_filename=None):
     """Modifies existing models (in summ_table) for resuming, to simulate more bursts
     """
     source = grid_strings.source_shorthand(source)
@@ -421,7 +424,8 @@ def extend_runs(summ_table, source, nbursts=40, basename='xrb', nstop=9999999,
             runs = np.array(batch_table['run'])
             kepler_jobscripts.write_submission_script(batch, run0=runs[0], run1=runs[-1],
                                                       runs=runs, source=source,
-                                                      walltime=walltime, restart=True)
+                                                      walltime=walltime, restart=True,
+                                                      adapnet_filename=adapnet_filename)
 
 
 def add_to_cmd(run, batch, source, add_line, basename='xrb'):

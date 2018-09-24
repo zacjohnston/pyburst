@@ -9,7 +9,6 @@ from pygrids.grids import grid_strings
 # ========================================================
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
-
 def get_span_string(run0, run1, runs=None):
     """Returns string of run0-run1, (or run0 if run0 == run1)
     """
@@ -64,7 +63,8 @@ def write_individual_scripts(batches, runs, source, walltime, **kwargs):
 def write_submission_script(batch, source, walltime, path=None,
                             run0=None, run1=None, runs=None,
                             parallel=False, qos='normal', basename='xrb',
-                            restart=False, max_tasks=16, debug=False):
+                            restart=False, max_tasks=16, debug=False,
+                            adapnet_filename=None):
     """Writes jobscripts to execute on MONARCH/ICER cluster
 
     Parameter:
@@ -102,7 +102,8 @@ def write_submission_script(batch, source, walltime, path=None,
                                         batch=batch, basename=basename, qos=qos,
                                         time_str=time_str, job_str=job_str,
                                         cluster=cluster, parallel=parallel,
-                                        debug=debug, restart=restart)
+                                        debug=debug, restart=restart,
+                                        adapnet_filename=adapnet_filename)
 
         span = get_span_string(run0, run1)
         prepend_str = {True: 'restart_'}.get(restart, '')
@@ -116,15 +117,19 @@ def write_submission_script(batch, source, walltime, path=None,
     if parallel:
         write_parallel_script(run0=run0, run1=run1, batch=batch, path=path,
                               restart=restart, basename=basename, source=source,
-                              debug=debug)
+                              debug=debug, adapnet_filename=adapnet_filename)
 
 
 def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
-                       qos, time_str, parallel, job_str, debug, restart):
+                       qos, time_str, parallel, job_str, debug, restart,
+                       adapnet_filename=None):
     source = grid_strings.source_shorthand(source=source)
     span_str = get_span_string(run0, run1, runs=runs)
     batch_str = get_jobstring(batch=batch, run0=run0, run1=run1, source=source,
                               include_source=False)
+
+    if adapnet_filename is None:
+        adapnet_filename = 'adapnet_alex_email_dec.5.2016.cfg'
 
     # ===== restart parameters =====
     cmd_str = {True: 'z1', False: 'xrb_g'}[restart]
@@ -150,7 +155,7 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=zac.johnston@monash.edu
 ######################
-cd /home/zacpetej/id43/kepler/runs/{source}_{batch}/logs
+cd $KEPLER_MODELS/{source}_{batch}/logs
 ./{parallel_file}
 """
 
@@ -170,9 +175,11 @@ cd /home/zacpetej/id43/kepler/runs/{source}_{batch}/logs
 
 ######################
 N=$SLURM_ARRAY_TASK_ID
-EXE_PATH=/home/zacpetej/id43/kepler/gfortran/keplery
-cd /home/zacpetej/id43/kepler/runs/{source}_{batch}/{basename}$N/
+EXE_PATH=$KEPLER_PATH/gfortran/keplery
+ADAPNET_PATH=$KEPLER_GRIDS/pygrids/files/{adapnet_filename}
+cd $KEPLER_MODELS/{source}_{batch}/{basename}$N/
 ln -sf $EXE_PATH ./k
+ln -sf $ADAPNET_PATH ./adapnet.cfg
 ./k {basename}$N {cmd_str} {debug_str}"""
 
     elif cluster == 'icer':
@@ -191,7 +198,7 @@ ln -sf $EXE_PATH ./k
 #PBS -M zac.johnston@monash.edu
 ###################################
 module load GNU/6.2
-cd /mnt/home/f0003004/kepler/runs/{source}_{batch}/logs
+cd $KEPLER_MODELS/{source}_{batch}/logs
 ./{parallel_file}
 qstat -f $PBS_JOBID     # Print statistics """
 
@@ -209,25 +216,27 @@ qstat -f $PBS_JOBID     # Print statistics """
 ###################################
 N=$PBS_ARRAYID
 EXE_PATH=$KEPLER_PATH/gfortran/keplery
+ADAPNET_PATH=$KEPLER_GRIDS/pygrids/files/{adapnet_filename}
 module load GNU/6.2
-cd /mnt/home/f0003004/kepler/runs/{source}_{batch}/{basename}$N/
+cd $KEPLER_MODELS/{source}_{batch}/{basename}$N/
 ln -sf $EXE_PATH ./k
+ln -sf $ADAPNET_PATH ./adapnet.cfg
 
 ./k {basename}$N {cmd_str} {debug_str}
 qstat -f $PBS_JOBID     # Print statistics """
-
-
     else:
         raise ValueError('invalid cluster. Must be one of [monarch, icer]')
 
 
 def write_parallel_script(run0, run1, batch, path, source, restart, debug=False,
-                          basename='xrb', gen_file='xrb_g'):
+                          basename='xrb', gen_file='xrb_g', adapnet_filename=None):
     """========================================================
     Writes a bash script to launch parallel kepler tasks
     ========================================================"""
     source = grid_strings.source_shorthand(source=source)
     print('Writing MPI script')
+    if adapnet_filename is None:
+        adapnet_filename = 'adapnet_alex_email_dec.5.2016.cfg'
 
     # ===== restart things =====
     debug_str = {True: 'x', False: ''}[debug]
@@ -242,14 +251,16 @@ def write_parallel_script(run0, run1, batch, path, source, restart, debug=False,
     with open(filepath, 'w') as f:
         f.write(f"""#!/bin/bash
 
-exe_path=$KEPLER_MODELS/../gfortran/keplery
+exe_path=$KEPLER_PATH/gfortran/keplery
 batch_dir=$KEPLER_MODELS/{source}_{batch}
+ADAPNET_PATH=$KEPLER_GRIDS/pygrids/files/{adapnet_filename}
 
 for run in $(seq {run0} {run1}); do
    run_str="{basename}${{run}}"
    echo "{start_str}"
    cd $batch_dir/$run_str
    ln -sf $exe_path ./k
+   ln -sf $ADAPNET_PATH ./adapnet.cfg
    {execute_str} > ${{run_str}}_std.out &
 done
 
