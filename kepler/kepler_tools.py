@@ -67,6 +67,8 @@ def dump_dict(dump):
     return {'y': dump.y,
             'tn': dump.tn,
             'xkn': dump.xkn,
+            'abar': dump.abar,
+            'zbar': dump.zbar,
             }
 
 
