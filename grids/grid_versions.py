@@ -50,7 +50,9 @@ version_definitions = {
     'exclude_any':
         {
             'adelle': {},
-            'biggrid2': {},
+            'biggrid2': {
+                1: {},
+            },
             'biggrid3': {},
             'test1': {},
             'grid4': {},
