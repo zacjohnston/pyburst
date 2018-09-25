@@ -74,6 +74,7 @@ class BurstRun(object):
                            'bimodal_sigma': 3,  # number of std's modes are separated by
                            'outlier_distance': 1.5,  # fraction of IQR above Q3
                            'max_shock_iterations': 100,  # max cycles in get_burst_candidates()
+                           'dump_time_offset': 0.0,  # time offset (s) from burst start
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
                            }
 
@@ -800,8 +801,9 @@ class BurstRun(object):
             return
 
         last_dump_index = self.dump_table.index[-1]
+        t_offset = self.parameters['dump_time_offset']
         for burst in self.bursts.itertuples():
-            idx = np.searchsorted(self.dump_table['time'], burst.t_start)[0]
+            idx = np.searchsorted(self.dump_table['time'], burst.t_start + t_offset)[0]
             if idx > last_dump_index:
                 return
             cycle, time = self.dump_table.iloc[idx]
