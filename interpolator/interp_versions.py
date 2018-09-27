@@ -84,7 +84,9 @@ version_definitions = {
                     25: 16,
                     26: 16,
                 },
-            'grid4': {},
+            'grid4': {
+                3: ['accrate', 'x', 'z', 'qb', 'mass'],
+            },
             'heat': {},
         },
     'bprops':
@@ -189,6 +191,11 @@ version_definitions = {
                 2: {'accrate': [0.08, 0.22],
                     'mass': 2.0,
                     },
+                3: {'accrate': [0.08, 0.20, 0.22],
+                    'x': [0.72, 0.74],
+                    'z': 0.005,
+                    'mass': 2.0
+                    }
                 },
             'heat': {
                 1: {  # gs1826 models
@@ -205,7 +212,11 @@ version_definitions = {
     'exclude_all':
         {
             'biggrid2': {},
-            'grid4': {},
+
+            'grid4': {
+                3: [{'x': 0.73, 'accdepth': 1e20}],
+            },
+
             'res1': {},
             'heat': {},
         }
