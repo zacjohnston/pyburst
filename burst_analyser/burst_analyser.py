@@ -72,6 +72,7 @@ class BurstRun(object):
                            'min_regress': 20,  # min num of bursts to do linear regression
                            'n_bimodal': 20,  # n_bursts to check for bimodality
                            'bimodal_sigma': 3,  # number of std's modes are separated by
+                           'outlier_bprops': ('dt', 'fluence', 'peak'),  # bprops to check
                            'outlier_distance': 1.5,  # fraction of IQR above Q3
                            'max_shock_iterations': 100,  # max cycles in get_burst_candidates()
                            'dump_time_offset': 0.0,  # time offset (s) from burst start
@@ -669,7 +670,7 @@ class BurstRun(object):
     def identify_outliers(self):
         """Identify outlier bursts
 
-        Note: bursts up to min_discard and short_waits will not be considered
+        Note: bursts up to min_discard and short_waits will not be included
                 in the calculation of the mean
         """
         self.bursts['outlier'] = np.full(self.n_bursts, False)
@@ -677,12 +678,16 @@ class BurstRun(object):
             self.printv('Too few bursts to get outliers')
             return
 
-        clean_dt = self.clean_bursts(exclude_outliers=False)['dt']
-        percentiles = burst_tools.get_quartiles(clean_dt,
-                                                iqr_frac=self.parameters['outlier_distance'])
+        outliers = self.bursts.copy()['outlier']
 
-        outliers = (self.bursts['dt'] < percentiles[0]) | (self.bursts['dt'] > percentiles[-1])
-        outliers[:self.parameters['min_discard']] = True
+        for bprop in self.parameters['outlier_bprops']:
+            clean = self.clean_bursts(exclude_outliers=False)[bprop]
+            percentiles = burst_tools.get_quartiles(clean, self.parameters['outlier_distance'])
+
+            outliers = ((self.bursts[bprop] < percentiles[0])
+                        | (self.bursts[bprop] > percentiles[-1])
+                        | outliers)
+            outliers[:self.parameters['min_discard']] = True  # min_discard always outliers
 
         self.bursts['outlier'] = outliers
         self.n_outliers = len(self.outliers())
