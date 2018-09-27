@@ -36,7 +36,7 @@ class BurstRun(object):
                  reload=False, save_lum=True, analyse=True, plot=False,
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
-                 load_dumps=True):
+                 load_dumps=True, set_paramaters=None):
         self.flags = {'lum_loaded': False,
                       'dumps_loaded': False,
                       'analysed': False,
@@ -78,6 +78,7 @@ class BurstRun(object):
                            'dump_time_offset': 0.0,  # time offset (s) from burst start
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
                            }
+        self.overwrite_parameters(set_paramaters)
 
         self.colours = {'bursts': 'C1',
                         'candidates': 'C3',
@@ -167,6 +168,20 @@ class BurstRun(object):
 
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
         self.flags['lum_loaded'] = True
+
+    def overwrite_parameters(self, set_parameters):
+        """Overwrite default analysis parameters
+        """
+        if set_parameters is not None:
+            if type(set_parameters) is dict:
+                for param, value in set_parameters.items():
+                    self.printv(f'Overwriting default analysis parameter: {param}={value}')
+                    if param in self.parameters:
+                        self.parameters[param] = value
+                    else:
+                        raise ValueError(f"parameter '{param}' not in self.parameters")
+            else:
+                raise TypeError("'set_parameters' must be type dict")
 
     def load_burst_table(self):
         """Load pre-extracted burst properties from file
