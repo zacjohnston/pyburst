@@ -1023,7 +1023,7 @@ class BurstRun(object):
         if self.flags['regress_too_few_bursts']:
             self.printv("Can't plot linregress: bursts not converged")
             return
-        fig, ax = plt.subplots(3, 1, figsize=(6, 8))
+        fig, ax = plt.subplots(3, 1, figsize=(6, 8), sharex=True)
         markersize = 8
         markeredgecolor = '0'
         fontsize = 14
