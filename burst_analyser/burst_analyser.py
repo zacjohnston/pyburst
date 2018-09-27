@@ -78,14 +78,14 @@ class BurstRun(object):
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
                            }
 
-        self.plot_colours = {'bursts': 'C1',
-                             'candidates': 'C3',
-                             'outliers': 'C9',
-                             'short_waits': 'C4',
-                             'burst_stages': 'C2',
-                             'shocks': 'C3',
-                             'dumps': 'C0',
-                             }
+        self.colours = {'bursts': 'C1',
+                        'candidates': 'C3',
+                        'outliers': 'C9',
+                        'short_waits': 'C4',
+                        'burst_stages': 'C2',
+                        'shocks': 'C3',
+                        'dumps': 'C0',
+                        }
 
         self.cols = ['n', 'dt', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
                      't_pre', 't_pre_i', 'lum_pre', 't_start', 't_start_i',
@@ -865,19 +865,19 @@ class BurstRun(object):
         if candidates:  # NOTE: candidates may be modified if a shock was removed
             x = self.candidates[:, 0] / timescale
             y = self.candidates[:, 1] / yscale
-            ax.plot(x, y, marker='o', c=self.plot_colours['candidates'], ls='none',
+            ax.plot(x, y, marker='o', c=self.colours['candidates'], ls='none',
                     markersize=markersize, markeredgecolor=markeredgecolor, label='Candidates')
 
         if peaks:
             ax.plot(self.bursts['t_peak']/timescale, self.bursts['peak']/yscale, marker='o', ls='none',
                     label='Bursts', markeredgecolor=markeredgecolor, markersize=markersize,
-                    c=self.plot_colours['bursts'])
+                    c=self.colours['bursts'])
 
         if outliers:
             bursts = self.outliers()
             x = bursts['t_peak'] / timescale
             y = bursts['peak'] / yscale
-            ax.plot(x, y, marker='o', c=self.plot_colours['outliers'], ls='none',
+            ax.plot(x, y, marker='o', c=self.colours['outliers'], ls='none',
                     markeredgecolor=markeredgecolor, markersize=markersize, label='Outliers')
 
         if short_wait:
@@ -885,7 +885,7 @@ class BurstRun(object):
                 bursts = self.short_waits()
                 x = bursts['t_peak'] / timescale
                 y = bursts['peak'] / yscale
-                ax.plot(x, y, marker='o', c=self.plot_colours['short_waits'], ls='none',
+                ax.plot(x, y, marker='o', c=self.colours['short_waits'], ls='none',
                         markersize=markersize, markeredgecolor=markeredgecolor, label='Short-wait')
 
         if burst_stages:
@@ -893,7 +893,7 @@ class BurstRun(object):
                 x = self.bursts[f't_{stage}'] / timescale
                 y = self.bursts[f'lum_{stage}'] / yscale
                 label = {'pre': 'Burst stages'}.get(stage, None)
-                ax.plot(x, y, marker='o', c=self.plot_colours['burst_stages'], ls='none',
+                ax.plot(x, y, marker='o', c=self.colours['burst_stages'], ls='none',
                         markersize=markersize, markeredgecolor=markeredgecolor, label=label)
 
         if shocks:  # plot shocks that were removed
@@ -904,7 +904,7 @@ class BurstRun(object):
                 shock_slice = self.lum[idx-1:idx+2, :]
                 shock_slice[1, 1] = shock_lum
                 ax.plot(shock_slice[:, 0]/timescale, shock_slice[:, 1]/yscale,
-                        c=self.plot_colours['shocks'],
+                        c=self.colours['shocks'],
                         label='shocks' if (i == 0) else '_nolegend_')
 
         if dumps:
@@ -912,7 +912,7 @@ class BurstRun(object):
                 self.load_dumpfiles()
             times = self.dump_table['time']
             ax.scatter(times/timescale, np.full_like(times, dump_y), marker='D',
-                       color=self.plot_colours['dumps'], label='dumps')
+                       color=self.colours['dumps'], label='dumps')
 
         if dump_start:
             burst_dumps = self.dumps_starts()
@@ -991,18 +991,18 @@ class BurstRun(object):
 
             if outliers:
                 ax[i].plot(bursts_outliers['n'], bursts_outliers[bprop] / y_scale,
-                           marker='o', c=self.plot_colours['outliers'], ls='none',
+                           marker='o', c=self.colours['outliers'], ls='none',
                            markersize=markersize, markeredgecolor=markeredgecolor,
                            label='Outliers')
 
             if short_waits:
                 ax[i].plot(bursts_short_waits['n'], bursts_short_waits[bprop] / y_scale,
-                           marker='o', c=self.plot_colours['short_waits'], ls='none',
+                           marker='o', c=self.colours['short_waits'], ls='none',
                            markersize=markersize, markeredgecolor=markeredgecolor,
                            label='Short waits')
 
             ax[i].plot(bursts['n'], bursts[bprop] / y_scale,
-                       marker='o', c=self.plot_colours['bursts'], ls='none',
+                       marker='o', c=self.colours['bursts'], ls='none',
                        markersize=markersize, markeredgecolor=markeredgecolor,
                        label='Bursts')
         if legend:
@@ -1037,19 +1037,19 @@ class BurstRun(object):
             if outliers:
                 x_outliers = np.array(bursts_outliers['n'])
                 ax[i].plot(x_outliers, np.zeros_like(x_outliers),
-                           c=self.plot_colours['outliers'], marker='o', ls='none',
+                           c=self.colours['outliers'], marker='o', ls='none',
                            markeredgecolor=markeredgecolor, markersize=markersize,
                            label='Outliers')
 
             if short_waits:
                 x_short = np.array(bursts_short_waits['n'])
                 ax[i].plot(x_short, np.zeros_like(x_short),
-                           c=self.plot_colours['short_waits'], marker='o', ls='none',
+                           c=self.colours['short_waits'], marker='o', ls='none',
                            markeredgecolor=markeredgecolor, markersize=markersize,
                            label='Short waits')
 
             ax[i].errorbar(x, y, yerr=y_err,
-                           c=self.plot_colours['bursts'], ls='none', marker='o', capsize=3,
+                           c=self.colours['bursts'], ls='none', marker='o', capsize=3,
                            markersize=markersize, markeredgecolor=markeredgecolor,
                            label='Slopes')
 
