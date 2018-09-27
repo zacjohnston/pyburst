@@ -93,6 +93,12 @@ version_definitions = {
 
 class GridVersion:
     """Class for defining different interpolator versions
+
+    Conventions
+    -----------
+    version = -1: No models excluded from grid. Entire grid accessible.
+    version = 0: Defaults excluded from grid
+    version > 0: As defined in this file
     """
     def __init__(self, source, version):
         self.source = source
@@ -108,6 +114,9 @@ class GridVersion:
 
 
 def get_parameter(source, version, parameter):
+    if version == -1:
+        return {'exclude_any': {}, 'exclude_all': [{}]}.get(parameter)
+
     default = version_defaults[parameter][source]
     out = version_definitions[parameter][source].get(version, default)
 
