@@ -284,6 +284,17 @@ prior_bounds = {
             (0.01, 10),  # f_b
             (0.01, 10),  # f_p
             ),
+        8: ((0.1, 0.18),  # mdot1
+            (0.1, 0.18),  # mdot2
+            (0.1, 0.18),  # mdot3
+            (0.7, 0.73),  # x
+            (0.0025, 0.0075),  # z
+            (0.05, 0.15),  # qb
+            (1.7 / 1.4, 2.3 / 1.4),  # g
+            (1.2, 1.4),  # redshift
+            (0.01, 10),  # f_b
+            (0.01, 10),  # f_p
+            ),
     },
 
     7: {
@@ -709,6 +720,7 @@ version_definitions = {
                 4: 2,
                 5: 3,
                 6: 4,
+                7: 3,
             },
             'heat': {
             },
@@ -788,6 +800,7 @@ version_definitions = {
             },
             'grid4': {
                 5: param_keys[6],
+                7: 5,
             },
             'heat': {
             },
@@ -879,6 +892,7 @@ version_definitions = {
             'grid4': {
                 5: prior_bounds[6][7],
                 6: prior_bounds[7][12],
+                7: prior_bounds[6][8],
             },
             'heat': {
             },
@@ -953,6 +967,7 @@ version_definitions = {
             },
             'grid4': {
                 5: initial_position[28],
+                7: initial_position[28],
             },
             'heat': {
             },
