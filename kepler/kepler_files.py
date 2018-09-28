@@ -12,7 +12,8 @@ def write_genfile(h1, he4, n14, qb, xi, lburn,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
                   accmass=1.0e18, zonermax=10, zonermin=-1, nstop=10000000,
                   accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
-                  minzone=51, thickfac=0.001, setup_test=False, substrate_off=True):
+                  minzone=51, thickfac=0.001, setup_test=False, substrate_off=True,
+                  ibdatov=0):
     """========================================================
     Creates a model generator file with the given params inserted
     ========================================================
@@ -172,8 +173,8 @@ c no h/he burn dumps
 p 454 -1.
 p 456 -1.
 
-# Use REACLIB bdat file
-# p ibdatov 1
+# Overwrite hard-coded rates with bdat
+p ibdatov {ibdatov:.0f}
 
 c=======================================================================
 c Now follows the command file

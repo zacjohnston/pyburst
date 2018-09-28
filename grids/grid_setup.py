@@ -93,7 +93,7 @@ def create_batch(batch, dv, source,
                  grid_version=None, qnuc_source='heat', minzone=51,
                  zonermax=10, zonermin=-1, thickfac=0.001,
                  substrate='fe54', substrate_off=True, adapnet_filename=None,
-                 bdat_filename=None, **kwargs):
+                 bdat_filename=None, ibdatov=0, **kwargs):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -257,7 +257,8 @@ def create_batch(batch, dv, source,
                                    nsdump=nsdump, nstop=nstop,
                                    nuc_heat=nuc_heat, setup_test=setup_test, cnv=0,
                                    minzone=minzone, zonermax=zonermax, zonermin=zonermin,
-                                   thickfac=thickfac, substrate_off=substrate_off)
+                                   thickfac=thickfac, substrate_off=substrate_off,
+                                   ibdatov=ibdatov)
 
 
 def print_grid_params(params):
