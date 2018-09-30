@@ -22,6 +22,7 @@ source_map = {
     'biggrid1': 'gs1826',  # alias for the source being modelled
     'biggrid2': 'gs1826',
     'grid4': 'gs1826',
+    'grid5': 'gs1826',
     'sim_test': 'biggrid2',
     'sim10': 'biggrid2',
     'heat': 'gs1826',
