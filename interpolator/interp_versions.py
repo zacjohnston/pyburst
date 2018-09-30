@@ -8,6 +8,7 @@ version_defaults = {
             'biggrid1': ['accrate', 'x', 'z', 'qb', 'mass'],
             'biggrid2': ['accrate', 'x', 'z', 'qb', 'mass'],
             'grid4': ['accrate', 'x', 'z', 'mass'],
+            'grid5': ['accrate', 'x', 'z', 'qb', 'mass'],
             'heat': ['accrate', 'x', 'z', 'mass'],
         },
     'bprops':
@@ -16,6 +17,7 @@ version_defaults = {
             'biggrid1': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
             'biggrid2': ('dt', 'u_dt', 'fluence', 'u_fluence', 'peak', 'u_peak'),
             'grid4': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+            'grid5': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
             'heat': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         },
     'exclude_any':
@@ -48,6 +50,7 @@ version_defaults = {
                     'accrate': [0.22],
                 },
 
+            'grid5': {},
             'heat': {},
 
         },
@@ -59,6 +62,7 @@ version_defaults = {
             'grid4': [{'x': 0.72, 'accdepth': 1e20},
                       {'x': 0.73, 'accdepth': 1e20},
                       ],
+            'grid5': [{}],
             'heat': [{}],
         },
 }
@@ -87,6 +91,9 @@ version_definitions = {
             'grid4': {
                 3: ['accrate', 'x', 'z', 'qb', 'mass'],
             },
+            'grid5': {
+                2: ['accrate', 'x', 'z', 'mass'],
+            },
             'heat': {},
         },
     'bprops':
@@ -99,6 +106,7 @@ version_definitions = {
                     26: 25
                 },
             'grid4': {},
+            'grid5': {},
             'heat': {},
         },
     'exclude_any':
@@ -112,6 +120,7 @@ version_definitions = {
                         'z': [0.001, 0.003],
                     },
                 },
+
             'biggrid1':
                 {
                     1: {
@@ -181,6 +190,7 @@ version_definitions = {
                 25: 23,
                 26: 23,
                 },
+
             'grid4':
                 {
                 1: {'accrate': [0.08, 0.22],
@@ -203,6 +213,9 @@ version_definitions = {
                     'mass': 2.0,
                     },
                 },
+
+            'grid5': {},
+
             'heat': {
                 1: {  # gs1826 models
                     'batch': np.concatenate((np.arange(1, 9), np.arange(10, 13),
@@ -222,7 +235,7 @@ version_definitions = {
             'grid4': {
                 3: [{'x': 0.73, 'accdepth': 1e20}],
             },
-
+            'grid5': {},
             'res1': {},
             'heat': {},
         }
