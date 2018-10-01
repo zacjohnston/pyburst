@@ -938,7 +938,9 @@ version_definitions = {
             2: prior_pdfs['f_ratio'][2],
             4: prior_pdfs['f_ratio'][2],
                  },
-         'grid5': {},
+         'grid5': {
+             3: prior_pdfs['f_ratio'][2],
+         },
          'heat': {
             2: prior_pdfs['f_ratio'][2],
             4: prior_pdfs['f_ratio'][2],
