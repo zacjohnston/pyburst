@@ -1107,7 +1107,7 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_lightcurves(self, bursts, save=False, display=True, log=False,
-                         zero_time=True, fontsize=14):
+                         zero_time=True, fontsize=14, **kwargs):
         """Plot individual burst lightcurve
 
         parameters
@@ -1130,7 +1130,7 @@ class BurstRun(object):
             ax.set_ylim([1e34, 1e39])
 
         for burst in bursts:
-            self.add_lightcurve(burst, ax, zero_time=zero_time)
+            self.add_lightcurve(burst, ax, zero_time=zero_time, **kwargs)
 
         ax.set_xlim(xmin=-5)
         plot_path = os.path.join(self.paths['plots'], 'lightcurves', self.batch_str)
@@ -1138,7 +1138,8 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
                            path=plot_path, extra='')
 
-    def add_lightcurve(self, burst, ax, zero_time=True):
+    def add_lightcurve(self, burst, ax, zero_time=True, color='C0', alpha=1.0,
+                       linewidth=1):
         """Add a lightcurve to the provided matplotlib axis
 
         parameters
@@ -1162,7 +1163,8 @@ class BurstRun(object):
 
         if zero_time:
             x = x - self.bursts['t_start'][burst]
-        ax.plot(x, y / yscale, c='C0', label=f'{burst}')
+        ax.plot(x, y / yscale, label=f'{burst}', color=color, alpha=alpha,
+                linewidth=linewidth)
 
     def save_all_lightcurves(self, **kwargs):
         for burst in range(self.n_bursts):
