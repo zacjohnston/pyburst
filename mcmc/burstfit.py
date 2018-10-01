@@ -31,6 +31,7 @@ source_map = {
 c = const.c.to(u.cm / u.s)
 msunyer_to_gramsec = (u.M_sun / u.year).to(u.g / u.s)
 mdot_edd = 1.75e-8 * msunyer_to_gramsec
+z_sun = 0.01
 
 
 def default_plt_options():
@@ -58,6 +59,7 @@ class BurstFit:
         self.mcmc_version = McmcVersion(source=source, version=version)
         self.param_idxs = {}
         self.get_param_indexes()
+        self.has_logz = 'logz' in self.mcmc_version.param_keys
         self.has_inc = 'inc' in self.mcmc_version.param_keys
         self.has_one_f = 'f' in self.mcmc_version.param_keys
         self.has_two_f = ('f_b' in self.mcmc_version.param_keys
@@ -177,6 +179,12 @@ class BurstFit:
         reference_mass = 1.4  # solmass
         interp_params = np.array(params[self.n_epochs - 1: self.param_idxs['g'] + 1])
         interp_params[-1] *= reference_mass
+
+        if self.has_logz:   # convert logz back to regular z
+            logz_idx = self.param_idxs['logz'] - (self.n_epochs - 1)
+            logz = interp_params[logz_idx]
+            interp_params[logz_idx] = z_sun * 10**logz
+
         self.debug.variable('interp_params', interp_params, '')
 
         # ===== compare model burst properties against observed =====
@@ -345,9 +353,13 @@ class BurstFit:
         if False in inside_bounds:
             return -np.inf
 
-        z = params[self.param_idxs['z']]
-        z_sun = 0.015
-        prior_lhood = np.log(self.z_prior(np.log10(z / z_sun)))
+        if self.has_logz:
+            z_input = params[self.param_idxs['logz']]
+        else:
+            z = params[self.param_idxs['z']]
+            z_input = np.log10(z / z_sun)
+
+        prior_lhood = np.log(self.z_prior(z_input))
 
         if self.has_two_f:
             f_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
@@ -446,7 +458,7 @@ class BurstFit:
             plt.show(block=False)
 
     def plot_z_prior(self):
-        z_sun = 0.015
+        z_sun = 0.01
         x = np.linspace(0, 0.02, 1000)
         fig, ax = plt.subplots()
         y = self.z_prior(np.log10(x / z_sun))
