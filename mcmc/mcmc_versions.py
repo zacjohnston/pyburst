@@ -11,6 +11,7 @@ from pygrids.grids import grid_strings
 # First layer identifies param_keys
 # -----------------------------------
 # TODO: clean the fuck up
+z_sun = 0.01
 
 prior_bounds = {
     1: {
@@ -438,6 +439,20 @@ prior_bounds = {
             (0.01, 10),  # f
             ),
     },
+
+    10: {
+        1: ((0.1, 0.18),  # mdot1
+            (0.1, 0.18),  # mdot2
+            (0.1, 0.18),  # mdot3
+            (0.7, 0.73),  # x
+            (np.log10(0.0025/z_sun), np.log10(0.0075/z_sun)),  # logz
+            (0.05, 0.15),  # qb
+            (1.7 / 1.4, 2.3 / 1.4),  # g
+            (1.2, 1.4),  # redshift
+            (0.01, 10),  # f_b
+            (0.01, 10),  # f_p
+            ),
+    }
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -472,6 +487,7 @@ param_keys = {
     7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f_b', 'f_p'],
     8: ['mdot1', 'mdot2', 'mdot3'],
     9: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f'],
+    10: ['mdot1', 'mdot2', 'mdot3', 'x', 'logz', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
 }
 
 # ===== initial position of walkers =====
@@ -531,6 +547,8 @@ initial_position = {
          0.72, 0.005, 1.3, 1.35, 0.51, 1.2),
     28: (0.15, 0.13, 0.105,
          0.72, 0.005, 0.075, 1.3, 1.35, 0.51, 1.2),
+    29: (0.15, 0.13, 0.105,
+         0.72, -0.5, 0.075, 1.3, 1.35, 0.51, 1.2),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -827,6 +845,7 @@ version_definitions = {
 
             'grid5': {
                 1: param_keys[7],
+                4: param_keys[10],
             },
 
             'heat': {},
@@ -926,6 +945,7 @@ version_definitions = {
 
             'grid5': {
                 1: prior_bounds[7][12],
+                4: prior_bounds[10][1],
             },
 
             'heat': {},
@@ -1007,6 +1027,7 @@ version_definitions = {
             },
             'grid5': {
                 1: initial_position[27],
+                4: initial_position[29],
             },
             'heat': {},
         },
