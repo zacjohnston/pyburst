@@ -50,7 +50,7 @@ class BurstFit:
 
     def __init__(self, source, version, verbose=True,
                  lhood_factor=1, debug=False, priors_only=False,
-                 re_interp=False, u_fper_frac=0.05, **kwargs):
+                 re_interp=False, u_fper_frac=0.0, **kwargs):
 
         self.source = source
         self.version = version
