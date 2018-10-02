@@ -13,6 +13,22 @@ from pygrids.grids import grid_strings
 # TODO: clean the fuck up
 z_sun = 0.01
 
+
+# ===== Defines order/number of params provided to BurstFit =====
+param_keys = {
+    1: ['mdot1', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
+    2: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
+    3: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'xi_b', 'xi_p'],
+    4: ['mdot1', 'mdot2', 'mdot3', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
+    5: ['mdot1', 'mdot2', 'mdot3', 'z', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
+    6: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
+    7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f_b', 'f_p'],
+    8: ['mdot1', 'mdot2', 'mdot3'],
+    9: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f'],
+    10: ['mdot1', 'mdot2', 'mdot3', 'x', 'logz', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
+}
+
+
 prior_bounds = {
     1: {
         1: ((0.08, 0.24),  # mdot1
@@ -475,20 +491,6 @@ prior_pdfs = {
     },
 }
 
-# ===== Defines order/number of params provided to BurstFit =====
-# TODO: Ensure correspond to prior_bounds
-param_keys = {
-    1: ['mdot1', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
-    2: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
-    3: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'xi_b', 'xi_p'],
-    4: ['mdot1', 'mdot2', 'mdot3', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
-    5: ['mdot1', 'mdot2', 'mdot3', 'z', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
-    6: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
-    7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f_b', 'f_p'],
-    8: ['mdot1', 'mdot2', 'mdot3'],
-    9: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f'],
-    10: ['mdot1', 'mdot2', 'mdot3', 'x', 'logz', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
-}
 
 # ===== initial position of walkers =====
 # TODO: organise by param_keys
@@ -560,6 +562,7 @@ initial_position = {
 #         ---version
 #               ---parameter value
 
+# TODO: reform into tables (saved as files), and a function to add versions (rows)
 version_defaults = {
     'param_keys':
         {
