@@ -309,6 +309,7 @@ class BurstFit:
     def extract_epoch_params(self, params):
         """Extracts a set of model parameters from params for each epoch
         """
+        self.debug.start_function('extract_epoch_params')
         # note: interpolate() will overwrite the mdot parameter
         #       assumes g is the last model param (need to make more robust)
         reference_mass = 1.4  # solmass
@@ -328,12 +329,12 @@ class BurstFit:
             epoch_params[0] = self._mdots
 
         self.debug.variable('epoch_params', epoch_params, '')
+        self.debug.end_function()
         return epoch_params
 
     def lnprior(self, params):
         """Return logarithm prior lhood of params
         """
-        # TODO: How to encode different priors in mcmc versions?
         self.debug.start_function('lnprior')
         lower_bounds = self.mcmc_version.prior_bounds[:, 0]
         upper_bounds = self.mcmc_version.prior_bounds[:, 1]
