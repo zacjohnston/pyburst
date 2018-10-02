@@ -174,23 +174,11 @@ class BurstFit:
             return -np.inf
 
         # ===== strip non-model params for interpolator =====
-        # note: interpolate() will overwrite the mdot parameter
-        #       assumes g is the last model param (need to make more robust)
-        reference_mass = 1.4  # solmass
-        interp_params = np.array(params[self.n_epochs - 1: self.param_idxs['g'] + 1])
-        interp_params[-1] *= reference_mass
-
-        if self.has_logz:   # convert logz back to regular z
-            logz_idx = self.param_idxs['logz'] - (self.n_epochs - 1)
-            logz = interp_params[logz_idx]
-            interp_params[logz_idx] = z_sun * 10**logz
-
-        self.debug.variable('interp_params', interp_params, '')
+        interp_params = self.extract_epoch_params(params)
 
         # ===== compare model burst properties against observed =====
         lh = 0.0
-        interp = self.interpolate(interp_params=interp_params,
-                                  mdots=self._mdots)
+        interp = self.interpolate(interp_params=interp_params, mdots=self._mdots)
 
         # Check if outside of interpolator domain
         if True in np.isnan(interp):
@@ -326,6 +314,23 @@ class BurstFit:
         output = self.kemulator.emulate_burst(params=interp_params)
         self.debug.end_function()
         return output
+
+    def extract_epoch_params(self, params):
+        """Extracts a set of model parameters from params for each epoch
+        """
+        # note: interpolate() will overwrite the mdot parameter
+        #       assumes g is the last model param (need to make more robust)
+        reference_mass = 1.4  # solmass
+        epoch_params = np.array(params[self.n_epochs - 1: self.param_idxs['g'] + 1])
+        epoch_params[-1] *= reference_mass
+
+        if self.has_logz:   # convert logz back to regular z
+            logz_idx = self.param_idxs['logz'] - (self.n_epochs - 1)
+            logz = epoch_params[logz_idx]
+            epoch_params[logz_idx] = z_sun * 10**logz
+
+        self.debug.variable('epoch_params', epoch_params, '')
+        return epoch_params
 
     def lnprior(self, params):
         """Return logarithm prior lhood of params
