@@ -174,7 +174,7 @@ class BurstFit:
             return -np.inf
 
         # ===== strip non-model params for interpolator =====
-        # note: interpolate_epochs() will overwrite the mdot parameter
+        # note: interpolate() will overwrite the mdot parameter
         #       assumes g is the last model param (need to make more robust)
         reference_mass = 1.4  # solmass
         interp_params = np.array(params[self.n_epochs - 1: self.param_idxs['g'] + 1])
@@ -189,8 +189,8 @@ class BurstFit:
 
         # ===== compare model burst properties against observed =====
         lh = 0.0
-        interp = self.interpolate_epochs(interp_params=interp_params,
-                                         mdots=self._mdots)
+        interp = self.interpolate(interp_params=interp_params,
+                                  mdots=self._mdots)
 
         # Check if outside of interpolator domain
         if True in np.isnan(interp):
@@ -303,21 +303,8 @@ class BurstFit:
         self.debug.end_function()
         return shifted
 
-    def interpolate(self, interp_params):
-        """Returns interpolated burst properties for given parameters
-
-        Parameters
-        ----------
-        interp_params : 1darray
-            parameters specific to the model (mdot1, x, z, qb, mass)
-        """
-        self.debug.start_function('interpolate')
-        interpolated = self.kemulator.emulate_burst(params=interp_params)[0]
-        self.debug.end_function()
-        return interpolated
-
-    def interpolate_epochs(self, interp_params, mdots):
-        """Iterates over interpolate for multiple accretion epochs
+    def interpolate(self, interp_params, mdots):
+        """Interpolates burst properties for N epochs
 
         Parameters
         ----------
@@ -326,7 +313,7 @@ class BurstFit:
         mdots : 1darray
             accretion rates for each epoch (as fraction of Eddington rate)
         """
-        self.debug.start_function('interpolate_epochs')
+        self.debug.start_function('interpolate')
         # TODO: generalise to N-epochs
         if self.n_epochs == 3:
             interp_params = np.array((interp_params, interp_params, interp_params))
