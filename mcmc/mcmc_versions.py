@@ -566,7 +566,6 @@ initial_position = {
 version_defaults = {
     'param_keys':
         {
-            'biggrid2': param_keys[2],
             'grid4': param_keys[7],
             'grid5': param_keys[6],
             'heat': param_keys[7],
@@ -574,14 +573,12 @@ version_defaults = {
 
     'bprops':
         {
-            'biggrid2': ('dt', 'fluence', 'peak'),
             'grid4': ('rate', 'fluence', 'peak'),
             'grid5': ('rate', 'fluence', 'peak'),
             'heat': ('rate', 'fluence', 'peak'),
         },
     'disc_model':
         {
-            'biggrid2': 'he16_d',
             'grid4': 'he16_a',
             'grid5': 'he16_a',
             'heat': 'he16_a',
@@ -589,7 +586,6 @@ version_defaults = {
 
     'interpolator':
         {
-            'biggrid2': 1,
             'grid4': 1,
             'grid5': 1,
             'heat': 1,
@@ -597,19 +593,12 @@ version_defaults = {
 
     'prior_bounds':
         {
-            'biggrid2': prior_bounds[2][2],
             'grid4': prior_bounds[7][10],
             'grid5': prior_bounds[6][8],
             'heat': prior_bounds[7][11],
         },
 
     'prior_pdfs': {
-        'biggrid2': {
-          'z': prior_pdfs['z'][1],
-          'f_ratio': prior_pdfs['f_ratio'][1],
-          'inc': prior_pdfs['inc'][1],
-        },
-
         'grid4': {
           'z': prior_pdfs['z'][1],
           'f_ratio': prior_pdfs['f_ratio'][1],
@@ -631,7 +620,6 @@ version_defaults = {
 
     'initial_position':
         {
-            'biggrid2': initial_position[4],
             'grid4': initial_position[27],
             'grid5': initial_position[28],
             'heat': initial_position[27],
@@ -641,76 +629,6 @@ version_defaults = {
 version_definitions = {
     'interpolator':
         {
-            'biggrid2': {
-                1: 1,
-                2: 1,
-                3: 1,
-                4: 2,
-                5: 1,
-                6: 3,
-                7: 4,
-                8: 4,
-                9: 5,
-                10: 5,
-                11: 5,
-                12: 5,
-                13: 5,
-                14: 5,
-                15: 5,
-                16: 5,
-                17: 6,
-                18: 6,
-                19: 6,
-                20: 6,
-                21: 6,
-                22: 6,
-                23: 6,
-                24: 6,
-                25: 7,
-                26: 8,
-                27: 8,
-                28: 8,
-                29: 8,
-                30: 9,
-                31: 9,
-                32: 10,
-                33: 11,
-                34: 12,
-                35: 13,
-                36: 13,
-                37: 12,
-                38: 13,
-                39: 14,
-                40: 14,
-                41: 14,
-                42: 14,
-                43: 15,
-                44: 15,
-                45: 15,
-                46: 15,
-                47: 16,
-                48: 16,
-                49: 16,
-                50: 16,
-                51: 17,
-                52: 17,
-                53: 17,
-                54: 16,
-                55: 18,
-                56: 18,
-                57: 19,
-                58: 20,
-                59: 21,
-                60: 22,
-                61: 23,
-                62: 24,
-                63: 25,
-                64: 25,
-                65: 25,
-                66: 25,
-                67: 26,
-            },
-
             'grid4': {
                 1: 1,
                 3: 2,
@@ -729,14 +647,6 @@ version_definitions = {
 
     'bprops':
         {
-            'biggrid2':
-                {
-                    63: ('rate', 'fluence', 'peak'),
-                    64: 63,
-                    65: 63,
-                    66: 63,
-                    67: 63,
-                },
             'grid4': {},
             'grid5': {},
             'heat': {
@@ -744,54 +654,6 @@ version_definitions = {
         },
     'param_keys':
         {
-            'biggrid2':
-                {
-                    1: param_keys[1],
-                    2: 1,
-                    3: 1,
-                    4: 1,
-                    5: 1,
-                    6: 1,
-                    7: 1,
-                    8: 1,
-                    9: 1,
-                    10: 1,
-                    11: 1,
-                    12: 1,
-                    31: param_keys[3],
-                    36: 36,
-                    37: 36,
-                    39: param_keys[4],
-                    40: 39,
-                    41: param_keys[5],
-                    42: 41,
-                    43: param_keys[6],
-                    44: 43,
-                    45: 43,
-                    46: 43,
-                    47: param_keys[7],
-                    48: 47,
-                    49: 47,
-                    50: 47,
-                    51: 43,
-                    52: param_keys[8],
-                    53: 52,
-                    54: 47,
-                    55: 47,
-                    56: 47,
-                    57: 47,
-                    58: 47,
-                    59: 43,
-                    60: 43,
-                    61: 47,
-                    62: 47,
-                    63: 47,
-                    64: param_keys[9],
-                    65: 47,
-                    66: 47,
-                    67: 47,
-                },
-
             'grid4': {
                 5: param_keys[6],
                 7: 5,
@@ -807,69 +669,6 @@ version_definitions = {
 
     'prior_bounds':
         {
-            'biggrid2': {
-                8: prior_bounds[1][1],
-                9: prior_bounds[1][2],
-                10: 9,
-                11: 9,
-                12: 9,
-                13: prior_bounds[2][1],
-                14: prior_bounds[2][2],
-                15: 14,
-                16: 14,
-                17: 14,
-                18: 14,
-                19: 14,
-                20: 14,
-                21: 14,
-                22: 14,
-                23: 14,
-                24: 14,
-                25: prior_bounds[2][3],
-                26: prior_bounds[2][4],
-                27: 26,
-                28: 26,
-                29: 26,
-                30: 26,
-                31: prior_bounds[3][1],
-                32: 26,
-                33: 26,
-                34: 26,
-                35: prior_bounds[2][5],
-                36: prior_bounds[3][2],
-                37: 31,
-                38: 35,
-                39: prior_bounds[4][1],
-                40: prior_bounds[4][2],
-                41: prior_bounds[5][1],
-                42: prior_bounds[5][2],
-                43: prior_bounds[6][1],
-                44: prior_bounds[6][2],
-                45: prior_bounds[6][3],
-                46: prior_bounds[6][4],
-                47: prior_bounds[7][1],
-                48: 47,
-                49: prior_bounds[7][2],
-                50: prior_bounds[7][3],
-                51: prior_bounds[6][5],
-                52: prior_bounds[8][1],
-                53: 52,
-                54: prior_bounds[7][4],
-                55: prior_bounds[7][5],
-                56: prior_bounds[7][6],
-                57: prior_bounds[7][7],
-                58: 57,
-                59: prior_bounds[6][6],
-                60: 59,
-                61: prior_bounds[7][8],
-                62: 61,
-                63: 61,
-                64: prior_bounds[9][1],
-                65: 61,
-                66: prior_bounds[7][9],
-                67: 61,
-            },
-
             'grid4': {
                 5: prior_bounds[6][7],
                 6: prior_bounds[7][12],
@@ -886,7 +685,6 @@ version_definitions = {
 
     'prior_pdfs':
         {
-         'biggrid2': {},
          'grid4': {
             2: prior_pdfs['f_ratio'][2],
             4: prior_pdfs['f_ratio'][2],
@@ -902,49 +700,6 @@ version_definitions = {
 
     'initial_position':
         {
-            'biggrid2': {
-                21: initial_position[4],
-                22: initial_position[5],
-                23: initial_position[6],
-                24: 23,
-                25: 23,
-                28: 23,
-                29: 23,
-                31: initial_position[7],
-                36: 31,
-                37: 31,
-                38: initial_position[8],
-                39: initial_position[9],
-                40: 39,
-                41: initial_position[10],
-                42: initial_position[11],
-                43: initial_position[12],
-                44: 43,
-                45: 43,
-                46: 43,
-                47: initial_position[15],
-                48: initial_position[16],
-                49: 48,
-                50: initial_position[17],
-                51: initial_position[14],
-                52: initial_position[22],
-                53: initial_position[23],
-                54: 50,
-                55: 50,
-                56: 50,
-                57: 50,
-                58: 50,
-                59: initial_position[24],
-                60: 59,
-                61: initial_position[25],
-                62: 61,
-                63: 61,
-                64: initial_position[26],
-                65: 61,
-                66: 61,
-                67: 61,
-            },
-
             'grid4': {
                 5: initial_position[28],
                 7: initial_position[28],
@@ -960,26 +715,6 @@ version_definitions = {
 
     'disc_model':
         {
-            'biggrid2': {
-                2: 'he16_a',
-                3: 'he16_b',
-                10: 2,
-                11: 3,
-                12: 'he16_c',
-                14: 2,
-                15: 3,
-                16: 12,
-                18: 2,
-                19: 3,
-                20: 12,
-                22: 2,
-                23: 3,
-                24: 12,
-                25: 3,
-                26: 2,
-                27: 3,
-                38: 2,
-            },
             'grid4': {},
             'grid5': {},
             'heat': {},
