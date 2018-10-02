@@ -26,6 +26,7 @@ param_keys = {
     8: ['mdot1', 'mdot2', 'mdot3'],
     9: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f'],
     10: ['mdot1', 'mdot2', 'mdot3', 'x', 'logz', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
+    11: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_p'],
 }
 
 
@@ -468,7 +469,23 @@ prior_bounds = {
             (0.01, 10),  # f_b
             (0.01, 10),  # f_p
             ),
-    }
+    },
+
+    11: {
+        1: ((0.1, 0.18),  # mdot1
+            (0.1, 0.18),  # mdot2
+            (0.1, 0.18),  # mdot3
+            (0.7, 0.73),  # x
+            (0.0025, 0.0075),  # z
+            (0.05, 0.15),  # qb1
+            (0.05, 0.15),  # qb2
+            (0.05, 0.15),  # qb3
+            (1.7 / 1.4, 2.3 / 1.4),  # g
+            (1.2, 1.4),  # redshift
+            (0.01, 10),  # f_b
+            (0.01, 10),  # f_p
+            ),
+    },
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -551,6 +568,8 @@ initial_position = {
          0.71, 0.005, 0.075, 1.5, 1.35, 0.55, 1.3),
     29: (0.15, 0.13, 0.105,
          0.72, -0.5, 0.075, 1.3, 1.35, 0.51, 1.2),
+    30: (0.162, 0.138, 0.102,
+         0.71, 0.005, 0.075, 0.075, 0.075, 1.5, 1.35, 0.55, 1.3),
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -662,6 +681,7 @@ version_definitions = {
             'grid5': {
                 1: param_keys[7],
                 4: param_keys[10],
+                5: param_keys[11],
             },
 
             'heat': {},
@@ -678,6 +698,7 @@ version_definitions = {
             'grid5': {
                 1: prior_bounds[7][12],
                 4: prior_bounds[10][1],
+                5: prior_bounds[11][1],
             },
 
             'heat': {},
@@ -708,6 +729,7 @@ version_definitions = {
             'grid5': {
                 1: initial_position[27],
                 4: initial_position[29],
+                5: initial_position[30],
             },
 
             'heat': {},
