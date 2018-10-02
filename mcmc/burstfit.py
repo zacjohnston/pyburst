@@ -178,7 +178,7 @@ class BurstFit:
 
         # ===== compare model burst properties against observed =====
         lh = 0.0
-        interp = self.interpolate(interp_params=interp_params, mdots=self._mdots)
+        interp = self.interpolate(interp_params=interp_params)
 
         # Check if outside of interpolator domain
         if True in np.isnan(interp):
@@ -291,25 +291,16 @@ class BurstFit:
         self.debug.end_function()
         return shifted
 
-    def interpolate(self, interp_params, mdots):
+    def interpolate(self, interp_params):
         """Interpolates burst properties for N epochs
 
         Parameters
         ----------
         interp_params : 1darray
             parameters specific to the model (e.g. mdot1, x, z, qb, mass)
-        mdots : 1darray
-            accretion rates for each epoch (as fraction of Eddington rate)
         """
         self.debug.start_function('interpolate')
         # TODO: generalise to N-epochs
-        if self.n_epochs == 3:
-            interp_params = np.array((interp_params, interp_params, interp_params))
-            interp_params[:, 0] = mdots
-        else:
-            interp_params = np.array(interp_params)
-            interp_params[0] = mdots
-
         self.debug.variable('interp_params', interp_params, '')
         output = self.kemulator.emulate_burst(params=interp_params)
         self.debug.end_function()
@@ -321,13 +312,20 @@ class BurstFit:
         # note: interpolate() will overwrite the mdot parameter
         #       assumes g is the last model param (need to make more robust)
         reference_mass = 1.4  # solmass
-        epoch_params = np.array(params[self.n_epochs - 1: self.param_idxs['g'] + 1])
-        epoch_params[-1] *= reference_mass
+        interp_params = np.array(params[self.n_epochs - 1: self.param_idxs['g'] + 1])
+        interp_params[-1] *= reference_mass
 
         if self.has_logz:   # convert logz back to regular z
             logz_idx = self.param_idxs['logz'] - (self.n_epochs - 1)
-            logz = epoch_params[logz_idx]
-            epoch_params[logz_idx] = z_sun * 10**logz
+            logz = interp_params[logz_idx]
+            interp_params[logz_idx] = z_sun * 10**logz
+
+        if self.n_epochs == 3:
+            epoch_params = np.array((interp_params, interp_params, interp_params))
+            epoch_params[:, 0] = self._mdots
+        else:
+            epoch_params = np.array(interp_params)
+            epoch_params[0] = self._mdots
 
         self.debug.variable('epoch_params', epoch_params, '')
         return epoch_params
