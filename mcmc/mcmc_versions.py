@@ -566,10 +566,7 @@ initial_position = {
 version_defaults = {
     'param_keys':
         {
-            'biggrid1': param_keys[1],
             'biggrid2': param_keys[2],
-            'sim_test': param_keys[1],
-            'sim10': param_keys[6],
             'grid4': param_keys[7],
             'grid5': param_keys[6],
             'heat': param_keys[7],
@@ -577,7 +574,6 @@ version_defaults = {
 
     'bprops':
         {
-            'biggrid1': ('dt', 'fluence', 'peak'),
             'biggrid2': ('dt', 'fluence', 'peak'),
             'grid4': ('rate', 'fluence', 'peak'),
             'grid5': ('rate', 'fluence', 'peak'),
@@ -585,10 +581,7 @@ version_defaults = {
         },
     'disc_model':
         {
-            'biggrid1': 'he16_d',
             'biggrid2': 'he16_d',
-            'sim_test': 'he16_a',
-            'sim10': 'he16_a',
             'grid4': 'he16_a',
             'grid5': 'he16_a',
             'heat': 'he16_a',
@@ -596,7 +589,6 @@ version_defaults = {
 
     'interpolator':
         {
-            'biggrid1': 1,
             'biggrid2': 1,
             'grid4': 1,
             'grid5': 1,
@@ -605,7 +597,6 @@ version_defaults = {
 
     'prior_bounds':
         {
-            'biggrid1': {},
             'biggrid2': prior_bounds[2][2],
             'grid4': prior_bounds[7][10],
             'grid5': prior_bounds[6][8],
@@ -640,10 +631,7 @@ version_defaults = {
 
     'initial_position':
         {
-            'biggrid1': initial_position[1],
             'biggrid2': initial_position[4],
-            'sim_test': initial_position[3],
-            'sim10': initial_position[12],
             'grid4': initial_position[27],
             'grid5': initial_position[28],
             'heat': initial_position[27],
@@ -653,14 +641,6 @@ version_defaults = {
 version_definitions = {
     'interpolator':
         {
-            'biggrid1': {
-                1: 1,
-                2: 1,
-                3: 2,
-                4: 2,
-                5: 2,
-                6: 2,
-            },
             'biggrid2': {
                 1: 1,
                 2: 1,
@@ -731,26 +711,6 @@ version_definitions = {
                 67: 26,
             },
 
-            'sim_test':
-                {1: 5,
-                 2: 5,
-                 3: 5,
-                 4: 5,
-                 5: 6,
-                 6: 6,
-                 7: 8,
-                 },
-
-            'sim10': {
-                1: 15,
-                2: 15,
-                3: 15,
-                4: 15,
-                5: 15,
-                6: 15,
-                7: 15,
-            },
-
             'grid4': {
                 1: 1,
                 3: 2,
@@ -763,12 +723,12 @@ version_definitions = {
             'grid5': {
                 1: 2,
             },
+
             'heat': {},
         },
 
     'bprops':
         {
-            'biggrid1': {},
             'biggrid2':
                 {
                     63: ('rate', 'fluence', 'peak'),
@@ -784,7 +744,6 @@ version_definitions = {
         },
     'param_keys':
         {
-            'biggrid1': {},
             'biggrid2':
                 {
                     1: param_keys[1],
@@ -833,14 +792,6 @@ version_definitions = {
                     67: 47,
                 },
 
-            'sim_test': {},
-            'sim10': {
-                4: param_keys[2],
-                5: 4,
-                6: 4,
-                7: 4,
-            },
-
             'grid4': {
                 5: param_keys[6],
                 7: 5,
@@ -856,7 +807,6 @@ version_definitions = {
 
     'prior_bounds':
         {
-            'biggrid1': {},
             'biggrid2': {
                 8: prior_bounds[1][1],
                 9: prior_bounds[1][2],
@@ -920,26 +870,6 @@ version_definitions = {
                 67: 61,
             },
 
-            'sim_test': {
-                1: prior_bounds[1][1],
-                2: prior_bounds[1][2],
-                3: prior_bounds[1][3],
-                4: 3,
-                5: 3,
-                6: 3,
-                7: prior_bounds[1][4],
-            },
-
-            'sim10': {
-                1: prior_bounds[6][3],
-                2: 1,
-                3: 1,
-                4: prior_bounds[2][6],
-                5: prior_bounds[2][7],
-                6: 5,
-                7: 5
-            },
-
             'grid4': {
                 5: prior_bounds[6][7],
                 6: prior_bounds[7][12],
@@ -972,7 +902,6 @@ version_definitions = {
 
     'initial_position':
         {
-            'biggrid1': {},
             'biggrid2': {
                 21: initial_position[4],
                 22: initial_position[5],
@@ -1015,33 +944,22 @@ version_definitions = {
                 66: 61,
                 67: 61,
             },
-            'sim_test': {},
-            'sim10': {
-                2: initial_position[13],
-                3: initial_position[14],
-                4: initial_position[18],
-                5: initial_position[19],
-                6: initial_position[20],
-                7: initial_position[21],
-            },
+
             'grid4': {
                 5: initial_position[28],
                 7: initial_position[28],
             },
+
             'grid5': {
                 1: initial_position[27],
                 4: initial_position[29],
             },
+
             'heat': {},
         },
 
     'disc_model':
         {
-            'biggrid1': {
-                2: 'he16_a',
-                5: 2,
-                6: 2,
-            },
             'biggrid2': {
                 2: 'he16_a',
                 3: 'he16_b',
@@ -1062,8 +980,6 @@ version_definitions = {
                 27: 3,
                 38: 2,
             },
-            'sim_test': {},
-            'sim10': {},
             'grid4': {},
             'grid5': {},
             'heat': {},
