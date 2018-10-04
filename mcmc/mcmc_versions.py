@@ -31,8 +31,8 @@ param_keys = {
 
 # ===== Define order/number of params for a single interpolated point =====
 interp_keys = {
-    1: ['mdot', 'x', 'z', 'qb', 'g'],
-    2: ['mdot', 'x', 'z', 'g'],
+    1: ['mdot', 'x', 'z', 'qb', 'mass'],
+    2: ['mdot', 'x', 'z', 'mass'],
 }
 
 
@@ -44,7 +44,8 @@ epoch_unique = {
 
 # ===== Define alias from interp-->param keys =====
 param_aliases = {
-    1: {'z': 'logz'},
+    1: {'mass': 'g'},
+    2: {'mass': 'g', 'z': 'logz'},
 }
 
 prior_bounds = {
@@ -617,8 +618,8 @@ source_defaults = {
     },
 
     'param_aliases': {
-        'grid4': {},
-        'grid5': {},
+        'grid4': param_aliases[1],
+        'grid5': param_aliases[1],
     },
 
     'bprops': {
@@ -729,7 +730,7 @@ version_definitions = {
     'param_aliases': {
         'grid4': {},
         'grid5': {
-            4: param_aliases[1],
+            4: param_aliases[2],
         },
     },
 
