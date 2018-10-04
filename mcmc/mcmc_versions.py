@@ -723,7 +723,7 @@ version_definitions = {
     'epoch_unique': {
         'grid4': {},
         'grid5': {
-            6: epoch_unique[2],
+            5: epoch_unique[2],
         },
     },
 
