@@ -14,7 +14,7 @@ from pygrids.grids import grid_strings
 z_sun = 0.01
 
 
-# ===== Defines order/number of params provided to BurstFit =====
+# ===== Define order/number of params provided to BurstFit =====
 param_keys = {
     1: ['mdot1', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
     2: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb', 'g', 'redshift', 'd', 'inc'],
@@ -29,10 +29,17 @@ param_keys = {
     11: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_p'],
 }
 
-# ===== Defines order/number of params for a single interpolated point =====
+# ===== Define order/number of params for a single interpolated point =====
 interp_keys = {
     1: ['mdot', 'x', 'z', 'qb', 'g'],
     2: ['mdot', 'x', 'z', 'g'],
+}
+
+
+# ===== Define params that are unique for each epoch =====
+epoch_unique = {
+    1: ['mdot'],
+    2: ['mdot', 'qb'],
 }
 
 prior_bounds = {
@@ -599,6 +606,11 @@ version_defaults = {
         'grid5': interp_keys[1],
     },
 
+    'epoch_unique': {
+        'grid4': epoch_unique[1],
+        'grid5': epoch_unique[1],
+    },
+
     'bprops': {
         'grid4': ('rate', 'fluence', 'peak'),
         'grid5': ('rate', 'fluence', 'peak'),
@@ -696,6 +708,13 @@ version_definitions = {
         },
     },
 
+    'epoch_unique': {
+        'grid4': {},
+        'grid5': {
+            6: epoch_unique[2],
+        },
+    },
+
     'prior_bounds': {
         'grid4': {
             5: prior_bounds[6][7],
@@ -768,6 +787,7 @@ class McmcVersion:
         self.version = version
         self.param_keys = get_parameter(source, version, 'param_keys')
         self.interp_keys = get_parameter(source, version, 'interp_keys')
+        self.epoch_unique = get_parameter(source, version, 'epoch_unique')
         self.bprops = get_parameter(source, version, 'bprops')
         self.interpolator = get_parameter(source, version, 'interpolator')
         self.prior_bounds = np.array(get_parameter(source, version, 'prior_bounds'))
@@ -783,6 +803,7 @@ class McmcVersion:
         return (f'MCMC version definitions for {self.source} V{self.version}'
                 + f'\nparam keys       : {self.param_keys}'
                 + f'\ninterp keys      : {self.interp_keys}'
+                + f'\nepoch unique     : {self.epoch_unique}'
                 + f'\nbprops           : {self.bprops}'
                 + f'\ninitial position : {self.initial_position}'
                 + f'\ndisc model       : {self.disc_model}'
