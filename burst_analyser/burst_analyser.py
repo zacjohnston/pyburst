@@ -36,7 +36,7 @@ class BurstRun(object):
                  reload=False, save_lum=True, analyse=True, plot=False,
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
-                 load_dumps=True, set_paramaters=None):
+                 load_dumps=False, set_paramaters=None):
         self.flags = {'lum_loaded': False,
                       'dumps_loaded': False,
                       'analysed': False,
