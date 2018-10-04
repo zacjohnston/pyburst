@@ -58,7 +58,9 @@ class BurstFit:
         self.debug = pyprint.Debugger(debug=debug)
         self.mcmc_version = McmcVersion(source=source, version=version)
         self.param_idxs = {}
+        self.interp_idxs = {}
         self.get_param_indexes()
+        self.has_g = 'g' in self.mcmc_version.param_keys
         self.has_logz = 'logz' in self.mcmc_version.param_keys
         self.has_inc = 'inc' in self.mcmc_version.param_keys
         self.has_one_f = 'f' in self.mcmc_version.param_keys
@@ -102,10 +104,12 @@ class BurstFit:
         Expects params array to be in same order as param_keys
         """
         self.debug.start_function('get_param_indexes')
-        pkeys = self.mcmc_version.param_keys
 
-        for key in pkeys:
-            self.param_idxs[key] = pkeys.index(key)
+        for i, key in enumerate(self.mcmc_version.param_keys):
+            self.param_idxs[key] = i
+        for i, key in enumerate(self.mcmc_version.interp_keys):
+            self.interp_idxs[key] = i
+
         self.debug.end_function()
 
     def setup_priors(self):
