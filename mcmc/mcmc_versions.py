@@ -599,7 +599,7 @@ initial_position = {
 #               ---parameter value
 
 # TODO: reform into tables (saved as files), and a function to add versions (rows)
-version_defaults = {
+source_defaults = {
     'param_keys': {
         'grid4': param_keys[7],
         'grid5': param_keys[6],
@@ -795,7 +795,7 @@ class McmcVersion:
     def __init__(self, source, version):
         source = grid_strings.check_synth_source(source)
 
-        if source not in version_defaults['param_keys']:
+        if source not in source_defaults['param_keys']:
             raise ValueError(f'source ({source}) not defined in mcmc_versions')
         elif version not in version_definitions['interpolator'][source]:
             print(f'version {version} of source {source} ' +
@@ -834,7 +834,7 @@ class McmcVersion:
 
 def get_parameter(source, version, parameter):
     source = grid_strings.check_synth_source(source)
-    default = version_defaults[parameter][source]
+    default = source_defaults[parameter][source]
     output = version_definitions[parameter][source].get(version, default)
 
     if (parameter != 'interpolator') and type(output) is int:
@@ -846,7 +846,7 @@ def get_parameter(source, version, parameter):
 def get_prior_pdfs(source, version):
     pdfs = {}
     for var in prior_pdfs:
-        default = version_defaults['prior_pdfs'][source][var]
+        default = source_defaults['prior_pdfs'][source][var]
         value = version_definitions['prior_pdfs'][source].get(version, default)
 
         if type(value) is int:  # allow pointing to previous versions
