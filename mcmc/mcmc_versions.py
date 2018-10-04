@@ -42,6 +42,11 @@ epoch_unique = {
     2: ['mdot', 'qb'],
 }
 
+# ===== Define alias from interp-->param keys =====
+param_aliases = {
+    1: {'z': 'logz'},
+}
+
 prior_bounds = {
     1: {
         1: ((0.08, 0.24),  # mdot1
@@ -611,11 +616,17 @@ version_defaults = {
         'grid5': epoch_unique[1],
     },
 
+    'param_aliases': {
+        'grid4': {},
+        'grid5': {},
+    },
+
     'bprops': {
         'grid4': ('rate', 'fluence', 'peak'),
         'grid5': ('rate', 'fluence', 'peak'),
         'heat': ('rate', 'fluence', 'peak'),
     },
+
     'disc_model': {
         'grid4': 'he16_a',
         'grid5': 'he16_a',
@@ -715,6 +726,13 @@ version_definitions = {
         },
     },
 
+    'param_aliases': {
+        'grid4': {},
+        'grid5': {
+            4: param_aliases[1],
+        },
+    },
+
     'prior_bounds': {
         'grid4': {
             5: prior_bounds[6][7],
@@ -788,6 +806,7 @@ class McmcVersion:
         self.param_keys = get_parameter(source, version, 'param_keys')
         self.interp_keys = get_parameter(source, version, 'interp_keys')
         self.epoch_unique = get_parameter(source, version, 'epoch_unique')
+        self.param_aliases = get_parameter(source, version, 'param_aliases')
         self.bprops = get_parameter(source, version, 'bprops')
         self.interpolator = get_parameter(source, version, 'interpolator')
         self.prior_bounds = np.array(get_parameter(source, version, 'prior_bounds'))
@@ -804,6 +823,7 @@ class McmcVersion:
                 + f'\nparam keys       : {self.param_keys}'
                 + f'\ninterp keys      : {self.interp_keys}'
                 + f'\nepoch unique     : {self.epoch_unique}'
+                + f'\nparam aliases    : {self.param_aliases}'
                 + f'\nbprops           : {self.bprops}'
                 + f'\ninitial position : {self.initial_position}'
                 + f'\ndisc model       : {self.disc_model}'
