@@ -29,6 +29,11 @@ param_keys = {
     11: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_p'],
 }
 
+# ===== Defines order/number of params for a single interpolated point =====
+interp_keys = {
+    1: ['mdot', 'x', 'z', 'qb', 'g'],
+    2: ['mdot', 'x', 'z', 'g'],
+}
 
 prior_bounds = {
     1: {
@@ -583,39 +588,39 @@ initial_position = {
 
 # TODO: reform into tables (saved as files), and a function to add versions (rows)
 version_defaults = {
-    'param_keys':
-        {
-            'grid4': param_keys[7],
-            'grid5': param_keys[6],
-            'heat': param_keys[7],
-        },
+    'param_keys': {
+        'grid4': param_keys[7],
+        'grid5': param_keys[6],
+        'heat': param_keys[7],
+    },
 
-    'bprops':
-        {
-            'grid4': ('rate', 'fluence', 'peak'),
-            'grid5': ('rate', 'fluence', 'peak'),
-            'heat': ('rate', 'fluence', 'peak'),
-        },
-    'disc_model':
-        {
-            'grid4': 'he16_a',
-            'grid5': 'he16_a',
-            'heat': 'he16_a',
-        },
+    'interp_keys': {
+        'grid4': interp_keys[2],
+        'grid5': interp_keys[1],
+    },
 
-    'interpolator':
-        {
-            'grid4': 1,
-            'grid5': 1,
-            'heat': 1,
-        },
+    'bprops': {
+        'grid4': ('rate', 'fluence', 'peak'),
+        'grid5': ('rate', 'fluence', 'peak'),
+        'heat': ('rate', 'fluence', 'peak'),
+    },
+    'disc_model': {
+        'grid4': 'he16_a',
+        'grid5': 'he16_a',
+        'heat': 'he16_a',
+    },
 
-    'prior_bounds':
-        {
-            'grid4': prior_bounds[7][10],
-            'grid5': prior_bounds[6][8],
-            'heat': prior_bounds[7][11],
-        },
+    'interpolator': {
+        'grid4': 1,
+        'grid5': 1,
+        'heat': 1,
+    },
+
+    'prior_bounds': {
+        'grid4': prior_bounds[7][10],
+        'grid5': prior_bounds[6][8],
+        'heat': prior_bounds[7][11],
+    },
 
     'prior_pdfs': {
         'grid4': {
@@ -637,110 +642,112 @@ version_defaults = {
         },
     },
 
-    'initial_position':
-        {
-            'grid4': initial_position[27],
-            'grid5': initial_position[28],
-            'heat': initial_position[27],
-        },
+    'initial_position': {
+        'grid4': initial_position[27],
+        'grid5': initial_position[28],
+        'heat': initial_position[27],
+    },
 }
 
 version_definitions = {
-    'interpolator':
-        {
-            'grid4': {
-                1: 1,
-                3: 2,
-                4: 2,
-                5: 3,
-                6: 4,
-                7: 3,
-            },
-
-            'grid5': {
-                1: 2,
-            },
-
-            'heat': {},
+    'interpolator': {
+        'grid4': {
+            1: 1,
+            3: 2,
+            4: 2,
+            5: 3,
+            6: 4,
+            7: 3,
         },
 
-    'bprops':
-        {
-            'grid4': {},
-            'grid5': {},
-            'heat': {
-            },
-        },
-    'param_keys':
-        {
-            'grid4': {
-                5: param_keys[6],
-                7: 5,
-            },
-
-            'grid5': {
-                1: param_keys[7],
-                4: param_keys[10],
-                5: param_keys[11],
-            },
-
-            'heat': {},
+        'grid5': {
+            1: 2,
         },
 
-    'prior_bounds':
-        {
-            'grid4': {
-                5: prior_bounds[6][7],
-                6: prior_bounds[7][12],
-                7: prior_bounds[6][8],
-            },
+        'heat': {},
+    },
 
-            'grid5': {
-                1: prior_bounds[7][12],
-                4: prior_bounds[10][1],
-                5: prior_bounds[11][1],
-            },
+    'bprops': {
+        'grid4': {},
+        'grid5': {},
+        'heat': {
+        },
+    },
 
-            'heat': {},
+    'param_keys': {
+        'grid4': {
+            5: param_keys[6],
+            7: 5,
         },
 
-    'prior_pdfs':
-        {
+        'grid5': {
+            1: param_keys[7],
+            4: param_keys[10],
+            5: param_keys[11],
+        },
+
+        'heat': {},
+    },
+
+    'interp_keys': {
+        'grid4': {},
+        'grid5': {
+            1: interp_keys[2],
+        },
+    },
+
+    'prior_bounds': {
+        'grid4': {
+            5: prior_bounds[6][7],
+            6: prior_bounds[7][12],
+            7: prior_bounds[6][8],
+        },
+
+        'grid5': {
+            1: prior_bounds[7][12],
+            4: prior_bounds[10][1],
+            5: prior_bounds[11][1],
+        },
+
+        'heat': {},
+    },
+
+    'prior_pdfs': {
          'grid4': {
             2: prior_pdfs['f_ratio'][2],
             4: prior_pdfs['f_ratio'][2],
-                 },
+         },
+
          'grid5': {
              3: prior_pdfs['f_ratio'][2],
          },
+
          'heat': {
             2: prior_pdfs['f_ratio'][2],
             4: prior_pdfs['f_ratio'][2],
-                 },
+         },
+    },
+
+    'initial_position': {
+        'grid4': {
+            5: initial_position[28],
+            7: initial_position[28],
         },
 
-    'initial_position':
-        {
-            'grid4': {
-                5: initial_position[28],
-                7: initial_position[28],
-            },
-
-            'grid5': {
-                1: initial_position[27],
-                4: initial_position[29],
-                5: initial_position[30],
-            },
-
-            'heat': {},
+        'grid5': {
+            1: initial_position[27],
+            4: initial_position[29],
+            5: initial_position[30],
         },
 
-    'disc_model':
-        {
-            'grid4': {},
-            'grid5': {},
-            'heat': {},
-        },
+        'heat': {},
+    },
+
+    'disc_model': {
+        'grid4': {},
+        'grid5': {},
+        'heat': {},
+    },
 }
 
 
@@ -760,6 +767,7 @@ class McmcVersion:
         self.source = source
         self.version = version
         self.param_keys = get_parameter(source, version, 'param_keys')
+        self.interp_keys = get_parameter(source, version, 'interp_keys')
         self.bprops = get_parameter(source, version, 'bprops')
         self.interpolator = get_parameter(source, version, 'interpolator')
         self.prior_bounds = np.array(get_parameter(source, version, 'prior_bounds'))
@@ -774,6 +782,7 @@ class McmcVersion:
     def __repr__(self):
         return (f'MCMC version definitions for {self.source} V{self.version}'
                 + f'\nparam keys       : {self.param_keys}'
+                + f'\ninterp keys      : {self.interp_keys}'
                 + f'\nbprops           : {self.bprops}'
                 + f'\ninitial position : {self.initial_position}'
                 + f'\ndisc model       : {self.disc_model}'
