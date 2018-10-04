@@ -166,7 +166,7 @@ class BurstFit:
             print_params(params, source=self.source, version=self.version)
 
         self._mdots = params[self.param_idxs['mdot1']: self.n_epochs]
-        self.debug.variable('mdots', self._mdots, '')
+        self.debug.variable('mdots', self._mdots, formatter='')
 
         # ===== check priors =====
         lp = self.lnprior(params=params)
@@ -177,14 +177,10 @@ class BurstFit:
             self.debug.end_function()
             return -np.inf
 
-        # ===== strip non-model params for interpolator =====
-        interp_params = self.extract_epoch_params(params)
+        # ===== interpolate bursts from model params =====
+        epoch_params = self.get_epoch_params(params)
+        interp = self.interpolate(interp_params=epoch_params)
 
-        # ===== compare model burst properties against observed =====
-        lh = 0.0
-        interp = self.interpolate(interp_params=interp_params)
-
-        # Check if outside of interpolator domain
         if True in np.isnan(interp):
             self.debug.print_('Outside interpolator bounds')
             self.debug.end_function()
@@ -196,6 +192,8 @@ class BurstFit:
         else:
             fig = ax = None
 
+        # ===== compare model burst properties against observed =====
+        lh = 0.0
         for i, bprop in enumerate(self.bprops):
             u_bprop = f'u_{bprop}'
             bprop_col = 2*i
@@ -305,34 +303,26 @@ class BurstFit:
         """
         self.debug.start_function('interpolate')
         # TODO: generalise to N-epochs
-        self.debug.variable('interp_params', interp_params, '')
+        self.debug.variable('interp_params', interp_params, formatter='')
         output = self.kemulator.emulate_burst(params=interp_params)
         self.debug.end_function()
         return output
 
-    def extract_epoch_params(self, params):
-        """Extracts a set of model parameters from params for each epoch
+    def get_epoch_params(self, params):
+        """Extracts array of model parameters for each epoch
         """
         self.debug.start_function('extract_epoch_params')
-        # note: interpolate() will overwrite the mdot parameter
-        #       assumes g is the last model param (need to make more robust)
-        reference_mass = 1.4  # solmass
-        interp_params = np.array(params[self.n_epochs - 1: self.param_idxs['g'] + 1])
-        interp_params[-1] *= reference_mass
+        # TODO: use base set of interp params (without epoch duplicates)
+        n_interp = len(self.mcmc_version.interp_keys)
+        epoch_params = np.full((self.n_epochs, n_interp), np.nan, dtype=float)
 
-        if self.has_logz:   # convert logz back to regular z
-            logz_idx = self.param_idxs['logz'] - (self.n_epochs - 1)
-            logz = interp_params[logz_idx]
-            interp_params[logz_idx] = z_sun * 10**logz
+        for i in range(self.n_epochs):
+            for j in range(n_interp):
+                key = self.mcmc_version.interp_keys[j]
+                epoch_params[i, j] = self.get_interp_param(key, params, epoch_idx=i)
 
-        if self.n_epochs == 3:
-            epoch_params = np.array((interp_params, interp_params, interp_params))
-            epoch_params[:, 0] = self._mdots
-        else:
-            epoch_params = np.array(interp_params)
-            epoch_params[0] = self._mdots
-
-        self.debug.variable('epoch_params', epoch_params, '')
+        self.transform_aliases(epoch_params)
+        self.debug.variable('epoch_params', epoch_params, formatter='')
         self.debug.end_function()
         return epoch_params
 
@@ -349,6 +339,28 @@ class BurstFit:
         self.debug.variable('param key', key, formatter='')
         self.debug.end_function()
         return params[self.param_idxs[key]]
+
+    def transform_aliases(self, epoch_params, reference_mass=1.4):
+        """Transforms any alias params into the correct model form
+
+        parameters
+        ----------
+        epoch_params : nparray
+            set of parameters to be parsed to interpolator
+        reference_mass : float
+            mass (Msun) that 'g' factor is relative to
+        """
+        self.debug.start_function('transform_aliases')
+        self.debug.variable('epoch params in', epoch_params, formatter='')
+
+        if self.has_g:
+            epoch_params[:, self.interp_idxs['mass']] *= reference_mass
+        if self.has_logz:
+            idx = self.interp_idxs['z']
+            epoch_params[:, idx] = z_sun * 10**epoch_params[:, idx]
+
+        self.debug.variable('epoch params out', epoch_params, formatter='')
+        self.debug.end_function()
 
     def lnprior(self, params):
         """Return logarithm prior lhood of params
@@ -377,7 +389,7 @@ class BurstFit:
             inc = params[self.param_idxs['inc']]
             prior_lhood += np.log(self.inc_prior(inc * u.deg)).value
 
-        self.debug.variable('prior_lhood', prior_lhood, 'f')
+        self.debug.variable('prior_lhood', prior_lhood, formatter='f')
         self.debug.end_function()
         return prior_lhood
 
