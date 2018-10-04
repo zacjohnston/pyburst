@@ -332,6 +332,20 @@ class BurstFit:
         self.debug.end_function()
         return epoch_params
 
+    def get_interp_param(self, key, params, epoch_idx):
+        """Extracts interp param value from full params
+        """
+        self.debug.start_function('get_interp_param')
+        self.debug.variable('interp key', key, formatter='')
+        key = self.mcmc_version.param_aliases.get(key, key)
+
+        if key in self.mcmc_version.epoch_unique:
+            key = f'{key}{epoch_idx + 1}'
+
+        self.debug.variable('param key', key, formatter='')
+        self.debug.end_function()
+        return params[self.param_idxs[key]]
+
     def lnprior(self, params):
         """Return logarithm prior lhood of params
         """
