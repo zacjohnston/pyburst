@@ -264,7 +264,7 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None,
                         source=None, version=None, smoothing=False):
     """Return ChainConsumer object set up with given chain and pkeys
     """
-    if type(param_labels) == type(None):
+    if param_labels is None:
         if (source is None) or (version is None):
             raise ValueError('If param_labels not provided, must give source, version')
         param_labels = mcmc_versions.get_parameter(source, version, 'param_keys')
