@@ -10,7 +10,6 @@ from pygrids.grids import grid_strings
 # '***' signifies values that changed over the previous version
 # First layer identifies param_keys
 # -----------------------------------
-# TODO: clean the fuck up
 z_sun = 0.01
 
 
@@ -152,16 +151,26 @@ prior_pdfs = {
 
 
 # ===== initial position of walkers =====
-# TODO: organise by param_keys
 initial_position = {
-    1: (0.15, 0.13, 0.105,
-        0.72, 0.005, 1.3, 1.35, 0.51, 1.2),
-    2: (0.162, 0.138, 0.102,
-        0.71, 0.005, 0.075, 1.5, 1.35, 0.55, 1.3),
-    3: (0.15, 0.13, 0.105,
-        0.72, -0.5, 0.075, 1.3, 1.35, 0.51, 1.2),
-    4: (0.162, 0.138, 0.102,
-        0.71, 0.005, 0.053, 0.065, 0.14, 1.5, 1.35, 0.55, 1.3),
+    1: {
+        1: (0.162, 0.138, 0.102,
+            0.71, 0.005, 0.075, 1.5, 1.35, 0.55, 1.3),
+    },
+    
+    2: {
+        1: (0.15, 0.13, 0.105,
+            0.72, 0.005, 1.3, 1.35, 0.51, 1.2),      
+    },
+    
+    3: {
+        1: (0.15, 0.13, 0.105,
+            0.72, -0.5, 0.075, 1.3, 1.35, 0.51, 1.2),
+    },
+    4: {
+        1: (0.162, 0.138, 0.102,
+            0.71, 0.005, 0.053, 0.065, 0.14, 1.5, 1.35, 0.55, 1.3),
+    },
+    
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -241,9 +250,9 @@ source_defaults = {
     },
 
     'initial_position': {
-        'grid4': initial_position[1],
-        'grid5': initial_position[2],
-        'heat': initial_position[1],
+        'grid4': initial_position[2][1],
+        'grid5': initial_position[1][1],
+        'heat': initial_position[2][1],
     },
 }
 
@@ -342,14 +351,14 @@ version_definitions = {
 
     'initial_position': {
         'grid4': {
-            5: initial_position[2],
-            7: initial_position[2],
+            5: initial_position[1][1],
+            7: initial_position[1][1],
         },
 
         'grid5': {
-            1: initial_position[1],
-            4: initial_position[3],
-            5: initial_position[4],
+            1: initial_position[2][1],
+            4: initial_position[3][1],
+            5: initial_position[4][1],
         },
 
         'heat': {},
