@@ -246,6 +246,37 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
               label=label, extension='.png')
 
 
+def plot_qb(chain, discard, source, version, cap=None, summ=None):
+    """Plot Qb versus accrate from MCMC run
+    """
+    fontsize = 14
+    mc_version = mcmc_versions.McmcVersion(source, version=version)
+    if 'qb' not in mc_version.epoch_unique:
+        raise ValueError(f"Qb is not an epoch parameter in "
+                         f"source '{source}', version '{version}'")
+    if summ is None:
+        summ = get_summary(chain, discard=discard, source=source, version=version, cap=cap)
+
+    fig, ax = plt.subplots()
+
+    n_epochs = 3
+    mdot_i0 = mc_version.param_keys.index('mdot1')
+    qb_i0 = mc_version.param_keys.index('qb1')
+
+    mdot = summ[mdot_i0:mdot_i0 + n_epochs]
+    qb = summ[qb_i0:qb_i0 + n_epochs]
+    xerr = np.diff(mdot).transpose()
+    yerr = np.diff(qb).transpose()
+
+    ax.errorbar(x=mdot[:, 1], y=qb[:, 1], xerr=xerr, yerr=yerr,
+                marker='o', capsize=3, color='C0', ls='none')
+
+    ax.set_ylabel('$Q_\mathrm{b}$ (MeV nucleon$^{-1}$)', fontsize=fontsize)
+    ax.set_xlabel('$\dot{M} / \dot{M}_\mathrm{Edd}$', fontsize=fontsize)
+    plt.tight_layout()
+    plt.show(block=False)
+
+
 def get_summary(chain, discard, source, version, cap=None):
     """Return summary values from MCMC chain (mean, uncertainties)
     """
