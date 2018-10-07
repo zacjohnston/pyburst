@@ -212,7 +212,8 @@ class BurstFit:
             if plot:
                 self.plot_compare(model=model, u_model=u_model, obs=self.obs_data[bprop],
                                   u_obs=self.obs_data[u_bprop], bprop=bprop,
-                                  ax=ax[np.where(plot_map == i)][0], display=False)
+                                  ax=ax[np.where(plot_map == i)][0], display=False,
+                                  legend=True if i==0 else False)
 
         # ===== compare predicted persistent flux with observed =====
         fper = self.shift_to_observer(values=self._mdots, bprop='fper', params=params)
@@ -226,7 +227,8 @@ class BurstFit:
         if plot:
             self.plot_compare(model=fper, u_model=u_fper, bprop='fper',
                               obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'],
-                              ax=ax[np.where(plot_map == 3)][0], display=False)
+                              ax=ax[np.where(plot_map == 3)][0], display=False,
+                              xlabel=True)
             self.debug.end_function()
             return lhood, fig
         else:
@@ -439,6 +441,7 @@ class BurstFit:
         bprop : str
             burst property being compared
         """
+        # TODO: move to mcmc_plot?
         fontsize = 12
         dx = 0.1  # horizontal offset of plot points
         yscale = {'dt': 1.0, 'rate': 1.0,
@@ -467,10 +470,14 @@ class BurstFit:
 
         ax.set_xlim([2009, 1996])
         ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
+
+        ax.set_xticks(epochs)
         if xlabel:
-            ax.set_xticks(epochs)
             ax.set_xticklabels(['2007', '2000', '1998'])
-            ax.set_xlabel('Epoch', fontsize=fontsize)
+            ax.set_xlabel('Epoch year', fontsize=fontsize)
+        else:
+            ax.set_xticklabels([])
+
         if title:
             ax.set_title(ylabel, fontsize=fontsize)
         if legend:
