@@ -186,9 +186,9 @@ class BurstFit:
             self.debug.end_function()
             return -np.inf
 
-        plot_map = np.arange(4).reshape((2, 2))
+        plot_map = np.arange(4)
         if plot:
-            fig, ax = plt.subplots(2, 2, figsize=(10, 8))
+            fig, ax = plt.subplots(4, 1, figsize=(6, 10))
         else:
             fig = ax = None
 
@@ -430,7 +430,7 @@ class BurstFit:
         return lh.sum()
 
     def plot_compare(self, model, u_model, obs, u_obs, bprop, ax=None, title=False,
-                     display=True):
+                     display=True, xlabel=False, legend=False):
         """Plots comparison of modelled and observed burst property
 
         Parameters
@@ -439,8 +439,8 @@ class BurstFit:
         bprop : str
             burst property being compared
         """
-        fontsize = 13
-        dx = 0.04  # horizontal offset of plot points
+        fontsize = 12
+        dx = 0.1  # horizontal offset of plot points
         yscale = {'dt': 1.0, 'rate': 1.0,
                   'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
         ylabel = {'dt': r'$\Delta t$',
@@ -457,23 +457,24 @@ class BurstFit:
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 
-        epochs = np.arange(1, self.n_epochs+1)
-        ax.set_xticks(epochs)
+        epochs = np.array([2007, 2000, 1998])
         x = epochs
 
         ax.errorbar(x=x - dx, y=model/yscale, yerr=u_model/yscale, ls='none', marker='o',
                     capsize=3, color='C3', label='Model')
         ax.errorbar(x=x + dx, y=obs/yscale, yerr=u_obs/yscale, ls='none',
                     marker='o', capsize=3, color='C0', label='Observed')
-        ax.set_xticklabels(['2007', '2000', '1998'])
 
-        ax.set_xlim([3.2, 0.8])
-        ax.set_xlabel('Epoch', fontsize=fontsize)
+        ax.set_xlim([2009, 1996])
         ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
+        if xlabel:
+            ax.set_xticks(epochs)
+            ax.set_xticklabels(['2007', '2000', '1998'])
+            ax.set_xlabel('Epoch', fontsize=fontsize)
         if title:
             ax.set_title(ylabel, fontsize=fontsize)
-
-        ax.legend()
+        if legend:
+            ax.legend()
         plt.tight_layout()
         if display:
             plt.show(block=False)
