@@ -188,7 +188,7 @@ class BurstFit:
 
         plot_map = np.arange(4)
         if plot:
-            fig, ax = plt.subplots(4, 1, figsize=(6, 10))
+            fig, ax = plt.subplots(4, 1, figsize=(6, 9))
         else:
             fig = ax = None
 
@@ -443,7 +443,9 @@ class BurstFit:
         """
         # TODO: move to mcmc_plot?
         fontsize = 12
-        dx = 0.1  # horizontal offset of plot points
+        markersize = 6
+        capsize = 3
+        dx = 0.13  # horizontal offset of plot points
         yscale = {'dt': 1.0, 'rate': 1.0,
                   'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
         ylabel = {'dt': r'$\Delta t$',
@@ -460,15 +462,16 @@ class BurstFit:
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 
-        epochs = np.array([2007, 2000, 1998])
+        epochs = np.array([1998, 2000, 2007])
         x = epochs
 
         ax.errorbar(x=x - dx, y=model/yscale, yerr=u_model/yscale, ls='none', marker='o',
-                    capsize=3, color='C3', label='Model')
+                    capsize=capsize, color='C3', label='Model', markersize=markersize)
         ax.errorbar(x=x + dx, y=obs/yscale, yerr=u_obs/yscale, ls='none',
-                    marker='o', capsize=3, color='C0', label='Observed')
+                    marker='o', capsize=capsize, color='C0', label='Observed',
+                    markersize=markersize)
 
-        ax.set_xlim([2009, 1996])
+        ax.set_xlim([2008, 1997])
         ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
 
         ax.set_xticks(epochs)
