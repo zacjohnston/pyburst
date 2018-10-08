@@ -348,7 +348,7 @@ class Kgrid:
         fixed   =  dict  : variables to hold fixed (e.g. 'z':0.01)
         """
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
-        var, fixed = self.check_var_fixed(var=var, fixed=fixed)
+        var, fixed = check_var_fixed(var=var, fixed=fixed)
 
         if self.source == 'biggrid2':
             accrate_unique = np.arange(8, 25)/100
@@ -468,16 +468,6 @@ class Kgrid:
         ax.set_title(f'{self.source}_V{self.grid_version.version}')
         plt.show(block=False)
 
-    def check_var_fixed(self, var, fixed):
-        if var in fixed:
-            raise ValueError('var cant also be in fixed')
-        return var, fixed
-
-    def get_not_vars(self, var):
-        p_list = ['x', 'z', 'qb', 'mass']
-        return [p for p in p_list
-                if (p != var)]
-
     def save_all_plots(self, fixed=None, bprops=('dt', 'fluence', 'peak'),
                        do_bprops=True, **kwargs):
         """Saves all lhood and var plots for given z,qb
@@ -510,7 +500,7 @@ class Kgrid:
 
         for var in fixed:
             self.printv(f'Saving plot var={var}')
-            not_vars = self.get_not_vars(var)
+            not_vars = get_not_vars(var)
             sub_fixed = {v: fixed[v] for v in not_vars}
 
             full_fixed = grid_tools.enumerate_params(sub_fixed)
@@ -575,3 +565,15 @@ def printv(string, verbose):
     """
     if verbose:
         print(string)
+
+
+def check_var_fixed(var, fixed):
+    if var in fixed:
+        raise ValueError('var cant also be in fixed')
+    return var, fixed
+
+
+def get_not_vars(var):
+    p_list = ['x', 'z', 'qb', 'mass']
+    return [p for p in p_list
+            if (p != var)]
