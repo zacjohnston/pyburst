@@ -155,7 +155,7 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
 #SBATCH --cpus-per-task=1
 #SBATCH --qos={qos}
 #SBATCH --partition=batch,medium
-#SBATCH --mem-per-cpu=2000
+#SBATCH --mem-per-cpu=1024
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=zac.johnston@monash.edu
 ######################
@@ -173,7 +173,7 @@ cd $KEPLER_MODELS/{source}_{batch}/logs
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --qos={qos}
-#SBATCH --mem-per-cpu=2000
+#SBATCH --mem-per-cpu=1024
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=zac.johnston@monash.edu
 
@@ -191,7 +191,7 @@ ln -sf $BDAT_PATH ./bdat
     elif cluster == 'icer':
         if parallel:
             ntasks = (run1 + 1) - run0
-            mem = 2000 * ntasks
+            mem = 1024 * ntasks
             disksize = 2 * ntasks
             return f"""#!/bin/bash --login
 #PBS -N {job_str}
@@ -212,7 +212,7 @@ qstat -f $PBS_JOBID     # Print statistics """
             return f"""#!/bin/bash --login
 #PBS -N {job_str}
 #PBS -l walltime={time_str}
-#PBS -l mem=2000mb
+#PBS -l mem=1024mb
 #PBS -l file=4gb
 #PBS -l nodes=1:ppn=1
 #PBS -j oe
