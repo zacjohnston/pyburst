@@ -246,7 +246,7 @@ def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
               label=label, extension='.png')
 
 
-def plot_qb(chain, discard, source, version, cap=None, summ=None):
+def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
     """Plot Qb versus accrate from MCMC run
     """
     fontsize = 14
@@ -268,7 +268,16 @@ def plot_qb(chain, discard, source, version, cap=None, summ=None):
     xerr = np.diff(mdot).transpose()
     yerr = np.diff(qb).transpose()
 
-    ax.errorbar(x=mdot[:, 1], y=qb[:, 1], xerr=xerr, yerr=yerr,
+    x = mdot[:, 1]
+    y = qb[:, 1]
+
+    if log:
+        xerr = xerr / (x * np.log(10))
+        yerr = yerr / (y * np.log(10))
+        x = np.log10(x)
+        y = np.log10(y)
+
+    ax.errorbar(x=x, y=y, xerr=xerr, yerr=yerr,
                 marker='o', capsize=3, color='C0', ls='none')
 
     ax.set_ylabel('$Q_\mathrm{b}$ (MeV nucleon$^{-1}$)', fontsize=fontsize)
