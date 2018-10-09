@@ -441,8 +441,12 @@ class BurstRun(object):
         self.get_recurrence_times()
         self.get_burst_starts()
         self.get_burst_ends()
-        self.check_n_bursts()
 
+        try:
+            self.check_n_bursts()
+        except NoBursts:
+            return
+        
         self.identify_short_wait_bursts()
         self.bursts.reset_index(inplace=True, drop=True)
 
