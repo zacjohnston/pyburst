@@ -170,6 +170,8 @@ initial_position = {
     4: {
         1: (0.165, 0.14, 0.102,
             0.7, 0.004, 0.058, 0.062, 0.14, 1.5, 1.33, 0.55, 1.3),
+        2: (0.12, 0.12, 0.12,  # (priors only test)
+            0.7, 0.005, 0.1, 0.1, 0.1, 1.3, 1.3, 1., 2.3),
     },
     
 }
@@ -363,7 +365,7 @@ version_definitions = {
             1: initial_position[2][1],
             4: initial_position[3][1],
             5: initial_position[4][1],
-            6: initial_position[4][1],
+            6: initial_position[4][2],
         },
 
         'heat': {},
