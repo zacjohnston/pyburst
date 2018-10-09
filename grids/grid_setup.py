@@ -6,6 +6,7 @@ import subprocess, sys, os
 from . import grid_analyser
 from . import grid_tools
 from . import grid_strings
+from pygrids.mcmc import mcmc_versions
 from pygrids.kepler import kepler_jobscripts, kepler_files
 from pygrids.misc.pyprint import print_title, print_dashes
 from pygrids.physics import burning
@@ -33,6 +34,7 @@ FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
+# TODO: This whole module is a mess. Needs lots of tidying up
 # TODO: Rewrite docstrings
 # TODO: Allow enumerating over multiple parameters, create_batches()
 
@@ -93,7 +95,7 @@ def create_batch(batch, dv, source,
                  grid_version=None, qnuc_source='heat', minzone=51,
                  zonermax=10, zonermin=-1, thickfac=0.001,
                  substrate='fe54', substrate_off=True, adapnet_filename=None,
-                 bdat_filename=None, ibdatov=0, **kwargs):
+                 bdat_filename=None, ibdatov=0, params_full=None, **kwargs):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -126,14 +128,16 @@ def create_batch(batch, dv, source,
     mass_ref = 1.4  # reference NS mass (in Msun)
     print_batch(batch=batch, source=source)
 
-    params = dict(params)
-    params_expanded, var = expand_params(dv, params)
+    if params_full is None:
+        params = dict(params)
+        params_expanded, var = expand_params(dv, params)
 
-    # ===== Cut out any excluded values =====
-    cut_params(params=params_expanded, exclude=exclude)
-    print_grid_params(params_expanded)
+        # ===== Cut out any excluded values =====
+        cut_params(params=params_expanded, exclude=exclude)
+        print_grid_params(params_expanded)
 
-    params_full = grid_tools.enumerate_params(params_expanded)
+        params_full = grid_tools.enumerate_params(params_expanded)
+
     n = len(params_full['x'])
 
     if parallel and (n % ntasks != 0):
@@ -259,6 +263,51 @@ def create_batch(batch, dv, source,
                                    minzone=minzone, zonermax=zonermax, zonermin=zonermin,
                                    thickfac=thickfac, substrate_off=substrate_off,
                                    ibdatov=ibdatov)
+
+
+def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcmc_version,
+                  constant=None, epoch_independent=('x', 'z', 'mass'),
+                  epoch_dependent=('accrate', 'qb')):
+    """Returns random sample of model parameters
+    """
+    ref_mass = 1.4
+    aliases = {'mass': 'g', 'accrate': 'mdot'}
+    if constant is None:
+        constant = {'tshift': 0.0, 'xi': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
+                    'accmass': 1e16, 'accdepth': 1e19}
+    mv = mcmc_versions.McmcVersion(source=ref_source, version=ref_mcmc_version)
+    params_full = {}
+
+    # ===== fill model params =====
+    for key in epoch_independent:
+        mv_key = aliases.get(key, key)
+        params_full[key] = get_random_params(mv_key, n_models=n_models, mv=mv)
+
+    # ===== fill constant params =====
+    for key, val in constant.items():
+        params_full[key] = np.full(n_models, val)
+
+    for i in range(n_epochs):
+        for key in epoch_dependent:
+            mv_key = aliases.get(key, key)
+            mv_key = f'{mv_key}1'
+            params_full[key] = get_random_params(mv_key, n_models=n_models, mv=mv)
+
+        create_batch(batch0+i, dv={}, params={}, source=source, nbursts=30, kgrid=kgrid,
+                     qos='normal', walltime=96, setup_test=False, nsdump=500,
+                     nuc_heat=True, predict_qnuc=False, grid_version=0,
+                     substrate_off=True, ibdatov=1, params_full=params_full)
+
+
+def get_random_params(key, n_models, mv):
+    """Returns random sample of length 'n_models', within mcmc boundaries
+    """
+    idx = mv.param_keys.index(key)
+
+    bounds = mv.prior_bounds[idx]
+    range_ = np.diff(bounds)
+    rand = np.random.random_sample(n_models)
+    return rand * range_ + bounds[0]
 
 
 def print_grid_params(params):
