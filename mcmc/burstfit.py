@@ -374,6 +374,7 @@ class BurstFit:
                                        params < upper_bounds)
 
         if False in inside_bounds:
+            self.debug.end_function()
             return -np.inf
 
         if self.has_logz:
@@ -386,7 +387,13 @@ class BurstFit:
 
         if self.has_two_f:
             f_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
-            prior_lhood += np.log(self.f_ratio_prior(f_ratio))
+            f_prior = self.f_ratio_prior(f_ratio)
+
+            if f_prior == 0:
+                self.debug.end_function()
+                return -np.inf
+            prior_lhood += np.log(f_prior)
+
         elif self.has_inc:
             inc = params[self.param_idxs['inc']]
             prior_lhood += np.log(self.inc_prior(inc * u.deg)).value
