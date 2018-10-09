@@ -292,6 +292,7 @@ version_definitions = {
             1: param_keys[2],
             4: param_keys[3],
             5: param_keys[4],
+            6: param_keys[4],
         },
 
         'heat': {},
@@ -308,6 +309,7 @@ version_definitions = {
         'grid4': {},
         'grid5': {
             5: epoch_unique[2],
+            6: epoch_unique[2],
         },
     },
 
@@ -329,6 +331,7 @@ version_definitions = {
             1: prior_bounds[2][3],
             4: prior_bounds[3][1],
             5: prior_bounds[4][1],
+            6: prior_bounds[4][1],
         },
 
         'heat': {},
@@ -360,6 +363,7 @@ version_definitions = {
             1: initial_position[2][1],
             4: initial_position[3][1],
             5: initial_position[4][1],
+            6: initial_position[4][1],
         },
 
         'heat': {},
