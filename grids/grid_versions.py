@@ -24,6 +24,7 @@ version_defaults = {
             'mass': [2.0],
         },
         'grid5': {},
+        'synth5': {},
         'res1': {},
         'test1': {},
 
@@ -39,6 +40,7 @@ version_defaults = {
             {'x': 0.73, 'accdepth': 1e20},
          ],
         'grid5': [{}],
+        'synth5': [{}],
         'heat': [{}],
         'res1': [{}],
         'test1': [{}],
@@ -57,6 +59,7 @@ version_definitions = {
             'test1': {},
             'grid4': {},
             'grid5': {},
+            'synth5': {},
             'heat': {
                 1: {
                     'batch': [1, 10, 11, 12, 14, 15, 16, 17],  # gs1826 models
@@ -86,6 +89,7 @@ version_definitions = {
             'biggrid3': {},
             'grid4': {},
             'grid5': {},
+            'synth5': {},
             'heat': {},
             'res1': {},
             'test1': {},
