@@ -36,7 +36,8 @@ class BurstRun(object):
                  reload=False, save_lum=True, analyse=True, plot=False,
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
-                 load_dumps=False, set_paramaters=None, auto_discard=False):
+                 load_dumps=False, set_paramaters=None, auto_discard=False,
+                 get_slopes=False):
         self.flags = {'lum_loaded': False,
                       'dumps_loaded': False,
                       'analysed': False,
@@ -47,6 +48,7 @@ class BurstRun(object):
                       'converged': False,
                       'shocks': False,
                       'zeros': False,
+                      'calculated_slopes': False,
                       }
 
         self.options = {'verbose': verbose,
@@ -56,6 +58,7 @@ class BurstRun(object):
                         'exclude_short_wait': exclude_short_wait,
                         'try_mkdir_plots': try_mkdir_plots,
                         'auto_discard': auto_discard,
+                        'get_slopes': get_slopes,
                         }
 
         self.parameters = {'lum_cutoff': 1e36,  # luminosity cutoff for burst detection
@@ -410,7 +413,8 @@ class BurstRun(object):
             self.identify_bursts()
             self.get_fluences()
             self.identify_outliers()
-            self.get_bprop_slopes()
+            if self.options['get_slopes']:
+                self.get_bprop_slopes()
             self.get_burst_dumps()
 
         if self.options['auto_discard']:
@@ -726,12 +730,14 @@ class BurstRun(object):
     def get_bprop_slopes(self):
         """Calculate slopes for properties as the burst sequence progresses
         """
+        self.printv('Calculating slopes in burst properties (along burst train)')
         for bprop in self.regress_bprops:
             self.bursts[f'slope_{bprop}'] = np.full(self.n_bursts, np.nan)
             self.bursts[f'slope_{bprop}_err'] = np.full(self.n_bursts, np.nan)
 
         if self.flags['regress_too_few_bursts']:
             self.printv('Too few bursts to get burst slopes')
+            self.flags['calculated_slopes'] = True
             return
 
         bursts_regress = self.clean_bursts(exclude_min_regress=True)
@@ -750,12 +756,19 @@ class BurstRun(object):
             minimum = (self.parameters['min_regress'] + self.parameters['min_discard']
                        + self.n_short_wait + self.n_outliers_unique)
             self.printv(f'Too few bursts to get slopes. '
-                            + f'Has {self.n_bursts}, need at least {minimum} '
-                            + '(assuming no further outliers/short_waits occur)')
+                        + f'Has {self.n_bursts}, need at least {minimum} '
+                        + '(assuming no further outliers/short_waits occur)')
+
+        self.flags['calculated_slopes'] = True
 
     def get_discard(self):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
         """
+        if not self.flags['calculated_slopes']:
+            self.get_bprop_slopes()
+
+        self.printv('Finding number of bursts to discard to ensure convergence')
+
         if self.flags['regress_too_few_bursts']:
             self.printv('Too few bursts to find self.discard, defaulting to min_discard')
             return self.parameters['min_discard']
