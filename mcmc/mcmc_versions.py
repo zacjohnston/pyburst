@@ -159,7 +159,6 @@ initial_position = {
 source_defaults = {
     'param_keys': {
         'grid5': param_keys[1],
-        'heat': param_keys[2],
     },
 
     'interp_keys': {
@@ -176,22 +175,18 @@ source_defaults = {
 
     'bprops': {
         'grid5': ('rate', 'fluence', 'peak'),
-        'heat': ('rate', 'fluence', 'peak'),
     },
 
     'disc_model': {
         'grid5': 'he16_a',
-        'heat': 'he16_a',
     },
 
     'interpolator': {
         'grid5': 1,
-        'heat': 1,
     },
 
     'prior_bounds': {
         'grid5': prior_bounds[1][1],
-        'heat': prior_bounds[2][1],
     },
 
     'prior_pdfs': {
@@ -200,29 +195,20 @@ source_defaults = {
           'f_ratio': prior_pdfs['f_ratio'][1],
           'inc': prior_pdfs['inc'][1],
         },
-
-        'heat': {
-          'z': prior_pdfs['z'][1],
-          'f_ratio': prior_pdfs['f_ratio'][1],
-          'inc': prior_pdfs['inc'][1],
-        },
     },
 
     'initial_position': {
         'grid5': initial_position[1][1],
-        'heat': initial_position[2][1],
     },
 }
 
 version_definitions = {
     'interpolator': {
         'grid5': {},
-        'heat': {},
     },
 
     'bprops': {
         'grid5': {},
-        'heat': {},
     },
 
     'param_keys': {
@@ -231,8 +217,6 @@ version_definitions = {
             5: param_keys[4],
             6: param_keys[4],
         },
-
-        'heat': {},
     },
 
     'interp_keys': {
@@ -257,8 +241,6 @@ version_definitions = {
             5: prior_bounds[4][1],
             6: prior_bounds[4][1],
         },
-
-        'heat': {},
     },
 
     'prior_pdfs': {
@@ -267,8 +249,6 @@ version_definitions = {
              3: prior_pdfs['f_ratio'][2],
              4: prior_pdfs['z'][2],
          },
-
-         'heat': {},
     },
 
     'initial_position': {
@@ -277,13 +257,10 @@ version_definitions = {
             5: initial_position[4][1],
             6: initial_position[4][2],
         },
-
-        'heat': {},
     },
 
     'disc_model': {
         'grid5': {},
-        'heat': {},
     },
 }
 
