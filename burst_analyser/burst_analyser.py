@@ -1060,8 +1060,12 @@ class BurstRun(object):
     def plot_linregress(self, display=True, save=False, short_waits=True,
                         outliers=True, legend=False):
         if self.flags['regress_too_few_bursts']:
-            self.printv("Can't plot linregress: bursts not converged")
+            self.printv("Can't plot linregress: too few bursts to get slopes")
             return
+        if not self.flags['calculated_slopes']:
+            self.printv('Slopes not yet calculated')
+            self.get_bprop_slopes()
+
         fig, ax = plt.subplots(3, 1, figsize=(6, 8), sharex=True)
         markersize = 8
         markeredgecolor = '0'
