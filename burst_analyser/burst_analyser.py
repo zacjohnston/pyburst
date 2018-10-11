@@ -730,36 +730,36 @@ class BurstRun(object):
     def get_bprop_slopes(self):
         """Calculate slopes for properties as the burst sequence progresses
         """
-        self.printv('Calculating slopes in burst properties (along burst train)')
-        for bprop in self.regress_bprops:
-            self.bursts[f'slope_{bprop}'] = np.full(self.n_bursts, np.nan)
-            self.bursts[f'slope_{bprop}_err'] = np.full(self.n_bursts, np.nan)
-
-        if self.flags['regress_too_few_bursts']:
-            self.printv('Too few bursts to get burst slopes')
-            self.flags['calculated_slopes'] = True
-            return
-
-        bursts_regress = self.clean_bursts(exclude_min_regress=True)
-        bursts_regress_full = self.clean_bursts(exclude_min_regress=False)
-
-        if len(bursts_regress) > 0:
+        try:
+            self.printv('Calculating slopes in burst properties (along burst train)')
             for bprop in self.regress_bprops:
-                for burst in bursts_regress.itertuples():
-                    regress_slice = bursts_regress_full[burst.Index:]
-                    lin = linregress(regress_slice['n'], regress_slice[bprop])
+                self.bursts[f'slope_{bprop}'] = np.full(self.n_bursts, np.nan)
+                self.bursts[f'slope_{bprop}_err'] = np.full(self.n_bursts, np.nan)
 
-                    self.bursts.loc[burst.Index, f'slope_{bprop}'] = lin[0]
-                    self.bursts.loc[burst.Index, f'slope_{bprop}_err'] = lin[-1]
-        else:
-            self.flags['regress_too_few_bursts'] = True
-            minimum = (self.parameters['min_regress'] + self.parameters['min_discard']
-                       + self.n_short_wait + self.n_outliers_unique)
-            self.printv(f'Too few bursts to get slopes. '
-                        + f'Has {self.n_bursts}, need at least {minimum} '
-                        + '(assuming no further outliers/short_waits occur)')
+            if self.flags['regress_too_few_bursts']:
+                self.printv('Too few bursts to get burst slopes')
+                return
 
-        self.flags['calculated_slopes'] = True
+            bursts_regress = self.clean_bursts(exclude_min_regress=True)
+            bursts_regress_full = self.clean_bursts(exclude_min_regress=False)
+
+            if len(bursts_regress) > 0:
+                for bprop in self.regress_bprops:
+                    for burst in bursts_regress.itertuples():
+                        regress_slice = bursts_regress_full[burst.Index:]
+                        lin = linregress(regress_slice['n'], regress_slice[bprop])
+
+                        self.bursts.loc[burst.Index, f'slope_{bprop}'] = lin[0]
+                        self.bursts.loc[burst.Index, f'slope_{bprop}_err'] = lin[-1]
+            else:
+                self.flags['regress_too_few_bursts'] = True
+                minimum = (self.parameters['min_regress'] + self.parameters['min_discard']
+                           + self.n_short_wait + self.n_outliers_unique)
+                self.printv(f'Too few bursts to get slopes. '
+                            + f'Has {self.n_bursts}, need at least {minimum} '
+                            + '(assuming no further outliers/short_waits occur)')
+        finally:
+            self.flags['calculated_slopes'] = True
 
     def get_discard(self):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
