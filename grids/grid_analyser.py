@@ -458,13 +458,13 @@ class Kgrid:
         print(bprop)
         return ax
 
-    def plot_nbursts(self):
-        """Plots number of bursts in each model, collected by batch
+    def plot_summ(self, var):
+        """Plot any column from summ stable, versus batch
         """
         fig, ax = plt.subplots()
-        ax.plot(self.summ['batch'], self.summ['num'], marker='o', ls='none')
+        ax.plot(self.summ['batch'], self.summ[var], marker='o', ls='none')
         ax.set_xlabel('Batch')
-        ax.set_ylabel('N bursts')
+        ax.set_ylabel(f'{var}')
         ax.set_title(f'{self.source}_V{self.grid_version.version}')
         plt.show(block=False)
 
