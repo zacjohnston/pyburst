@@ -137,11 +137,12 @@ def flat_prior(x):
 prior_pdfs = {
     'z': {
         1: norm(loc=-0.5, scale=0.25).pdf,  # log10-space [z/solar]
+        2: flat_prior,                      # flat prior
     },
 
     'f_ratio': {
         1: norm(loc=2.3, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
-        2: flat_prior,                   # flat prior
+        2: flat_prior,                    # flat prior
     },
 
     'inc': {
@@ -188,57 +189,43 @@ initial_position = {
 # TODO: reform into tables (saved as files), and a function to add versions (rows)
 source_defaults = {
     'param_keys': {
-        'grid4': param_keys[2],
         'grid5': param_keys[1],
         'heat': param_keys[2],
     },
 
     'interp_keys': {
-        'grid4': interp_keys[2],
         'grid5': interp_keys[1],
     },
 
     'epoch_unique': {
-        'grid4': epoch_unique[1],
         'grid5': epoch_unique[1],
     },
 
     'param_aliases': {
-        'grid4': param_aliases[1],
         'grid5': param_aliases[1],
     },
 
     'bprops': {
-        'grid4': ('rate', 'fluence', 'peak'),
         'grid5': ('rate', 'fluence', 'peak'),
         'heat': ('rate', 'fluence', 'peak'),
     },
 
     'disc_model': {
-        'grid4': 'he16_a',
         'grid5': 'he16_a',
         'heat': 'he16_a',
     },
 
     'interpolator': {
-        'grid4': 1,
         'grid5': 1,
         'heat': 1,
     },
 
     'prior_bounds': {
-        'grid4': prior_bounds[2][1],
         'grid5': prior_bounds[1][2],
         'heat': prior_bounds[2][2],
     },
 
     'prior_pdfs': {
-        'grid4': {
-          'z': prior_pdfs['z'][1],
-          'f_ratio': prior_pdfs['f_ratio'][1],
-          'inc': prior_pdfs['inc'][1],
-        },
-
         'grid5': {
           'z': prior_pdfs['z'][1],
           'f_ratio': prior_pdfs['f_ratio'][1],
@@ -253,7 +240,6 @@ source_defaults = {
     },
 
     'initial_position': {
-        'grid4': initial_position[2][1],
         'grid5': initial_position[1][1],
         'heat': initial_position[2][1],
     },
@@ -261,15 +247,6 @@ source_defaults = {
 
 version_definitions = {
     'interpolator': {
-        'grid4': {
-            1: 1,
-            3: 2,
-            4: 2,
-            5: 3,
-            6: 4,
-            7: 3,
-        },
-
         'grid5': {
             1: 2,
         },
@@ -278,18 +255,12 @@ version_definitions = {
     },
 
     'bprops': {
-        'grid4': {},
         'grid5': {},
         'heat': {
         },
     },
 
     'param_keys': {
-        'grid4': {
-            5: param_keys[1],
-            7: 5,
-        },
-
         'grid5': {
             1: param_keys[2],
             4: param_keys[3],
@@ -301,14 +272,12 @@ version_definitions = {
     },
 
     'interp_keys': {
-        'grid4': {},
         'grid5': {
             1: interp_keys[2],
         },
     },
 
     'epoch_unique': {
-        'grid4': {},
         'grid5': {
             5: epoch_unique[2],
             6: epoch_unique[2],
@@ -316,19 +285,12 @@ version_definitions = {
     },
 
     'param_aliases': {
-        'grid4': {},
         'grid5': {
             4: param_aliases[2],
         },
     },
 
     'prior_bounds': {
-        'grid4': {
-            5: prior_bounds[1][1],
-            6: prior_bounds[2][3],
-            7: prior_bounds[1][2],
-        },
-
         'grid5': {
             1: prior_bounds[2][3],
             4: prior_bounds[3][1],
@@ -340,11 +302,6 @@ version_definitions = {
     },
 
     'prior_pdfs': {
-         'grid4': {
-            2: prior_pdfs['f_ratio'][2],
-            4: prior_pdfs['f_ratio'][2],
-         },
-
          'grid5': {
              3: prior_pdfs['f_ratio'][2],
          },
@@ -356,11 +313,6 @@ version_definitions = {
     },
 
     'initial_position': {
-        'grid4': {
-            5: initial_position[1][1],
-            7: initial_position[1][1],
-        },
-
         'grid5': {
             1: initial_position[2][1],
             4: initial_position[3][1],
@@ -372,7 +324,6 @@ version_definitions = {
     },
 
     'disc_model': {
-        'grid4': {},
         'grid5': {},
         'heat': {},
     },
