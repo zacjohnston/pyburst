@@ -41,24 +41,13 @@ param_aliases = {
 
 prior_bounds = {
     1: {
-        1: ((0.1, 0.18),  # mdot1
-            (0.1, 0.18),  # mdot2
-            (0.1, 0.18),  # mdot3
-            (0.7, 0.73),  # x
+        1: ((0.08, 0.18),  # mdot1
+            (0.08, 0.18),  # mdot2
+            (0.08, 0.18),  # mdot3
+            (0.67, 0.73),  # x
             (0.0025, 0.0075),  # z
-            (0.05, 0.1),  # qb
-            (1.7 / 1.4, 2.3 / 1.4),  # g
-            (1.2, 1.4),  # redshift
-            (0.01, 10),  # f_b
-            (0.01, 10),  # f_p
-            ),
-        2: ((0.1, 0.18),  # mdot1
-            (0.1, 0.18),  # mdot2
-            (0.1, 0.18),  # mdot3
-            (0.7, 0.73),  # x
-            (0.0025, 0.0075),  # z
-            (0.05, 0.15),  # qb
-            (1.7 / 1.4, 2.3 / 1.4),  # g
+            (0.0, 0.2),  # qb
+            (1.4 / 1.4, 2.3 / 1.4),  # g
             (1.2, 1.4),  # redshift
             (0.01, 10),  # f_b
             (0.01, 10),  # f_p
@@ -70,26 +59,6 @@ prior_bounds = {
             (0.08, 0.22),  # mdot2
             (0.08, 0.22),  # mdot3
             (0.7, 0.74),  # x
-            (0.0025, 0.0075),  # z
-            (1.7 / 1.4, 2.3 / 1.4),  # g
-            (1.2, 1.4),  # redshift
-            (0.01, 10),  # f_b
-            (0.01, 10),  # f_p
-            ),
-        2: ((0.1, 0.2),  # mdot1
-            (0.1, 0.2),  # mdot2
-            (0.1, 0.2),  # mdot3
-            (0.7, 0.73),  # x
-            (0.0025, 0.0075),  # z
-            (1.7 / 1.4, 2.3 / 1.4),  # g
-            (1.2, 1.4),  # redshift
-            (0.01, 10),  # f_b
-            (0.01, 10),  # f_p
-            ),
-        3: ((0.1, 0.18),  # mdot1
-            (0.1, 0.18),  # mdot2
-            (0.1, 0.18),  # mdot3
-            (0.7, 0.73),  # x
             (0.0025, 0.0075),  # z
             (1.7 / 1.4, 2.3 / 1.4),  # g
             (1.2, 1.4),  # redshift
@@ -221,8 +190,8 @@ source_defaults = {
     },
 
     'prior_bounds': {
-        'grid5': prior_bounds[1][2],
-        'heat': prior_bounds[2][2],
+        'grid5': prior_bounds[1][1],
+        'heat': prior_bounds[2][1],
     },
 
     'prior_pdfs': {
@@ -249,6 +218,7 @@ version_definitions = {
     'interpolator': {
         'grid5': {
             1: 2,
+            2: 2,
         },
 
         'heat': {},
@@ -262,8 +232,7 @@ version_definitions = {
 
     'param_keys': {
         'grid5': {
-            1: param_keys[2],
-            4: param_keys[3],
+            4: param_keys[4],
             5: param_keys[4],
             6: param_keys[4],
         },
@@ -272,28 +241,24 @@ version_definitions = {
     },
 
     'interp_keys': {
-        'grid5': {
-            1: interp_keys[2],
-        },
+        'grid5': {},
     },
 
     'epoch_unique': {
         'grid5': {
+            4: epoch_unique[2],
             5: epoch_unique[2],
             6: epoch_unique[2],
         },
     },
 
     'param_aliases': {
-        'grid5': {
-            4: param_aliases[2],
-        },
+        'grid5': {},
     },
 
     'prior_bounds': {
         'grid5': {
-            1: prior_bounds[2][3],
-            4: prior_bounds[3][1],
+            4: prior_bounds[4][1],
             5: prior_bounds[4][1],
             6: prior_bounds[4][1],
         },
@@ -303,19 +268,17 @@ version_definitions = {
 
     'prior_pdfs': {
          'grid5': {
+             2: prior_pdfs['z'][2],
              3: prior_pdfs['f_ratio'][2],
+             4: prior_pdfs['z'][2],
          },
 
-         'heat': {
-            2: prior_pdfs['f_ratio'][2],
-            4: prior_pdfs['f_ratio'][2],
-         },
+         'heat': {},
     },
 
     'initial_position': {
         'grid5': {
-            1: initial_position[2][1],
-            4: initial_position[3][1],
+            4: initial_position[4][1],
             5: initial_position[4][1],
             6: initial_position[4][2],
         },
