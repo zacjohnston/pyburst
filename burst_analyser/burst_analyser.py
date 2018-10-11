@@ -77,7 +77,7 @@ class BurstRun(object):
                            'n_bimodal': 20,  # n_bursts to check for bimodality
                            'bimodal_sigma': 3,  # number of std's modes are separated by
                            'outlier_bprops': ('dt', 'fluence', 'peak'),  # bprops to check
-                           'outlier_distance': 2.,  # fraction of IQR above Q3
+                           'outlier_distance': 3.,  # fraction of IQR above Q3
                            'max_shock_iterations': 100,  # max cycles in get_burst_candidates()
                            'dump_time_offset': 0.0,  # time offset (s) from burst start
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
