@@ -113,5 +113,5 @@ def extract_runs(runs, batch, source, save_plots=True, reload=False, load_bursts
         if save_plots:
             model.plot(display=False, save=True)
             model.plot_convergence(display=False, save=True)
-            model.plot_linregress(display=False, save=True)
+            # model.plot_linregress(display=False, save=True)
 
