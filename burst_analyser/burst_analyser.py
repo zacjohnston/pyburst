@@ -36,7 +36,7 @@ class BurstRun(object):
                  reload=False, save_lum=True, analyse=True, plot=False,
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
-                 load_dumps=False, set_paramaters=None):
+                 load_dumps=False, set_paramaters=None, auto_discard=False):
         self.flags = {'lum_loaded': False,
                       'dumps_loaded': False,
                       'analysed': False,
@@ -55,6 +55,7 @@ class BurstRun(object):
                         'exclude_outliers': exclude_outliers,
                         'exclude_short_wait': exclude_short_wait,
                         'try_mkdir_plots': try_mkdir_plots,
+                        'auto_discard': auto_discard,
                         }
 
         self.parameters = {'lum_cutoff': 1e36,  # luminosity cutoff for burst detection
@@ -412,7 +413,13 @@ class BurstRun(object):
             self.get_bprop_slopes()
             self.get_burst_dumps()
 
-        self.discard = self.get_discard()
+        if self.options['auto_discard']:
+            self.discard = self.get_discard()
+        else:
+            self.printv("Discarding default initial bursts, "
+                        f"min_discard={self.parameters['min_discard']}")
+            self.discard = self.parameters['min_discard']
+
         if not self.load_summary:
             self.setup_summary()
         self.flags['analysed'] = True
@@ -446,7 +453,7 @@ class BurstRun(object):
             self.check_n_bursts()
         except NoBursts:
             return
-        
+
         self.identify_short_wait_bursts()
         self.bursts.reset_index(inplace=True, drop=True)
 
