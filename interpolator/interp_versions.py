@@ -4,20 +4,16 @@ import numpy as np
 version_defaults = {
     'param_keys': {
         'grid5': ['accrate', 'x', 'z', 'qb', 'mass'],
-        'heat': ['accrate', 'x', 'z', 'mass'],
     },
     'bprops': {
         'grid5': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
-        'heat': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
     },
     'exclude_any': {
         'grid5': {},
-        'heat': {},
 
     },
     'exclude_all': {
         'grid5': [{}],
-        'heat': [{}],
     },
 }
 
@@ -27,33 +23,18 @@ version_definitions = {
         'grid5': {
             2: ['accrate', 'x', 'z', 'mass'],
         },
-        'heat': {},
     },
 
     'bprops': {
         'grid5': {},
-        'heat': {},
     },
 
     'exclude_any': {
         'grid5': {},
-
-        'heat': {
-            1: {  # gs1826 models
-                'batch': np.concatenate((np.arange(1, 9), np.arange(10, 13),
-                                        np.arange(14, 20))),
-            },
-
-            2: {  # 4u1820 models
-                'batch': np.concatenate((np.arange(1, 10), [13])),
-                'accrate': 0.1,
-                },
-            },
     },
-    
+
     'exclude_all': {
         'grid5': {},
-        'heat': {},
     },
 }
 
