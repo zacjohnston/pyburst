@@ -453,7 +453,7 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
 
 
 def extend_runs(summ_table, source, nbursts=40, basename='xrb', nstop=9999999,
-                nsdump=1000, walltime=96, do_cmd_files=True, do_jobscripts=True,
+                nsdump=500, walltime=96, do_cmd_files=True, do_jobscripts=True,
                 adapnet_filename=None):
     """Modifies existing models (in summ_table) for resuming, to simulate more bursts
     """
