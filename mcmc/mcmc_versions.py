@@ -216,18 +216,13 @@ source_defaults = {
 
 version_definitions = {
     'interpolator': {
-        'grid5': {
-            1: 2,
-            2: 2,
-        },
-
+        'grid5': {},
         'heat': {},
     },
 
     'bprops': {
         'grid5': {},
-        'heat': {
-        },
+        'heat': {},
     },
 
     'param_keys': {
