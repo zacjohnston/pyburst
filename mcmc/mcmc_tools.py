@@ -100,6 +100,17 @@ def get_max_lhood_params(source, version, n_walkers, n_steps, verbose=True,
         return max_params
 
 
+def get_random_sample(chain, n, discard=None, cap=None):
+    """Returns random sample of params from given MCMC chain
+    """
+    chain = slice_chain(chain, discard=discard, cap=cap)
+    n_dim = chain.shape[-1]
+    flat_chain = chain.reshape((-1, n_dim))
+    idxs = np.random.randint(len(flat_chain), size=n)
+
+    return flat_chain[idxs]
+
+
 def save_sampler_state(sampler, source, version, n_steps, n_walkers):
     """Saves sampler state as dict
     """
