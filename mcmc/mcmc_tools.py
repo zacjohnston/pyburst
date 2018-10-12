@@ -108,7 +108,7 @@ def get_random_sample(chain, n, discard=None, cap=None):
     flat_chain = chain.reshape((-1, n_dim))
     idxs = np.random.randint(len(flat_chain), size=n)
 
-    return flat_chain[idxs]
+    return flat_chain[idxs], idxs
 
 
 def save_sampler_state(sampler, source, version, n_steps, n_walkers):
