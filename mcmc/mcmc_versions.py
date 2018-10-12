@@ -245,9 +245,9 @@ version_definitions = {
 
     'prior_pdfs': {
          'grid5': {
-             2: prior_pdfs['z'][2],
-             3: prior_pdfs['f_ratio'][2],
-             4: prior_pdfs['z'][2],
+             2: {'z': prior_pdfs['z'][2]},
+             3: {'f_ratio': prior_pdfs['f_ratio'][2]},
+             4: {'z': prior_pdfs['z'][2]},
          },
     },
 
@@ -324,7 +324,12 @@ def get_prior_pdfs(source, version):
     pdfs = {}
     for var in prior_pdfs:
         default = source_defaults['prior_pdfs'][source][var]
-        value = version_definitions['prior_pdfs'][source].get(version, default)
+        v_definition = version_definitions['prior_pdfs'][source].get(version)
+
+        if v_definition is None:
+            value = default
+        else:
+            value = v_definition.get(var, default)
 
         if type(value) is int:  # allow pointing to previous versions
             pdfs[var] = version_definitions['prior_pdfs'][source].get(value, default)
