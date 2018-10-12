@@ -81,7 +81,6 @@ class BurstFit:
         concord_source = source_map.get(source, source)
         self.obs = ctools.load_obs(concord_source)
         self.n_epochs = len(self.obs)
-        self._mdots = None
 
         if self.source == 'sim_test':
             self.n_epochs = 1
@@ -165,9 +164,6 @@ class BurstFit:
         if self.debug.debug:
             print_params(params, source=self.source, version=self.version)
 
-        self._mdots = params[self.param_idxs['mdot1']: self.n_epochs]
-        self.debug.variable('mdots', self._mdots, formatter='')
-
         # ===== check priors =====
         lp = self.lnprior(params=params)
         if self.priors_only:
@@ -216,7 +212,8 @@ class BurstFit:
                                   legend=True if i==0 else False)
 
         # ===== compare predicted persistent flux with observed =====
-        fper = self.shift_to_observer(values=self._mdots, bprop='fper', params=params)
+        fper = self.shift_to_observer(values=epoch_params[:, self.interp_idxs['mdot']],
+                                      bprop='fper', params=params)
         u_fper = fper * self.u_fper_frac  # Assign uncertainty to model persistent flux
 
         lh += self.compare(model=fper, u_model=u_fper, label='fper',
