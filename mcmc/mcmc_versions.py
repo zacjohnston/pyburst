@@ -306,6 +306,7 @@ class McmcVersion:
                 + f'\ndisc model       : {self.disc_model}'
                 + f'\ninterpolator     : {self.interpolator}'
                 + f'\nprior bounds     : {self.prior_bounds}'
+                + f'\nprior pdfs       : {self.prior_pdfs}'
                 )
 
 
