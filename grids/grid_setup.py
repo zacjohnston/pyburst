@@ -6,10 +6,9 @@ import subprocess, sys, os
 from . import grid_analyser
 from . import grid_tools
 from . import grid_strings
-from pygrids.mcmc import mcmc_versions
+from pygrids.mcmc import mcmc_versions, mcmc_tools
 from pygrids.kepler import kepler_jobscripts, kepler_files
 from pygrids.misc.pyprint import print_title, print_dashes
-from pygrids.physics import burning
 from pygrids.qnuc import qnuc_tools
 
 # Concord
@@ -27,9 +26,14 @@ import define_sources
 
 flt2 = '{:.2f}'.format
 flt4 = '{:.4f}'.format
-FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
-              'tshift': flt2, 'qb': flt4, 'xi': flt2, 'qb_delay': flt2,
-              'mass': flt2}
+flt8 = '{:.8f}'.format
+# FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
+#               'tshift': flt2, 'qb': flt4, 'xi': flt2, 'qb_delay': flt2,
+#               'mass': flt2}
+
+FORMATTERS = {'z': flt8, 'y': flt8, 'x': flt8, 'accrate': flt8,
+              'tshift': flt2, 'qb': flt8, 'xi': flt2, 'qb_delay': flt2,
+              'mass': flt8}
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -268,7 +272,7 @@ def create_batch(batch, dv, source,
 def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcmc_version,
                   constant=None, epoch_independent=('x', 'z', 'mass'),
                   epoch_dependent=('accrate', 'qb')):
-    """Returns random sample of model parameters
+    """Creates random sample of model parameters
     """
     ref_mass = 1.4
     aliases = {'mass': 'g', 'accrate': 'mdot'}
@@ -287,6 +291,8 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
     for key, val in constant.items():
         params_full[key] = np.full(n_models, val)
 
+    params_full['mass'] *= ref_mass
+
     for i in range(n_epochs):
         for key in epoch_dependent:
             mv_key = aliases.get(key, key)
@@ -297,6 +303,80 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
                      qos='normal', walltime=96, setup_test=False, nsdump=500,
                      nuc_heat=True, predict_qnuc=False, grid_version=0,
                      substrate_off=True, ibdatov=1, params_full=params_full)
+
+
+def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
+                      ref_mcmc_version, kgrid, constant=None,
+                      epoch_independent=('x', 'z', 'mass'),
+                      epoch_dependent=('accrate', 'qb'), discard=200, cap=None):
+    """Creates batches of models, with random sample of params drawn from MCMC chain
+    """
+    ref_mass = 1.4
+    aliases = {'mass': 'g', 'accrate': 'mdot'}
+    if constant is None:
+        constant = {'tshift': 0.0, 'xi': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
+                    'accmass': 1e16, 'accdepth': 1e19}
+
+    mv = mcmc_versions.McmcVersion(source=ref_source, version=ref_mcmc_version)
+    params_full = {}
+    param_sample, idxs = mcmc_tools.get_random_sample(chain, n=n_models,
+                                                      discard=discard, cap=cap)
+    batch1 = batch0 + n_epochs - 1
+    save_sample_array(param_sample, source=source, batch0=batch0, batch1=batch1)
+    idx_string = get_index_str(idxs, discard=discard, cap=cap)
+
+    # ===== fill model params =====
+    for key in epoch_independent:
+        mv_key = aliases.get(key, key)
+        params_full[key] = get_mcmc_params(mv_key, param_sample=param_sample, mv=mv)
+
+    # ===== fill constant params =====
+    for key, val in constant.items():
+        params_full[key] = np.full(n_models, val)
+
+    params_full['mass'] *= ref_mass
+
+    for i in range(n_epochs):
+        for key in epoch_dependent:
+            mv_key = aliases.get(key, key)
+            mv_key = f'{mv_key}{i+1}'
+            params_full[key] = get_mcmc_params(mv_key, param_sample=param_sample, mv=mv)
+
+        create_batch(batch0+i, dv={}, params={}, source=source, nbursts=30, kgrid=kgrid,
+                     qos='normal', walltime=96, setup_test=False, nsdump=500,
+                     nuc_heat=True, predict_qnuc=False, grid_version=0,
+                     substrate_off=True, ibdatov=1, params_full=params_full,
+                     notes=idx_string)
+
+
+def save_sample_array(param_sample, source, batch0, batch1):
+    """Saves original parameter sample to file for safe keeping
+    """
+    filename = f'param_sample_{source}_{batch0}-{batch1}.txt'
+    path = grid_strings.get_source_path(source)
+    filepath = os.path.join(path, filename)
+    print(f'Saving parameter sample: {filepath}')
+    np.savetxt(filepath, param_sample)
+
+
+def get_mcmc_params(key, param_sample, mv):
+    """Returns model param from mcmc sample point params
+    """
+    idx = mv.param_keys.index(key)
+    return param_sample[:, idx]
+
+
+def get_index_str(idxs, discard, cap, header=None):
+    """Returns str of indexes to save to file
+    """
+    if header is None:
+        header = 'Indexes of samples from mcmc chain ' \
+                 f'(after slicing: discard={discard}, cap={cap})'
+    string = f'{header}\n'
+
+    for i in idxs:
+        string += f'{i}\n'
+    return string
 
 
 def get_random_params(key, n_models, mv):
