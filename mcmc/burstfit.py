@@ -71,7 +71,6 @@ class BurstFit:
             source = 'biggrid2'  # from here on effectively treat as biggrid2
 
         self.u_fper_frac = u_fper_frac
-        self.bprops = self.mcmc_version.bprops
         self.lhood_factor = lhood_factor
         self.priors_only = priors_only
         self.kemulator = interpolator.Kemulator(source=source,
@@ -191,7 +190,7 @@ class BurstFit:
 
         # ===== compare model burst properties against observed =====
         lh = 0.0
-        for i, bprop in enumerate(self.bprops):
+        for i, bprop in enumerate(self.mcmc_version.bprops):
             u_bprop = f'u_{bprop}'
             bprop_col = 2*i
             u_bprop_col = bprop_col + 1
