@@ -168,7 +168,8 @@ class BurstFit:
         lp = self.lnprior(params=params)
         if self.priors_only:
             self.debug.end_function()
-            return lp
+            return lp * self.lhood_factor
+
         if np.isinf(lp):
             self.debug.end_function()
             return -np.inf
