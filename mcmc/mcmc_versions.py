@@ -19,6 +19,7 @@ param_keys = {
     2: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f_b', 'f_p'],
     3: ['mdot1', 'mdot2', 'mdot3', 'x', 'logz', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
     4: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_p'],
+    5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -94,6 +95,22 @@ prior_bounds = {
             (1.2, 1.4),  # redshift
             (0.01, 10),  # f_b
             (0.01, 10),  # f_p
+            ),
+    },
+
+    5: {
+        1: ((0.08, 0.18),  # mdot1
+            (0.08, 0.18),  # mdot2
+            (0.08, 0.18),  # mdot3
+            (0.67, 0.73),  # x
+            (0.0025, 0.0075),  # z
+            (0.0, 0.2),  # qb1
+            (0.0, 0.2),  # qb2
+            (0.0, 0.2),  # qb3
+            (1.4 / 1.4, 2.3 / 1.4),  # g
+            (1.2, 1.4),  # redshift
+            (0.01, 10),  # f_b
+            (0.1, 10),  # f_ratio
             ),
     },
 }
@@ -227,6 +244,7 @@ version_definitions = {
             5: 4,
             6: 4,
             7: 4,
+            8: param_keys[5],
         },
     },
 
@@ -240,6 +258,7 @@ version_definitions = {
             5: 4,
             6: 4,
             7: 4,
+            8: 4,
         },
     },
 
@@ -253,6 +272,7 @@ version_definitions = {
             5: 4,
             6: 4,
             7: 4,
+            8: prior_bounds[5][1],
         },
     },
 
@@ -270,6 +290,7 @@ version_definitions = {
             5: 4,
             6: initial_position[4][2],
             7: 4,
+            8: 4,
         },
     },
 
