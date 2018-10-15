@@ -27,6 +27,11 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 OUTPUT_SUFFIX = '_output'
 INPUT_SUFFIX = '_input'
 
+# xxxxxxxxxxxxxxxx !!!CAUTION!!! xxxxxxxxxxxxxxxxxxxxxxx
+# this module is very outdated and very un-maintained
+# nothing is gaurunteed to work anymore
+# proceed with caution
+# xxxxxxxxxxxxxxxx !!!CAUTION!!! xxxxxxxxxxxxxxxxxxxxxxx
 
 def multi_setup_analyser(batches, source, multithread=True, **kwargs):
     batches = grid_tools.expand_batches(batches, source)
