@@ -67,30 +67,7 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
 
     # ===== load input params from MODEL file =====
     paramfile = os.path.join(runs_path, 'MODELS.txt')
-    params = np.loadtxt(paramfile, usecols=[1, 3, 5, 7], skiprows=1)
-
-    # kepler_analyser cyrrently doesn't work with only one model.
-    # Hack fix is just double-up a single model
-    n = len(runs)
-    if n == 1:
-        n = 2
-        runs = np.full(2, runs[0], dtype='int')
-        params = np.stack([params, params])
-
-    z = params[:, 0]
-    x = params[:, 1]
-    accrate = params[:, 2] * params[:, 3]  # multiply accrate by xi factor
-
-    # ====== Check for single-length arrays (see Note for Input Parameters) ======
-    arrays = {'x': x, 'z': z, 'accrate': accrate}
-    for var in arrays:
-        if len(arrays[var]) == 1:
-            print(f'Taking {var} to be constant')
-            arrays[var] = np.full(n, arrays[var][0])  # expand array to appropriate length
-
-    x = arrays['x']
-    z = arrays['z']
-    accrate = arrays['accrate']
+    params = pd.read_csv(paramfile, delim_whitespace=True)
 
     # ====== Create input/output directories ======
     indir = f'{batch_name}{INPUT_SUFFIX}'
@@ -102,22 +79,18 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
         grid_tools.try_mkdir(folder, skip=True)
 
     # ====== Extract and write data files (and get no. of cycles) ======
-    cycles = extract_lightcurves(runs,
-                                 basename=basename,
-                                 path_data=runs_path,
-                                 path_target=inpath)
+    extract_lightcurves(runs,
+                        basename=basename,
+                        path_data=runs_path,
+                        path_target=inpath)
 
-    write_model_table(runs=runs,
-                      x=x,
-                      z=z,
-                      accrate=accrate,
-                      cycles=cycles,
+    write_model_table(table=params,
                       basename=basename,
                       batch_name=batch_name,
                       path=inpath)
 
 
-def write_model_table(runs, x, z, accrate, cycles, basename, batch_name, path):
+def write_model_table(table, basename, batch_name, path):
     """
     Writes MODELS.txt file for kepler_analyser input
     """
@@ -133,18 +106,14 @@ def write_model_table(runs, x, z, accrate, cycles, basename, batch_name, path):
     # path   = str : path to input directory
     # -------------------------------------------------------------------------  -
     filepath = os.path.join(path, 'MODELS.txt')
-    n = len(runs)
     m_edd = 1.75e-8  # * 1.7/(x+1)
-    acc_sol = np.array(accrate) * m_edd  # accretion rate in solar masses per year
 
     print('Writing MODELS.txt file')
-    print_dashes()
-
     with open(filepath, 'w') as f:
         f.write('#mod     acc rate        Z         H       Lacc/Ledd   #pul   #cycle   Comment\n')
-        for i in range(n):
-            f.write(f'{basename}{runs[i]}   {acc_sol[i]:.6e}    {z[i]:.4f}    {x[i]:.4f}'
-                    + f'  {accrate[i]:.6f}      {runs[i]}    {cycles[i]}    {batch_name}\n')
+        for row in table.itertuples():
+            f.write(f'{basename}{row.run}   {row.accrate*m_edd:.6e}    {row.z:.4f}    {row.x:.4f}'
+                    + f'  {row.accrate:.6f}      {row.run}    0    {batch_name}\n')
 
 
 def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
