@@ -268,7 +268,7 @@ class BurstFit:
                 flux_factor_b = 1e45 * params[self.param_idxs['f']]
                 flux_factor_p = flux_factor_b
             elif self.has_ratio:
-                flux_factor_b = 1e45 * params[self.param_idxs['f']]
+                flux_factor_b = 1e45 * params[self.param_idxs['f_b']]
                 flux_factor_p = flux_factor_b * params[self.param_idxs['f_ratio']]
             else:
                 if self.has_inc:  # model explicitly uses inclination

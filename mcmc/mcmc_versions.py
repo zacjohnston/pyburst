@@ -160,7 +160,11 @@ initial_position = {
         2: (0.12, 0.12, 0.12,  # (priors only test)
             0.7, 0.005, 0.1, 0.1, 0.1, 1.3, 1.3, 1., 2.3),
     },
-    
+
+    5: {
+        1: (0.165, 0.14, 0.102,
+            0.7, 0.004, 0.058, 0.062, 0.14, 1.5, 1.33, 0.55, 2.3),
+    },
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -290,7 +294,7 @@ version_definitions = {
             5: 4,
             6: initial_position[4][2],
             7: 4,
-            8: 4,
+            8: initial_position[5][1],
         },
     },
 
