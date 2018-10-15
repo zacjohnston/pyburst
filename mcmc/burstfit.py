@@ -172,7 +172,7 @@ class BurstFit:
 
         if np.isinf(lp):
             self.debug.end_function()
-            return -np.inf
+            return -np.inf * self.lhood_factor
 
         # ===== interpolate bursts from model params =====
         epoch_params = self.get_epoch_params(params)
@@ -181,7 +181,7 @@ class BurstFit:
         if True in np.isnan(interp):
             self.debug.print_('Outside interpolator bounds')
             self.debug.end_function()
-            return -np.inf
+            return -np.inf * self.lhood_factor
 
         plot_map = np.arange(4)
         if plot:
