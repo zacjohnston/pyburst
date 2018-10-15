@@ -50,7 +50,7 @@ class BurstFit:
 
     def __init__(self, source, version, verbose=True,
                  lhood_factor=1, debug=False, priors_only=False,
-                 re_interp=False, u_fper_frac=0.0, **kwargs):
+                 re_interp=False, u_fper_frac=0.0, zero_lhood=-np.inf, **kwargs):
 
         self.source = source
         self.version = version
@@ -71,6 +71,7 @@ class BurstFit:
         if 'sim' in self.source:
             source = 'biggrid2'  # from here on effectively treat as biggrid2
 
+        self.zero_lhood = zero_lhood
         self.u_fper_frac = u_fper_frac
         self.lhood_factor = lhood_factor
         self.priors_only = priors_only
@@ -170,9 +171,9 @@ class BurstFit:
             self.debug.end_function()
             return lp * self.lhood_factor
 
-        if np.isinf(lp):
+        if lp == self.zero_lhood:
             self.debug.end_function()
-            return -np.inf * self.lhood_factor
+            return self.zero_lhood * self.lhood_factor
 
         # ===== interpolate bursts from model params =====
         epoch_params = self.get_epoch_params(params)
@@ -181,7 +182,7 @@ class BurstFit:
         if True in np.isnan(interp):
             self.debug.print_('Outside interpolator bounds')
             self.debug.end_function()
-            return -np.inf * self.lhood_factor
+            return self.zero_lhood * self.lhood_factor
 
         plot_map = np.arange(4)
         if plot:
@@ -380,7 +381,7 @@ class BurstFit:
 
         if False in inside_bounds:
             self.debug.end_function()
-            return -np.inf
+            return self.zero_lhood
 
         if self.has_logz:
             z_input = params[self.param_idxs['logz']]
@@ -396,7 +397,7 @@ class BurstFit:
 
             if f_prior == 0:
                 self.debug.end_function()
-                return -np.inf
+                return self.zero_lhood
             prior_lhood += np.log(f_prior)
 
         elif self.has_inc:
