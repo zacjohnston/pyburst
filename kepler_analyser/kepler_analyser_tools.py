@@ -262,11 +262,7 @@ def reformat_summ(batch, source, basename='xrb', **kwargs):
     summ_filepath = os.path.join(output_path, 'summ.csv')
 
     summ = pd.read_table(summ_filepath, delimiter=',')
-
-    # ==== fix first column name ====
-    new_columns = summ.columns.values
-    new_columns[0] = 'run'
-    summ.columns = new_columns
+    summ = summ.rename(index=str, columns={'# model': 'run'})
 
     # ===== strip model ids to integers =====
     for i, model in enumerate(summ['run']):
