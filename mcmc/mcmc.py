@@ -117,7 +117,7 @@ def optimise(source, version, params0):
         Initial guess of parameters
     """
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
-                             lhood_factor=-1)
+                             lhood_factor=-1, zero_lhood=1e9)
     bnds = ((0.09, 0.23), (0.61, 0.79), (0.00251, 0.0174), (0.0251, 0.124),
             (0.81 / 1.4, 3.19 / 1.4), (1.01, 2.), (0.1, None), (0.1, 89.9))
 
