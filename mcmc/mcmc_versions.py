@@ -177,6 +177,10 @@ source_defaults = {
         'grid5': ('rate', 'fluence', 'peak'),
     },
 
+    'weights': {
+        'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0}
+    },
+
     'disc_model': {
         'grid5': 'he16_a',
     },
@@ -209,6 +213,12 @@ version_definitions = {
 
     'bprops': {
         'grid5': {},
+    },
+
+    'weights': {
+        'grid5': {
+            7: {'rate': 20.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+        },
     },
 
     'param_keys': {
@@ -285,6 +295,7 @@ class McmcVersion:
         self.epoch_unique = get_parameter(source, version, 'epoch_unique')
         self.param_aliases = get_parameter(source, version, 'param_aliases')
         self.bprops = get_parameter(source, version, 'bprops')
+        self.weights = get_parameter(source, version, 'weights')
         self.interpolator = get_parameter(source, version, 'interpolator')
         self.prior_bounds = np.array(get_parameter(source, version, 'prior_bounds'))
         self.initial_position = get_parameter(source, version, 'initial_position')
@@ -302,6 +313,7 @@ class McmcVersion:
                 + f'\nepoch unique     : {self.epoch_unique}'
                 + f'\nparam aliases    : {self.param_aliases}'
                 + f'\nbprops           : {self.bprops}'
+                + f'\nweights          : {self.weights}'
                 + f'\ninitial position : {self.initial_position}'
                 + f'\ndisc model       : {self.disc_model}'
                 + f'\ninterpolator     : {self.interpolator}'
