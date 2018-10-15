@@ -63,6 +63,7 @@ class BurstFit:
         self.has_g = 'g' in self.mcmc_version.param_keys
         self.has_logz = 'logz' in self.mcmc_version.param_keys
         self.has_inc = 'inc' in self.mcmc_version.param_keys
+        self.has_ratio = 'f_ratio' in self.mcmc_version.param_keys
         self.has_one_f = 'f' in self.mcmc_version.param_keys
         self.has_two_f = ('f_b' in self.mcmc_version.param_keys
                           and 'f_p' in self.mcmc_version.param_keys)
@@ -266,6 +267,9 @@ class BurstFit:
             elif self.has_one_f:
                 flux_factor_b = 1e45 * params[self.param_idxs['f']]
                 flux_factor_p = flux_factor_b
+            elif self.has_ratio:
+                flux_factor_b = 1e45 * params[self.param_idxs['f']]
+                flux_factor_p = flux_factor_b * params[self.param_idxs['f_ratio']]
             else:
                 if self.has_inc:  # model explicitly uses inclination
                     inc = params[self.param_idxs['inc']]
