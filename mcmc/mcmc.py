@@ -4,7 +4,7 @@ import os
 import sys
 import time
 import emcee
-from scipy.optimize import minimize
+from scipy.optimize import fmin
 
 # kepler_grids
 from . import burstfit
@@ -107,7 +107,7 @@ def get_acceptance_fraction(source=None, version=None, n_walkers=None,
     return np.average(sampler['naccepted'] / n_steps)
 
 
-def optimise(source, version, params0):
+def optimise(source, version):
     """Optimise the starting position of the mcmc walkers using standard
         minimisation methods
 
@@ -117,11 +117,8 @@ def optimise(source, version, params0):
         Initial guess of parameters
     """
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
-                             lhood_factor=-1, zero_lhood=1e9)
-    bnds = ((0.09, 0.23), (0.61, 0.79), (0.00251, 0.0174), (0.0251, 0.124),
-            (0.81 / 1.4, 3.19 / 1.4), (1.01, 2.), (0.1, None), (0.1, 89.9))
-
-    return minimize(bfit.lhood, x0=params0, bounds=bnds)
+                             lhood_factor=-1, zero_lhood=-1e9)
+    return fmin(bfit.lhood, x0=bfit.mcmc_version.initial_position)
 
 
 def convert_params(params, source, version):
