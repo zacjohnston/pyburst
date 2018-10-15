@@ -317,11 +317,10 @@ class Kgrid:
         """
         batch_str = f'{self.source}_{batch}'
         path = os.path.join(self.source_path, 'mean_lightcurves', batch_str)
-
-        n_runs = self.get_nruns(batch)
+        batch_table = self.get_params(batch=batch)
         self.mean_lc[batch] = {}
 
-        for run in range(1, n_runs + 1):
+        for run in batch_table['run']:
             run_str = grid_strings.get_run_string(run, basename=self.basename)
             filename = f'{batch_str}_{run_str}_mean.data'
             filepath = os.path.join(path, filename)
