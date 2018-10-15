@@ -224,8 +224,9 @@ version_definitions = {
     'param_keys': {
         'grid5': {
             4: param_keys[4],
-            5: param_keys[4],
-            6: param_keys[4],
+            5: 4,
+            6: 4,
+            7: 4,
         },
     },
 
@@ -236,8 +237,9 @@ version_definitions = {
     'epoch_unique': {
         'grid5': {
             4: epoch_unique[2],
-            5: epoch_unique[2],
-            6: epoch_unique[2],
+            5: 4,
+            6: 4,
+            7: 4,
         },
     },
 
@@ -248,8 +250,9 @@ version_definitions = {
     'prior_bounds': {
         'grid5': {
             4: prior_bounds[4][1],
-            5: prior_bounds[4][1],
-            6: prior_bounds[4][1],
+            5: 4,
+            6: 4,
+            7: 4,
         },
     },
 
@@ -264,8 +267,9 @@ version_definitions = {
     'initial_position': {
         'grid5': {
             4: initial_position[4][1],
-            5: initial_position[4][1],
+            5: 4,
             6: initial_position[4][2],
+            7: 4,
         },
     },
 
