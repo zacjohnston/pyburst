@@ -191,7 +191,7 @@ def collect_output(runs, batches, source, basename='xrb',
         print('          to: ', source_path)
 
         print('Copying/reformatting summ files')
-        reformat_summ(batch=batch, source=source)
+        reformat_summ(batch=batch, source=source, basename=basename)
 
         print('Copying mean lightcurves')
         final_run_str = grid_strings.get_run_string(runs[-1], basename)
@@ -264,7 +264,7 @@ def reformat_summ(batch, source, basename='xrb', **kwargs):
     summ = pd.read_table(summ_filepath, delimiter=',')
     summ = summ.rename(index=str, columns={'# model': 'run'})
 
-    # ===== strip model ids to integers =====
+    # ===== convert model ids to integers =====
     for i, model in enumerate(summ['run']):
         string = model.strip("'")
         string = string.strip(basename)
