@@ -255,6 +255,7 @@ version_definitions = {
             7: 4,
             8: param_keys[5],
             9: 8,
+            10: 8,
         },
     },
 
@@ -270,6 +271,7 @@ version_definitions = {
             7: 4,
             8: 4,
             9: 4,
+            10: 4,
         },
     },
 
@@ -285,6 +287,7 @@ version_definitions = {
             7: 4,
             8: prior_bounds[5][1],
             9: 8,
+            10: 8,
         },
     },
 
@@ -293,6 +296,7 @@ version_definitions = {
              2: {'z': prior_pdfs['z'][2]},
              3: {'f_ratio': prior_pdfs['f_ratio'][2]},
              4: {'z': prior_pdfs['z'][2]},
+             10: {'f_ratio': flat_prior},
          },
     },
 
@@ -304,6 +308,7 @@ version_definitions = {
             7: initial_position[4][3],
             8: initial_position[5][1],
             9: initial_position[5][2],
+            10: 8,
         },
     },
 
