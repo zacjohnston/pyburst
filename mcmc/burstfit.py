@@ -230,6 +230,7 @@ class BurstFit:
                               obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'],
                               ax=ax[np.where(plot_map == 3)][0], display=False,
                               xlabel=True)
+            plt.show(block=False)
             self.debug.end_function()
             return lhood, fig
         else:
