@@ -143,28 +143,8 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
     parallel_file = f'parallel_{restart_str}{source}_{batch_str}.sh'
 
     if cluster == 'monarch':
-        if parallel:
-            ntasks = (run1 + 1) - run0
-            return f"""#!/bin/bash
-#SBATCH --job-name={job_str}
-#SBATCH --output=job_{batch}.out
-#SBATCH --error=job_{batch}.err
-#SBATCH --time={time_str}
-#SBATCH --nodes=1
-#SBATCH --ntasks={ntasks}
-#SBATCH --cpus-per-task=1
-#SBATCH --qos={qos}
-#SBATCH --partition=batch,medium
-#SBATCH --mem-per-cpu=1024
-#SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --mail-user=zac.johnston@monash.edu
-######################
-cd $KEPLER_MODELS/{source}_{batch}/logs
-./{parallel_file}
-"""
-
-        else:
-            return f"""#!/bin/bash
+        return f"""#!/bin/bash
+###################################
 #SBATCH --job-name={job_str}
 #SBATCH --output=arrayJob_%A_%a.out
 #SBATCH --error=arrayJob_%A_%a.err
@@ -176,62 +156,40 @@ cd $KEPLER_MODELS/{source}_{batch}/logs
 #SBATCH --mem-per-cpu=1024
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=zac.johnston@monash.edu
+###################################
 
-######################
 N=$SLURM_ARRAY_TASK_ID
 EXE_PATH=$KEPLER_PATH/gfortran/keplery
 ADAPNET_PATH=$KEPLER_GRIDS/pygrids/files/{adapnet_filename}
 BDAT_PATH=$KEPLER_GRIDS/pygrids/files/{bdat_filename}
+
 cd $KEPLER_MODELS/{source}_{batch}/{basename}$N/
-ln -sf $EXE_PATH ./k
 ln -sf $ADAPNET_PATH ./adapnet.cfg
 ln -sf $BDAT_PATH ./bdat
-./k {basename}$N {cmd_str} {debug_str}"""
+$EXE_PATH {basename}$N {cmd_str} {debug_str}"""
 
     elif cluster == 'icer':
-        if parallel:
-            ntasks = (run1 + 1) - run0
-            mem = 1024 * ntasks
-            disksize = 2 * ntasks
-            return f"""#!/bin/bash --login
-#PBS -N {job_str}
-#PBS -l walltime={time_str}
-#PBS -l mem={mem}mb
-#PBS -l file={disksize}gb
-#PBS -l nodes=1:ppn={ntasks}
-#PBS -j oe
-#PBS -m abe
-#PBS -M zac.johnston@monash.edu
+        return f"""#!/bin/bash --login
 ###################################
-module load GNU/6.2
-cd $KEPLER_MODELS/{source}_{batch}/logs
-./{parallel_file}
-qstat -f $PBS_JOBID     # Print statistics """
-
-        else:
-            return f"""#!/bin/bash --login
-#PBS -N {job_str}
-#PBS -l walltime={time_str}
-#PBS -l mem=1024mb
-#PBS -l file=4gb
-#PBS -l nodes=1:ppn=1
-#PBS -j oe
-#PBS -m abe
-#PBS -M zac.johnston@monash.edu
-#PBS -t {span_str}
+#SBATCH --job-name {job_str}
+#SBATCH --array={span_str}
+#SBATCH --time={time_str}
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --constraint=intel16
+#SBATCH --mem-per-cpu=1024
+#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-user=zac.johnston@monash.edu
 ###################################
-N=$PBS_ARRAYID
+N=$SLURM_ARRAY_TASK_ID
 EXE_PATH=$KEPLER_PATH/gfortran/keplery
 ADAPNET_PATH=$KEPLER_GRIDS/pygrids/files/{adapnet_filename}
 BDAT_PATH=$KEPLER_GRIDS/pygrids/files/{bdat_filename}
-module load GNU/6.2
-cd $KEPLER_MODELS/{source}_{batch}/{basename}$N/
-ln -sf $EXE_PATH ./k
+
+cd $KEPLER_MODELS/{source}_{batch}/xrb$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
 ln -sf $BDAT_PATH ./bdat
-
-./k {basename}$N {cmd_str} {debug_str}
-qstat -f $PBS_JOBID     # Print statistics """
+$EXE_PATH xrb$N xrb_g"""
     else:
         raise ValueError('invalid cluster. Must be one of [monarch, icer]')
 
