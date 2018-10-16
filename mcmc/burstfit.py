@@ -458,6 +458,7 @@ class BurstFit:
         fontsize = 12
         markersize = 6
         capsize = 3
+        n_sigma = 3
         dx = 0.13  # horizontal offset of plot points
         yscale = {'dt': 1.0, 'rate': 1.0,
                   'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
@@ -478,9 +479,9 @@ class BurstFit:
         epochs = np.array([1998, 2000, 2007])
         x = epochs
 
-        ax.errorbar(x=x - dx, y=model/yscale, yerr=u_model/yscale, ls='none', marker='o',
+        ax.errorbar(x=x - dx, y=model/yscale, yerr=n_sigma*u_model/yscale, ls='none', marker='o',
                     capsize=capsize, color='C3', label='Model', markersize=markersize)
-        ax.errorbar(x=x + dx, y=obs/yscale, yerr=u_obs/yscale, ls='none',
+        ax.errorbar(x=x + dx, y=obs/yscale, yerr=n_sigma*u_obs/yscale, ls='none',
                     marker='o', capsize=capsize, color='C0', label='Observed',
                     markersize=markersize)
 
