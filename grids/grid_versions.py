@@ -60,7 +60,15 @@ version_definitions = {
             'biggrid3': {},
             'test1': {},
             'grid4': {},
-            'grid5': {},
+            'grid5': {
+                1: {
+                  'z': 0.01, 'x': 0.74,
+                },
+
+                2: {
+                    'qb': 0.2, 'z': 0.0025,
+                },
+            },
             'synth5': {},
             'sample5': {},
             'heat': {
