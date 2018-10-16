@@ -204,11 +204,10 @@ class BurstFit:
                                                         bprop=key, params=params)
             model = interp[:, bprop_col]
             u_model = interp[:, u_bprop_col]
-            weight = self.mcmc_version.weights[bprop]
 
-            lh += weight * self.compare(model=model, u_model=u_model,
-                                        obs=self.obs_data[bprop],
-                                        u_obs=self.obs_data[u_bprop], label=bprop)
+            lh += self.compare(model=model, u_model=u_model,
+                               obs=self.obs_data[bprop], bprop=bprop,
+                               u_obs=self.obs_data[u_bprop], label=bprop)
             if plot:
                 self.plot_compare(model=model, u_model=u_model, obs=self.obs_data[bprop],
                                   u_obs=self.obs_data[u_bprop], bprop=bprop,
@@ -219,11 +218,10 @@ class BurstFit:
         fper = self.shift_to_observer(values=epoch_params[:, self.interp_idxs['mdot']],
                                       bprop='fper', params=params)
         u_fper = fper * self.u_fper_frac  # Assign uncertainty to model persistent flux
-        weight = self.mcmc_version.weights['fper']
 
-        lh += weight * self.compare(model=fper, u_model=u_fper, label='fper',
-                                    obs=self.obs_data['fper'],
-                                    u_obs=self.obs_data['u_fper'])
+        lh += self.compare(model=fper, u_model=u_fper, label='fper',
+                           obs=self.obs_data['fper'], bprop='fper',
+                           u_obs=self.obs_data['u_fper'])
 
         lhood = (lp + lh) * self.lhood_factor
 
@@ -408,7 +406,7 @@ class BurstFit:
         self.debug.end_function()
         return prior_lhood
 
-    def compare(self, model, u_model, obs, u_obs, label='', plot=False):
+    def compare(self, model, u_model, obs, u_obs, bprop, label='', plot=False):
         """Returns logarithmic likelihood of given model values
 
         Calculates difference between modelled and observed values.
@@ -424,6 +422,8 @@ class BurstFit:
             Corresponding model uncertainties
         u_obs : 1darray
             corresponding observed uncertainties
+        bprop : str
+            burst property being compared
         label : str
             label of parameter to print
         plot : bool
@@ -433,8 +433,9 @@ class BurstFit:
         pyprint.check_same_length(model, obs, 'model and obs arrays')
         pyprint.check_same_length(u_model, u_obs, 'u_model and u_obs arrays')
 
+        weight = self.mcmc_version.weights[bprop]
         inv_sigma2 = 1 / (u_model ** 2 + u_obs ** 2)
-        lh = -0.5 * ((model - obs) ** 2 * inv_sigma2
+        lh = -0.5 * weight * ((model - obs) ** 2 * inv_sigma2
                      + np.log(2 * np.pi / inv_sigma2))
         self.debug.print_(f'lhood breakdown: {label} {lh}')
 
