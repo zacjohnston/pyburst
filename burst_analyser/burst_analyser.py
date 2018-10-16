@@ -712,6 +712,9 @@ class BurstRun(object):
 
         for bprop in self.parameters['outlier_bprops']:
             clean = self.clean_bursts(exclude_outliers=False)[bprop]
+            if len(clean) == 0:
+                self.printv('Too few bursts to get outliers')
+                return
             percentiles = burst_tools.get_quartiles(clean, self.parameters['outlier_distance'])
 
             outliers = ((self.bursts[bprop] < percentiles[0])
