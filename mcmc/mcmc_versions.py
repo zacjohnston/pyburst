@@ -166,6 +166,8 @@ initial_position = {
     5: {
         1: (0.165, 0.14, 0.102,
             0.725, 0.004, 0.068, 0.062, 0.14, 1.6, 1.3, 0.55, 2.2),
+        2: (0.165, 0.14, 0.102,
+            0.728, 0.007, 0.01, 0.01, 0.09, 1.6, 1.33, 0.55, 2.2),
     },
 }
 
@@ -240,7 +242,8 @@ version_definitions = {
 
     'weights': {
         'grid5': {
-            7: {'rate': 20.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+            7: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+            9: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         },
     },
 
@@ -251,6 +254,7 @@ version_definitions = {
             6: 4,
             7: 4,
             8: param_keys[5],
+            9: 8,
         },
     },
 
@@ -265,6 +269,7 @@ version_definitions = {
             6: 4,
             7: 4,
             8: 4,
+            9: 4,
         },
     },
 
@@ -279,6 +284,7 @@ version_definitions = {
             6: 4,
             7: 4,
             8: prior_bounds[5][1],
+            9: 8,
         },
     },
 
@@ -297,6 +303,7 @@ version_definitions = {
             6: initial_position[4][2],
             7: initial_position[4][3],
             8: initial_position[5][1],
+            9: initial_position[5][2],
         },
     },
 
