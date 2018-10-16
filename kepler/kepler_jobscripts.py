@@ -177,6 +177,7 @@ $EXE_PATH {basename}$N {cmd_str} {debug_str}"""
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --constraint=intel16
+#SBATCH --exclude=lac-217
 #SBATCH --mem-per-cpu=1024
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=zac.johnston@monash.edu
