@@ -20,9 +20,7 @@ version_defaults = {
 
 version_definitions = {
     'param_keys': {  # This will set the order of params when calling interpolator
-        'grid5': {
-            2: ['accrate', 'x', 'z', 'mass'],
-        },
+        'grid5': {},
     },
 
     'bprops': {
@@ -30,7 +28,14 @@ version_definitions = {
     },
 
     'exclude_any': {
-        'grid5': {},
+        'grid5': {
+            1: {
+                'z': 0.01, 'x': 0.74,
+            },
+            2: {
+                'qb': 0.2, 'z': 0.0025,
+            },
+        },
     },
 
     'exclude_all': {
