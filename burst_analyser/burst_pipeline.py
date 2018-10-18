@@ -26,7 +26,6 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
                  load_summary=False, auto_last_batch=False, basename='xrb'):
     """Run all analysis steps for burst models
     """
-    # TODO: copy generators
     all_batches = np.arange(batches[-1]) + 1  # assumes batches[-1] is final batch of grid
     if copy_params:
         print_title('Copying parameter tables')
@@ -42,7 +41,6 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
     if collect:
         print_title('Collecting results')
         if auto_last_batch:
-            # TODO: make more automatic
             grid_table = grid_tools.load_grid_table('params', source=source,
                                                     burst_analyser=True)
             last_batch = grid_table.batch.iloc[-1]
