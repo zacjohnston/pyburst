@@ -1,0 +1,10 @@
+# Preliminary anisotropy models for NS disks with inner gaps
+#  From Chongchong He (email date: 18/06/2018)
+# Units: /NS-radius, deg, direct fraction, reflected fraction, direct/reflected
+gap  inc  direct reflected dir_reflected
+0    0    0.999985517635    0.588800571750    0.588809099098
+0    60   0.781538603709    0.168754990592    0.215926621911
+0.1  0    0.999985517635    0.513541298175    0.513548735575
+0.1  60   0.820376718194    0.153702991257    0.187356598315
+0.3  0    0.999985517635    0.418769741927    0.418775806791
+0.3  60   0.884187015404    0.131279697845    0.148475034759
