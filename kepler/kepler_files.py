@@ -7,7 +7,7 @@ import os
 # ========================================================
 
 
-def write_genfile(h1, he4, n14, qb, xi, lburn,
+def write_genfile(h1, he4, n14, qb, acc_mult, lburn,
                   geemult, path, header, lumdata=0, qnuc=5.,
                   t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
                   accmass=1.0e18, zonermax=10, zonermin=-1, nstop=10000000,
@@ -202,9 +202,9 @@ p accrate {{xledd}} *
 p xlum0 {{xledd}} *
 
 c apply anisotropy multiplier/factor
-o xip {xi:.4f} def
-p accrate {{xip}} *
-p xlum0 {{xip}} *
+o accmult {acc_mult:.4f} def
+p accrate {{accmult}} *
+p xlum0 {{accmult}} *
 
 c -------------------------
 c get model in equilibrium
@@ -247,8 +247,8 @@ p lumdata {lumdata}
 {accrate1_str}
 
 c multiplier (only on time-dependent files!)
-p accratef {xi:.4f}
-p xl0ratef {xi:.4f}
+p accratef {acc_mult:.4f}
+p xl0ratef {acc_mult:.4f}
 
 c use accdepth 5.d20 for He
 c use accdepth 1.d20 for H

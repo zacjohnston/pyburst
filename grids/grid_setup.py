@@ -28,11 +28,11 @@ flt2 = '{:.2f}'.format
 flt4 = '{:.4f}'.format
 flt8 = '{:.8f}'.format
 # FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
-#               'tshift': flt2, 'qb': flt4, 'xi': flt2, 'qb_delay': flt2,
+#               'tshift': flt2, 'qb': flt4, 'acc_mult': flt2, 'qb_delay': flt2,
 #               'mass': flt2}
 
 FORMATTERS = {'z': flt8, 'y': flt8, 'x': flt8, 'accrate': flt8,
-              'tshift': flt2, 'qb': flt8, 'xi': flt2, 'qb_delay': flt2,
+              'tshift': flt2, 'qb': flt8, 'acc_mult': flt2, 'qb_delay': flt2,
               'mass': flt8}
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -87,7 +87,7 @@ def create_epoch_grid(batch0, dv, params, source, kgrid=None,
 def create_batch(batch, dv, source,
                  params={'x': [0.6, 0.8], 'z': [0.01, 0.02],
                          'tshift': [0.0], 'accrate': [0.05],
-                         'qb': [0.125], 'xi': [1.0], 'qnuc': 5.0,
+                         'qb': [0.125], 'acc_mult': [1.0], 'qnuc': 5.0,
                          'qb_delay': [0.0], 'mass': [1.4],
                          'accmass': [1e16], 'accdepth': [1e20]},
                  lburn=1, t_end=1.3e5, exclude={}, basename='xrb',
@@ -233,7 +233,7 @@ def create_batch(batch, dv, source,
         accrate0 = params_full['accrate'][i]
 
         if auto_t_end:
-            mdot = params_full['accrate'][i] * params_full['xi'][i]
+            mdot = params_full['accrate'][i] * params_full['acc_mult'][i]
             rate_params = {}
             for param in ('x', 'z', 'qb', 'mass'):
                 rate_params[param] = params_full[param][i]
@@ -257,7 +257,7 @@ def create_batch(batch, dv, source,
 
         kepler_files.write_genfile(h1=params_full['x'][i], he4=params_full['y'][i],
                                    n14=params_full['z'][i], qb=params_full['qb'][i],
-                                   xi=params_full['xi'][i], qnuc=params_full['qnuc'][i],
+                                   acc_mult=params_full['acc_mult'][i], qnuc=params_full['qnuc'][i],
                                    lburn=lburn, geemult=params_full['geemult'][i],
                                    path=run_path, t_end=t_end, header=header,
                                    accrate0=accrate0, accdepth=accdepth,
@@ -277,7 +277,7 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
     ref_mass = 1.4
     aliases = {'mass': 'g', 'accrate': 'mdot'}
     if constant is None:
-        constant = {'tshift': 0.0, 'xi': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
+        constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
                     'accmass': 1e16, 'accdepth': 1e19}
     mv = mcmc_versions.McmcVersion(source=ref_source, version=ref_mcmc_version)
     params_full = {}
@@ -314,7 +314,7 @@ def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
     ref_mass = 1.4
     aliases = {'mass': 'g', 'accrate': 'mdot'}
     if constant is None:
-        constant = {'tshift': 0.0, 'xi': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
+        constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
                     'accmass': 1e16, 'accdepth': 1e19}
 
     mv = mcmc_versions.McmcVersion(source=ref_source, version=ref_mcmc_version)
@@ -416,7 +416,7 @@ def cut_params(params, exclude):
 def expand_params(dv={'x': 0.05},
                   params={'x': [0.4, 0.5], 'z': [0.02],
                           'tshift': [20.0], 'accrate': [-1],
-                          'qb': [0.3], 'xi': [1.05],
+                          'qb': [0.3], 'acc_mult': [1.05],
                           'qb_delay': [0.0], 'mass': [1.4]}):
     """Expand variable parameters to fill their ranges, given specified stepsizes
     """
@@ -520,7 +520,7 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
     p['lburn'] = lburn_list
 
     cols = ['run', 'z', 'y', 'x', 'accrate', 'qb', 'qnuc',
-            'tshift', 'xi', 'qb_delay', 'mass', 'lburn',
+            'tshift', 'acc_mult', 'qb_delay', 'mass', 'lburn',
             'accmass', 'accdepth']
     ptable = pd.DataFrame(p)
     ptable = ptable[cols]  # Fix column order
