@@ -112,6 +112,19 @@ prior_bounds = {
             (0.01, 10),  # f_b
             (0.1, 10),  # f_ratio
             ),
+        2: ((0.08, 0.18),  # mdot1
+            (0.08, 0.18),  # mdot2
+            (0.08, 0.18),  # mdot3
+            (0.67, 0.74),  # x
+            (0.005, 0.01),  # z
+            (0.0, 0.15),  # qb1
+            (0.0, 0.15),  # qb2
+            (0.0, 0.15),  # qb3
+            (1.4 / 1.4, 2.3 / 1.4),  # g
+            (1.2, 1.4),  # redshift
+            (0.01, 10),  # f_b
+            (0.1, 10),  # f_ratio
+            ),
     },
 }
 
@@ -166,8 +179,8 @@ initial_position = {
     5: {
         1: (0.165, 0.14, 0.102,
             0.725, 0.004, 0.068, 0.062, 0.14, 1.6, 1.3, 0.55, 2.2),
-        2: (0.165, 0.14, 0.102,
-            0.728, 0.007, 0.01, 0.01, 0.09, 1.6, 1.33, 0.55, 2.2),
+        2: (0.16, 0.135, 0.10,
+            0.73, 0.0084, 0.005, 0.009, 0.1, 1.6, 1.33, 0.55, 2.),
     },
 }
 
@@ -231,9 +244,21 @@ source_defaults = {
     },
 }
 
+# Summary
+# -------
+# grid5:
+#   8  : as 5, but f_ratio instead of f_p
+#   7  : as 5, with 10x weight on burst rate
+#   9  : as 8, with 10x weight on burst rate
+#   10 : as 8, with flat f_ratio prior
+#   11 : as 8, with flat f_ratio prior and 10x weight on burst rate
+
 version_definitions = {
     'interpolator': {
-        'grid5': {},
+        'grid5': {
+            9: 2,
+            11: 2,
+        },
     },
 
     'bprops': {
@@ -244,6 +269,7 @@ version_definitions = {
         'grid5': {
             7: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
             9: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+            11: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         },
     },
 
@@ -256,6 +282,7 @@ version_definitions = {
             8: param_keys[5],
             9: 8,
             10: 8,
+            11: 8,
         },
     },
 
@@ -272,6 +299,7 @@ version_definitions = {
             8: 4,
             9: 4,
             10: 4,
+            11: 4,
         },
     },
 
@@ -286,8 +314,9 @@ version_definitions = {
             6: 4,
             7: 4,
             8: prior_bounds[5][1],
-            9: 8,
+            9: prior_bounds[5][2],
             10: 8,
+            11: 9,
         },
     },
 
@@ -297,6 +326,7 @@ version_definitions = {
              3: {'f_ratio': prior_pdfs['f_ratio'][2]},
              4: {'z': prior_pdfs['z'][2]},
              10: {'f_ratio': flat_prior},
+             11: {'f_ratio': flat_prior},
          },
     },
 
@@ -309,6 +339,7 @@ version_definitions = {
             8: initial_position[5][1],
             9: initial_position[5][2],
             10: 8,
+            11: 9,
         },
     },
 
