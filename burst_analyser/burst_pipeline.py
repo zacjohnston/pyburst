@@ -43,9 +43,9 @@ def run_analysis(batches, source, copy_params=True, reload=True, multithread=Tru
         print_title('Collecting results')
         if auto_last_batch:
             # TODO: make more automatic
-            kgrid = grid_analyser.Kgrid(source, exclude_defaults=True,
-                                        powerfits=False, burst_analyser=True)
-            last_batch = int(kgrid.params.iloc[-1]['batch'])
+            grid_table = grid_tools.load_grid_table('params', source=source,
+                                                    burst_analyser=True)
+            last_batch = grid_table.batch.iloc[-1]
         else:
             last_batch = batches[-1]  # Assumes last batch is the last for whole grid
 
