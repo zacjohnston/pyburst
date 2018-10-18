@@ -187,22 +187,22 @@ c .... 1.0642929e+36 (L/Ledd) * (Q/MeV)
 p xlum0   1.0642929e+36
 c -------------------------
 c substrate L, Q/MeV
-p xlum0 {qb:.4f} *
+p xlum0 {qb:.6f} *
 c .......
 c ..... SCALE to He/C/O L_Edd accretion: factor 1.7 / (X + 1)
 c --- h mass fraction ---
-o x {h1:.4f} def
+o x {h1:.6f} def
 # o xeddf {{1.7 / (1. + x)}} def
 # p accrate {{xeddf}} *
 # p xlum0 {{xeddf}} *
 
 c set fraction of Eddington accretion rate
-o xledd {accrate0:.4f} def
+o xledd {accrate0:.6f} def
 p accrate {{xledd}} *
 p xlum0 {{xledd}} *
 
 c apply anisotropy multiplier/factor
-o accmult {acc_mult:.4f} def
+o accmult {acc_mult:.6f} def
 p accrate {{accmult}} *
 p xlum0 {{accmult}} *
 
@@ -226,7 +226,7 @@ c plot
 
 c ================================
 c MATCH TO accmass
-@xm(jm)<{accmass:.2e}
+@xm(jm)<{accmass:.4e}
 p 52 20
 p accdepth 1.d99
 p iterbarm 999999
@@ -239,7 +239,7 @@ c =================================
 p ncnvout {cnv}
 
 c overwrites accreted composition (if need to change)
-compsurb {n14:.4f} n14 {he4:.4f} he4 {h1:.4f} h1
+compsurb {n14:.6f} n14 {he4:.6f} he4 {h1:.6f} h1
 
 p xlum0 1. *
 p lumdata {lumdata}
@@ -247,12 +247,12 @@ p lumdata {lumdata}
 {accrate1_str}
 
 c multiplier (only on time-dependent files!)
-p accratef {acc_mult:.4f}
-p xl0ratef {acc_mult:.4f}
+p accratef {acc_mult:.6f}
+p xl0ratef {acc_mult:.6f}
 
 c use accdepth 5.d20 for He
 c use accdepth 1.d20 for H
-p accdepth {accdepth:.2e}
+p accdepth {accdepth:.4e}
 
 mapsurfb
 p ibwarn 0
@@ -272,8 +272,8 @@ p tnucmin 1.d7
 p 86 1
 p 87 1
 p 452 0
-p zonermin {zonermin:.2f}
-p zonermax {zonermax:.2f}
+p zonermin {zonermin:.4f}
+p zonermax {zonermax:.4f}
 p zonemmax 1.d99
 p ddmin 1.d4
 c decretion
@@ -293,7 +293,7 @@ p nstop {nstop:.0f}
 p abunlim 0.01
 {kill_setup}
 
-@time>{t_end:.3e}
+@time>{t_end:.4e}
 d #
 end""")
 
