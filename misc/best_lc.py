@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
-from scipy.optimize import minimize
 
 from pygrids.grids import grid_analyser
 from pygrids.mcmc import burstfit, mcmc_tools
