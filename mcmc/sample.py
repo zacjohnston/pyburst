@@ -117,6 +117,45 @@ class Ksample:
 
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
+    def plot(self, residuals=True):
+        fig, ax = plt.subplots(self.n_epochs, 2, sharex=True, figsize=(20, 12))
+
+        for epoch_i in range(self.n_epochs):
+            batch = self.batches[epoch_i]
+            obs_burst = self.bfit.obs[epoch_i]
+            obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)
+            obs_y = np.array(obs_burst.flux)
+            obs_y_u = np.array(obs_burst.flux_err)
+
+            ax[epoch_i][0].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
+
+            for run_i, run in enumerate(self.runs):
+                model = self.shifted_lc[batch][run]
+                t_shift = self.t_shifts[epoch_i, run_i]
+
+                m_x = model[:, 0] + t_shift
+                m_y = model[:, 1]
+                m_y_u = model[:, 2]
+                m_y_upper = m_y + m_y_u
+                m_y_lower = m_y - m_y_u
+
+                # ====== Plot lightcurves ======
+                ax[epoch_i][0].fill_between(m_x, m_y_lower, m_y_upper, color='0.7')
+                ax[epoch_i][0].plot(m_x, m_y, color='black')
+
+                # ====== Plot residuals ======
+                if residuals:
+                    y_residuals = obs_y - self.interp_lc[batch][run]['flux'](obs_x - t_shift)
+                    ax[epoch_i][1].fill_between(m_x, -m_y_u, m_y_u, color='0.7')
+                    ax[epoch_i][1].errorbar(obs_x, y_residuals, yerr=obs_y_u, ls='none', capsize=3, color='C1')
+                    ax[epoch_i][1].plot([-1e3, 1e3], [0, 0], color='black')
+
+        ax[-1][0].set_xlabel('Time (s)', fontsize=20)
+        ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=20)
+        ax[-1][0].set_xlim([-10, 200])
+        plt.tight_layout()
+        plt.show(block=False)
+
 
 def plot_batch(source, batch, error=False):
     kgrid = grid_analyser.Kgrid(source=source, linregress_burst_rate=False,
