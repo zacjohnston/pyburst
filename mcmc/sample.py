@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,12 +15,17 @@ class Ksample:
     """Testing comparisons of LC from 'best' MCMC sample,
     against observed LC
     """
-    def __init__(self, source, mcmc_source, mcmc_version, batches=(1, 2, 3), runs=None):
+    def __init__(self, source, mcmc_source, mcmc_version, batches, runs=None,
+                 verbose=True):
         self.source = source
         self.grid = grid_analyser.Kgrid(self.source)
         self.bfit = burstfit.BurstFit(mcmc_source, version=mcmc_version, re_interp=False)
         self.batches = batches
         self.params = load_param_sample(self.source, self.batches)
+        self.verbose = verbose
+
+        # !!! Hack fix
+        self.batches = (3, 2, 1)
 
         if runs is None:
             sub_batch = self.grid.get_params(self.batches[0])
@@ -33,7 +39,36 @@ class Ksample:
         self.t_shifts = None
 
         self.extract_lc()
-        # self.get_all_tshifts()
+        self.interp_obs_lc()
+        self.get_all_tshifts()
+
+    def printv(self, string):
+        if self.verbose:
+            print(string)
+
+    def interp_obs_lc(self):
+        """Creates interpolated lightcurve of observed burst epochs
+        """
+        for epoch_i in range(self.n_epochs):
+            if self.verbose:
+                sys.stdout.write('\rInterpolating observed burst lightcurves: '
+                                 f'{epoch_i + 1}/{self.n_epochs}')
+
+            obs_burst = self.bfit.obs[epoch_i]
+            obs_x = np.array(obs_burst.time + 0.5 * obs_burst.dt)
+            obs_flux = np.array(obs_burst.flux)
+            obs_flux_err = np.array(obs_burst.flux_err)
+
+            self.interp_lc['obs'] = {}
+            self.interp_lc['obs'][epoch_i] = {}
+            self.interp_lc['obs'][epoch_i]['flux'] = interp1d(obs_x, obs_flux,
+                                                              bounds_error=False,
+                                                              fill_value=0)
+            self.interp_lc['obs'][epoch_i]['flux_err'] = interp1d(obs_x, obs_flux_err,
+                                                                  bounds_error=False,
+                                                                  fill_value=0)
+        if self.verbose:
+            sys.stdout.write('\n')
 
     def extract_lc(self):
         """Extracts mean lightcurves from models and shifts to observer according to
@@ -45,6 +80,9 @@ class Ksample:
             self.grid.load_mean_lightcurves(batch)
 
             for i, run in enumerate(self.runs):
+                if self.verbose:
+                    sys.stdout.write('\rExtracting and shifting model lightcurves: '
+                                     f'Batch {batch} : run {run}/{len(self.runs)}')
                 params = self.params[i]
                 self.shifted_lc[batch][run] = np.array(self.grid.mean_lc[batch][run])
 
@@ -66,15 +104,23 @@ class Ksample:
                 self.interp_lc[batch][run]['flux_err'] = interp1d(t, flux_err,
                                                                   bounds_error=False,
                                                                   fill_value=0)
+            if self.verbose:
+                sys.stdout.write('\n')
 
     def get_all_tshifts(self):
         """Gets best t_shift for all bursts
         """
         t_shifts = np.full((self.n_epochs, len(self.runs)), np.nan)
 
-        for i in range(self.n_epochs):
-            for j, run in enumerate(self.runs):
-                t_shifts[i, j] = self.fit_tshift(run=run, epoch_i=i)
+        for epoch_i in range(self.n_epochs):
+            for run_i, run in enumerate(self.runs):
+                if self.verbose:
+                    sys.stdout.write('\rOptimising time shifts: '
+                                     f'epoch {epoch_i + 1}, run {run}/{len(self.runs)}')
+                t_shifts[epoch_i, run_i] = self.fit_tshift(run=run, epoch_i=epoch_i)
+
+            if self.verbose:
+                sys.stdout.write('\n')
 
         self.t_shifts = t_shifts
 
@@ -145,10 +191,12 @@ class Ksample:
 
                 # ====== Plot residuals ======
                 if residuals:
-                    y_residuals = obs_y - self.interp_lc[batch][run]['flux'](obs_x - t_shift)
-                    ax[epoch_i][1].fill_between(m_x, -m_y_u, m_y_u, color='0.7')
-                    ax[epoch_i][1].errorbar(obs_x, y_residuals, yerr=obs_y_u, ls='none', capsize=3, color='C1')
-                    ax[epoch_i][1].plot([-1e3, 1e3], [0, 0], color='black')
+                    y_residuals = self.interp_lc[batch][run]['flux'](obs_x - t_shift) - obs_y
+                    # ax[epoch_i][1].plot(m_x, y_residuals, color='black')
+                    # ax[epoch_i][1].fill_between(m_x, y_residuals - m_y_u,
+                    #                             y_residuals + m_y_u, color='0.7')
+                    ax[epoch_i][1].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
+                                            ls='none', capsize=3, color='C1')
 
         ax[-1][0].set_xlabel('Time (s)', fontsize=20)
         ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=20)
