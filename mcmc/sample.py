@@ -163,8 +163,9 @@ class Ksample:
 
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
-    def plot(self, residuals=True, shaded=True, alpha_lines=0.3, alpha_shaded=0.7):
-        fig, ax = plt.subplots(self.n_epochs, 2, sharex=True, figsize=(20, 12))
+    def plot(self, residuals=True, shaded=True, alpha_lines=0.3, alpha_shaded=0.7,
+             fontsize=16):
+        fig, ax = plt.subplots(self.n_epochs, 2, sharex=True, figsize=(14, 10))
 
         for epoch_i in range(self.n_epochs):
             batch = self.batches[epoch_i]
@@ -208,9 +209,9 @@ class Ksample:
 
             ax[epoch_i][0].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
 
-        ax[-1][0].set_xlabel('Time (s)', fontsize=20)
-        ax[-1][1].set_xlabel('Time (s)', fontsize=20)
-        ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=20)
+        ax[-1][0].set_xlabel('Time (s)', fontsize=fontsize)
+        ax[-1][1].set_xlabel('Time (s)', fontsize=fontsize)
+        ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
         ax[-1][0].set_xlim([-10, 200])
         plt.tight_layout()
         plt.show(block=False)
