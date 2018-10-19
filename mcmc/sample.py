@@ -163,7 +163,7 @@ class Ksample:
 
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
-    def plot(self, residuals=True):
+    def plot(self, residuals=True, shaded=True):
         fig, ax = plt.subplots(self.n_epochs, 2, sharex=True, figsize=(20, 12))
 
         for epoch_i in range(self.n_epochs):
@@ -172,8 +172,6 @@ class Ksample:
             obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)
             obs_y = np.array(obs_burst.flux)
             obs_y_u = np.array(obs_burst.flux_err)
-
-            ax[epoch_i][0].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
 
             for run_i, run in enumerate(self.runs):
                 model = self.shifted_lc[batch][run]
@@ -186,8 +184,9 @@ class Ksample:
                 m_y_lower = m_y - m_y_u
 
                 # ====== Plot lightcurves ======
-                ax[epoch_i][0].fill_between(m_x, m_y_lower, m_y_upper, color='0.7')
-                ax[epoch_i][0].plot(m_x, m_y, color='black')
+                if shaded:
+                    ax[epoch_i][0].fill_between(m_x, m_y_lower, m_y_upper, color='0.7')
+                ax[epoch_i][0].plot(m_x, m_y, color='black', alpha=0.3)
 
                 # ====== Plot residuals ======
                 if residuals:
@@ -197,6 +196,8 @@ class Ksample:
                     #                             y_residuals + m_y_u, color='0.7')
                     ax[epoch_i][1].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
                                             ls='none', capsize=3, color='C1')
+
+            ax[epoch_i][0].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
 
         ax[-1][0].set_xlabel('Time (s)', fontsize=20)
         ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=20)
