@@ -49,6 +49,7 @@ class Ksample:
     def interp_obs_lc(self):
         """Creates interpolated lightcurve of observed burst epochs
         """
+        self.interp_lc['obs'] = {}
         for epoch_i in range(self.n_epochs):
             if self.verbose:
                 sys.stdout.write('\rInterpolating observed burst lightcurves: '
@@ -59,7 +60,6 @@ class Ksample:
             obs_flux = np.array(obs_burst.flux)
             obs_flux_err = np.array(obs_burst.flux_err)
 
-            self.interp_lc['obs'] = {}
             self.interp_lc['obs'][epoch_i] = {}
             self.interp_lc['obs'][epoch_i]['flux'] = interp1d(obs_x, obs_flux,
                                                               bounds_error=False,
@@ -163,7 +163,7 @@ class Ksample:
 
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
-    def plot(self, residuals=True, shaded=True):
+    def plot(self, residuals=True, shaded=True, alpha_lines=0.3, alpha_shaded=0.7):
         fig, ax = plt.subplots(self.n_epochs, 2, sharex=True, figsize=(20, 12))
 
         for epoch_i in range(self.n_epochs):
@@ -183,19 +183,24 @@ class Ksample:
                 m_y_upper = m_y + m_y_u
                 m_y_lower = m_y - m_y_u
 
-                # ====== Plot lightcurves ======
+                # ====== Plot model lightcurves ======
                 if shaded:
-                    ax[epoch_i][0].fill_between(m_x, m_y_lower, m_y_upper, color='0.7')
-                ax[epoch_i][0].plot(m_x, m_y, color='black', alpha=0.3)
+                    ax[epoch_i][0].fill_between(m_x, m_y_lower, m_y_upper, color='0.7',
+                                                alpha=alpha_shaded)
+                ax[epoch_i][0].plot(m_x, m_y, color='black', alpha=alpha_lines)
 
                 # ====== Plot residuals ======
                 if residuals:
-                    y_residuals = self.interp_lc[batch][run]['flux'](obs_x - t_shift) - obs_y
-                    # ax[epoch_i][1].plot(m_x, y_residuals, color='black')
-                    # ax[epoch_i][1].fill_between(m_x, y_residuals - m_y_u,
-                    #                             y_residuals + m_y_u, color='0.7')
-                    ax[epoch_i][1].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
-                                            ls='none', capsize=3, color='C1')
+                    y_residuals = m_y - self.interp_lc['obs'][epoch_i]['flux'](m_x)
+
+                    ax[epoch_i][1].plot(m_x, y_residuals, color='black', alpha=alpha_lines)
+                    ax[epoch_i][1].fill_between(m_x, y_residuals - m_y_u,
+                                                y_residuals + m_y_u, color='0.7',
+                                                alpha=alpha_shaded)
+
+            # ====== Plot observed lightcurves ======
+            ax[epoch_i][1].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
+                                    ls='none', capsize=3, color='C1')
 
             ax[epoch_i][0].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
 
