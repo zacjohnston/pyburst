@@ -191,12 +191,14 @@ class Ksample:
 
                 # ====== Plot residuals ======
                 if residuals:
-                    y_residuals = m_y - self.interp_lc['obs'][epoch_i]['flux'](m_x)
+                    # y_residuals = m_y - self.interp_lc['obs'][epoch_i]['flux'](m_x)
+                    y_residuals = self.interp_lc[batch][run]['flux'](obs_x-t_shift) - obs_y
+                    y_residuals_err = self.interp_lc[batch][run]['flux_err'](obs_x-t_shift)
 
-                    ax[epoch_i][1].plot(m_x, y_residuals, color='black', alpha=alpha_lines)
-                    ax[epoch_i][1].fill_between(m_x, y_residuals - m_y_u,
-                                                y_residuals + m_y_u, color='0.7',
-                                                alpha=alpha_shaded)
+                    ax[epoch_i][1].plot(obs_x, y_residuals, color='black', alpha=alpha_lines)
+                    ax[epoch_i][1].fill_between(obs_x, y_residuals - y_residuals_err,
+                                                y_residuals + y_residuals_err,
+                                                color='0.7', alpha=alpha_shaded)
 
             # ====== Plot observed lightcurves ======
             ax[epoch_i][1].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
