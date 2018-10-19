@@ -196,9 +196,11 @@ class Ksample:
                     y_residuals_err = self.interp_lc[batch][run]['flux_err'](obs_x-t_shift)
 
                     ax[epoch_i][1].plot(obs_x, y_residuals, color='black', alpha=alpha_lines)
-                    ax[epoch_i][1].fill_between(obs_x, y_residuals - y_residuals_err,
-                                                y_residuals + y_residuals_err,
-                                                color='0.7', alpha=alpha_shaded)
+
+                    if shaded:
+                        ax[epoch_i][1].fill_between(obs_x, y_residuals - y_residuals_err,
+                                                    y_residuals + y_residuals_err,
+                                                    color='0.7', alpha=alpha_shaded)
 
             # ====== Plot observed lightcurves ======
             ax[epoch_i][1].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
@@ -207,6 +209,7 @@ class Ksample:
             ax[epoch_i][0].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
 
         ax[-1][0].set_xlabel('Time (s)', fontsize=20)
+        ax[-1][1].set_xlabel('Time (s)', fontsize=20)
         ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=20)
         ax[-1][0].set_xlim([-10, 200])
         plt.tight_layout()
