@@ -52,8 +52,10 @@ class Ksample:
                 t = lc[:, 0]
                 lum = lc[:, 1:3]
 
-                lc[:, 0] = self.bfit.shift_to_observer(values=t, bprop='dt', params=params)
-                lc[:, 1:3] = self.bfit.shift_to_observer(values=lum, bprop='peak', params=params)
+                lc[:, 0] = 3600 * self.bfit.shift_to_observer(values=t, bprop='dt',
+                                                              params=params)
+                lc[:, 1:3] = self.bfit.shift_to_observer(values=lum, bprop='peak',
+                                                         params=params)
 
                 flux = lum[:, 0]
                 flux_err = lum[:, 1]
