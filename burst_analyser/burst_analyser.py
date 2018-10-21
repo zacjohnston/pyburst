@@ -39,6 +39,7 @@ class BurstRun(object):
                  load_dumps=False, set_paramaters=None, auto_discard=False,
                  get_slopes=False):
         self.flags = {'lum_loaded': False,
+                      'lum_does_not_exist': False,
                       'dumps_loaded': False,
                       'analysed': False,
                       'too_few_bursts': False,
@@ -169,6 +170,11 @@ class BurstRun(object):
                                         source=self.source, basename=self.basename,
                                         save=self.options['save_lum'],
                                         reload=self.options['reload'])
+
+        if self.lum is None:
+            self.flags['lum_does_not_exist'] = True
+            self.n_bursts = 0
+            return
 
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
         self.flags['lum_loaded'] = True
@@ -440,7 +446,11 @@ class BurstRun(object):
            5. Get start/end times (discard final burst if cut off)
         """
         if not self.flags['lum_loaded']:
-            self.load_lum_file()
+            if self.flags['lum_does_not_exist']:
+                return
+            else:
+                self.load_lum_file()
+
         self.printv('Identifying bursts')
         self.get_burst_candidates()
 
