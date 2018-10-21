@@ -29,27 +29,20 @@ INPUT_SUFFIX = '_input'
 
 # xxxxxxxxxxxxxxxx !!!CAUTION!!! xxxxxxxxxxxxxxxxxxxxxxx
 # this module is very outdated and very un-maintained
-# nothing is gaurunteed to work anymore
+# nothing is gauranteed to work anymore
 # proceed with caution
 # xxxxxxxxxxxxxxxx !!!CAUTION!!! xxxxxxxxxxxxxxxxxxxxxxx
 
-def multi_setup_analyser(batches, source, multithread=True, **kwargs):
+def multi_setup_analyser(batches, source, multithread=True, basename='xrb'):
     batches = grid_tools.expand_batches(batches, source)
 
-    if multithread:
-        args = []
-        for batch in batches:
-            args.append((batch, source))
-        with mp.Pool(processes=8) as pool:
-            pool.starmap(setup_analyser, args)
-
-    else:
-        for batch in batches:
-            runs = grid_tools.get_nruns(batch, source)
-            setup_analyser(runs=runs, batch=batch, source=source, **kwargs)
+    for batch in batches:
+        runs = grid_tools.get_nruns(batch, source)
+        setup_analyser(runs=runs, batch=batch, source=source, multithread=multithread,
+                       basename=basename)
 
 
-def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
+def setup_analyser(batch, source, runs=None, basename='xrb', multithread=True):
     """
     Sets up directories and files for kepler_analyser
     --------------------------------------------------------------------------
@@ -60,7 +53,7 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
            it will be assumed that all runs have the same value.
     """
     source = grid_strings.source_shorthand(source=source)
-    path = kwargs.get('path', GRIDS_PATH)
+    path = GRIDS_PATH
     analyser_path = os.path.join(path, 'analyser', source)
 
     batch_name = grid_strings.get_batch_string(batch, source)
@@ -84,41 +77,22 @@ def setup_analyser(batch, source, runs=None, basename='xrb', **kwargs):
         grid_tools.try_mkdir(folder, skip=True)
 
     # ====== Extract and write data files (and get no. of cycles) ======
-    extract_lightcurves(runs,
-                        basename=basename,
-                        path_data=runs_path,
-                        path_target=inpath)
+    if multithread:
+        args = []
+        for run in runs:
+            args.append(([run], runs_path, inpath, basename))
+        with mp.Pool(processes=8) as pool:
+            pool.starmap(extract_lightcurves, args)
+    else:
+        extract_lightcurves(runs,
+                            basename=basename,
+                            path_data=runs_path,
+                            path_target=inpath)
 
     write_model_table(table=params,
                       basename=basename,
                       batch_name=batch_name,
                       path=inpath)
-
-
-def write_model_table(table, basename, batch_name, path):
-    """
-    Writes MODELS.txt file for kepler_analyser input
-    """
-    # --------------------------------------------------------------------------
-    # Input Parameters
-    # --------------------------------------------------------------------------
-    # runs         : as above (setup_analyser)
-    # x, z         : as above
-    # accrate      : as above
-    # basename     : as above
-    # batch        : as above
-    # cycles = []  : list of no. of cycles in each model
-    # path   = str : path to input directory
-    # -------------------------------------------------------------------------  -
-    filepath = os.path.join(path, 'MODELS.txt')
-    m_edd = 1.75e-8  # * 1.7/(x+1)
-
-    print('Writing MODELS.txt file')
-    with open(filepath, 'w') as f:
-        f.write('#mod     acc rate        Z         H       Lacc/Ledd   #pul   #cycle   Comment\n')
-        for row in table.itertuples():
-            f.write(f'{basename}{row.run}   {row.accrate*m_edd:.6e}    {row.z:.4f}    {row.x:.4f}'
-                    + f'  {row.accrate:.6f}      {row.run}    0    {batch_name}\n')
 
 
 def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
@@ -149,7 +123,7 @@ def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
 
         print(f'Loading kepler binary for {rname}')
         lcpath = os.path.join(path_data, rname, lcfile)
-        data = lcdata.load(lcpath)
+        data = lcdata.load(lcpath, graphical=False)
 
         print('Writing txt file')
         savepath = os.path.join(path_target, savefile)
@@ -159,7 +133,31 @@ def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
         cycles[i] = len(data.time)
         print_dashes()
 
-    return cycles
+
+def write_model_table(table, basename, batch_name, path):
+    """
+    Writes MODELS.txt file for kepler_analyser input
+    """
+    # --------------------------------------------------------------------------
+    # Input Parameters
+    # --------------------------------------------------------------------------
+    # runs         : as above (setup_analyser)
+    # x, z         : as above
+    # accrate      : as above
+    # basename     : as above
+    # batch        : as above
+    # cycles = []  : list of no. of cycles in each model
+    # path   = str : path to input directory
+    # -------------------------------------------------------------------------  -
+    filepath = os.path.join(path, 'MODELS.txt')
+    m_edd = 1.75e-8  # * 1.7/(x+1)
+
+    print('Writing MODELS.txt file')
+    with open(filepath, 'w') as f:
+        f.write('#mod     acc rate        Z         H       Lacc/Ledd   #pul   #cycle   Comment\n')
+        for row in table.itertuples():
+            f.write(f'{basename}{row.run}   {row.accrate*m_edd:.6e}    {row.z:.4f}    {row.x:.4f}'
+                    + f'  {row.accrate:.6f}      {row.run}    0    {batch_name}\n')
 
 
 def collect_output(runs, batches, source, basename='xrb',
