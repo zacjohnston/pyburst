@@ -47,7 +47,11 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
             lum = load_ascii(presaved_filepath)
         except FileNotFoundError:
             print('No presaved file found. Reloading binary')
-            lum = load_save(binary_filepath, presaved_filepath)
+            try:
+                lum = load_save(binary_filepath, presaved_filepath)
+            except FileNotFoundError:
+                print('lumfile not found. Skipping')
+                return None
 
     if check_monotonic:
         dt = np.diff(lum[:, 0])
@@ -77,12 +81,15 @@ def extract_lcdata(filepath, silent=True):
     """Extracts luminosity versus time from kepler binary file (.lc)
     """
     lumfile = lcdata.load(filepath, silent=silent, graphical=False)
-    n = len(lumfile.time)
-    lum = np.full((n, 2), np.nan)
-    lum[:, 0] = lumfile.time
-    lum[:, 1] = lumfile.xlum
 
-    return lum
+    if lumfile is None:
+        raise FileNotFoundError("lumfile doesn't exist")
+    else:
+        n = len(lumfile.time)
+        lum = np.full((n, 2), np.nan)
+        lum[:, 0] = lumfile.time
+        lum[:, 1] = lumfile.xlum
+        return lum
 
 
 def batch_save(batch, source, runs=None, basename='xrb', reload=True, **kwargs):
