@@ -41,7 +41,11 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     if reload:
         print('Deleting presaved file, reloading binary file')
         subprocess.run(['rm', '-f', presaved_filepath])
-        lum = load_save(binary_filepath, presaved_filepath)
+        try:
+            lum = load_save(binary_filepath, presaved_filepath)
+        except FileNotFoundError:
+            print('!!!!!!! lumfile not found. Skipping !!!!!!!!')
+            return
     else:
         try:
             lum = load_ascii(presaved_filepath)
@@ -50,8 +54,8 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
             try:
                 lum = load_save(binary_filepath, presaved_filepath)
             except FileNotFoundError:
-                print('lumfile not found. Skipping')
-                return None
+                print('!!!!!!! lumfile not found. Skipping !!!!!!!!')
+                return
 
     if check_monotonic:
         dt = np.diff(lum[:, 0])
