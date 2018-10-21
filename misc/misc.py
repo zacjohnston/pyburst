@@ -129,7 +129,7 @@ def convert_adelle_table(filename='allruns_attribs.txt',
                          savename='MODELS.txt'):
     """Loads model table of Adelle's grid, and converts to kepler_grids format
     """
-    col_order = ['run', 'z', 'y', 'x', 'qb', 'accrate', 'tshift', 'xi',
+    col_order = ['run', 'z', 'y', 'x', 'qb', 'accrate', 'tshift', 'acc_mult',
                  'qb_delay', 'mass', 'lburn']
 
     col_rename = {'Qbvalue': 'qb',
@@ -139,7 +139,7 @@ def convert_adelle_table(filename='allruns_attribs.txt',
                   'runid': 'run'}
 
     col_missing = {'tshift': 0.0,
-                   'xi': 1.0,
+                   'acc_mult': 1.0,
                    'qb_delay': 0.0,
                    'lburn': 1}
 

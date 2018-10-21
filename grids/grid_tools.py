@@ -17,7 +17,7 @@ flt2 = '{:.2f}'.format
 flt4 = '{:.4f}'.format
 exp2 = '{:.2e}'.format
 FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
-              'tshift': flt2, 'qb': flt4, 'xi': flt2, 'qb_delay': flt2,
+              'tshift': flt2, 'qb': flt4, 'acc_mult': flt2, 'qb_delay': flt2,
               'mass': flt2, 'accmass': exp2, 'accdepth': exp2}
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']

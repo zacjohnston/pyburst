@@ -173,7 +173,7 @@ class Kgrid:
             if len(table_params) < 2:
                 continue
             else:
-                accrate = table_params['accrate'].values * table_params['xi'].values
+                accrate = table_params['accrate'].values * table_params['acc_mult'].values
                 rate = table_summ['rate'].values
                 m, y0, _, _, _ = linregress(x=accrate, y=rate)
                 linear_rate.loc[i, 'm'] = m
@@ -235,7 +235,7 @@ class Kgrid:
 
             batch = int(row['batch'])
             run = int(row['run'])
-            mdot = row['accrate'] * row['xi']
+            mdot = row['accrate'] * row['acc_mult']
             title += f'mdot={mdot:.4f}'
 
             ax = self.plot_mean_lc(batch=batch, run=run, show=show)
@@ -273,7 +273,7 @@ class Kgrid:
             for i in range(1, n_models, skip):
                 batch = int(subset.iloc[i]['batch'])
                 run = int(subset.iloc[i]['run'])
-                mdot = accrate * subset.iloc[i]['xi']
+                mdot = accrate * subset.iloc[i]['acc_mult']
                 label = f'{mdot:.4f}'
 
                 ax = self.add_lc_plot(ax=ax, batch=batch, run=run, label=label, **kwargs)
@@ -403,7 +403,7 @@ class Kgrid:
                 subset = self.get_params(params=params)
                 idxs = subset.index
 
-                mdot_tmp = np.array(accrate * subset['xi'])
+                mdot_tmp = np.array(accrate * subset['acc_mult'])
                 prop_tmp = np.array(self.summ.iloc[idxs][bprop] / unit_f)
                 u_tmp = np.array(self.summ.iloc[idxs][u_prop] / unit_f)
 
