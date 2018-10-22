@@ -110,7 +110,7 @@ class Kemulator:
         n_bprops = len(bprops)
         values = np.full((n_models, n_bprops), np.nan)
         self.printv(f'Number of models: {n_models}')
-        
+
         t0 = time.time()
         self.printv(f'Creating interpolator:')
         for i, bp in enumerate(bprops):
