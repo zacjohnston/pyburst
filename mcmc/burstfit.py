@@ -392,12 +392,10 @@ class BurstFit:
 
         if self.has_two_f:
             f_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
-            f_prior = self.f_ratio_prior(f_ratio)
-
-            if f_prior == 0:
-                self.debug.end_function()
-                return self.zero_lhood
-            prior_lhood += np.log(f_prior)
+            prior_lhood += np.log(self.f_ratio_prior(f_ratio))
+        elif self.has_ratio:
+            f_ratio = params[self.param_idxs['f_ratio']]
+            prior_lhood += np.log(self.f_ratio_prior(f_ratio))
 
         elif self.has_inc:
             inc = params[self.param_idxs['inc']]
