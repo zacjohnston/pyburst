@@ -136,12 +136,10 @@ def flat_prior(x):
 prior_pdfs = {
     'z': {
         1: norm(loc=-0.5, scale=0.25).pdf,  # log10-space [z/solar]
-        2: flat_prior,                      # flat prior
     },
 
     'f_ratio': {
         1: norm(loc=2.3, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
-        2: flat_prior,                    # flat prior
     },
 
     'inc': {
@@ -322,9 +320,9 @@ version_definitions = {
 
     'prior_pdfs': {
          'grid5': {
-             2: {'z': prior_pdfs['z'][2]},
-             3: {'f_ratio': prior_pdfs['f_ratio'][2]},
-             4: {'z': prior_pdfs['z'][2]},
+             2: {'z': flat_prior},
+             3: {'f_ratio': flat_prior},
+             4: {'z': flat_prior},
              10: {'f_ratio': flat_prior},
              11: {'f_ratio': flat_prior},
          },
