@@ -30,7 +30,7 @@ version_definitions = {
     'exclude_any': {
         'grid5': {
             1: {
-                'z': 0.01, 'x': 0.74,
+                'z': 0.01, 'x': 0.74, 'mass': 2.5,
             },
             2: {
                 'qb': 0.2, 'z': 0.0025,
