@@ -155,6 +155,12 @@ class BurstFit:
             # ====== extract burst rates ======
             self.obs_data['rate'] = hr_day / self.obs_data['dt']
             self.obs_data['u_rate'] = hr_day * self.obs_data['u_dt'] / self.obs_data['dt']**2
+
+            for var in ('fper', 'peak'):
+                u_var = f'u_{var}'
+                self.obs_data[var] *= self.obs_data['cbol']
+                self.obs_data[u_var] *= self.obs_data['cbol']
+
             self.debug.end_function()
 
     def lhood(self, params, plot=False):
