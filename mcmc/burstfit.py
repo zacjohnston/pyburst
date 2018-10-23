@@ -122,12 +122,18 @@ class BurstFit:
     def extract_obs_values(self):
         """Unpacks observed burst properties (dt, fper, etc.) from data
         """
+        def strip_units(x):
+            if type(x) is u.quantity.Quantity:
+                x = x.value
+            return x
+
         self.debug.start_function('extract_obs_values')
         hr_day = 24
         key_map = {'dt': 'tdel', 'u_dt': 'tdel_err',
                    'fper': 'fper', 'u_fper': 'fper_err',
                    'fluence': 'fluen', 'u_fluence': 'fluen_err',
-                   'peak': 'F_pk', 'u_peak': 'F_pk_err'}
+                   'peak': 'F_pk', 'u_peak': 'F_pk_err',
+                   'cbol': 'cbol', 'u_cbol': 'cbol_err'}
 
         if self.source == 'sim_test':
             filepath = os.path.join(GRIDS_PATH, 'obs_data', 'sim1', 'sim_test_summary.p')
@@ -144,7 +150,7 @@ class BurstFit:
                 key_old = key_map[key]
 
                 for i in range(self.n_epochs):
-                    self.obs_data[key][i] = self.obs[i].__dict__[key_old].value
+                    self.obs_data[key][i] = strip_units(self.obs[i].__dict__[key_old])
 
             # ====== extract burst rates ======
             self.obs_data['rate'] = hr_day / self.obs_data['dt']
