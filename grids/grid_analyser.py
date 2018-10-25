@@ -337,8 +337,8 @@ class Kgrid:
             self.load_mean_lightcurves(batch=batch)
         self.printv('')
 
-    def plot_burst_property(self, bprop, var, fixed, save=False, show=True,
-                            linear_rates=False, interpolate=True,
+    def plot_burst_property(self, bprop, var, fixed, xaxis='accrate', save=False,
+                            show=True, linear_rates=False, interpolate=True,
                             shaded=True, xlims=(0.075, 0.245)):
         """Plots given burst property against accretion rate
         
@@ -348,11 +348,8 @@ class Kgrid:
         """
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = check_var_fixed(var=var, fixed=fixed)
-
-        if self.source == 'biggrid2':
-            accrate_unique = np.arange(8, 25)/100
-        else:
-            accrate_unique = self.unique_params['accrate']
+        xlabel = {'accrate': r'$\dot{M} / \dot{M}_\mathrm{Edd}$'}.get(xaxis, xaxis)
+        x_unique = self.unique_params[xaxis]
 
         var_unique = self.unique_params[var]
         params = dict(fixed)
@@ -381,12 +378,12 @@ class Kgrid:
             title += f'{p}={pv:.{precision}f}, '
 
         fontsize = 14
-        ax.set_xlim(xlims)
-        ax.set_xlabel(r'$\dot{M} / \dot{M}_\mathrm{Edd}$', fontsize=fontsize)
+        # ax.set_xlim(xlims)
+        ax.set_xlabel(xlabel, fontsize=fontsize)
         ax.set_ylabel(y_label, fontsize=fontsize)
         ax.set_title(title, fontsize=14)
         plt.tight_layout()
-
+        # TODO: make more generic (other xaxis variables)
         for v in var_unique:
             # ===== check if any models exist =====
             params[var] = v
@@ -398,20 +395,15 @@ class Kgrid:
             prop_y = []
             u_y = []
 
-            for accrate in accrate_unique:
-                params['accrate'] = accrate
+            for x_value in x_unique:
+                params[xaxis] = x_value
                 subset = self.get_params(params=params)
                 idxs = subset.index
 
-                mdot_tmp = np.array(accrate * subset['acc_mult'])
+                # mdot_tmp = np.array(x_value * subset['acc_mult'])
+                mdot_tmp = np.full(len(subset), x_value)
                 prop_tmp = np.array(self.summ.iloc[idxs][bprop] / unit_f)
                 u_tmp = np.array(self.summ.iloc[idxs][u_prop] / unit_f)
-
-                # === remove zero-uncertainties (if model has only 3 bursts)===
-                if 0.0 in u_tmp:
-                    frac_err = 0.13  # typical fractional error
-                    idx = np.where(u_tmp == 0.0)[0][0]
-                    u_tmp[idx] = frac_err * prop_tmp[idx]
 
                 mdot_x = np.concatenate([mdot_x, mdot_tmp])
                 prop_y = np.concatenate([prop_y, prop_tmp])
@@ -428,7 +420,7 @@ class Kgrid:
 
             ax.errorbar(x=mdot_x, y=prop_y, yerr=u_y, marker='o',
                         label=label, capsize=3, ls='-' if interpolate else 'none')
-            del (params['accrate'])
+            del (params[xaxis])
 
         if linear_rates:
             ax.set_prop_cycle(None)  # reset color cycle
