@@ -459,8 +459,7 @@ class Kgrid:
         ax.set_title(f'{self.source}_V{self.grid_version.version}')
         plt.show(block=False)
 
-    def save_all_plots(self, fixed=None, bprops=('dt', 'fluence', 'peak'),
-                       do_bprops=True, **kwargs):
+    def save_all_plots(self, fixed=None, bprops=('dt', 'fluence', 'peak'), **kwargs):
         """Saves all lhood and var plots for given z,qb
         """
 
@@ -500,14 +499,10 @@ class Kgrid:
             for i in range(n_fixed):
                 fixed_input = {x: full_fixed[x][i]
                                for x in full_fixed}
-                # if do_lhoods:
-                #     self.plot_lhood(var=var, fixed={pfix:val}, save=True,
-                #                         show=False, **kwargs)
-                if do_bprops:
-                    for bprop in bprops:
-                        self.plot_burst_property(bprop=bprop, var=var,
-                                                 fixed=fixed_input,
-                                                 save=True, show=False, **kwargs)
+                for bprop in bprops:
+                    self.plot_burst_property(bprop=bprop, var=var,
+                                             fixed=fixed_input,
+                                             save=True, show=False, **kwargs)
                 plt.close('all')
 
     def print_params(self, batch, run):
