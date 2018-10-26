@@ -472,19 +472,7 @@ class Kgrid:
 
         self.printv('Saving lhood and bprop plots:')
         if fixed is None:
-            default_fixed = {'gs1826': {'z': [0.005, 0.0075, 0.01, 0.0125, 0.015, 0.02],
-                                        'qb': [0.05, 0.1, 0.15, 0.2]},
-
-                             '4u1820': {'z': [0.005, 0.01, 0.015, 0.02],
-                                        'qb': [0.1, 0.2],
-                                        'x': [0.0, 0.05, 0.1]},
-
-                             'biggrid2': {'z': [0.0025, 0.005, 0.0075],
-                                          'qb': [0.05],
-                                          # 'mass': [0.8, 1.4, 2.0, 2.6, 3.2],
-                                          'mass': [1.7, 2.0, 2.3],
-                                          # 'x': [0.6, 0.7, 0.8]},
-                                          'x': [0.65, 0.7, 0.72, 0.73]},
+            default_fixed = {'grid5': {''}
                              }
             fixed = default_fixed.get(self.source, use_unique())
 
