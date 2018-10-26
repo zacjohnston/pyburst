@@ -28,8 +28,8 @@ version_defaults = {
         'sample5': {},
         'res1': {},
         'test1': {},
-
         'heat': {'batch': [1]},
+        'triplets': {},
     },
 
     'exclude_all': {
@@ -46,6 +46,7 @@ version_defaults = {
         'heat': [{}],
         'res1': [{}],
         'test1': [{}],
+        'triplets': [{}],
     },
 }
 
@@ -91,7 +92,8 @@ version_definitions = {
                     'accdepth': 1e21
                 },
                 2: {},
-            }
+            },
+            'triplets': {},
         },
     'exclude_all':
         {
@@ -105,6 +107,7 @@ version_definitions = {
             'heat': {},
             'res1': {},
             'test1': {},
+            'triplets': {},
         }
 }
 
