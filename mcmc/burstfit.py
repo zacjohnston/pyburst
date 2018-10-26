@@ -67,10 +67,10 @@ class BurstFit:
         self.has_one_f = 'f' in self.mcmc_version.param_keys
         self.has_two_f = ('f_b' in self.mcmc_version.param_keys
                           and 'f_p' in self.mcmc_version.param_keys)
+        self.has_d = ('d_b' in self.mcmc_version.param_keys
+                      and 'xi_ratio' in self.mcmc_version.param_keys)
 
-        if 'sim' in self.source:
-            source = 'biggrid2'  # from here on effectively treat as biggrid2
-
+        self.kpc_to_cm = u.kpc.to(u.cm)
         self.zero_lhood = zero_lhood
         self.u_fper_frac = u_fper_frac
         self.lhood_factor = lhood_factor
@@ -91,6 +91,7 @@ class BurstFit:
 
         self.z_prior = None
         self.f_ratio_prior = None
+        self.xi_ratio_prior = None
         self.inc_prior = None
         self.setup_priors()
 
@@ -116,6 +117,7 @@ class BurstFit:
         self.debug.start_function('setup_priors')
         self.z_prior = self.mcmc_version.prior_pdfs['z']
         self.f_ratio_prior = self.mcmc_version.prior_pdfs['f_ratio']
+        self.xi_ratio_prior = self.mcmc_version.prior_pdfs['xi_ratio']
         self.inc_prior = self.mcmc_version.prior_pdfs['inc']
         self.debug.end_function()
 
@@ -280,6 +282,9 @@ class BurstFit:
             elif self.has_ratio:
                 flux_factor_b = 1e45 * params[self.param_idxs['f_b']]
                 flux_factor_p = flux_factor_b * params[self.param_idxs['f_ratio']]
+            elif self.has_d:
+                flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']])**2
+                flux_factor_p = flux_factor_b * params[self.param_idxs['xi_ratio']]
             else:
                 if self.has_inc:  # model explicitly uses inclination
                     inc = params[self.param_idxs['inc']]
@@ -406,7 +411,9 @@ class BurstFit:
         elif self.has_ratio:
             f_ratio = params[self.param_idxs['f_ratio']]
             prior_lhood += np.log(self.f_ratio_prior(f_ratio))
-
+        elif self.has_d:
+            xi_ratio = params[self.param_idxs['xi_ratio']]
+            prior_lhood += np.log(self.xi_ratio_prior(xi_ratio))
         elif self.has_inc:
             inc = params[self.param_idxs['inc']]
             prior_lhood += np.log(self.inc_prior(inc * u.deg)).value
