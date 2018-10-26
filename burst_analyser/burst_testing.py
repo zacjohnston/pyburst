@@ -25,4 +25,4 @@ def test_bursts(n_bursts, run=1, batch=281, source='biggrid2', plot=True):
     if plot:
         model_test.plot()
         model_test.plot_convergence()
-        model_test.plot_linregress()
+        # model_test.plot_linregress()
