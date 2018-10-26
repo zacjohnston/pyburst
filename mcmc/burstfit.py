@@ -63,12 +63,10 @@ class BurstFit:
         self.has_g = 'g' in self.mcmc_version.param_keys
         self.has_logz = 'logz' in self.mcmc_version.param_keys
         self.has_inc = 'inc' in self.mcmc_version.param_keys
-        self.has_ratio = 'f_ratio' in self.mcmc_version.param_keys
+        self.has_xi_ratio = 'xi_ratio' in self.mcmc_version.param_keys
         self.has_one_f = 'f' in self.mcmc_version.param_keys
         self.has_two_f = ('f_b' in self.mcmc_version.param_keys
                           and 'f_p' in self.mcmc_version.param_keys)
-        self.has_d = ('d_b' in self.mcmc_version.param_keys
-                      and 'xi_ratio' in self.mcmc_version.param_keys)
 
         self.kpc_to_cm = u.kpc.to(u.cm)
         self.zero_lhood = zero_lhood
@@ -90,7 +88,6 @@ class BurstFit:
         self.extract_obs_values()
 
         self.z_prior = None
-        self.f_ratio_prior = None
         self.xi_ratio_prior = None
         self.inc_prior = None
         self.setup_priors()
@@ -116,7 +113,6 @@ class BurstFit:
     def setup_priors(self):
         self.debug.start_function('setup_priors')
         self.z_prior = self.mcmc_version.prior_pdfs['z']
-        self.f_ratio_prior = self.mcmc_version.prior_pdfs['f_ratio']
         self.xi_ratio_prior = self.mcmc_version.prior_pdfs['xi_ratio']
         self.inc_prior = self.mcmc_version.prior_pdfs['inc']
         self.debug.end_function()
@@ -279,10 +275,7 @@ class BurstFit:
             elif self.has_one_f:
                 flux_factor_b = 1e45 * params[self.param_idxs['f']]
                 flux_factor_p = flux_factor_b
-            elif self.has_ratio:
-                flux_factor_b = 1e45 * params[self.param_idxs['f_b']]
-                flux_factor_p = flux_factor_b * params[self.param_idxs['f_ratio']]
-            elif self.has_d:
+            elif self.has_xi_ratio:
                 flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']])**2
                 flux_factor_p = flux_factor_b * params[self.param_idxs['xi_ratio']]
             else:
@@ -405,13 +398,11 @@ class BurstFit:
 
         prior_lhood = np.log(self.z_prior(z_input))
 
+        # ===== anisotropy/inclination priors =====
         if self.has_two_f:
-            f_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
-            prior_lhood += np.log(self.f_ratio_prior(f_ratio))
-        elif self.has_ratio:
-            f_ratio = params[self.param_idxs['f_ratio']]
-            prior_lhood += np.log(self.f_ratio_prior(f_ratio))
-        elif self.has_d:
+            xi_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
+            prior_lhood += np.log(self.xi_ratio_prior(xi_ratio))
+        elif self.has_xi_ratio:
             xi_ratio = params[self.param_idxs['xi_ratio']]
             prior_lhood += np.log(self.xi_ratio_prior(xi_ratio))
         elif self.has_inc:

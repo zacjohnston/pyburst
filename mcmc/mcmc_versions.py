@@ -19,8 +19,7 @@ param_keys = {
     2: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'g', 'redshift', 'f_b', 'f_p'],
     3: ['mdot1', 'mdot2', 'mdot3', 'x', 'logz', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
     4: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_p'],
-    5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_ratio'],
-    6: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'd_b', 'xi_ratio'],
+    5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -110,8 +109,8 @@ prior_bounds = {
             (0.0, 0.2),  # qb3
             (1.4 / 1.4, 2.3 / 1.4),  # g
             (1.2, 1.5),  # redshift
-            (0.01, 10),  # f_b
-            (0.1, 10),  # f_ratio
+            (1, 15),  # f_b
+            (0.1, 10),  # xi_ratio
             ),
         2: ((0.08, 0.18),  # mdot1
             (0.08, 0.18),  # mdot2
@@ -123,24 +122,8 @@ prior_bounds = {
             (0.0, 0.15),  # qb3
             (1.7 / 1.4, 2.3 / 1.4),  # g
             (1.2, 1.5),  # redshift
-            (0.01, 10),  # f_b
-            (0.1, 10),  # f_ratio
-            ),
-    },
-
-    6: {
-        1: ((0.08, 0.18),  # mdot1
-            (0.08, 0.18),  # mdot2
-            (0.08, 0.18),  # mdot3
-            (0.67, 0.73),  # x
-            (0.0025, 0.01),  # z
-            (0.0, 0.2),  # qb1
-            (0.0, 0.2),  # qb2
-            (0.0, 0.2),  # qb3
-            (1.4 / 1.4, 2.3 / 1.4),  # g
-            (1.2, 1.5),  # redshift
-            (1, 10),  # d_b
-            (0.1, 10),  # d_ratio
+            (1, 15),  # d_b
+            (0.1, 10),  # xi_ratio
             ),
     },
 }
@@ -153,10 +136,6 @@ def flat_prior(x):
 prior_pdfs = {
     'z': {
         1: norm(loc=-0.5, scale=0.25).pdf,  # log10-space [z/solar]
-    },
-
-    'f_ratio': {
-        1: norm(loc=2.3, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
     },
 
     'xi_ratio': {
@@ -197,14 +176,9 @@ initial_position = {
 
     5: {
         1: (0.165, 0.14, 0.102,
-            0.725, 0.004, 0.068, 0.062, 0.14, 1.6, 1.3, 0.55, 2.2),
-        2: (0.165, 0.14, 0.103,
-            0.73, 0.0095, 0.005, 0.009, 0.1, 1.64, 1.46, 0.5, 3.),
-    },
-
-    6: {
-        1: (0.165, 0.14, 0.102,
             0.725, 0.004, 0.068, 0.062, 0.14, 1.6, 1.3, 5., 2.2),
+        2: (0.165, 0.14, 0.103,
+            0.73, 0.0095, 0.005, 0.009, 0.1, 1.64, 1.46, 5., 3.),
     },
 }
 
@@ -258,7 +232,6 @@ source_defaults = {
     'prior_pdfs': {
         'grid5': {
           'z': prior_pdfs['z'][1],
-          'f_ratio': prior_pdfs['f_ratio'][1],
           'xi_ratio': prior_pdfs['xi_ratio'][1],
           'inc': prior_pdfs['inc'][1],
         },
@@ -272,11 +245,11 @@ source_defaults = {
 # Summary
 # -------
 # grid5:
-#   8  : as 5, but f_ratio instead of f_p
+#   8  : as 5, but xi_ratio instead of f_p
 #   7  : as 5, with 10x weight on burst rate
 #   9  : as 8, with 10x weight on burst rate
-#   10 : as 8, with flat f_ratio prior
-#   11 : as 8, with flat f_ratio prior and 10x weight on burst rate
+#   10 : as 8, with flat xi_ratio prior
+#   11 : as 8, with flat xi_ratio prior and 10x weight on burst rate
 
 version_definitions = {
     'interpolator': {
@@ -308,7 +281,6 @@ version_definitions = {
             9: 8,
             10: 8,
             11: 8,
-            12: param_keys[6],
         },
     },
 
@@ -326,7 +298,6 @@ version_definitions = {
             9: 4,
             10: 4,
             11: 4,
-            12: 4,
         },
     },
 
@@ -344,17 +315,16 @@ version_definitions = {
             9: prior_bounds[5][2],
             10: 8,
             11: 9,
-            12: prior_bounds[6][1],
         },
     },
 
     'prior_pdfs': {
          'grid5': {
              2: {'z': flat_prior},
-             3: {'f_ratio': flat_prior},
+             3: {'xi_ratio': flat_prior},
              4: {'z': flat_prior},
-             10: {'f_ratio': flat_prior},
-             11: {'f_ratio': flat_prior},
+             10: {'xi_ratio': flat_prior},
+             11: {'xi_ratio': flat_prior},
          },
     },
 
@@ -368,7 +338,6 @@ version_definitions = {
             9: initial_position[5][2],
             10: 8,
             11: 9,
-            12: initial_position[6][1],
         },
     },
 
