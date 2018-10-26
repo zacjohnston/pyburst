@@ -459,9 +459,9 @@ class BurstRun(object):
         except NoBursts:
             return
 
-        self.get_recurrence_times()
         self.get_burst_starts()
         self.get_burst_ends()
+        self.get_recurrence_times()
 
         try:
             self.check_n_bursts()
