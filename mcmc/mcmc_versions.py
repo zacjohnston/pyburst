@@ -20,6 +20,7 @@ param_keys = {
     3: ['mdot1', 'mdot2', 'mdot3', 'x', 'logz', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
     4: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_p'],
     5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_ratio'],
+    6: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'd_b', 'd_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -103,7 +104,7 @@ prior_bounds = {
             (0.08, 0.18),  # mdot2
             (0.08, 0.18),  # mdot3
             (0.67, 0.73),  # x
-            (0.0025, 0.0075),  # z
+            (0.0025, 0.01),  # z
             (0.0, 0.2),  # qb1
             (0.0, 0.2),  # qb2
             (0.0, 0.2),  # qb3
@@ -116,14 +117,30 @@ prior_bounds = {
             (0.08, 0.18),  # mdot2
             (0.08, 0.18),  # mdot3
             (0.7, 0.74),  # x
-            (0.005, 0.0125),  # z
+            (0.005, 0.01),  # z
             (0.0, 0.15),  # qb1
             (0.0, 0.15),  # qb2
             (0.0, 0.15),  # qb3
-            (1.7 / 1.4, 2.5 / 1.4),  # g
+            (1.7 / 1.4, 2.3 / 1.4),  # g
             (1.2, 1.5),  # redshift
             (0.01, 10),  # f_b
             (0.1, 10),  # f_ratio
+            ),
+    },
+
+    6: {
+        1: ((0.08, 0.18),  # mdot1
+            (0.08, 0.18),  # mdot2
+            (0.08, 0.18),  # mdot3
+            (0.67, 0.73),  # x
+            (0.0025, 0.01),  # z
+            (0.0, 0.2),  # qb1
+            (0.0, 0.2),  # qb2
+            (0.0, 0.2),  # qb3
+            (1.4 / 1.4, 2.3 / 1.4),  # g
+            (1.2, 1.5),  # redshift
+            (1, 10),  # d_b
+            (0.1, 10),  # d_ratio
             ),
     },
 }
@@ -140,6 +157,10 @@ prior_pdfs = {
 
     'f_ratio': {
         1: norm(loc=2.3, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
+    },
+
+    'd_ratio': {
+        1: norm(loc=2.3, scale=0.4).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
     },
 
     'inc': {
@@ -179,6 +200,11 @@ initial_position = {
             0.725, 0.004, 0.068, 0.062, 0.14, 1.6, 1.3, 0.55, 2.2),
         2: (0.165, 0.14, 0.103,
             0.73, 0.0095, 0.005, 0.009, 0.1, 1.64, 1.46, 0.5, 3.),
+    },
+
+    6: {
+        1: (0.165, 0.14, 0.102,
+            0.725, 0.004, 0.068, 0.062, 0.14, 1.6, 1.3, 5., 2.2),
     },
 }
 
@@ -233,6 +259,7 @@ source_defaults = {
         'grid5': {
           'z': prior_pdfs['z'][1],
           'f_ratio': prior_pdfs['f_ratio'][1],
+          'd_ratio': prior_pdfs['d_ratio'][1],
           'inc': prior_pdfs['inc'][1],
         },
     },
@@ -281,6 +308,7 @@ version_definitions = {
             9: 8,
             10: 8,
             11: 8,
+            12: param_keys[6],
         },
     },
 
@@ -298,6 +326,7 @@ version_definitions = {
             9: 4,
             10: 4,
             11: 4,
+            12: 4,
         },
     },
 
@@ -315,6 +344,7 @@ version_definitions = {
             9: prior_bounds[5][2],
             10: 8,
             11: 9,
+            12: prior_bounds[6][1],
         },
     },
 
@@ -338,6 +368,7 @@ version_definitions = {
             9: initial_position[5][2],
             10: 8,
             11: 9,
+            12: initial_position[6][1],
         },
     },
 
