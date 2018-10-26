@@ -20,7 +20,7 @@ param_keys = {
     3: ['mdot1', 'mdot2', 'mdot3', 'x', 'logz', 'qb', 'g', 'redshift', 'f_b', 'f_p'],
     4: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_p'],
     5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_ratio'],
-    6: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'd_b', 'd_ratio'],
+    6: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -159,7 +159,7 @@ prior_pdfs = {
         1: norm(loc=2.3, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
     },
 
-    'd_ratio': {
+    'xi_ratio': {
         1: norm(loc=2.3, scale=0.4).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
     },
 
@@ -259,7 +259,7 @@ source_defaults = {
         'grid5': {
           'z': prior_pdfs['z'][1],
           'f_ratio': prior_pdfs['f_ratio'][1],
-          'd_ratio': prior_pdfs['d_ratio'][1],
+          'xi_ratio': prior_pdfs['xi_ratio'][1],
           'inc': prior_pdfs['inc'][1],
         },
     },
