@@ -4,16 +4,20 @@ import numpy as np
 version_defaults = {
     'param_keys': {
         'grid5': ['accrate', 'x', 'z', 'qb', 'mass'],
+        'grid6': ['accrate', 'x', 'z', 'qb', 'mass'],
     },
     'bprops': {
         'grid5': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+        'grid6': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
     },
     'exclude_any': {
         'grid5': {},
+        'grid6': {},
 
     },
     'exclude_all': {
         'grid5': [{}],
+        'grid6': [{}],
     },
 }
 
@@ -21,25 +25,30 @@ version_defaults = {
 version_definitions = {
     'param_keys': {  # This will set the order of params when calling interpolator
         'grid5': {},
+        'grid6': {},
     },
 
     'bprops': {
         'grid5': {},
+        'grid6': {},
     },
 
     'exclude_any': {
         'grid5': {
             1: {
-                'z': [0.01, 0.0125], 'x': 0.74, 'mass': 2.5,
+                'z': [0.01, 0.0125], 'x': [0.74], 'mass': [2.5], 'qb': [0.05, 0.15],
+                'accrate': [0.1, 0.14],
             },
             2: {
-                'qb': 0.2, 'z': 0.0025, 'x': 0.67, 'mass': 1.4,
+                'qb': 0.2, 'z': [0.0025], 'x': [0.67, 0.73], 'mass': [1.4, 2.3],
             },
         },
+        'grid6': {},
     },
 
     'exclude_all': {
         'grid5': {},
+        'grid6': {},
     },
 }
 
