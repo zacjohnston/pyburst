@@ -674,6 +674,7 @@ class BurstRun(object):
         if self.n_bursts == 0:  # have deleted last burst
             self.print_warn('Discarded only burst')
             raise NoBursts
+        # TODO: this won't catch if the second burst is also deleted after the first
         if burst_i == 0:    # if deleting first burst, second burst has undefined dt
             self.bursts.loc[1, 'dt'] = np.nan
 
