@@ -91,6 +91,7 @@ class BurstFit:
         self.z_prior = None
         self.xi_ratio_prior = None
         self.inc_prior = None
+        self.d_b_prior = None
         self.setup_priors()
 
     def printv(self, string, **kwargs):
@@ -116,6 +117,7 @@ class BurstFit:
         self.z_prior = self.mcmc_version.prior_pdfs['z']
         self.xi_ratio_prior = self.mcmc_version.prior_pdfs['xi_ratio']
         self.inc_prior = self.mcmc_version.prior_pdfs['inc']
+        self.d_b_prior = self.mcmc_version.prior_pdfs['d_b']
         self.debug.end_function()
 
     def extract_obs_values(self):
@@ -405,7 +407,9 @@ class BurstFit:
             prior_lhood += np.log(self.xi_ratio_prior(xi_ratio))
         elif self.has_xi_ratio:
             xi_ratio = params[self.param_idxs['xi_ratio']]
+            d_b = params[self.param_idxs['d_b']]
             prior_lhood += np.log(self.xi_ratio_prior(xi_ratio))
+            prior_lhood += np.log(self.d_b_prior(d_b))
         elif self.has_inc:
             inc = params[self.param_idxs['inc']]
             prior_lhood += np.log(self.inc_prior(inc * u.deg)).value
