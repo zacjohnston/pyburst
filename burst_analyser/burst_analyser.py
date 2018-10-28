@@ -587,8 +587,8 @@ class BurstRun(object):
         if self.n_bursts > 1:
             dt = np.diff(self.bursts['t_peak'])
             self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
-        else:
-            self.bursts.loc[0, 'dt'] = np.nan
+        elif self.n_bursts == 1:
+            self.bursts['dt'] = np.nan
 
     def get_burst_starts(self):
         """Finds first point in lightcurve that reaches a given fraction of the peak
