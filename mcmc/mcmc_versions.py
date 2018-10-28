@@ -116,11 +116,11 @@ prior_bounds = {
             (0.08, 0.18),  # mdot2
             (0.08, 0.18),  # mdot3
             (0.7, 0.74),  # x
-            (0.005, 0.01),  # z
+            (0.005, 0.0125),  # z
             (0.0, 0.15),  # qb1
             (0.0, 0.15),  # qb2
             (0.0, 0.15),  # qb3
-            (1.7 / 1.4, 2.3 / 1.4),  # g
+            (1.7 / 1.4, 2.5 / 1.4),  # g
             (1.2, 1.5),  # redshift
             (1, 15),  # d_b
             (0.1, 10),  # xi_ratio
@@ -177,8 +177,8 @@ initial_position = {
     5: {
         1: (0.165, 0.14, 0.102,
             0.725, 0.004, 0.068, 0.062, 0.14, 1.6, 1.3, 7.2, 1.8),
-        2: (0.165, 0.14, 0.103,
-            0.73, 0.01, 0.01, 0.009, 0.1, 1.64, 1.46, 7.2, 1.8),
+        2: (0.16, 0.138, 0.103,
+            0.735, 0.012, 0.01, 0.007, 0.08, 1.75, 1.46, 7.1, 1.8),
     },
 }
 
@@ -249,7 +249,7 @@ source_defaults = {
 #   7  : as 5, with 10x weight on burst rate
 #   9  : as 8, with 10x weight on burst rate
 #   10 : as 8, with flat xi_ratio prior
-#   11 : as 8, with flat xi_ratio prior and 10x weight on burst rate
+#   11 : as 9, with flat xi_ratio prior
 
 version_definitions = {
     'interpolator': {
