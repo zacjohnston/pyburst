@@ -23,6 +23,7 @@ source_map = {
     'biggrid2': 'gs1826',
     'grid4': 'gs1826',
     'grid5': 'gs1826',
+    'grid6': 'gs1826',
     'sim_test': 'biggrid2',
     'sim10': 'biggrid2',
     'heat': 'gs1826',
