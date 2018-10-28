@@ -153,6 +153,7 @@ prior_pdfs = {
 
     'xi_ratio': {
         1: norm(loc=2.3, scale=0.4).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
+        2: norm(loc=1.5, scale=0.3).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
     },
 
     'inc': {
@@ -364,7 +365,9 @@ version_definitions = {
              10: {'xi_ratio': flat_prior},
              11: {'xi_ratio': flat_prior},
          },
-        'grid6': {},
+         'grid6': {
+             2: {'xi_ratio': prior_pdfs['xi_ratio'][2]}
+         },
     },
 
     'initial_position': {
