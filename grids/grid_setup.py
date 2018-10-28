@@ -607,7 +607,8 @@ def get_table_subset(table, batches):
     return table.iloc[idxs]
 
 
-def sync_model_restarts(short_model_table, source, basename='xrb', verbose=True,
+def sync_model_restarts(source, basename='xrb', verbose=True,
+                        batches=None, runs=None, short_model_table=None,
                         sync_model_files=True, sync_jobscripts=True, sync_model_tables=True,
                         dry_run=False, modelfiles=('.cmd', '.lc', 'z1')):
     """Sync kepler models to cluster for resuming extended runs
@@ -630,7 +631,12 @@ def sync_model_restarts(short_model_table, source, basename='xrb', verbose=True,
     modelfiles : list
         the model files (by extension) which will be synced
     """
-    batches = np.unique(short_model_table['batch'])
+    if short_model_table is None:
+        if batches is None or runs is None:
+            raise ValueError('Must provide either short_model_table or both batches and runs')
+    else:
+        batches = np.unique(short_model_table['batch'])
+
     target_path = 'isync:~/kepler/runs/'
     sync_paths = []
 
@@ -638,8 +644,9 @@ def sync_model_restarts(short_model_table, source, basename='xrb', verbose=True,
         batch_str = grid_strings.get_batch_string(batch, source)
         batch_path = os.path.join(MODELS_PATH, '.', batch_str)
 
-        batch_table = grid_tools.reduce_table(short_model_table, params={'batch': batch})
-        runs = np.array(batch_table['run'])
+        if short_model_table is not None:
+            batch_table = grid_tools.reduce_table(short_model_table, params={'batch': batch})
+            runs = np.array(batch_table['run'])
 
         if sync_jobscripts:
             span_str = kepler_jobscripts.get_span_string(runs[0], runs[-1])
