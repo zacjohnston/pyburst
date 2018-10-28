@@ -125,6 +125,19 @@ prior_bounds = {
             (1, 15),  # d_b
             (0.1, 10),  # xi_ratio
             ),
+        3: ((0.08, 0.20),  # mdot1
+            (0.08, 0.20),  # mdot2
+            (0.08, 0.20),  # mdot3
+            (0.66, 0.74),  # x
+            (0.0025, 0.0125),  # z
+            (0.0, 0.2),  # qb1
+            (0.0, 0.2),  # qb2
+            (0.0, 0.2),  # qb3
+            (1.5 / 1.4, 2.5 / 1.4),  # g
+            (1.2, 1.5),  # redshift
+            (1, 15),  # d_b
+            (0.1, 10),  # xi_ratio
+            ),
     },
 }
 
@@ -179,6 +192,8 @@ initial_position = {
             0.725, 0.004, 0.068, 0.062, 0.14, 1.6, 1.3, 7.2, 1.8),
         2: (0.16, 0.138, 0.103,
             0.735, 0.012, 0.01, 0.007, 0.08, 1.75, 1.46, 7.1, 1.8),
+        3: (0.16, 0.138, 0.103,
+            0.72, 0.012, 0.01, 0.007, 0.08, 1.75, 1.46, 7.1, 1.8),
     },
 }
 
@@ -195,38 +210,47 @@ initial_position = {
 source_defaults = {
     'param_keys': {
         'grid5': param_keys[1],
+        'grid6': param_keys[5],
     },
 
     'interp_keys': {
         'grid5': interp_keys[1],
+        'grid6': interp_keys[1],
     },
 
     'epoch_unique': {
         'grid5': epoch_unique[1],
+        'grid6': epoch_unique[2],
     },
 
     'param_aliases': {
         'grid5': param_aliases[1],
+        'grid6': param_aliases[1],
     },
 
     'bprops': {
         'grid5': ('rate', 'fluence', 'peak'),
+        'grid6': ('rate', 'fluence', 'peak'),
     },
 
     'weights': {
-        'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0}
+        'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+        'grid6': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
     },
 
     'disc_model': {
         'grid5': 'he16_a',
+        'grid6': 'he16_a',
     },
 
     'interpolator': {
         'grid5': 1,
+        'grid6': 1,
     },
 
     'prior_bounds': {
         'grid5': prior_bounds[1][1],
+        'grid6': prior_bounds[5][3],
     },
 
     'prior_pdfs': {
@@ -235,10 +259,16 @@ source_defaults = {
           'xi_ratio': prior_pdfs['xi_ratio'][1],
           'inc': prior_pdfs['inc'][1],
         },
+        'grid6': {
+          'z': prior_pdfs['z'][1],
+          'xi_ratio': flat_prior,
+          'inc': prior_pdfs['inc'][1],
+        },
     },
 
     'initial_position': {
         'grid5': initial_position[1][1],
+        'grid6': initial_position[5][3],
     },
 }
 
@@ -257,10 +287,12 @@ version_definitions = {
             9: 2,
             11: 2,
         },
+        'grid6': {},
     },
 
     'bprops': {
         'grid5': {},
+        'grid6': {},
     },
 
     'weights': {
@@ -269,6 +301,7 @@ version_definitions = {
             9: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
             11: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         },
+        'grid6': {},
     },
 
     'param_keys': {
@@ -282,10 +315,12 @@ version_definitions = {
             10: 8,
             11: 8,
         },
+        'grid6': {},
     },
 
     'interp_keys': {
         'grid5': {},
+        'grid6': {},
     },
 
     'epoch_unique': {
@@ -299,10 +334,12 @@ version_definitions = {
             10: 4,
             11: 4,
         },
+        'grid6': {},
     },
 
     'param_aliases': {
         'grid5': {},
+        'grid6': {},
     },
 
     'prior_bounds': {
@@ -316,6 +353,7 @@ version_definitions = {
             10: 8,
             11: 9,
         },
+        'grid6': {},
     },
 
     'prior_pdfs': {
@@ -326,6 +364,7 @@ version_definitions = {
              10: {'xi_ratio': flat_prior},
              11: {'xi_ratio': flat_prior},
          },
+        'grid6': {},
     },
 
     'initial_position': {
@@ -339,10 +378,12 @@ version_definitions = {
             10: 8,
             11: 9,
         },
+        'grid6': {},
     },
 
     'disc_model': {
         'grid5': {},
+        'grid6': {},
     },
 }
 
