@@ -151,6 +151,10 @@ prior_pdfs = {
         1: norm(loc=-0.5, scale=0.25).pdf,  # log10-space [z/solar]
     },
 
+    'd_b': {
+        1: norm(loc=5.7, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
+    },
+
     'xi_ratio': {
         1: norm(loc=2.3, scale=0.4).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
         2: norm(loc=1.5, scale=0.3).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
@@ -257,12 +261,14 @@ source_defaults = {
     'prior_pdfs': {
         'grid5': {
           'z': prior_pdfs['z'][1],
+          'd_b': flat_prior,
           'xi_ratio': prior_pdfs['xi_ratio'][1],
           'inc': prior_pdfs['inc'][1],
         },
         'grid6': {
           'z': prior_pdfs['z'][1],
           'xi_ratio': flat_prior,
+          'd_b': flat_prior,
           'inc': prior_pdfs['inc'][1],
         },
     },
@@ -366,7 +372,8 @@ version_definitions = {
              11: {'xi_ratio': flat_prior},
          },
          'grid6': {
-             2: {'xi_ratio': prior_pdfs['xi_ratio'][2]}
+             2: {'xi_ratio': prior_pdfs['xi_ratio'][2]},
+             3: {'d_b': prior_pdfs['d_b'][1]},
          },
     },
 
