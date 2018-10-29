@@ -107,7 +107,7 @@ def get_acceptance_fraction(source=None, version=None, n_walkers=None,
     return np.average(sampler['naccepted'] / n_steps)
 
 
-def optimise(source, version):
+def optimise(source, version, x0=None):
     """Optimise the starting position of the mcmc walkers using standard
         minimisation methods
 
@@ -118,7 +118,10 @@ def optimise(source, version):
     """
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
                              lhood_factor=-1, zero_lhood=-1e9)
-    return fmin(bfit.lhood, x0=bfit.mcmc_version.initial_position, maxfun=10000)
+    if x0 is None:
+        x0 = bfit.mcmc_version.initial_position
+
+    return fmin(bfit.lhood, x0=x0, maxfun=10000)
 
 
 def convert_params(params, source, version):
