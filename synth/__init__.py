@@ -1,5 +1,6 @@
+from . import synth
 from . import synth_data
-
 __all__ = [
-           'synth_data',
+    'synth',
+    'synth_data',
 ]
