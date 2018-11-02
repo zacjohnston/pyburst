@@ -132,11 +132,25 @@ def set_free_params(group_table, mcv,
         group_table[var] = rand_x
 
 
-def convert_lum(x, d_star, redshift):
-    return convert_fluence(x, d_star) / redshift
+def observe_rate(rate, redshift):
+    """Returns observable burst rate (per day) from given local rate
+    """
+    return rate / redshift
 
-def convert_fluence(x, d_star):
-    return x / (4*np.pi * d_star)
+def observe_dt(dt, redshift):
+    """Returns observable burst rate (per day) from given local rate
+        """
+    return dt * redshift
+
+def observe_lum(lum, d_star, redshift):
+    """Returns observable flux from given local luminosity
+    """
+    return observe_fluence(lum, d_star) / redshift
+
+def observe_fluence(fluence, d_star):
+    """Returns observable fluence from given local burst energy
+    """
+    return fluence / (4*np.pi * d_star)
 
 def get_lacc(accrate, redshift):
     """Returns accretion luminosity
