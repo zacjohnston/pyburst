@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from pygrids.grids import grid_analyser, grid_tools
+from pygrids.grids import grid_tools
 from pygrids.mcmc import mcmc_versions, mcmc_tools
 
 # TODO
@@ -24,7 +24,6 @@ def setup_table(kgrid, batches, source, mc_version):
     mc_version : int
     """
     param_list = ('x', 'z', 'accrate', 'qb', 'mass')
-    summ_list = ('rate', 'dt', 'fluence', 'peak')
 
     mcv = mcmc_versions.McmcVersion(source=source, version=mc_version)
     sub = grid_tools.reduce_table(kgrid.params, params={'batch': batches[0]})
@@ -39,7 +38,6 @@ def setup_table(kgrid, batches, source, mc_version):
 
     for group in groups:
         group_params = kgrid.get_params(run=group).set_index(['batch']).loc[batches]
-        group_summ = kgrid.get_summ(run=group).set_index(['batch']).loc[batches]
 
         group_table = pd.DataFrame()
         group_table['group'] = np.full(n_epochs, group)
@@ -49,13 +47,9 @@ def setup_table(kgrid, batches, source, mc_version):
         for var in param_list:
             group_table[var] = np.array(group_params[var])
 
-        for var in summ_list:
-            u_var = f'u_{var}'
-            group_table[var] = np.array(group_summ[var])
-            group_table[u_var] = np.array(group_summ[u_var])
+        set_summ_cols(group_table, batches=batches, kgrid=kgrid)
+        set_free_params(group_table, mcv=mcv)
 
-        get_free_params(group_table, mcv=mcv)
-        
         # TODO:
         #   - Calculate observables (from summ values and conversion factors)
         #   - Calculate f_per (from accrate and conversion factors)
@@ -63,7 +57,19 @@ def setup_table(kgrid, batches, source, mc_version):
 
     return table
 
-def get_free_params(group_table, mcv,
+
+def set_summ_cols(group_table, batches, kgrid,
+                  summ_list=('rate', 'dt', 'fluence', 'peak')):
+    """"""
+    group_summ = kgrid.get_summ(run=group_table.group[0]).set_index(['batch']).loc[batches]
+
+    for var in summ_list:
+        u_var = f'u_{var}'
+        group_table[var] = np.array(group_summ[var])
+        group_table[u_var] = np.array(group_summ[u_var])
+
+
+def set_free_params(group_table, mcv,
                     free_params=('redshift', 'd_b', 'xi_ratio')):
     """Chooses random free parameters for a given group of epochs
 
