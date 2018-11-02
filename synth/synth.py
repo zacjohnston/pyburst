@@ -23,8 +23,6 @@ def setup_table(kgrid, batches, source, mc_version):
     source : str
     mc_version : int
     """
-    param_list = ('x', 'z', 'accrate', 'qb', 'mass')
-
     mcv = mcmc_versions.McmcVersion(source=source, version=mc_version)
     sub = grid_tools.reduce_table(kgrid.params, params={'batch': batches[0]})
     groups = np.array(sub['run'])
@@ -37,16 +35,13 @@ def setup_table(kgrid, batches, source, mc_version):
     table = pd.DataFrame()
 
     for group in groups:
-        group_params = kgrid.get_params(run=group).set_index(['batch']).loc[batches]
 
         group_table = pd.DataFrame()
         group_table['group'] = np.full(n_epochs, group)
         group_table['epoch'] = epochs
         group_table['batch'] = batches
 
-        for var in param_list:
-            group_table[var] = np.array(group_params[var])
-
+        set_param_cols(group_table, batches=batches, kgrid=kgrid)
         set_summ_cols(group_table, batches=batches, kgrid=kgrid)
         set_free_params(group_table, mcv=mcv)
 
@@ -58,10 +53,22 @@ def setup_table(kgrid, batches, source, mc_version):
     return table
 
 
+def set_param_cols(group_table, batches, kgrid,
+                   params=('x', 'z', 'accrate', 'qb', 'mass')):
+    """Sets model parameter columns in table for a single group of epochs
+    """
+    group_params = kgrid.get_params(run=group_table.group[0]
+                                    ).set_index(['batch']).loc[batches]
+    for var in params:
+        group_table[var] = np.array(group_params[var])
+
+
 def set_summ_cols(group_table, batches, kgrid,
                   summ_list=('rate', 'dt', 'fluence', 'peak')):
-    """"""
-    group_summ = kgrid.get_summ(run=group_table.group[0]).set_index(['batch']).loc[batches]
+    """Sets summ value columns in table for a single group of epochs
+    """
+    group_summ = kgrid.get_summ(run=group_table.group[0]
+                                ).set_index(['batch']).loc[batches]
 
     for var in summ_list:
         u_var = f'u_{var}'
