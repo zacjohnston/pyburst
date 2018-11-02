@@ -285,7 +285,7 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
     # ===== fill model params =====
     for key in epoch_independent:
         mv_key = aliases.get(key, key)
-        params_full[key] = get_random_params(mv_key, n_models=n_models, mv=mv)
+        params_full[key] = mcmc_tools.get_random_params(mv_key, n_models=n_models, mv=mv)
 
     # ===== fill constant params =====
     for key, val in constant.items():
@@ -297,7 +297,8 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
         for key in epoch_dependent:
             mv_key = aliases.get(key, key)
             mv_key = f'{mv_key}1'
-            params_full[key] = get_random_params(mv_key, n_models=n_models, mv=mv)
+            params_full[key] = mcmc_tools.get_random_params(mv_key,
+                                                            n_models=n_models, mv=mv)
 
         create_batch(batch0+i, dv={}, params={}, source=source, nbursts=30, kgrid=kgrid,
                      qos='normal', walltime=96, setup_test=False, nsdump=500,
@@ -377,17 +378,6 @@ def get_index_str(idxs, discard, cap, header=None):
     for i in idxs:
         string += f'{i}\n'
     return string
-
-
-def get_random_params(key, n_models, mv):
-    """Returns random sample of length 'n_models', within mcmc boundaries
-    """
-    idx = mv.param_keys.index(key)
-
-    bounds = mv.prior_bounds[idx]
-    range_ = np.diff(bounds)
-    rand = np.random.random_sample(n_models)
-    return rand * range_ + bounds[0]
 
 
 def print_grid_params(params):

@@ -111,6 +111,17 @@ def get_random_sample(chain, n, discard=None, cap=None):
     return flat_chain[idxs], idxs
 
 
+def get_random_params(key, n_models, mv):
+    """Returns random sample of length 'n_models', within mcmc boundaries
+    """
+    idx = mv.param_keys.index(key)
+
+    bounds = mv.prior_bounds[idx]
+    range_ = np.diff(bounds)
+    rand = np.random.random_sample(n_models)
+    return rand * range_ + bounds[0]
+
+
 def save_sampler_state(sampler, source, version, n_steps, n_walkers):
     """Saves sampler state as dict
     """
