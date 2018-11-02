@@ -6,7 +6,6 @@ from pygrids.mcmc import mcmc_versions, mcmc_tools
 
 # TODO
 #   - generate synthetic data (load, add noise, save, tables)
-#   - load models (groups)
 #   - add noise
 #   - write table (input, output): files/synth
 
@@ -67,6 +66,17 @@ def initialise_group_table(group, batches):
 def set_param_cols(group_table, batches, kgrid,
                    params=('x', 'z', 'accrate', 'qb', 'mass')):
     """Sets model parameter columns in table for a single group of epochs
+
+    parameters
+    ----------
+    group_table : pd.DataFrame
+        table to add columns to
+    batches : sequence
+        list of batches that correspond to the group's epochs
+    kgrid : Kgrid object
+        contains the model paramters for each batch of runs
+    params : sequence
+        parameters to extract from kgrid and add to the table
     """
     group_params = kgrid.get_params(run=group_table.group[0]
                                     ).set_index(['batch']).loc[batches]
@@ -77,6 +87,17 @@ def set_param_cols(group_table, batches, kgrid,
 def set_summ_cols(group_table, batches, kgrid,
                   summ_list=('rate', 'dt', 'fluence', 'peak')):
     """Sets summ value columns in table for a single group of epochs
+
+    parameters
+    ----------
+    group_table : pd.DataFrame
+        table to add columns to
+    batches : sequence
+        list of batches that correspond to the group's epochs
+    kgrid : Kgrid object
+        contains the model paramters for each batch of runs
+    summ_list : sequence
+        names of quantities to extract from kgrid and add to the table
     """
     group_summ = kgrid.get_summ(run=group_table.group[0]
                                 ).set_index(['batch']).loc[batches]
