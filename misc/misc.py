@@ -1,11 +1,17 @@
 import numpy as np
 import pandas as pd
+import astropy.constants as const
+import astropy.units as units
 import os
 import sys
 import matplotlib.pyplot as plt
 import chainconsumer
 
+# concord
 import ctools
+import anisotropy
+
+# kepler_grids
 from pygrids.grids import grid_analyser
 from pygrids.mcmc import mcmc_tools, burstfit
 from pygrids.physics import gparams
@@ -168,3 +174,11 @@ def convert_adelle_table(filename='allruns_attribs.txt',
 
     return table[col_order]
 
+def get_fper(accrate, redshift, distance, inc):
+    c = const.c.to(units.cm / units.s)
+    mdot_edd = 1.75e-8 * (units.Msun / units.year).to(units.g / units.s)
+    phi = (redshift - 1) * c.value**2 / redshift
+    _, xi_p = anisotropy.anisotropy(inc*units.deg)
+    d = distance * units.kpc.to(units.cm)
+
+    return accrate * mdot_edd * phi / (redshift * 4*np.pi * xi_p * d**2)
