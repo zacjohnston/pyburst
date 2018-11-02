@@ -16,7 +16,9 @@ c = const.c.to(units.cm / units.s)
 msunyer_to_gramsec = (units.M_sun / units.year).to(units.g / units.s)
 mdot_edd = 1.75e-8 * msunyer_to_gramsec
 
-def setup_table(kgrid, batches, source, mc_version):
+def setup_table(kgrid, batches, source, mc_version,
+                observables=('rate', 'peak', 'fluence', 'fper'),
+                ):
     """Sets up table of synthetic data, including input/output values
 
     parameters
@@ -38,8 +40,8 @@ def setup_table(kgrid, batches, source, mc_version):
         group_table = initialise_group_table(group, batches)
         set_param_cols(group_table, batches=batches, kgrid=kgrid)
         set_summ_cols(group_table, batches=batches, kgrid=kgrid)
-        set_free_params(group_table, mcv=mcv)
-
+        set_rand_free_params(group_table, mcv=mcv)
+        set_observables(group_table, observables=observables)
         # TODO:
         #   - Calculate observables (from summ values and conversion factors)
         #   - Calculate f_per (from accrate and conversion factors)
@@ -114,7 +116,7 @@ def set_summ_cols(group_table, batches, kgrid,
         group_table[u_var] = np.array(group_summ[u_var])
 
 
-def set_free_params(group_table, mcv,
+def set_rand_free_params(group_table, mcv,
                     free_params=('redshift', 'd_b', 'xi_ratio')):
     """Chooses random free parameters for a given group of epochs
 
@@ -130,6 +132,48 @@ def set_free_params(group_table, mcv,
     for var in free_params:
         rand_x = mcmc_tools.get_random_params(var, n_models=1, mv=mcv)[0]
         group_table[var] = rand_x
+
+
+def set_observables(group_table, observables):
+    """Calculate observables from model results and parameters
+
+    parameters
+    ----------
+    group_table : pd.Dataframe
+        table of a single group of epochs to add columns to
+    observables : sequence(str)
+        names of observables to calculate
+    """
+    local_keys = {'fper': 'accrate', 'u_fper': 'accrate'}
+    redshift = group_table.redshift[0]
+    d_b = group_table.d_b[0]
+    xi_ratio = group_table.xi_ratio[0]
+
+    for var in observables:
+        for key in (var, f'u_{var}'):
+            local_key = local_keys.get(key, key)
+            key_obs = f'{key}_obs'
+            local = group_table[local_key]
+            observed = None
+
+            if 'rate' in key:
+                observed = observe_rate(local, redshift=redshift)
+            elif 'dt' in key:
+                observed = observe_dt(local, redshift=redshift)
+            elif 'peak' in key:
+                d_star = d_b**2
+                observed = observe_lum(local, d_star=d_star, redshift=redshift)
+            elif 'fluence' in key:
+                d_star = d_b**2
+                observed = observe_fluence(local, d_star=d_star)
+            elif 'fper' in key:
+                d_star = xi_ratio * d_b**2
+                acc_lum = get_lacc(local, redshift=redshift)
+                observed = observe_lum(acc_lum, d_star=d_star, redshift=redshift)
+                if key == 'u_fper':
+                    observed *= 0.03    # hack fix uncertainty
+
+            group_table[key_obs] = observed
 
 
 def observe_rate(rate, redshift):
