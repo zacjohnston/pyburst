@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
+import astropy.constants as const
+from astropy import units
 
+# kepler_grids
 from pygrids.grids import grid_tools
 from pygrids.mcmc import mcmc_versions, mcmc_tools
 
@@ -9,6 +12,9 @@ from pygrids.mcmc import mcmc_versions, mcmc_tools
 #   - add noise
 #   - write table (input, output): files/synth
 
+c = const.c.to(units.cm / units.s)
+msunyer_to_gramsec = (units.M_sun / units.year).to(units.g / units.s)
+mdot_edd = 1.75e-8 * msunyer_to_gramsec
 
 def setup_table(kgrid, batches, source, mc_version):
     """Sets up table of synthetic data, including input/output values
@@ -70,12 +76,12 @@ def set_param_cols(group_table, batches, kgrid,
     parameters
     ----------
     group_table : pd.DataFrame
-        table to add columns to
+        table of a single group of epochs to add columns to
     batches : sequence
         list of batches that correspond to the group's epochs
     kgrid : Kgrid object
         contains the model paramters for each batch of runs
-    params : sequence
+    params : sequence(str)
         parameters to extract from kgrid and add to the table
     """
     group_params = kgrid.get_params(run=group_table.group[0]
@@ -91,12 +97,12 @@ def set_summ_cols(group_table, batches, kgrid,
     parameters
     ----------
     group_table : pd.DataFrame
-        table to add columns to
+        table of a single group of epochs to add columns to
     batches : sequence
         list of batches that correspond to the group's epochs
     kgrid : Kgrid object
         contains the model paramters for each batch of runs
-    summ_list : sequence
+    summ_list : sequence(str)
         names of quantities to extract from kgrid and add to the table
     """
     group_summ = kgrid.get_summ(run=group_table.group[0]
@@ -115,13 +121,26 @@ def set_free_params(group_table, mcv,
     parameters
     ----------
     group_table : pd.DataFrame
-        table of a single group of epochs
+        table of a single group of epochs to add columns to
     mcv : McmcVersion
         Object of mcmc constraints (for boundaries of free parameters)
-    free_params : sequence
+    free_params : sequence(str)
         free parameters to generate
     """
     for var in free_params:
         rand_x = mcmc_tools.get_random_params(var, n_models=1, mv=mcv)[0]
         group_table[var] = rand_x
+
+
+def convert_lum(x, d_star, redshift):
+    return convert_fluence(x, d_star) / redshift
+
+def convert_fluence(x, d_star):
+    return x / (4*np.pi * d_star)
+
+def get_lacc(accrate, redshift):
+    """Returns accretion luminosity
+    """
+    phi = (redshift - 1) * c.value**2 / redshift  # gravitational potential
+    return accrate * mdot_edd * phi
 
