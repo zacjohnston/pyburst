@@ -27,20 +27,10 @@ def setup_table(kgrid, batches, source, mc_version):
     sub = grid_tools.reduce_table(kgrid.params, params={'batch': batches[0]})
     groups = np.array(sub['run'])
 
-    n_groups = len(groups)
-    n_epochs = len(batches)
-    n_models = n_epochs * n_groups
-    epochs = np.arange(n_epochs) + 1
-
     table = pd.DataFrame()
 
     for group in groups:
-
-        group_table = pd.DataFrame()
-        group_table['group'] = np.full(n_epochs, group)
-        group_table['epoch'] = epochs
-        group_table['batch'] = batches
-
+        group_table = initialise_group_table(group, batches)
         set_param_cols(group_table, batches=batches, kgrid=kgrid)
         set_summ_cols(group_table, batches=batches, kgrid=kgrid)
         set_free_params(group_table, mcv=mcv)
@@ -51,6 +41,27 @@ def setup_table(kgrid, batches, source, mc_version):
         table = pd.concat([table, group_table], ignore_index=True)
 
     return table
+
+
+def initialise_group_table(group, batches):
+    """Initialises a table for a single group of epochs
+
+    parameters
+    ----------
+    group : int
+        group ID number
+    batches : sequence
+        list of batch ID numbers that correspond to epochs
+    """
+    n_epochs = len(batches)
+    epochs = np.arange(n_epochs) + 1
+
+    group_table = pd.DataFrame()
+    group_table['group'] = np.full(n_epochs, group)
+    group_table['epoch'] = epochs
+    group_table['batch'] = batches
+
+    return group_table
 
 
 def set_param_cols(group_table, batches, kgrid,
