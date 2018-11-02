@@ -17,6 +17,9 @@ msunyer_to_gramsec = (units.M_sun / units.year).to(units.g / units.s)
 mdot_edd = 1.75e-8 * msunyer_to_gramsec
 
 def setup_table(kgrid, batches, source, mc_version,
+                params=('x', 'z', 'accrate', 'qb', 'mass'),
+                summ_list=('rate', 'dt', 'fluence', 'peak'),
+                free_params=('redshift', 'd_b', 'xi_ratio'),
                 observables=('rate', 'peak', 'fluence', 'fper'),
                 ):
     """Sets up table of synthetic data, including input/output values
@@ -29,6 +32,14 @@ def setup_table(kgrid, batches, source, mc_version,
         batch correspond to each other.
     source : str
     mc_version : int
+    params : sequence(str)
+        parameters to extract from kgrid and add to the table
+    summ_list : sequence(str)
+        burst properties to extract from kgrid and add to the table
+    free_params : sequence(str)
+        free parameters to randomly choose
+    observables : sequence(str)
+        names of observables to calculate from burst properties
     """
     mcv = mcmc_versions.McmcVersion(source=source, version=mc_version)
     sub = grid_tools.reduce_table(kgrid.params, params={'batch': batches[0]})
@@ -38,9 +49,9 @@ def setup_table(kgrid, batches, source, mc_version,
 
     for group in groups:
         group_table = initialise_group_table(group, batches)
-        set_param_cols(group_table, batches=batches, kgrid=kgrid)
-        set_summ_cols(group_table, batches=batches, kgrid=kgrid)
-        set_rand_free_params(group_table, mcv=mcv)
+        set_param_cols(group_table, batches=batches, kgrid=kgrid, params=params)
+        set_summ_cols(group_table, batches=batches, kgrid=kgrid, summ_list=summ_list)
+        set_rand_free_params(group_table, mcv=mcv, free_params=free_params)
         set_observables(group_table, observables=observables)
         # TODO:
         #   - Calculate observables (from summ values and conversion factors)
@@ -71,8 +82,7 @@ def initialise_group_table(group, batches):
     return group_table
 
 
-def set_param_cols(group_table, batches, kgrid,
-                   params=('x', 'z', 'accrate', 'qb', 'mass')):
+def set_param_cols(group_table, batches, kgrid, params):
     """Sets model parameter columns in table for a single group of epochs
 
     parameters
@@ -92,8 +102,7 @@ def set_param_cols(group_table, batches, kgrid,
         group_table[var] = np.array(group_params[var])
 
 
-def set_summ_cols(group_table, batches, kgrid,
-                  summ_list=('rate', 'dt', 'fluence', 'peak')):
+def set_summ_cols(group_table, batches, kgrid, summ_list):
     """Sets summ value columns in table for a single group of epochs
 
     parameters
@@ -116,8 +125,7 @@ def set_summ_cols(group_table, batches, kgrid,
         group_table[u_var] = np.array(group_summ[u_var])
 
 
-def set_rand_free_params(group_table, mcv,
-                    free_params=('redshift', 'd_b', 'xi_ratio')):
+def set_rand_free_params(group_table, mcv, free_params):
     """Chooses random free parameters for a given group of epochs
 
     parameters
