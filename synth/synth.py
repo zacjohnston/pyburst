@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from pygrids.grids import grid_analyser, grid_tools
-
+from pygrids.mcmc import mcmc_versions, mcmc_tools
 
 # TODO
 #   - generate synthetic data (load, add noise, save, tables)
@@ -11,7 +11,7 @@ from pygrids.grids import grid_analyser, grid_tools
 #   - write table (input, output): files/synth
 
 
-def setup_table(kgrid, batches):
+def setup_table(kgrid, batches, source, mc_version):
     """Sets up table of synthetic data, including input/output values
 
     parameters
@@ -20,10 +20,13 @@ def setup_table(kgrid, batches):
     batches : array
         list of batches, each corresponding to an epoch. Assumes the runs in each
         batch correspond to each other.
+    source : str
+    mc_version : int
     """
     param_list = ('x', 'z', 'accrate', 'qb', 'mass')
     summ_list = ('rate', 'dt', 'fluence', 'peak')
 
+    mcv = mcmc_versions.McmcVersion(source=source, version=mc_version)
     sub = grid_tools.reduce_table(kgrid.params, params={'batch': batches[0]})
     groups = np.array(sub['run'])
 
@@ -45,15 +48,35 @@ def setup_table(kgrid, batches):
 
         for var in param_list:
             group_table[var] = np.array(group_params[var])
+
         for var in summ_list:
             u_var = f'u_{var}'
             group_table[var] = np.array(group_summ[var])
             group_table[u_var] = np.array(group_summ[u_var])
 
+        get_free_params(group_table, mcv=mcv)
+        
         # TODO:
-        #   - Randomly choose conversion factors (redshift, d_b, xi_ratio)
         #   - Calculate observables (from summ values and conversion factors)
         #   - Calculate f_per (from accrate and conversion factors)
         table = pd.concat([table, group_table], ignore_index=True)
 
     return table
+
+def get_free_params(group_table, mcv,
+                    free_params=('redshift', 'd_b', 'xi_ratio')):
+    """Chooses random free parameters for a given group of epochs
+
+    parameters
+    ----------
+    group_table : pd.DataFrame
+        table of a single group of epochs
+    mcv : McmcVersion
+        Object of mcmc constraints (for boundaries of free parameters)
+    free_params : sequence
+        free parameters to generate
+    """
+    for var in free_params:
+        rand_x = mcmc_tools.get_random_params(var, n_models=1, mv=mcv)[0]
+        group_table[var] = rand_x
+
