@@ -218,31 +218,37 @@ source_defaults = {
     'param_keys': {
         'grid5': param_keys[1],
         'grid6': param_keys[5],
+        'synth5': param_keys[5],
     },
 
     'interp_keys': {
         'grid5': interp_keys[1],
         'grid6': interp_keys[1],
+        'synth5': interp_keys[1],
     },
 
     'epoch_unique': {
         'grid5': epoch_unique[1],
         'grid6': epoch_unique[2],
+        'synth5': epoch_unique[2],
     },
 
     'param_aliases': {
         'grid5': param_aliases[1],
         'grid6': param_aliases[1],
+        'synth5': param_aliases[1],
     },
 
     'bprops': {
         'grid5': ('rate', 'fluence', 'peak'),
         'grid6': ('rate', 'fluence', 'peak'),
+        'synth5': ('rate', 'fluence', 'peak'),
     },
 
     'weights': {
         'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         'grid6': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+        'synth5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
     },
 
     'disc_model': {},
@@ -250,11 +256,13 @@ source_defaults = {
     'interpolator': {
         'grid5': 1,
         'grid6': 1,
+        'synth5': 1,
     },
 
     'prior_bounds': {
         'grid5': prior_bounds[1][1],
         'grid6': prior_bounds[5][3],
+        'synth5': prior_bounds[5][3],
     },
 
     'prior_pdfs': {
@@ -264,17 +272,26 @@ source_defaults = {
           'xi_ratio': prior_pdfs['xi_ratio'][1],
           'inc': prior_pdfs['inc'][1],
         },
+
         'grid6': {
           'z': prior_pdfs['z'][1],
           'xi_ratio': flat_prior,
           'd_b': flat_prior,
           'inc': prior_pdfs['inc'][1],
         },
+
+        'synth5': {
+            'z': flat_prior,
+            'xi_ratio': flat_prior,
+            'd_b': flat_prior,
+            'inc': prior_pdfs['inc'][1],
+        },
     },
 
     'initial_position': {
         'grid5': initial_position[1][1],
         'grid6': initial_position[5][3],
+        'synth5': initial_position[5][3],
     },
 
     'synthetic': {  # whether the data being matches is synthetic
@@ -309,11 +326,13 @@ version_definitions = {
             11: 2,
         },
         'grid6': {},
+        'synth5': {},
     },
 
     'bprops': {
         'grid5': {},
         'grid6': {},
+        'synth5': {},
     },
 
     'weights': {
@@ -325,6 +344,8 @@ version_definitions = {
         'grid6': {
             4: {'rate': 5.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         },
+        'synth5': {},
+
     },
 
     'param_keys': {
@@ -339,11 +360,13 @@ version_definitions = {
             11: 8,
         },
         'grid6': {},
+        'synth5': {},
     },
 
     'interp_keys': {
         'grid5': {},
         'grid6': {},
+        'synth5': {},
     },
 
     'epoch_unique': {
@@ -358,11 +381,13 @@ version_definitions = {
             11: 4,
         },
         'grid6': {},
+        'synth5': {},
     },
 
     'param_aliases': {
         'grid5': {},
         'grid6': {},
+        'synth5': {},
     },
 
     'prior_bounds': {
@@ -377,6 +402,7 @@ version_definitions = {
             11: 9,
         },
         'grid6': {},
+        'synth5': {},
     },
 
     'prior_pdfs': {
@@ -391,6 +417,7 @@ version_definitions = {
              2: {'xi_ratio': prior_pdfs['xi_ratio'][2]},
              3: {'d_b': prior_pdfs['d_b'][1]},
          },
+         'synth5': {},
     },
 
     'initial_position': {
@@ -407,6 +434,7 @@ version_definitions = {
         'grid6': {
             4: initial_position[5][4],
         },
+        'synth5': {},
     },
 
     'disc_model': {},
@@ -445,11 +473,14 @@ class McmcVersion:
         self.initial_position = self.get_parameter('initial_position')
         self.prior_pdfs = self.get_prior_pdfs()
         self.synthetic = source_defaults['synthetic'][source]
+        self.disc_model = None
 
-        if 'inc' in self.param_keys:
-            self.disc_model = self.get_parameter('disc_model')
+        if self.synthetic:
+            self.interp_source = self.get_parameter('interp_source')
+            self.synth_version = self.get_parameter('synth_version')
         else:
-            self.disc_model = None
+            self.interp_source = None
+            self.synth_version = None
 
     def __repr__(self):
         return (f'MCMC version definitions for {self.source} V{self.version}'
@@ -482,7 +513,7 @@ def get_parameter(source, version, parameter):
     if output is default:
         print(f"mcmc_versions: '{parameter}' not specified. Using default values")
 
-    if (parameter != 'interpolator') and type(output) is int:
+    if parameter not in ('interpolator', 'synth_version') and type(output) is int:
         return version_definitions[parameter][source][output]
     else:
         return output
