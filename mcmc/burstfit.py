@@ -78,13 +78,8 @@ class BurstFit:
                                                 version=self.mcmc_version.interpolator,
                                                 re_interp=re_interp,
                                                 **kwargs)
-        concord_source = source_map.get(source, source)
-        self.obs = ctools.load_obs(concord_source)
-        self.n_epochs = len(self.obs)
-
-        if self.source == 'sim_test':
-            self.n_epochs = 1
-
+        self.obs = None
+        self.n_epochs = None
         self.obs_data = None
         self.extract_obs_values()
 
@@ -116,8 +111,9 @@ class BurstFit:
         self.debug.start_function('setup_priors')
         self.z_prior = self.mcmc_version.prior_pdfs['z']
         self.xi_ratio_prior = self.mcmc_version.prior_pdfs['xi_ratio']
-        self.inc_prior = self.mcmc_version.prior_pdfs['inc']
         self.d_b_prior = self.mcmc_version.prior_pdfs['d_b']
+        if self.has_inc:
+            self.inc_prior = self.mcmc_version.prior_pdfs['inc']
         self.debug.end_function()
 
     def extract_obs_values(self):
@@ -136,6 +132,13 @@ class BurstFit:
                    'fluence': 'fluen', 'u_fluence': 'fluen_err',
                    'peak': 'F_pk', 'u_peak': 'F_pk_err',
                    'cbol': 'cbol', 'u_cbol': 'cbol_err'}
+
+        concord_source = source_map.get(self.source, self.source)
+        self.obs = ctools.load_obs(concord_source)
+        self.n_epochs = len(self.obs)
+
+        if self.source == 'sim_test':
+            self.n_epochs = 1
 
         if self.source == 'sim_test':
             filepath = os.path.join(GRIDS_PATH, 'obs_data', 'sim1', 'sim_test_summary.p')
