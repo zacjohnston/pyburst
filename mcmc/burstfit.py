@@ -127,7 +127,8 @@ class BurstFit:
             if type(x) is u.quantity.Quantity:
                 x = x.value
             return x
-
+        # TODO:
+        #   - load synthetic data
         self.debug.start_function('extract_obs_values')
         hr_day = 24
         key_map = {'dt': 'tdel', 'u_dt': 'tdel_err',
