@@ -68,21 +68,26 @@ def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_versi
 def save_table(table, synth_source, synth_version):
     """Save synth table to file
     """
-    path = grid_strings.get_obs_data_path(synth_source)
-    grid_tools.try_mkdir(path, skip=True)
-
-    filename = f'synth_{synth_source}_{synth_version}.txt'
-    filepath = os.path.join(path, filename)
+    filepath = get_table_filepath(synth_source, synth_version, try_mkdir=True)
     grid_tools.write_pandas_table(table, filepath)
 
 
 def load_table(synth_source, synth_version):
     """Load synth table from file
     """
-    path = grid_strings.get_obs_data_path(synth_source)
-    filename = f'synth_{synth_source}_{synth_version}.txt'
-    filepath = os.path.join(path, filename)
+    filepath = get_table_filepath(synth_source, synth_version)
     return pd.read_table(filepath, delim_whitespace=True)
+
+
+def get_table_filepath(synth_source, synth_version, try_mkdir=False):
+    """Returns filepath of synth table
+    """
+    path = grid_strings.get_obs_data_path(synth_source)
+    if try_mkdir:
+        grid_tools.try_mkdir(path, skip=True)
+
+    filename = f'synth_{synth_source}_{synth_version}.txt'
+    return os.path.join(path, filename)
 
 
 def initialise_group_table(group, batches):
