@@ -61,15 +61,19 @@ def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_versi
 
         table = pd.concat([table, group_table], ignore_index=True)
 
-    # ===== save table to file ======
+    save_table(table, synth_source=synth_source, synth_version=synth_version)
+    return table
+
+
+def save_table(table, synth_source, synth_version):
+    """Save synth table to file
+    """
     path = grid_strings.get_obs_data_path(synth_source)
     grid_tools.try_mkdir(path, skip=True)
 
     filename = f'synth_{synth_source}_{synth_version}.txt'
     filepath = os.path.join(path, filename)
     grid_tools.write_pandas_table(table, filepath)
-
-    return table
 
 
 def initialise_group_table(group, batches):
