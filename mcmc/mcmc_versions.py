@@ -245,10 +245,7 @@ source_defaults = {
         'grid6': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
     },
 
-    'disc_model': {
-        'grid5': 'he16_a',
-        'grid6': 'he16_a',
-    },
+    'disc_model': {},
 
     'interpolator': {
         'grid5': 1,
@@ -278,6 +275,21 @@ source_defaults = {
     'initial_position': {
         'grid5': initial_position[1][1],
         'grid6': initial_position[5][3],
+    },
+
+    'synthetic': {  # whether the data being matches is synthetic
+        'grid5': False,
+        'grid6': False,
+        'synth5': True,
+    },
+
+    # ===== Special definitions for synthetic data sources =====
+    'interp_source': {  # Source interpolator to use
+        'synth5': 'grid5',
+    },
+
+    'synth_version': {  # Version ID of synthetic data table
+        'synth5': 1,
     },
 }
 
@@ -397,9 +409,15 @@ version_definitions = {
         },
     },
 
-    'disc_model': {
-        'grid5': {},
-        'grid6': {},
+    'disc_model': {},
+
+    # ===== Special definitions for synthetic data sources =====
+    'interp_source': {
+        'synth5': {},
+    },
+
+    'synth_version': {
+        'synth5': {},
     },
 }
 
@@ -429,6 +447,7 @@ class McmcVersion:
         self.prior_bounds = np.array(get_parameter(source, version, 'prior_bounds'))
         self.initial_position = get_parameter(source, version, 'initial_position')
         self.prior_pdfs = get_prior_pdfs(source, version)
+        self.synthetic = source_defaults['synthetic'][source]
 
         if 'inc' in self.param_keys:
             self.disc_model = get_parameter(source, version, 'disc_model')
@@ -448,6 +467,7 @@ class McmcVersion:
                 + f'\ninterpolator     : {self.interpolator}'
                 + f'\nprior bounds     : {self.prior_bounds}'
                 + f'\nprior pdfs       : {self.prior_pdfs}'
+                + f'\nsynthetic        : {self.synthetic}'
                 )
 
 
