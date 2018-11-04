@@ -48,19 +48,23 @@ def get_model_string(run, batch, source, b_tag='', r_tag=''):
 # ======================================================
 # Top level paths
 # ======================================================
+def top_path(sub_dir, source):
+    return os.path.join(GRIDS_PATH, sub_dir, source)
+
+
 def get_source_path(source):
     source = check_synth_source(source)
-    return os.path.join(GRIDS_PATH, 'sources', source)
+    return top_path(sub_dir='sources', source=source)
 
 
 def get_analyser_path(source):
     source = check_synth_source(source)
-    return os.path.join(GRIDS_PATH, 'analyser', source)
+    return top_path(sub_dir='analyser', source=source)
 
 
 def get_obs_data_path(source):
     source = check_synth_source(source)
-    return os.path.join(GRIDS_PATH, 'obs_data', source)
+    return top_path(sub_dir='obs_data', source=source)
 
 
 # ======================================================
@@ -85,6 +89,7 @@ def batch_analysis_path(batch, source):
 
 def plots_path(source):
     return get_source_subdir(source, 'plots')
+
 
 def get_source_subdir(source, dir_):
     source = check_synth_source(source)
