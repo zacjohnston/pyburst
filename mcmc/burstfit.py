@@ -18,7 +18,7 @@ import ctools
 import anisotropy
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
-source_map = {
+concord_source_map = {
     'biggrid1': 'gs1826',  # alias for the source being modelled
     'biggrid2': 'gs1826',
     'grid4': 'gs1826',
@@ -123,8 +123,7 @@ class BurstFit:
             if type(x) is u.quantity.Quantity:
                 x = x.value
             return x
-        # TODO:
-        #   - load synthetic data
+
         self.debug.start_function('extract_obs_values')
         hr_day = 24
         key_map = {'dt': 'tdel', 'u_dt': 'tdel_err',
@@ -133,7 +132,7 @@ class BurstFit:
                    'peak': 'F_pk', 'u_peak': 'F_pk_err',
                    'cbol': 'cbol', 'u_cbol': 'cbol_err'}
 
-        concord_source = source_map.get(self.source, self.source)
+        concord_source = concord_source_map.get(self.source, self.source)
         self.obs = ctools.load_obs(concord_source)
         self.n_epochs = len(self.obs)
 
