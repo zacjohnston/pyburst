@@ -76,6 +76,15 @@ def save_table(table, synth_source, synth_version):
     grid_tools.write_pandas_table(table, filepath)
 
 
+def load_table(synth_source, synth_version):
+    """Load synth table from file
+    """
+    path = grid_strings.get_obs_data_path(synth_source)
+    filename = f'synth_{synth_source}_{synth_version}.txt'
+    filepath = os.path.join(path, filename)
+    return pd.read_table(filepath, delim_whitespace=True)
+
+
 def initialise_group_table(group, batches):
     """Initialises a table for a single group of epochs
 
