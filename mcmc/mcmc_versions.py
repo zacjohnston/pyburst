@@ -270,21 +270,18 @@ source_defaults = {
           'z': prior_pdfs['z'][1],
           'd_b': flat_prior,
           'xi_ratio': prior_pdfs['xi_ratio'][1],
-          'inc': prior_pdfs['inc'][1],
         },
 
         'grid6': {
           'z': prior_pdfs['z'][1],
           'xi_ratio': flat_prior,
           'd_b': flat_prior,
-          'inc': prior_pdfs['inc'][1],
         },
 
         'synth5': {
             'z': flat_prior,
             'xi_ratio': flat_prior,
             'd_b': flat_prior,
-            'inc': prior_pdfs['inc'][1],
         },
     },
 
@@ -484,6 +481,7 @@ class McmcVersion:
 
     def __repr__(self):
         return (f'MCMC version definitions for {self.source} V{self.version}'
+                + f'\nsynthetic        : {self.synthetic}'
                 + f'\nparam keys       : {self.param_keys}'
                 + f'\ninterp keys      : {self.interp_keys}'
                 + f'\nepoch unique     : {self.epoch_unique}'
@@ -495,7 +493,6 @@ class McmcVersion:
                 + f'\ninterpolator     : {self.interpolator}'
                 + f'\nprior bounds     : {self.prior_bounds}'
                 + f'\nprior pdfs       : {self.prior_pdfs}'
-                + f'\nsynthetic        : {self.synthetic}'
                 )
 
     def get_parameter(self, parameter):
@@ -521,7 +518,7 @@ def get_parameter(source, version, parameter):
 
 def get_prior_pdfs(source, version):
     pdfs = {}
-    for var in prior_pdfs:
+    for var in source_defaults['prior_pdfs'][source]:
         default = source_defaults['prior_pdfs'][source][var]
         v_definition = version_definitions['prior_pdfs'][source].get(version)
 
