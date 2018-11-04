@@ -25,7 +25,10 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     def load_save(load_filepath, save_filepath):
         lum_loaded = extract_lcdata(filepath=load_filepath, silent=silent)
         if save:
-            save_ascii(lum=lum_loaded, filepath=save_filepath)
+            try:
+                save_ascii(lum=lum_loaded, filepath=save_filepath)
+            except FileNotFoundError:
+                print("Can't save preloaded luminosity file, path not found")
         return lum_loaded
 
     pyprint.print_dashes()
@@ -37,24 +40,24 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     run_str = grid_strings.get_run_string(run, basename)
     model_path = grid_strings.get_model_path(run, batch, source, basename)
     binary_filepath = os.path.join(model_path, f'{run_str}.lc')
-
+    print(binary_filepath)
     if reload:
-        print('Deleting presaved file, reloading binary file')
+        print('Deleting preloaded file, reloading binary file')
         subprocess.run(['rm', '-f', presaved_filepath])
         try:
             lum = load_save(binary_filepath, presaved_filepath)
         except FileNotFoundError:
-            print('!!!!!!! lumfile not found. Skipping !!!!!!!!')
+            print('XXXXXXX lumfile not found. Skipping XXXXXXXX')
             return
     else:
         try:
             lum = load_ascii(presaved_filepath)
         except FileNotFoundError:
-            print('No presaved file found. Reloading binary')
+            print('No preloaded file found. Reloading binary')
             try:
                 lum = load_save(binary_filepath, presaved_filepath)
             except FileNotFoundError:
-                print('!!!!!!! lumfile not found. Skipping !!!!!!!!')
+                print('XXXXXXX lumfile not found. Skipping XXXXXXX')
                 return
 
     if check_monotonic:
@@ -70,12 +73,13 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
 def load_ascii(filepath):
     """Loads pre-extracted .txt file of [time, lum]
     """
-    print(f'Loading pre-saved luminosity file: {filepath}')
+    print(f'Loading preloaded luminosity file: {filepath}')
     return np.loadtxt(filepath, skiprows=1)
 
 
 def save_ascii(lum, filepath):
-    """Saves extracted [time, lum]"""
+    """Saves extracted [time, lum]
+    """
     print(f'Saving data for faster loading in: {filepath}')
     header = 'time (s),             luminosity (erg/s)'
     np.savetxt(filepath, lum, header=header)
