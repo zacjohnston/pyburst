@@ -434,20 +434,20 @@ class McmcVersion:
 
         self.source = source
         self.version = version
-        self.param_keys = get_parameter(source, version, 'param_keys')
-        self.interp_keys = get_parameter(source, version, 'interp_keys')
-        self.epoch_unique = get_parameter(source, version, 'epoch_unique')
-        self.param_aliases = get_parameter(source, version, 'param_aliases')
-        self.bprops = get_parameter(source, version, 'bprops')
-        self.weights = get_parameter(source, version, 'weights')
-        self.interpolator = get_parameter(source, version, 'interpolator')
-        self.prior_bounds = np.array(get_parameter(source, version, 'prior_bounds'))
-        self.initial_position = get_parameter(source, version, 'initial_position')
-        self.prior_pdfs = get_prior_pdfs(source, version)
+        self.param_keys = self.get_parameter('param_keys')
+        self.interp_keys = self.get_parameter('interp_keys')
+        self.epoch_unique = self.get_parameter('epoch_unique')
+        self.param_aliases = self.get_parameter('param_aliases')
+        self.bprops = self.get_parameter('bprops')
+        self.weights = self.get_parameter('weights')
+        self.interpolator = self.get_parameter('interpolator')
+        self.prior_bounds = np.array(self.get_parameter('prior_bounds'))
+        self.initial_position = self.get_parameter('initial_position')
+        self.prior_pdfs = self.get_prior_pdfs()
         self.synthetic = source_defaults['synthetic'][source]
 
         if 'inc' in self.param_keys:
-            self.disc_model = get_parameter(source, version, 'disc_model')
+            self.disc_model = self.get_parameter('disc_model')
         else:
             self.disc_model = None
 
@@ -466,6 +466,12 @@ class McmcVersion:
                 + f'\nprior pdfs       : {self.prior_pdfs}'
                 + f'\nsynthetic        : {self.synthetic}'
                 )
+
+    def get_parameter(self, parameter):
+        return get_parameter(self.source, self.version, parameter)
+
+    def get_prior_pdfs(self):
+        return get_prior_pdfs(self.source, self.version)
 
 
 def get_parameter(source, version, parameter):
