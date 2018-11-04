@@ -431,9 +431,6 @@ class McmcVersion:
 
         if source not in source_defaults['param_keys']:
             raise ValueError(f'source ({source}) not defined in mcmc_versions')
-        elif version not in version_definitions['interpolator'][source]:
-            print(f'version {version} of source {source} ' +
-                  'not defined in mcmc_versions. Using default values')
 
         self.source = source
         self.version = version
@@ -475,6 +472,9 @@ def get_parameter(source, version, parameter):
     source = grid_strings.check_synth_source(source)
     default = source_defaults[parameter][source]
     output = version_definitions[parameter][source].get(version, default)
+
+    if output is default:
+        print(f"mcmc_versions: '{parameter}' not specified. Using default values")
 
     if (parameter != 'interpolator') and type(output) is int:
         return version_definitions[parameter][source][output]
