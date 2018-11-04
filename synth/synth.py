@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
+import os
 import astropy.constants as const
 from astropy import units
 
 # kepler_grids
-from pygrids.grids import grid_tools
+from pygrids.grids import grid_tools, grid_strings
 from pygrids.mcmc import mcmc_versions, mcmc_tools
 
 # TODO
@@ -16,7 +17,7 @@ c = const.c.to(units.cm / units.s)
 msunyer_to_gramsec = (units.M_sun / units.year).to(units.g / units.s)
 mdot_edd = 1.75e-8 * msunyer_to_gramsec
 
-def setup_table(kgrid, batches, source, mc_version,
+def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_version,
                 params=('x', 'z', 'accrate', 'qb', 'mass'),
                 summ_list=('rate', 'dt', 'fluence', 'peak'),
                 free_params=('redshift', 'd_b', 'xi_ratio'),
@@ -30,8 +31,10 @@ def setup_table(kgrid, batches, source, mc_version,
     batches : array
         list of batches, each corresponding to an epoch. Assumes the runs in each
         batch correspond to each other.
-    source : str
+    synth_source : str
+    mc_source : str
     mc_version : int
+    synth_version : int
     params : sequence(str)
         parameters to extract from kgrid and add to the table
     summ_list : sequence(str)
@@ -41,22 +44,30 @@ def setup_table(kgrid, batches, source, mc_version,
     observables : sequence(str)
         names of observables to calculate from burst properties
     """
-    mcv = mcmc_versions.McmcVersion(source=source, version=mc_version)
+    mcv = mcmc_versions.McmcVersion(source=mc_source, version=mc_version)
     sub = grid_tools.reduce_table(kgrid.params, params={'batch': batches[0]})
     groups = np.array(sub['run'])
 
     table = pd.DataFrame()
 
+    # ===== For each group of epochs, setup sub-table of inputs/outputs =====
     for group in groups:
         group_table = initialise_group_table(group, batches)
+
         set_param_cols(group_table, batches=batches, kgrid=kgrid, params=params)
         set_summ_cols(group_table, batches=batches, kgrid=kgrid, summ_list=summ_list)
         set_rand_free_params(group_table, mcv=mcv, free_params=free_params)
         set_observables(group_table, observables=observables)
-        # TODO:
-        #   - Calculate observables (from summ values and conversion factors)
-        #   - Calculate f_per (from accrate and conversion factors)
+
         table = pd.concat([table, group_table], ignore_index=True)
+
+    # ===== save table to file ======
+    path = grid_strings.get_obs_data_path(synth_source)
+    grid_tools.try_mkdir(path, skip=True)
+
+    filename = f'synth_{synth_source}_{synth_version}.txt'
+    filepath = os.path.join(path, filename)
+    grid_tools.write_pandas_table(table, filepath)
 
     return table
 
