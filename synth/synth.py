@@ -90,6 +90,21 @@ def get_table_filepath(synth_source, synth_version, try_mkdir=False):
     return os.path.join(path, filename)
 
 
+def extract_obs_data(synth_source, synth_version, group,
+                     bprops=('rate', 'fluence', 'peak', 'fper')):
+    """Returns summary "observed" data as dictionary, for Burstfit
+    """
+    table = load_table(synth_source, synth_version)
+    group_table = grid_tools.reduce_table(table, params={'group': group})
+
+    obs_data = {}
+    for bprop in bprops:
+        for var in (bprop, f'u_{bprop}'):
+            obs_data[var] = np.array(group_table[f'{var}_obs'])
+
+    return obs_data
+
+
 def initialise_group_table(group, batches):
     """Initialises a table for a single group of epochs
 
