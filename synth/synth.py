@@ -17,6 +17,8 @@ c = const.c.to(units.cm / units.s)
 msunyer_to_gramsec = (units.M_sun / units.year).to(units.g / units.s)
 mdot_edd = 1.75e-8 * msunyer_to_gramsec
 kpc_to_cm = units.kpc.to(units.cm)
+mass_ref = 1.4
+
 
 def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_version,
                 params=('x', 'z', 'accrate', 'qb', 'mass'),
@@ -93,9 +95,11 @@ def get_true_values(source, group, version,
     """
     truth = np.array([])
     group_table = load_group_table(source, version, group)
+    multiplier = {'mass': 1/mass_ref}
 
     for param in params:
-        values = np.unique(group_table[param])
+        mult = multiplier.get(param, 1.0)
+        values = np.unique(group_table[param]) * mult
         truth = np.concatenate((truth, values))
 
     return truth
