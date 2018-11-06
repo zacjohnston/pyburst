@@ -271,7 +271,7 @@ def create_batch(batch, dv, source,
 
 def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcmc_version,
                   constant=None, epoch_independent=('x', 'z', 'mass'),
-                  epoch_dependent=('accrate', 'qb')):
+                  epoch_dependent=('accrate', 'qb'), epoch_chosen=None):
     """Creates random sample of model parameters
     """
     ref_mass = 1.4
@@ -279,6 +279,9 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
     if constant is None:
         constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
                     'accmass': 1e16, 'accdepth': 1e19}
+    if epoch_chosen is None:
+        epoch_chosen = {}
+
     mv = mcmc_versions.McmcVersion(source=ref_source, version=ref_mcmc_version)
     params_full = {}
 
@@ -295,10 +298,14 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
 
     for i in range(n_epochs):
         for key in epoch_dependent:
-            mv_key = aliases.get(key, key)
-            mv_key = f'{mv_key}1'
-            params_full[key] = mcmc_tools.get_random_params(mv_key,
-                                                            n_models=n_models, mv=mv)
+            if key in epoch_chosen:
+                val = epoch_chosen[key][i]
+                params_full[key] = np.full(n_models, val)
+            else:
+                mv_key = aliases.get(key, key)
+                mv_key = f'{mv_key}1'
+                params_full[key] = mcmc_tools.get_random_params(mv_key,
+                                                                n_models=n_models, mv=mv)
 
         create_batch(batch0+i, dv={}, params={}, source=source, nbursts=30, kgrid=kgrid,
                      qos='normal', walltime=96, setup_test=False, nsdump=500,
