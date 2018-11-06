@@ -461,7 +461,7 @@ class McmcVersion:
     """Class for holding different mcmc versions
     """
 
-    def __init__(self, source, version):
+    def __init__(self, source, version, verbose=False):
         source = grid_strings.check_synth_source(source)
 
         if source not in source_defaults['param_keys']:
@@ -469,6 +469,7 @@ class McmcVersion:
 
         self.source = source
         self.version = version
+        self.verbose = verbose
         self.param_keys = self.get_parameter('param_keys')
         self.interp_keys = self.get_parameter('interp_keys')
         self.epoch_unique = self.get_parameter('epoch_unique')
@@ -521,18 +522,18 @@ class McmcVersion:
                 )
 
     def get_parameter(self, parameter):
-        return get_parameter(self.source, self.version, parameter)
+        return get_parameter(self.source, self.version, parameter, verbose=self.verbose)
 
     def get_prior_pdfs(self):
         return get_prior_pdfs(self.source, self.version)
 
 
-def get_parameter(source, version, parameter):
+def get_parameter(source, version, parameter, verbose=False):
     source = grid_strings.check_synth_source(source)
     default = source_defaults[parameter][source]
     output = version_definitions[parameter][source].get(version, default)
 
-    if output is default:
+    if verbose and output is default:
         print(f"mcmc_versions: '{parameter}' not specified. Using default values")
 
     if parameter not in ('interpolator', 'synth_version', 'synth_group') \
