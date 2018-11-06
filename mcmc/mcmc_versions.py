@@ -452,9 +452,7 @@ version_definitions = {
     },
 
     'synth_group': {
-        'synth5': {
-            1: 1,
-        },
+        'synth5': {},
     },
 }
 
@@ -490,7 +488,9 @@ class McmcVersion:
             self.synth_group = self.get_parameter('synth_group')
 
             if self.synth_group is None:
-                raise ValueError(f'synth_group undefined for {source} V{version}')
+                print(f'synth_group undefined for {source} V{version}, '
+                      f'defaulting to {version}')
+                self.synth_group = self.version
         else:
             self.interp_source = None
             self.synth_version = None
