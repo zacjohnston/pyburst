@@ -31,7 +31,7 @@ def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_versi
     parameters
     ----------
     kgrid : Kgrid object
-    batches : array
+    batches : list
         list of batches, each corresponding to an epoch. Assumes the runs in each
         batch correspond to each other.
     synth_source : str
