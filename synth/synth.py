@@ -90,7 +90,8 @@ def load_group_table(source, version, group):
 
 
 def get_true_values(source, group, version,
-                    params=('accrate', 'x', 'z', 'qb', 'mass', 'redshift', 'd_b', 'xi_ratio')):
+                    params=('accrate', 'x', 'z', 'qb', 'mass', 'redshift', 'd_b', 'xi_ratio'),
+                    verbose=True):
     """Returns the "True" synthetic values to compare with posteriors
     """
     truth = np.array([])
@@ -105,6 +106,9 @@ def get_true_values(source, group, version,
             values = np.array([values[0]])
         truth = np.concatenate((truth, values))
 
+    if verbose:
+        print('True values:\n' + '-'*20)
+        mcmc_tools.print_params(truth, source=source, version=version)
     return truth
 
 def get_table_filepath(source, version, try_mkdir=False):

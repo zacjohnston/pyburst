@@ -201,8 +201,8 @@ initial_position = {
             0.7, 0.006, 0.01, 0.01, 0.08, 1.45, 1.45, 7.3, 1.7),
         4: (0.16, 0.14, 0.10,
             0.73, 0.0065, 0.01, 0.01, 0.08, 1.44, 1.42, 7., 1.6),
-        5: (0.13, 0.09, 0.12,
-            0.7, 0.0065, 0.01, 0.01, 0.1, 1.4, 1.3, 7., 2.),
+        5: (0.12, 0.12, 0.12,
+            0.7, 0.005, 0.1, 0.1, 0.1, 1.4, 1.3, 7., 3.),
     },
 }
 
@@ -264,7 +264,7 @@ source_defaults = {
     'prior_bounds': {
         'grid5': prior_bounds[1][1],
         'grid6': prior_bounds[5][3],
-        'synth5': prior_bounds[5][3],
+        'synth5': prior_bounds[5][1],
     },
 
     'prior_pdfs': {
@@ -290,7 +290,7 @@ source_defaults = {
     'initial_position': {
         'grid5': initial_position[1][1],
         'grid6': initial_position[5][3],
-        'synth5': initial_position[5][3],
+        'synth5': initial_position[5][5],
     },
 
     'synthetic': {  # whether the data being matches is synthetic
