@@ -80,6 +80,20 @@ def load_table(synth_source, synth_version):
     return pd.read_table(filepath, delim_whitespace=True)
 
 
+def get_true_values(source, group, version,
+                    params=('accrate', 'x', 'z', 'qb', 'mass', 'redshift', 'd_b', 'xi_ratio')):
+    """Returns the "True" synthetic values to compare with posteriors
+    """
+    truth = np.array([])
+    table = load_table(source, version)
+    sub_table = grid_tools.reduce_table(table, params={'group': group})
+
+    for param in params:
+        values = np.unique(sub_table[param])
+        truth = np.concatenate((truth, values))
+
+    return truth
+
 def get_table_filepath(synth_source, synth_version, try_mkdir=False):
     """Returns filepath of synth table
     """
