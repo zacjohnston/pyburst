@@ -16,6 +16,7 @@ from pygrids.mcmc import mcmc_versions, mcmc_tools
 c = const.c.to(units.cm / units.s)
 msunyer_to_gramsec = (units.M_sun / units.year).to(units.g / units.s)
 mdot_edd = 1.75e-8 * msunyer_to_gramsec
+kpc_to_cm = units.kpc.to(units.cm)
 
 def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_version,
                 params=('x', 'z', 'accrate', 'qb', 'mass'),
@@ -198,7 +199,7 @@ def set_observables(group_table, observables):
     """
     local_keys = {'fper': 'accrate', 'u_fper': 'accrate'}
     redshift = group_table.redshift[0]
-    d_b = group_table.d_b[0]
+    d_b = group_table.d_b[0] * kpc_to_cm
     xi_ratio = group_table.xi_ratio[0]
 
     for var in observables:
