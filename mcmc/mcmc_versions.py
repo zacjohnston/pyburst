@@ -480,8 +480,13 @@ class McmcVersion:
             self.synth_version = None
 
     def __repr__(self):
+        if self.synthetic:
+            synth_str = (f'\ninterp source    : {self.interp_source}'
+                         + f'\nsynth version    : {self.synth_version}')
+        else:
+            synth_str = ''
+            
         return (f'MCMC version definitions for {self.source} V{self.version}'
-                + f'\nsynthetic        : {self.synthetic}'
                 + f'\nparam keys       : {self.param_keys}'
                 + f'\ninterp keys      : {self.interp_keys}'
                 + f'\nepoch unique     : {self.epoch_unique}'
@@ -493,6 +498,8 @@ class McmcVersion:
                 + f'\ninterpolator     : {self.interpolator}'
                 + f'\nprior bounds     : {self.prior_bounds}'
                 + f'\nprior pdfs       : {self.prior_pdfs}'
+                + f'\nsynthetic        : {self.synthetic}'
+                + synth_str
                 )
 
     def get_parameter(self, parameter):
