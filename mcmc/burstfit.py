@@ -11,7 +11,7 @@ from pygrids.interpolator import interpolator
 from .mcmc_versions import McmcVersion
 from pygrids.mcmc.mcmc_tools import print_params
 from pygrids.misc import pyprint
-from pygrids.synth import synth_data
+from pygrids.synth import synth_data, synth
 
 # concord
 import ctools
@@ -74,7 +74,13 @@ class BurstFit:
         self.u_fper_frac = u_fper_frac
         self.lhood_factor = lhood_factor
         self.priors_only = priors_only
-        self.kemulator = interpolator.Kemulator(source=source,
+
+        if self.mcmc_version.synthetic:
+            interp_source = self.mcmc_version.interp_source
+        else:
+            interp_source = self.source
+
+        self.kemulator = interpolator.Kemulator(source=interp_source,
                                                 version=self.mcmc_version.interpolator,
                                                 re_interp=re_interp,
                                                 **kwargs)
@@ -132,22 +138,21 @@ class BurstFit:
                    'peak': 'F_pk', 'u_peak': 'F_pk_err',
                    'cbol': 'cbol', 'u_cbol': 'cbol_err'}
 
-        concord_source = concord_source_map.get(self.source, self.source)
-        self.obs = ctools.load_obs(concord_source)
-        self.n_epochs = len(self.obs)
-
-        if self.source == 'sim_test':
+        if self.mcmc_version.synthetic:
+            self.obs_data = synth.extract_obs_data(self.source,
+                                                   self.mcmc_version.synth_version,
+                                                   group=self.mcmc_version.synth_group)
+            self.n_epochs = len(self.obs_data['fluence'])
+        elif self.source == 'sim_test':
             self.n_epochs = 1
-
-        if self.source == 'sim_test':
             filepath = os.path.join(GRIDS_PATH, 'obs_data', 'sim1', 'sim_test_summary.p')
             self.obs_data = pickle.load(open(filepath, 'rb'))
             self.debug.end_function()
             return
-        elif 'sim' in self.source:
-            self.obs_data = synth_data.extract_obs_data(self.source)
-            return
         else:
+            concord_source = concord_source_map.get(self.source, self.source)
+            self.obs = ctools.load_obs(concord_source)
+            self.n_epochs = len(self.obs)
             self.obs_data = dict.fromkeys(key_map)
             for key in self.obs_data:
                 self.obs_data[key] = np.zeros(self.n_epochs)
