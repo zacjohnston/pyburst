@@ -305,6 +305,10 @@ source_defaults = {
     'synth_version': {  # Version ID of synthetic data table
         'synth5': 1,
     },
+
+    'synth_group': {
+        'synth5': None,
+    },
 }
 
 # Summary
@@ -444,6 +448,10 @@ version_definitions = {
     'synth_version': {
         'synth5': {},
     },
+
+    'synth_group': {
+        'synth5': {},
+    },
 }
 
 
@@ -475,17 +483,20 @@ class McmcVersion:
         if self.synthetic:
             self.interp_source = self.get_parameter('interp_source')
             self.synth_version = self.get_parameter('synth_version')
+            self.synth_group = self.get_parameter('synth_group')
         else:
             self.interp_source = None
             self.synth_version = None
+            self.synth_group = None
 
     def __repr__(self):
         if self.synthetic:
             synth_str = (f'\ninterp source    : {self.interp_source}'
-                         + f'\nsynth version    : {self.synth_version}')
+                         + f'\nsynth version    : {self.synth_version}'
+                         + f'\nsynth group      : {self.synth_group}')
         else:
             synth_str = ''
-            
+
         return (f'MCMC version definitions for {self.source} V{self.version}'
                 + f'\nparam keys       : {self.param_keys}'
                 + f'\ninterp keys      : {self.interp_keys}'
@@ -517,7 +528,8 @@ def get_parameter(source, version, parameter):
     if output is default:
         print(f"mcmc_versions: '{parameter}' not specified. Using default values")
 
-    if parameter not in ('interpolator', 'synth_version') and type(output) is int:
+    if parameter not in ('interpolator', 'synth_version', 'synth_group') \
+            and type(output) is int:
         return version_definitions[parameter][source][output]
     else:
         return output
