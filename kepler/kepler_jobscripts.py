@@ -64,7 +64,8 @@ def write_submission_script(batch, source, walltime, path=None,
                             run0=None, run1=None, runs=None,
                             parallel=False, qos='normal', basename='xrb',
                             restart=False, max_tasks=16, debug=False,
-                            adapnet_filename=None, bdat_filename=None):
+                            adapnet_filename=None, bdat_filename=None,
+                            dependency=False):
     """Writes jobscripts to execute on MONARCH/ICER cluster
 
     Parameter:
@@ -104,7 +105,8 @@ def write_submission_script(batch, source, walltime, path=None,
                                         cluster=cluster, parallel=parallel,
                                         debug=debug, restart=restart,
                                         adapnet_filename=adapnet_filename,
-                                        bdat_filename=bdat_filename)
+                                        bdat_filename=bdat_filename,
+                                        dependency=dependency)
 
         span = get_span_string(run0, run1)
         prepend_str = {True: 'restart_'}.get(restart, '')
@@ -124,7 +126,7 @@ def write_submission_script(batch, source, walltime, path=None,
 
 def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
                        qos, time_str, parallel, job_str, debug, restart,
-                       adapnet_filename=None, bdat_filename=None):
+                       adapnet_filename=None, bdat_filename=None, dependency=False):
     source = grid_strings.source_shorthand(source=source)
     span_str = get_span_string(run0, run1, runs=runs)
     batch_str = get_jobstring(batch=batch, run0=run0, run1=run1, source=source,
@@ -140,7 +142,16 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
     restart_str = {True: 'restart_', False: ''}[restart]
     debug_str = {True: 'x', False: ''}[debug]
 
-    parallel_file = f'parallel_{restart_str}{source}_{batch_str}.sh'
+    dependency_str = ''
+    dependency_bash = ''
+    if dependency:
+        dependency_str = '#SBATCH --dependency=singleton'
+        dependency_bash = """if (( $N == 1 ))
+then
+    sleep 60
+    cd $KEPLER_MODELS/{source}_{batch}/logs
+    sbatch icer_restart_{source}_{batch}_{span_str}.qsub
+fi"""
 
     if cluster == 'monarch':
         return f"""#!/bin/bash
@@ -177,6 +188,7 @@ $EXE_PATH {basename}$N {cmd_str} {debug_str}"""
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --constraint=intel16
+{dependency_str}
 #SBATCH --exclude=lac-217,lac-356,lac-357,lac-358
 #SBATCH --mem-per-cpu=1024
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -187,10 +199,11 @@ EXE_PATH=$KEPLER_PATH/gfortran/keplery
 ADAPNET_PATH=$KEPLER_GRIDS/pygrids/files/{adapnet_filename}
 BDAT_PATH=$KEPLER_GRIDS/pygrids/files/{bdat_filename}
 
+{dependency_bash}
 cd $KEPLER_MODELS/{source}_{batch}/xrb$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
 ln -sf $BDAT_PATH ./bdat
-$EXE_PATH xrb$N xrb_g"""
+$EXE_PATH {basename}$N {cmd_str}"""
     else:
         raise ValueError('invalid cluster. Must be one of [monarch, icer]')
 
