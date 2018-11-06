@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from pygrids.synth import synth
 from pygrids.mcmc import mcmc_plot, mcmc_versions
 
-
 def plot_posteriors(chain, source, mc_version, discard, **kwargs):
     """Plots mcmc posteriors for synthetic data
     """

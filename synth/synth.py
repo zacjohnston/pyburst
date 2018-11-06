@@ -99,7 +99,10 @@ def get_true_values(source, group, version,
 
     for param in params:
         mult = multiplier.get(param, 1.0)
-        values = np.unique(group_table[param]) * mult
+
+        values = np.array(group_table[param]) * mult
+        if len(np.unique(values)) == 1:
+            values = np.array([values[0]])
         truth = np.concatenate((truth, values))
 
     return truth
