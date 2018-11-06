@@ -80,16 +80,22 @@ def load_table(synth_source, synth_version):
     return pd.read_table(filepath, delim_whitespace=True)
 
 
+def load_group_table(source, version, group):
+    """Returns synth table of single group of epochs
+    """
+    table = load_table(source, version)
+    return grid_tools.reduce_table(table, params={'group': group})
+
+
 def get_true_values(source, group, version,
                     params=('accrate', 'x', 'z', 'qb', 'mass', 'redshift', 'd_b', 'xi_ratio')):
     """Returns the "True" synthetic values to compare with posteriors
     """
     truth = np.array([])
-    table = load_table(source, version)
-    sub_table = grid_tools.reduce_table(table, params={'group': group})
+    group_table = load_group_table(source, version, group)
 
     for param in params:
-        values = np.unique(sub_table[param])
+        values = np.unique(group_table[param])
         truth = np.concatenate((truth, values))
 
     return truth
