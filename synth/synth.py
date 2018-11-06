@@ -62,21 +62,21 @@ def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_versi
 
         table = pd.concat([table, group_table], ignore_index=True)
 
-    save_table(table, synth_source=synth_source, synth_version=synth_version)
+    save_table(table, source=synth_source, version=synth_version)
     return table
 
 
-def save_table(table, synth_source, synth_version):
+def save_table(table, source, version):
     """Save synth table to file
     """
-    filepath = get_table_filepath(synth_source, synth_version, try_mkdir=True)
+    filepath = get_table_filepath(source, version, try_mkdir=True)
     grid_tools.write_pandas_table(table, filepath)
 
 
-def load_table(synth_source, synth_version):
+def load_table(source, version):
     """Load synth table from file
     """
-    filepath = get_table_filepath(synth_source, synth_version)
+    filepath = get_table_filepath(source, version=version)
     return pd.read_table(filepath, delim_whitespace=True)
 
 
@@ -100,22 +100,22 @@ def get_true_values(source, group, version,
 
     return truth
 
-def get_table_filepath(synth_source, synth_version, try_mkdir=False):
+def get_table_filepath(source, version, try_mkdir=False):
     """Returns filepath of synth table
     """
-    path = grid_strings.get_obs_data_path(synth_source)
+    path = grid_strings.get_obs_data_path(source)
     if try_mkdir:
         grid_tools.try_mkdir(path, skip=True)
 
-    filename = f'synth_{synth_source}_{synth_version}.txt'
+    filename = f'synth_{source}_{version}.txt'
     return os.path.join(path, filename)
 
 
-def extract_obs_data(synth_source, synth_version, group,
+def extract_obs_data(source, version, group,
                      bprops=('rate', 'fluence', 'peak', 'fper')):
     """Returns summary "observed" data as dictionary, for Burstfit
     """
-    table = load_table(synth_source, synth_version)
+    table = load_table(source, version)
     group_table = grid_tools.reduce_table(table, params={'group': group})
 
     obs_data = {}
