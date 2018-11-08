@@ -366,7 +366,7 @@ version_definitions = {
 
     'param_keys': {
         'grid5': {
-            -1: param_keys[5],
+            -1: param_keys[5],  # dummy version for synth reference
             4: param_keys[4],
             5: 4,
             6: 4,
