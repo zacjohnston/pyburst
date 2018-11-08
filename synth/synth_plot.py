@@ -8,16 +8,41 @@ from pygrids.mcmc import mcmc_plot, mcmc_versions, mcmc_tools
 # TODO:
 #   - plot contours
 def plot_posteriors(source, mc_version, discard, chain=None, n_walkers=None,
-                    n_steps=None, save=False):
+                    n_steps=None, save=False, display=True):
     """Plots mcmc posteriors for synthetic data
+    """
+    plot_truth(plot_type='posteriors', source=source, mc_version=mc_version, discard=discard,
+               chain=chain, n_walkers=n_walkers, n_steps=n_steps, save=save, display=display)
+
+
+def plot_corner(source, mc_version, discard, chain=None, n_walkers=None,
+                n_steps=None, save=False, display=True):
+    """Plots mcmc corner plot for synthetic data
+    """
+    plot_truth(plot_type='corner', source=source, mc_version=mc_version, discard=discard,
+               chain=chain, n_walkers=n_walkers, n_steps=n_steps, save=save, display=display)
+
+
+def plot_truth(plot_type, source, mc_version, discard, chain=None, n_walkers=None,
+               n_steps=None, save=False, display=True):
+    """Plots results of MCMC against true values of synthetic data
     """
     mcv = mcmc_versions.McmcVersion(source, mc_version)
     chain = check_chain(chain, n_walkers=n_walkers, n_steps=n_steps, source=source,
                         version=mc_version)
     truth = synth.get_true_values(source, version=mcv.synth_version,
                                   group=mcv.synth_group)
-    mcmc_plot.plot_posteriors(chain, source=source, version=mcv.synth_version,
-                              discard=discard, truth_values=truth, save=save)
+
+    if plot_type == 'posteriors':
+        mcmc_plot.plot_posteriors(chain, source=source, version=mc_version,
+                                  discard=discard, truth_values=truth, save=save,
+                                  display=display)
+    elif plot_type == 'corner':
+        mcmc_plot.plot_contours(chain, discard=discard, source=source, truth=True,
+                                version=mc_version, truth_values=truth, save=save,
+                                display=display)
+    else:
+        raise ValueError('plot_type must be one of: (posteriors, corner)')
 
 
 def check_chain(chain, n_walkers, n_steps, source, version):
