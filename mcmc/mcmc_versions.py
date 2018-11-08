@@ -318,7 +318,7 @@ source_defaults = {
     },
 
     'synth_version': {  # Version ID of synthetic data table
-        'synth5': 1,
+        'synth5': None,
     },
 
     'synth_group': {
@@ -463,23 +463,11 @@ version_definitions = {
     },
 
     'synth_version': {
-        'synth5': {
-            11: 2,
-            12: 2,
-            13: 2,
-            14: 2,
-            15: 2,
-        },
+        'synth5': {},
     },
 
     'synth_group': {
-        'synth5': {
-            11: 1,
-            12: 2,
-            13: 3,
-            14: 4,
-            15: 5,
-        },
+        'synth5': {},
     },
 }
 
@@ -545,9 +533,15 @@ class McmcVersion:
         self.interp_source = self.get_parameter('interp_source')
         self.synth_version = self.get_parameter('synth_version')
         self.synth_group = self.get_parameter('synth_group')
+        v_str = f'{self.version:03d}'
+
+        if self.synth_version is None:
+            default_version = 1 + int(v_str[:2])    # use leading digits
+            print(f'synth_version undefined fro {self.source} V{self.version}, '
+                  f'defaulting to {default_version}')
+            self.synth_version = default_version
 
         if self.synth_group is None:
-            v_str = str(self.version)
             default_group = int(v_str[-1])
 
             if default_group is 0:
