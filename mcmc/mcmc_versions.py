@@ -533,6 +533,12 @@ class McmcVersion:
         self.interp_source = self.get_parameter('interp_source')
         self.synth_version = self.get_parameter('synth_version')
         self.synth_group = self.get_parameter('synth_group')
+
+        # Attempts to get default synth_version/synth_group from version ID
+        #   1. Uses last digit for synth_group (note: 0 interpreted as 10)
+        #   2. Uses leading digits +1 for synth_version
+        #   e.g., version=24 becomes synth_version=2+1=2, synth_group=4
+        #   note: this means group 10 of synth_version 2 corresponds to self.version 20
         v_str = f'{self.version:03d}'
 
         if self.synth_version is None:
