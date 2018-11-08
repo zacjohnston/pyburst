@@ -303,7 +303,7 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
                 params_full[key] = np.full(n_models, val)
             else:
                 mv_key = aliases.get(key, key)
-                mv_key = f'{mv_key}1'
+                mv_key = f'{mv_key}{i+1}'
                 params_full[key] = mcmc_tools.get_random_params(mv_key,
                                                                 n_models=n_models, mv=mv)
 
