@@ -468,6 +468,7 @@ version_definitions = {
             12: 2,
             13: 2,
             14: 2,
+            15: 2,
         },
     },
 
@@ -476,6 +477,8 @@ version_definitions = {
             11: 1,
             12: 2,
             13: 3,
+            14: 4,
+            15: 5,
         },
     },
 }
@@ -513,9 +516,15 @@ class McmcVersion:
             self.synth_group = self.get_parameter('synth_group')
 
             if self.synth_group is None:
+                v_str = str(version)
+                default_group = int(v_str[-1])
+
+                if default_group is 0:
+                    default_group = 10
+
                 print(f'synth_group undefined for {source} V{version}, '
-                      f'defaulting to {version}')
-                self.synth_group = self.version
+                      f'defaulting to {default_group}')
+                self.synth_group = default_group
         else:
             self.interp_source = None
             self.synth_version = None
