@@ -463,11 +463,20 @@ version_definitions = {
     },
 
     'synth_version': {
-        'synth5': {},
+        'synth5': {
+            11: 2,
+            12: 2,
+            13: 2,
+            14: 2,
+        },
     },
 
     'synth_group': {
-        'synth5': {},
+        'synth5': {
+            11: 1,
+            12: 2,
+            13: 3,
+        },
     },
 }
 
