@@ -29,5 +29,4 @@ def check_chain(chain, n_walkers, n_steps, source, version):
         else:
             chain = mcmc_tools.load_chain(source, version=version, n_walkers=n_walkers,
                                           n_steps=n_steps)
-
     return chain
