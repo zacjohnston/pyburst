@@ -5,8 +5,10 @@ import matplotlib.pyplot as plt
 from pygrids.synth import synth
 from pygrids.mcmc import mcmc_plot, mcmc_versions, mcmc_tools
 
+# TODO:
+#   - plot contours
 def plot_posteriors(source, mc_version, discard, chain=None, n_walkers=None,
-                    n_steps=None):
+                    n_steps=None, save=False):
     """Plots mcmc posteriors for synthetic data
     """
     mcv = mcmc_versions.McmcVersion(source, mc_version)
@@ -15,7 +17,7 @@ def plot_posteriors(source, mc_version, discard, chain=None, n_walkers=None,
     truth = synth.get_true_values(source, version=mcv.synth_version,
                                   group=mcv.synth_group)
     mcmc_plot.plot_posteriors(chain, source=source, version=mcv.synth_version,
-                              discard=discard, truth_values=truth)
+                              discard=discard, truth_values=truth, save=save)
 
 
 def check_chain(chain, n_walkers, n_steps, source, version):
