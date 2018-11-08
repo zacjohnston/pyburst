@@ -511,20 +511,7 @@ class McmcVersion:
         self.disc_model = None
 
         if self.synthetic:
-            self.interp_source = self.get_parameter('interp_source')
-            self.synth_version = self.get_parameter('synth_version')
-            self.synth_group = self.get_parameter('synth_group')
-
-            if self.synth_group is None:
-                v_str = str(version)
-                default_group = int(v_str[-1])
-
-                if default_group is 0:
-                    default_group = 10
-
-                print(f'synth_group undefined for {source} V{version}, '
-                      f'defaulting to {default_group}')
-                self.synth_group = default_group
+            self.setup_synthetic()
         else:
             self.interp_source = None
             self.synth_version = None
@@ -553,6 +540,22 @@ class McmcVersion:
                 + f'\nsynthetic        : {self.synthetic}'
                 + synth_str
                 )
+
+    def setup_synthetic(self):
+        self.interp_source = self.get_parameter('interp_source')
+        self.synth_version = self.get_parameter('synth_version')
+        self.synth_group = self.get_parameter('synth_group')
+
+        if self.synth_group is None:
+            v_str = str(self.version)
+            default_group = int(v_str[-1])
+
+            if default_group is 0:
+                default_group = 10
+
+            print(f'synth_group undefined for {self.source} V{self.version}, '
+                  f'defaulting to {default_group}')
+            self.synth_group = default_group
 
     def get_parameter(self, parameter):
         return get_parameter(self.source, self.version, parameter, verbose=self.verbose)
