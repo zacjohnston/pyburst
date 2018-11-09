@@ -15,11 +15,11 @@ def plot_posteriors(source, mc_version, discard, chain=None, n_walkers=None,
                chain=chain, n_walkers=n_walkers, n_steps=n_steps, save=save, display=display)
 
 
-def plot_corner(source, mc_version, discard, chain=None, n_walkers=None,
-                n_steps=None, save=False, display=True):
+def plot_contours(source, mc_version, discard, chain=None, n_walkers=None,
+                  n_steps=None, save=False, display=True):
     """Plots mcmc corner plot for synthetic data
     """
-    plot_truth(plot_type='corner', source=source, mc_version=mc_version, discard=discard,
+    plot_truth(plot_type='contours', source=source, mc_version=mc_version, discard=discard,
                chain=chain, n_walkers=n_walkers, n_steps=n_steps, save=save, display=display)
 
 
@@ -37,7 +37,7 @@ def plot_truth(plot_type, source, mc_version, discard, chain=None, n_walkers=Non
         mcmc_plot.plot_posteriors(chain, source=source, version=mc_version,
                                   discard=discard, truth_values=truth, save=save,
                                   display=display)
-    elif plot_type == 'corner':
+    elif plot_type == 'contours':
         mcmc_plot.plot_contours(chain, discard=discard, source=source, truth=True,
                                 version=mc_version, truth_values=truth, save=save,
                                 display=display)
