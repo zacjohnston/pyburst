@@ -525,14 +525,43 @@ class Kgrid:
 
     def get_combined_params(self, batches):
         """Returns sub-table of self.params with specified batches
+
+        parameters
+        ----------
+        batches : sequence(int)
         """
+        return self.get_combined(batches, label='params')
+
+    def get_combined_summ(self, batches):
+        """Returns sub-table of self.summ with specified batches
+
+        parameters
+        ----------
+        batches : sequence(int)
+        """
+        return self.get_combined(batches, label='summ')
+
+    def get_combined(self, batches, label):
+        """Returns sub-table of self.params or self.summ, with specified batches
+
+        parameters
+        ----------
+        batches : sequence(int)
+        label : str
+            one of (params, summ)
+        """
+        if label == 'params':
+            func = self.get_params
+        elif label == 'summ':
+            func = self.get_summ
+        else:
+            raise ValueError("'label' must be one of (params, summ)")
+
         table = pd.DataFrame()
         for batch in batches:
-            batch_params = self.get_params(batch)
+            batch_params = func(batch)
             table = table.append(batch_params, ignore_index=True)
-
         return table
-
 
 def printv(string, verbose):
     """Prints string if verbose == True
