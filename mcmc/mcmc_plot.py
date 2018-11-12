@@ -132,9 +132,9 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
     """
     default_plt_options()
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-    plot_tools.convert_mcmc_labels(param_keys=pkeys)
-    cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap,
-                             smoothing=smoothing)
+    pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
+    cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
+                             cap=cap, smoothing=smoothing)
     height = 3 * ceil(len(pkeys) / 4)
     if truth_values is not None:
         fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],

@@ -58,5 +58,7 @@ def mcmc_label(quantity):
 def convert_mcmc_labels(param_keys):
     """Returns sequence of formatted parameter labels
     """
-    for i, key in enumerate(param_keys):
-        param_keys[i] = mcmc_label(key)
+    keys = list(param_keys)
+    for i, key in enumerate(keys):
+        keys[i] = mcmc_label(key)
+    return keys
