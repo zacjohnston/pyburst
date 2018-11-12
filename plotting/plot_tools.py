@@ -28,6 +28,7 @@ def unit_scale(quantity):
     }
     return scales.get(quantity, 1.0)
 
+
 def unit_label(quantity):
     """Returns units as a string, for given quantity
     """
@@ -38,3 +39,17 @@ def unit_label(quantity):
         'peak': r'$10^{38}$ erg s$^{-1}$',
     }
     return labels.get(quantity, '')
+
+
+def mcmc_label(quantity):
+    """Returns string of MCMC parameter label
+    """
+    labels = {
+        'x': r'$X_0$',
+        'z': r'$Z_\mathrm{CNO}$',
+        'qb': r'$Q_\mathrm{b}$',
+        'redshift': r'$(1+z)$',
+        'd_b': r'$d_\mathrm{b}$',
+        'xi_ratio': r'$\xi_\mathrm{p} / \xi_\mathrm{b}$',
+    }
+    return labels.get(quantity, quantity)
