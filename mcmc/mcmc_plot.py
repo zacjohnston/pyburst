@@ -12,6 +12,7 @@ from . import mcmc_versions
 from . import mcmc_tools
 from . import burstfit
 from pygrids.physics import gparams
+from pygrids.plotting import plot_tools
 from pygrids.grids.grid_strings import get_source_path, print_warning
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -131,6 +132,7 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
     """
     default_plt_options()
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+    plot_tools.convert_mcmc_labels(param_keys=pkeys)
     cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap,
                              smoothing=smoothing)
     height = 3 * ceil(len(pkeys) / 4)
@@ -163,7 +165,7 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
                                         source=source, version=version, cap=cap)
 
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['Mass', 'Radius'])
+    cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['M', 'R'])
     if not smoothing:
         cc.configure(kde=False, smooth=0)
 
