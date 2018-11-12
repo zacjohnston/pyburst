@@ -59,7 +59,8 @@ def check_chain(chain, n_walkers, n_steps, source, version):
     return chain
 
 
-def plot_interp_residuals(synth_source, batches, mc_source, mc_version):
+def plot_interp_residuals(synth_source, batches, mc_source, mc_version,
+                          fontsize=16):
     """Plot synthetic burst properties against interpolated predictions
         to test accuracy of interpolator
     """
@@ -94,9 +95,9 @@ def plot_interp_residuals(synth_source, batches, mc_source, mc_version):
         x_max = np.max(model)
         x_min = np.min(model)
         ax[i].plot([0.9*x_min, 1.1*x_max], [0, 0], ls='--', color='black')
-        ax[i].set_xlabel(f'{bprop} ({yunits})')
+        ax[i].set_xlabel(f'{bprop} ({yunits})', fontsize=fontsize)
 
-    ax[1].set_ylabel(f'Interpolated - model')
+    ax[1].set_ylabel(f'Interpolated - model', fontsize=fontsize)
     plt.tight_layout()
     plt.show(block=False)
 
