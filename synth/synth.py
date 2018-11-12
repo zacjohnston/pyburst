@@ -218,6 +218,32 @@ def set_rand_free_params(group_table, mcv, free_params):
         group_table[var] = rand_x
 
 
+def inherit_free_params(group_table, free_params, parent_source, parent_version,
+                        parent_group=None):
+    """Inherit free params from an existing synth table
+
+    parameters
+    ----------
+    group_table : pd.DataFrame
+        table of a single group of epochs to add columns to
+    free_params : sequence(str)
+        free parameters to inherit from parent group
+    parent_source : str
+        source of parent table to inherit from
+    parent_version : int
+        version of parent table to inherit from
+    parent_group : int (optional)
+        defaults to same group as the provided child group_table
+    """
+    if parent_group is None:
+        parent_group = group_table['group'][0]
+    print('grou', parent_group)
+    parent_table = load_group_table(parent_source, version=parent_version, group=parent_group)
+    print(parent_table)
+    for var in free_params:
+        group_table[var] = parent_table[var]
+
+
 def set_observables(group_table, observables):
     """Calculate observables from model results and parameters
 
