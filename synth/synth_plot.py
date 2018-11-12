@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from pygrids.grids import grid_analyser
 from pygrids.synth import synth
-from pygrids.mcmc import mcmc_plot, mcmc_versions, mcmc_tools
+from pygrids.mcmc import mcmc_plot, mcmc_versions, mcmc_tools, burstfit
 
 # TODO:
 #   - plot contours
@@ -55,3 +56,35 @@ def check_chain(chain, n_walkers, n_steps, source, version):
             chain = mcmc_tools.load_chain(source, version=version, n_walkers=n_walkers,
                                           n_steps=n_steps)
     return chain
+
+
+def plot_compare(synth_source, batches, mc_source, mc_version):
+    """Plot synthetic burst properties against interpolated predictions
+        to test accuracy of interpolator
+    """
+    bfit = burstfit.BurstFit(source=mc_source, version=mc_version)
+    mcv = mcmc_versions.McmcVersion(source=mc_source, version=mc_version)
+
+    kgrid = grid_analyser.Kgrid(source=synth_source)
+    param_table = kgrid.get_combined_params(batches)
+    summ_table = kgrid.get_combined_summ(batches)
+
+    interp_params = extract_interp_params(param_table, mcv=mcv)
+    interped = bfit.interpolate(interp_params)
+
+    return interped
+
+
+def extract_interp_params(param_table, mcv):
+    """Returns np.array of params (n_models, n_params) ready for input to interpolator
+    """
+    aliases = {'mdot': 'accrate'}
+    n_params = len(mcv.interp_keys)
+    n_models = len(param_table)
+    interp_params = np.full((n_models, n_params), np.nan)
+
+    for i, key in enumerate(mcv.interp_keys):
+        key = aliases.get(key, key)
+        interp_params[:, i] = np.array(param_table[key])
+
+    return interp_params
