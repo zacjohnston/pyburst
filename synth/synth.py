@@ -246,11 +246,10 @@ def inherit_free_params(group_table, free_params, parent_source, parent_version,
     """
     if parent_group is None:
         parent_group = group_table['group'][0]
-    print('grou', parent_group)
     parent_table = load_group_table(parent_source, version=parent_version, group=parent_group)
+
     for var in free_params:
-        print(parent_table[var])
-        group_table[var] = parent_table[var]
+        group_table[var] = np.array(parent_table[var])
 
 
 def set_observables(group_table, observables):
