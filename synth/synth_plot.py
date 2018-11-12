@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 from pygrids.grids import grid_analyser
 from pygrids.synth import synth
+from pygrids.plotting import plot_tools
 from pygrids.mcmc import mcmc_plot, mcmc_versions, mcmc_tools, burstfit
 
 # TODO:
@@ -72,14 +73,17 @@ def plot_interp_residuals(synth_source, batches, mc_source, mc_version):
     interp_table = extract_interp_table(param_table, bfit=bfit)
     summ_table = kgrid.get_combined_summ(batches)
 
-    fig, ax = plt.subplots(len(bprops), figsize=(8, 10))
+    fig, ax = plt.subplots(len(bprops), figsize=(6, 8))
 
     for i, bprop in enumerate(bprops):
         u_bprop = f'u_{bprop}'
-        model = np.array(summ_table[bprop])
-        interp = np.array(interp_table[bprop])
-        u_model = np.array(summ_table[u_bprop])
-        u_interp = np.array(interp_table[u_bprop])
+        yscale = plot_tools.unit_scale(bprop)
+        yunits = plot_tools.unit_label(bprop)
+
+        model = np.array(summ_table[bprop]) / yscale
+        interp = np.array(interp_table[bprop]) / yscale
+        u_model = np.array(summ_table[u_bprop]) / yscale
+        u_interp = np.array(interp_table[u_bprop]) / yscale
 
         residuals = interp - model
         u_residuals = n_sigma * np.sqrt(u_model**2 + u_interp**2)
@@ -90,7 +94,7 @@ def plot_interp_residuals(synth_source, batches, mc_source, mc_version):
         x_max = np.max(model)
         x_min = np.min(model)
         ax[i].plot([0.9*x_min, 1.1*x_max], [0, 0], ls='--', color='black')
-        ax[i].set_xlabel(f'{bprop}')
+        ax[i].set_xlabel(f'{bprop} ({yunits})')
 
     ax[1].set_ylabel(f'Interpolated - model')
     plt.tight_layout()
