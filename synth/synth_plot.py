@@ -88,3 +88,25 @@ def extract_interp_params(param_table, mcv):
         interp_params[:, i] = np.array(param_table[key])
 
     return interp_params
+
+
+def extract_interp_table(param_table, bfit):
+    """Returns pd.DataFrame of interpolated burst properties, from given param table
+
+    parameters
+    ----------
+    param_table : pd.DataFrame
+        subset of Kgrid.params to get interpolations for
+    bfit : burstfit.BurstFit
+        corresponding BurstFit object to use for interpolation
+    """
+    interp_params = extract_interp_params(param_table, mcv=bfit.mcmc_version)
+    interp_bursts = bfit.interpolate(interp_params)
+
+    interp_table = pd.DataFrame()
+    for i, bprop in enumerate(bfit.mcmc_version.bprops):
+        u_bprop = f'u_{bprop}'
+        interp_table[bprop] = interp_bursts[:, 2*i]
+        interp_table[u_bprop] = interp_bursts[:, 2*i + 1]
+
+    return interp_table
