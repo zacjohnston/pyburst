@@ -25,7 +25,7 @@ def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_versi
                 summ_list=('rate', 'dt', 'fluence', 'peak'),
                 free_params=('redshift', 'd_b', 'xi_ratio'),
                 observables=('rate', 'peak', 'fluence', 'fper'),
-                ):
+                update=False):
     """Sets up table of synthetic data, including input/output values
 
     parameters
@@ -46,6 +46,9 @@ def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_versi
         free parameters to randomly choose
     observables : sequence(str)
         names of observables to calculate from burst properties
+    update : bool
+        whether to simply update an existing synth table,
+        e.g. if the models just need updating. Keeps the previously randomised params
     """
     mcv = mcmc_versions.McmcVersion(source=mc_source, version=mc_version)
     sub = grid_tools.reduce_table(kgrid.params, params={'batch': batches[0]})
@@ -59,7 +62,13 @@ def setup_table(kgrid, batches, synth_source, mc_source, mc_version, synth_versi
 
         set_param_cols(group_table, batches=batches, kgrid=kgrid, params=params)
         set_summ_cols(group_table, batches=batches, kgrid=kgrid, summ_list=summ_list)
-        set_rand_free_params(group_table, mcv=mcv, free_params=free_params)
+
+        if update:
+            inherit_free_params(group_table, free_params=free_params, parent_group=group,
+                                parent_source=synth_source, parent_version=synth_version)
+        else:
+            set_rand_free_params(group_table, mcv=mcv, free_params=free_params)
+
         set_observables(group_table, observables=observables)
 
         table = pd.concat([table, group_table], ignore_index=True)
@@ -239,8 +248,8 @@ def inherit_free_params(group_table, free_params, parent_source, parent_version,
         parent_group = group_table['group'][0]
     print('grou', parent_group)
     parent_table = load_group_table(parent_source, version=parent_version, group=parent_group)
-    print(parent_table)
     for var in free_params:
+        print(parent_table[var])
         group_table[var] = parent_table[var]
 
 
