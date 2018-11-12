@@ -58,21 +58,43 @@ def check_chain(chain, n_walkers, n_steps, source, version):
     return chain
 
 
-def plot_compare(synth_source, batches, mc_source, mc_version):
+def plot_interp_residuals(synth_source, batches, mc_source, mc_version):
     """Plot synthetic burst properties against interpolated predictions
         to test accuracy of interpolator
     """
+    n_sigma = 1.96
     bfit = burstfit.BurstFit(source=mc_source, version=mc_version)
-    mcv = mcmc_versions.McmcVersion(source=mc_source, version=mc_version)
+    bprops = bfit.mcmc_version.bprops
 
     kgrid = grid_analyser.Kgrid(source=synth_source)
     param_table = kgrid.get_combined_params(batches)
+
+    interp_table = extract_interp_table(param_table, bfit=bfit)
     summ_table = kgrid.get_combined_summ(batches)
 
-    interp_params = extract_interp_params(param_table, mcv=mcv)
-    interped = bfit.interpolate(interp_params)
+    fig, ax = plt.subplots(len(bprops), figsize=(8, 10))
 
-    return interped
+    for i, bprop in enumerate(bprops):
+        u_bprop = f'u_{bprop}'
+        model = np.array(summ_table[bprop])
+        interp = np.array(interp_table[bprop])
+        u_model = np.array(summ_table[u_bprop])
+        u_interp = np.array(interp_table[u_bprop])
+
+        residuals = interp - model
+        u_residuals = n_sigma * np.sqrt(u_model**2 + u_interp**2)
+
+        ax[i].errorbar(model, residuals, yerr=u_residuals, marker='o',
+                       ls='none', capsize=3)
+
+        x_max = np.max(model)
+        x_min = np.min(model)
+        ax[i].plot([0.9*x_min, 1.1*x_max], [0, 0], ls='--', color='black')
+        ax[i].set_xlabel(f'{bprop}')
+
+    ax[1].set_ylabel(f'Interpolated - model')
+    plt.tight_layout()
+    plt.show(block=False)
 
 
 def extract_interp_params(param_table, mcv):
