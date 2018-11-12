@@ -53,3 +53,10 @@ def mcmc_label(quantity):
         'xi_ratio': r'$\xi_\mathrm{p} / \xi_\mathrm{b}$',
     }
     return labels.get(quantity, quantity)
+
+
+def convert_mcmc_labels(param_keys):
+    """Returns sequence of formatted parameter labels
+    """
+    for i, key in enumerate(param_keys):
+        param_keys[i] = mcmc_label(key)
