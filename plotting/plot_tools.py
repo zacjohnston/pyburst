@@ -17,7 +17,7 @@ def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear
     ax.set_yscale(yscale)
 
 
-def units_scale(quantity):
+def unit_scale(quantity):
     """Returns typical scale factor for given quantity
     """
     scales = {
@@ -27,3 +27,14 @@ def units_scale(quantity):
         'peak': 1e38,
     }
     return scales.get(quantity, 1.0)
+
+def unit_label(quantity):
+    """Returns units as a string, for given quantity
+    """
+    labels = {
+        'rate': r'day$^{-1}$',
+        'dt': 'hr',
+        'fluence': r'$10^{39}$ erg',
+        'peak': r'$10^{38}$ erg s$^{-1}$',
+    }
+    return labels.get(quantity, '')
