@@ -1,4 +1,4 @@
-from . import plotting_tools
+from . import plot_tools
 
-__all__ = ['plotting_tools',
+__all__ = ['plot_tools',
            ]

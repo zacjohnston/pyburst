@@ -5,7 +5,7 @@ from scipy.stats import linregress
 # pygrids
 from . import qnuc_tools
 from pygrids.grids import grid_analyser, grid_tools
-from pygrids.plotting.plotting_tools import set_axes
+from pygrids.plotting.plot_tools import set_axes
 
 
 def plot_qnuc(source, mass, grid_version, linear=True):
