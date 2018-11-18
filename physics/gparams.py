@@ -5,7 +5,7 @@ import astropy.constants as const
 from scipy.optimize import brentq
 
 # kepler_grids
-from pygrids.misc.pyprint import print_title, print_dashes
+from pyburst.misc.pyprint import print_title, print_dashes
 
 # Constants in cgs units
 G = const.G.to(u.cm**3/(u.g*u.s**2))

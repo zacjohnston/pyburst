@@ -6,10 +6,10 @@ import subprocess, sys, os
 from . import grid_analyser
 from . import grid_tools
 from . import grid_strings
-from pygrids.mcmc import mcmc_versions, mcmc_tools
-from pygrids.kepler import kepler_jobscripts, kepler_files
-from pygrids.misc.pyprint import print_title, print_dashes
-from pygrids.qnuc import qnuc_tools
+from pyburst.mcmc import mcmc_versions, mcmc_tools
+from pyburst.kepler import kepler_jobscripts, kepler_files
+from pyburst.misc.pyprint import print_title, print_dashes
+from pyburst.qnuc import qnuc_tools
 
 # Concord
 import define_sources

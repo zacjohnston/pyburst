@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
 # kepler_grids
-from pygrids.grids import grid_analyser, grid_strings
-from pygrids.mcmc import burstfit, mcmc_tools
+from pyburst.grids import grid_analyser, grid_strings
+from pyburst.mcmc import burstfit, mcmc_tools
 
 # TODO convert to observable (use F_b, redshift)
 

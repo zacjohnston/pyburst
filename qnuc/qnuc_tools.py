@@ -4,10 +4,10 @@ import os
 import sys
 from scipy.stats import linregress
 
-# pygrids
-from pygrids.burst_analyser import burst_tools
-from pygrids.grids import grid_tools, grid_analyser, grid_strings
-from pygrids.kepler import kepler_tools
+# pyburst
+from pyburst.burst_analyser import burst_tools
+from pyburst.grids import grid_tools, grid_analyser, grid_strings
+from pyburst.kepler import kepler_tools
 
 
 def predict_qnuc(params, source, linr_table=None, grid_version=0):

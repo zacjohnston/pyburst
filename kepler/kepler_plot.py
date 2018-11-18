@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pygrids.kepler import kepler_tools
+from pyburst.kepler import kepler_tools
 
 
 def plot_dump_profile(run, batch, source, y_param, x_param='y', cycles=None,

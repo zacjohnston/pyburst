@@ -1,7 +1,7 @@
 import sys
 import os
 
-from pygrids.grids import grid_strings
+from pyburst.grids import grid_strings
 # =================================================================
 # Script callable from terminal to clean up chain/sampler files
 # =================================================================

@@ -1,6 +1,6 @@
 import os
 
-from pygrids.grids import grid_strings
+from pyburst.grids import grid_strings
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 

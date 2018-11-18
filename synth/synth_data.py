@@ -27,7 +27,7 @@ import pandas as pd
 import os
 
 # kepler_grids
-from pygrids.grids import grid_strings, grid_tools
+from pyburst.grids import grid_strings, grid_tools
 
 # concord
 import ctools

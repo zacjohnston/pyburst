@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import norm
 
 # kepler_grids
-from pygrids.grids import grid_strings
+from pyburst.grids import grid_strings
 
 # -----------------------------------
 # Define different prior boundaries.

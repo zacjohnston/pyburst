@@ -1,6 +1,6 @@
 import numpy as np
 
-from pygrids.burst_analyser import burst_analyser
+from pyburst.burst_analyser import burst_analyser
 
 
 def test_few_bursts(run=1, batch=281, source='biggrid2', plot=False):

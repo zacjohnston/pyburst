@@ -9,9 +9,9 @@ from scipy.stats import linregress
 
 # kepler_grids
 from . import burst_tools
-from pygrids.grids import grid_tools, grid_strings
-from pygrids.kepler import kepler_tools
-from pygrids.kepler import kepler_plot
+from pyburst.grids import grid_tools, grid_strings
+from pyburst.kepler import kepler_tools
+from pyburst.kepler import kepler_plot
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']

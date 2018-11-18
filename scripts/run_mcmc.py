@@ -1,6 +1,6 @@
 # kepler_grids
-from pygrids.mcmc import mcmc
-from pygrids.mcmc import mcmc_tools
+from pyburst.mcmc import mcmc
+from pyburst.mcmc import mcmc_tools
 
 import numpy as np
 import sys

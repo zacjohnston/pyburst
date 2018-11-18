@@ -6,7 +6,7 @@ import time
 import pickle
 
 # kepler_grids
-from pygrids.grids import grid_tools, grid_strings
+from pyburst.grids import grid_tools, grid_strings
 from . import interp_versions
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']

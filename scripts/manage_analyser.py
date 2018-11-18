@@ -2,8 +2,8 @@ import numpy as np
 import sys
 
 # kepler grids
-from pygrids.kepler_analyser import kepler_analyser_tools
-from pygrids.grids import grid_tools, grid_strings
+from pyburst.kepler_analyser import kepler_analyser_tools
+from pyburst.grids import grid_tools, grid_strings
 
 # =================================================================
 # Script callable from terminal to setup/collect kepler-analyser models

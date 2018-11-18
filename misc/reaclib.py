@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from pygrids.grids import grid_analyser
+from pyburst.grids import grid_analyser
 
 def compare(batch, source, ref_source, bprops=('rate', 'fluence', 'peak')):
     """Compares models with differe bdats/adapnets"""

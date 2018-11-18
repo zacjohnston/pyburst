@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
-from pygrids.grids import grid_analyser
-from pygrids.mcmc import burstfit, mcmc_tools
+from pyburst.grids import grid_analyser
+from pyburst.mcmc import burstfit, mcmc_tools
 
 
 class Best:

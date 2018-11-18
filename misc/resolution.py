@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-from pygrids.grids import grid_analyser, grid_strings, grid_tools
+from pyburst.grids import grid_analyser, grid_strings, grid_tools
 
 # resolution tests
 

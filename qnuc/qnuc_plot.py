@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import linregress
 
-# pygrids
+# pyburst
 from . import qnuc_tools
-from pygrids.grids import grid_analyser, grid_tools
-from pygrids.plotting.plot_tools import set_axes
+from pyburst.grids import grid_analyser, grid_tools
+from pyburst.plotting.plot_tools import set_axes
 
 
 def plot_qnuc(source, mass, grid_version, linear=True):

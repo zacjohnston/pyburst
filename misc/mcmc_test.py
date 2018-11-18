@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from pygrids.mcmc import burstfit
+from pyburst.mcmc import burstfit
 
 
 class BfitTester:

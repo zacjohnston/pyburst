@@ -8,8 +8,8 @@ from scipy.interpolate import interp1d
 import kepdump
 
 # kepler_grids
-from pygrids.grids import grid_strings
-from pygrids.misc.pyprint import printv
+from pyburst.grids import grid_strings
+from pyburst.misc.pyprint import printv
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']

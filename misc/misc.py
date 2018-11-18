@@ -12,10 +12,10 @@ import ctools
 import anisotropy
 
 # kepler_grids
-from pygrids.grids import grid_analyser
-from pygrids.mcmc import mcmc_tools, burstfit
-from pygrids.physics import gparams
-from pygrids.burst_analyser import burst_analyser
+from pyburst.grids import grid_analyser
+from pyburst.mcmc import mcmc_tools, burstfit
+from pyburst.physics import gparams
+from pyburst.burst_analyser import burst_analyser
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']

@@ -9,9 +9,9 @@ import time
 # kepler
 import lcdata
 
-# pygrids
-from pygrids.misc import pyprint
-from pygrids.grids import grid_strings, grid_tools
+# pyburst
+from pyburst.misc import pyprint
+from pyburst.grids import grid_strings, grid_tools
 
 MODELS_PATH = os.environ['KEPLER_MODELS']
 GRIDS_PATH = os.environ['KEPLER_GRIDS']

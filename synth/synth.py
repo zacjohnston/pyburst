@@ -5,8 +5,8 @@ import astropy.constants as const
 from astropy import units
 
 # kepler_grids
-from pygrids.grids import grid_tools, grid_strings
-from pygrids.mcmc import mcmc_versions, mcmc_tools
+from pyburst.grids import grid_tools, grid_strings
+from pyburst.mcmc import mcmc_versions, mcmc_tools
 
 # TODO
 #   - generate synthetic data (load, add noise, save, tables)

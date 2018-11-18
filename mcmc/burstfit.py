@@ -7,11 +7,11 @@ import pickle
 from matplotlib.ticker import NullFormatter
 
 # kepler_grids
-from pygrids.interpolator import interpolator
+from pyburst.interpolator import interpolator
 from .mcmc_versions import McmcVersion
-from pygrids.mcmc.mcmc_tools import print_params
-from pygrids.misc import pyprint
-from pygrids.synth import synth_data, synth
+from pyburst.mcmc.mcmc_tools import print_params
+from pyburst.misc import pyprint
+from pyburst.synth import synth_data, synth
 
 # concord
 import ctools

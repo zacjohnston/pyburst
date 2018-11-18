@@ -11,7 +11,7 @@ import lcdata
 
 # kepler_grids
 from ..grids import grid_tools, grid_strings
-from pygrids.misc.pyprint import print_title, print_dashes
+from pyburst.misc.pyprint import print_title, print_dashes
 
 # ============================================
 # Author: Zac Johnston (2017)

@@ -6,16 +6,16 @@ from astropy import units
 import subprocess
 from scipy.stats import linregress
 
-# pygrids
-from pygrids.grids import grid_strings, grid_tools
-from pygrids.kepler import kepler_tools, kepler_plot
-from pygrids.burst_analyser import burst_tools
+# pyburst
+from pyburst.grids import grid_strings, grid_tools
+from pyburst.kepler import kepler_tools, kepler_plot
+from pyburst.burst_analyser import burst_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 PROJECT_PATH = '/home/zacpetej/projects/oscillations/'
 
-# TODO: implement module as proper pygrids module
+# TODO: implement module as proper pyburst module
 
 def extract_cycles(cycles, run, batch, source, basename='xrb',
                    prefix=''):

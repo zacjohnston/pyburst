@@ -1,7 +1,7 @@
 import numpy as np
 import sys
 
-from pygrids.burst_analyser import burst_pipeline
+from pyburst.burst_analyser import burst_pipeline
 
 # =================================================================
 # Script callable from terminal to run burst analysis

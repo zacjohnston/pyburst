@@ -11,8 +11,8 @@ from . import burstfit
 from . import mcmc_versions
 from . import mcmc_plot
 from . import mcmc_tools
-from pygrids.grids import grid_tools
-from pygrids.misc.pyprint import check_params_length
+from pyburst.grids import grid_tools
+from pyburst.misc.pyprint import check_params_length
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']

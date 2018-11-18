@@ -11,9 +11,9 @@ from math import ceil
 from . import mcmc_versions
 from . import mcmc_tools
 from . import burstfit
-from pygrids.physics import gparams
-from pygrids.plotting import plot_tools
-from pygrids.grids.grid_strings import get_source_path, print_warning
+from pyburst.physics import gparams
+from pyburst.plotting import plot_tools
+from pyburst.grids.grid_strings import get_source_path, print_warning
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 

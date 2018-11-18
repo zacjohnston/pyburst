@@ -7,7 +7,7 @@ import subprocess
 from astropy.io import ascii
 
 # kepler_grids
-from pygrids.misc.pyprint import print_dashes
+from pyburst.misc.pyprint import print_dashes
 from . import grid_strings
 
 # kepler

@@ -3,8 +3,8 @@ import os
 import pickle
 
 # kepler_grids
-from pygrids.misc import pyprint
-from pygrids.grids import grid_strings
+from pyburst.misc import pyprint
+from pyburst.grids import grid_strings
 from . import mcmc_versions
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']

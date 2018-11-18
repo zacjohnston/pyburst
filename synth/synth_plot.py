@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from pygrids.grids import grid_analyser
-from pygrids.synth import synth
-from pygrids.plotting import plot_tools
-from pygrids.mcmc import mcmc_plot, mcmc_versions, mcmc_tools, burstfit
+from pyburst.grids import grid_analyser
+from pyburst.synth import synth
+from pyburst.plotting import plot_tools
+from pyburst.mcmc import mcmc_plot, mcmc_versions, mcmc_tools, burstfit
 
 # TODO:
 #   - plot contours
