@@ -29,8 +29,6 @@ import os
 # kepler_grids
 from pyburst.grids import grid_strings, grid_tools
 
-# concord
-import ctools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 bprops = ['dt', 'u_dt', 'fper', 'u_fper', 'fluence', 'u_fluence', 'peak', 'u_peak']
@@ -158,11 +156,6 @@ def get_peak(lightcurve):
     u_peak = lightcurve.iloc[idx]['u_flux'] * 1e-9
 
     return peak, u_peak
-
-
-def generate_synth_data(batches, runs, source):
-    obs = ctools.load_obs('gs1826')
-    models = ctools.load_models(batches=batches, runs=runs, source=source)
 
 
 def pick_random_params():
