@@ -15,7 +15,6 @@ from pyburst.synth import synth_data, synth
 
 # concord
 import ctools
-import anisotropy
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 concord_source_map = {
@@ -63,7 +62,6 @@ class BurstFit:
         self.get_param_indexes()
         self.has_g = 'g' in self.mcmc_version.param_keys
         self.has_logz = 'logz' in self.mcmc_version.param_keys
-        self.has_inc = 'inc' in self.mcmc_version.param_keys
         self.has_xi_ratio = 'xi_ratio' in self.mcmc_version.param_keys
         self.has_one_f = 'f' in self.mcmc_version.param_keys
         self.has_two_f = ('f_b' in self.mcmc_version.param_keys
@@ -118,8 +116,6 @@ class BurstFit:
         self.z_prior = self.mcmc_version.prior_pdfs['z']
         self.xi_ratio_prior = self.mcmc_version.prior_pdfs['xi_ratio']
         self.d_b_prior = self.mcmc_version.prior_pdfs['d_b']
-        if self.has_inc:
-            self.inc_prior = self.mcmc_version.prior_pdfs['inc']
         self.debug.end_function()
 
     def extract_obs_values(self):
@@ -294,13 +290,8 @@ class BurstFit:
                 flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']])**2
                 flux_factor_p = flux_factor_b * params[self.param_idxs['xi_ratio']]
             else:
-                if self.has_inc:  # model explicitly uses inclination
-                    inc = params[self.param_idxs['inc']]
-                    xi_b, xi_p = anisotropy.anisotropy(inclination=inc*u.deg,
-                                                       model=self.mcmc_version.disc_model)
-                else:   # model explicitly uses xi
-                    xi_b = params[self.param_idxs['xi_b']]
-                    xi_p = params[self.param_idxs['xi_p']]
+                xi_b = params[self.param_idxs['xi_b']]
+                xi_p = params[self.param_idxs['xi_p']]
 
                 d = params[self.param_idxs['d']]
                 d *= u.kpc.to(u.cm)
@@ -422,9 +413,6 @@ class BurstFit:
             d_b = params[self.param_idxs['d_b']]
             prior_lhood += np.log(self.xi_ratio_prior(xi_ratio))
             prior_lhood += np.log(self.d_b_prior(d_b))
-        elif self.has_inc:
-            inc = params[self.param_idxs['inc']]
-            prior_lhood += np.log(self.inc_prior(inc * u.deg)).value
 
         self.debug.variable('prior_lhood', prior_lhood, formatter='f')
         self.debug.end_function()
