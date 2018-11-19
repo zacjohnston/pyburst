@@ -16,6 +16,8 @@ key_map = {'dt': 'tDel', 'u_dt': 'uTDel',
            'fluence': 'fluence', 'u_fluence': 'uFluence',
            'peak': 'peakLum', 'u_peak': 'uPeakLum'}
 
+# TODO:
+#   - function to re-generate interpolator files
 
 class Kemulator:
     """Kepler emulator class. Creates a 'model' of kepler results
