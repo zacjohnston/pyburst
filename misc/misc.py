@@ -17,6 +17,32 @@ from pyburst.burst_analyser import burst_analyser
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
+flt2 = '{:.2f}'.format
+flt4 = '{:.4f}'.format
+exp5 = '{:.3e}'.format
+formatters = {'fluence': exp5}
+
+
+def resave_obs(source):
+    epochs = {'gs1826': (1998, 2000, 2002),
+              '4u1820': ()}
+    col_order = ['epoch', 'dt', 'fluence', 'fper', 'cbol', 'peak', 'rate',
+                 'u_dt', 'u_fluence', 'u_fper', 'u_cbol', 'u_peak', 'u_rate']
+    bfit = burstfit.BurstFit('grid5', version=0)
+
+    table = pd.DataFrame(bfit.obs_data)
+    table['epoch'] = epochs[source]
+
+    table = table[col_order]
+    table_str = table.to_string(index=False, justify='left',
+                                formatters=formatters)
+    path = os.path.join(f'/home/zacpetej/projects/codes/pyburst/files/obs_data/{source}')
+
+    filename = f'{source}.dat'
+    filepath = os.path.join(path, filename)
+    with open(filepath, 'w') as f:
+        f.write(table_str)
+
 
 def compare_bprops(source, version, n_walkers, n_steps, epoch):
     """Plot model/obs comparison of single epoch, as one plot"""
