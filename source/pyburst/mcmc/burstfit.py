@@ -1,6 +1,7 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import os
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.constants as const
 import pickle
@@ -13,11 +14,10 @@ from pyburst.mcmc.mcmc_tools import print_params
 from pyburst.misc import pyprint
 from pyburst.synth import synth_data, synth
 
-# concord
-import ctools
-
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
-concord_source_map = {
+PYBURST_PATH = os.environ['PYBURST_PATH']
+
+obs_source_map = {
     'biggrid1': 'gs1826',  # alias for the source being modelled
     'biggrid2': 'gs1826',
     'grid4': 'gs1826',
@@ -146,20 +146,17 @@ class BurstFit:
             self.debug.end_function()
             return
         else:
-            concord_source = concord_source_map.get(self.source, self.source)
-            self.obs = ctools.load_obs(concord_source)
+            obs_source = obs_source_map.get(self.source, self.source)
+            filename = f'{obs_source}.dat'
+            filepath = os.path.join(PYBURST_PATH, 'files', 'obs_data',
+                                    obs_source, filename)
+
+            self.obs = pd.read_csv(filepath, delim_whitespace=True)
             self.n_epochs = len(self.obs)
-            self.obs_data = dict.fromkeys(key_map)
-            for key in self.obs_data:
-                self.obs_data[key] = np.zeros(self.n_epochs)
-                key_old = key_map[key]
+            self.obs_data = self.obs.to_dict(orient='list')
 
-                for i in range(self.n_epochs):
-                    self.obs_data[key][i] = strip_units(self.obs[i].__dict__[key_old])
-
-            # ====== extract burst rates ======
-            self.obs_data['rate'] = hr_day / self.obs_data['dt']
-            self.obs_data['u_rate'] = hr_day * self.obs_data['u_dt'] / self.obs_data['dt']**2
+            for key, item in self.obs_data.items():
+                self.obs_data[key] = np.array(item)
 
             # ===== Apply bollometric corrections (cbol) to fper ======
             u_fper_frac = np.sqrt((self.obs_data['u_cbol']/self.obs_data['cbol'])**2
