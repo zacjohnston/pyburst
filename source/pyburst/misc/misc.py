@@ -23,14 +23,18 @@ exp5 = '{:.3e}'.format
 formatters = {'fluence': exp5}
 
 
-def resave_obs(source):
+def resave_obs(source, obs_data=None):
+    ref_source = {'gs1826': 'grid5',
+                  '4u1820': '4u1820'}
     epochs = {'gs1826': (1998, 2000, 2002),
-              '4u1820': ()}
+              '4u1820': (1997, 2009)}
     col_order = ['epoch', 'dt', 'fluence', 'fper', 'cbol', 'peak', 'rate',
                  'u_dt', 'u_fluence', 'u_fper', 'u_cbol', 'u_peak', 'u_rate']
-    bfit = burstfit.BurstFit('grid5', version=0)
+    if obs_data is None:
+        bfit = burstfit.BurstFit(ref_source[source], version=0)
+        obs_data = bfit.obs_data
 
-    table = pd.DataFrame(bfit.obs_data)
+    table = pd.DataFrame(obs_data)
     table['epoch'] = epochs[source]
 
     table = table[col_order]
