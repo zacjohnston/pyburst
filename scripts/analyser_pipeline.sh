@@ -19,10 +19,10 @@ fi
 #============================================
 GRID_PATH=${KEPLER_GRIDS}
 MODELS_PATH=${KEPLER_MODELS}
-GEN_SCRIPT=${GRID_PATH}'/scripts/collgen.sh'
-MANAGER_SCRIPT=${GRID_PATH}'/scripts/manage_analyser.py'
-ANALYSE_SCRIPT=${GRID_PATH}'/scripts/run_analyser.py'
-GIT_SCRIPT=${GRID_PATH}'/scripts/update_git.sh'
+GEN_SCRIPT=${PYBURST_PATH}'/scripts/collgen.sh'
+MANAGER_SCRIPT=${PYBURST_PATH}'/scripts/manage_analyser.py'
+ANALYSE_SCRIPT=${PYBURST_PATH}'/scripts/run_analyser.py'
+GIT_SCRIPT=${PYBURST_PATH}'/scripts/update_git.sh'
 
 SRC=${1}
 BATCH1=${2}
