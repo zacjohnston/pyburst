@@ -9,6 +9,8 @@ from scipy.interpolate import interp1d
 from pyburst.grids import grid_analyser, grid_strings
 from pyburst.mcmc import burstfit, mcmc_tools
 
+import ctools
+
 # TODO convert to observable (use F_b, redshift)
 
 class Ksample:
@@ -20,12 +22,13 @@ class Ksample:
         self.source = source
         self.grid = grid_analyser.Kgrid(self.source)
         self.bfit = burstfit.BurstFit(mcmc_source, version=mcmc_version, re_interp=False)
+        self.obs = ctools.load_obs('gs1826')
         self.batches = batches
         self.params = load_param_sample(self.source, self.batches)
         self.verbose = verbose
 
         # !!! Hack fix
-        self.batches = (3, 2, 1)
+        # self.batches = (3, 2, 1)
 
         if runs is None:
             sub_batch = self.grid.get_params(self.batches[0])
@@ -55,7 +58,7 @@ class Ksample:
                 sys.stdout.write('\rInterpolating observed burst lightcurves: '
                                  f'{epoch_i + 1}/{self.n_epochs}')
 
-            obs_burst = self.bfit.obs[epoch_i]
+            obs_burst = self.obs[epoch_i]
             obs_x = np.array(obs_burst.time + 0.5 * obs_burst.dt)
             obs_flux = np.array(obs_burst.flux)
             obs_flux_err = np.array(obs_burst.flux_err)
@@ -151,7 +154,7 @@ class Ksample:
     def chi_squared(self, tshift, epoch_i, run):
         """Returns chi^2 of model vs. observed lightcurves
         """
-        obs_burst = self.bfit.obs[epoch_i]
+        obs_burst = self.obs[epoch_i]
         obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)
         obs_flux = np.array(obs_burst.flux)
         obs_flux_err = np.array(obs_burst.flux_err)
@@ -169,7 +172,7 @@ class Ksample:
 
         for epoch_i in range(self.n_epochs):
             batch = self.batches[epoch_i]
-            obs_burst = self.bfit.obs[epoch_i]
+            obs_burst = self.obs[epoch_i]
             obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)
             obs_y = np.array(obs_burst.flux)
             obs_y_u = np.array(obs_burst.flux_err)
@@ -212,6 +215,7 @@ class Ksample:
         ax[-1][0].set_xlabel('Time (s)', fontsize=fontsize)
         ax[-1][1].set_xlabel('Time (s)', fontsize=fontsize)
         ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
+        ax[1][1].set_ylabel(r'Residuals (erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
         ax[-1][0].set_xlim([-10, 200])
         plt.tight_layout()
         plt.show(block=False)
