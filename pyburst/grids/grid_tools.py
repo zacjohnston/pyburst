@@ -163,6 +163,7 @@ def combine_tables(source, burst_analyser=True, add_radius=True, radius=10,
         param_table['gravity'] = gravities.value
 
     print('Combining summ and params tables')
+    summ_table.drop(['batch', 'run'], axis=1, inplace=True)
     combined_table = pd.concat([param_table, summ_table], axis=1)
 
     path = grid_strings.get_source_path(source)
