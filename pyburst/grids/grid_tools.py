@@ -8,6 +8,7 @@ from astropy.io import ascii
 
 # kepler_grids
 from pyburst.misc.pyprint import print_dashes
+from pyburst.physics import gravity
 from . import grid_strings
 
 # kepler
@@ -143,7 +144,8 @@ def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'
         write_pandas_table(table, filepath)
 
 
-def combine_tables(source, burst_analyser=True, add_radius=True, radius=10):
+def combine_tables(source, burst_analyser=True, add_radius=True, radius=10,
+                   add_gravity=True):
     """Combines summ and params tables
     """
     param_table = load_grid_table('params', source=source)
@@ -154,6 +156,11 @@ def combine_tables(source, burst_analyser=True, add_radius=True, radius=10):
 
     if add_radius:
         param_table['radius'] = radius
+    if add_gravity:
+        masses = np.array(param_table['mass'])
+        radii = np.array(param_table['radius'])
+        gravities = gravity.get_acceleration_newtonian(r=radii, m=masses)
+        param_table['gravity'] = gravities.value
 
     print('Combining summ and params tables')
     combined_table = pd.concat([param_table, summ_table], axis=1)
