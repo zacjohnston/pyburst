@@ -143,7 +143,7 @@ def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'
         write_pandas_table(table, filepath)
 
 
-def combine_tables(source, burst_analyser=True):
+def combine_tables(source, burst_analyser=True, add_radius=True, radius=10):
     """Combines summ and params tables
     """
     param_table = load_grid_table('params', source=source)
@@ -151,6 +151,9 @@ def combine_tables(source, burst_analyser=True):
 
     if len(param_table) != len(summ_table):
         raise RuntimeError('param and summ tables are different lengths')
+
+    if add_radius:
+        param_table['radius'] = radius
 
     print('Combining summ and params tables')
     combined_table = pd.concat([param_table, summ_table], axis=1)
