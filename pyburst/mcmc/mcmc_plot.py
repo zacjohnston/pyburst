@@ -11,7 +11,7 @@ from math import ceil
 from . import mcmc_versions
 from . import mcmc_tools
 from . import burstfit
-from pyburst.physics import gparams
+from pyburst.physics import gravity
 from pyburst.plotting import plot_tools
 from pyburst.grids.grid_strings import get_source_path, print_warning
 
@@ -328,7 +328,7 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     """
     mass_reference = 1.4
     radius_reference = 10
-    g_reference = gparams.get_acceleration_newtonian(r=radius_reference, m=mass_reference)
+    g_reference = gravity.get_acceleration_newtonian(r=radius_reference, m=mass_reference)
 
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_walkers, n_steps, n_dimensions = chain.shape
@@ -338,7 +338,7 @@ def get_mass_radius(chain, discard, source, version, cap=None):
 
     redshift = chain_flat[:, pkeys.index('redshift')]
     g = chain_flat[:, pkeys.index('g')] * g_reference
-    mass, radius = gparams.get_mass_radius(g=g, redshift=redshift)
+    mass, radius = gravity.get_mass_radius(g=g, redshift=redshift)
 
     # reshape back into chain
     new_shape = (n_walkers, n_steps)
@@ -353,13 +353,13 @@ def get_mass_radius_point(params, source, version):
     """
     mass_reference = 1.4
     radius_reference = 10
-    g_reference = gparams.get_acceleration_newtonian(r=radius_reference, m=mass_reference)
+    g_reference = gravity.get_acceleration_newtonian(r=radius_reference, m=mass_reference)
 
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
     redshift = params[pkeys.index('redshift')]
     g = params[pkeys.index('g')] * g_reference
-    mass, radius = gparams.get_mass_radius(g=g, redshift=redshift)
+    mass, radius = gravity.get_mass_radius(g=g, redshift=redshift)
     return mass.value, radius.value
 
 

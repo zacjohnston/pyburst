@@ -11,7 +11,7 @@ import chainconsumer
 # kepler_grids
 from pyburst.grids import grid_analyser
 from pyburst.mcmc import mcmc_tools, burstfit
-from pyburst.physics import gparams
+from pyburst.physics import gravity
 from pyburst.burst_analyser import burst_analyser
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -72,7 +72,7 @@ def plot_posteriors(chain=None, discard=10000):
               'gravity ($10^{14}$ cm s$^{-2}$)', 'redshift (1+z)',
               'distance (kpc)', 'inclination (degrees)']
 
-    g = gparams.get_acceleration_newtonian(10, 1.4).value / 1e14
+    g = gravity.get_acceleration_newtonian(10, 1.4).value / 1e14
     chain[:, :, 4] *= g
 
     cc = chainconsumer.ChainConsumer()

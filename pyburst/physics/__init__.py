@@ -1,6 +1,6 @@
-from . import gparams
+from . import gravity
 from . import burning
 
-__all__ = ['gparams',
+__all__ = ['gravity',
            'burning',
            ]
