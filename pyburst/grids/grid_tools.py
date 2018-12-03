@@ -143,6 +143,24 @@ def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'
         write_pandas_table(table, filepath)
 
 
+def combine_tables(source, burst_analyser=True):
+    """Combines summ and params tables
+    """
+    param_table = load_grid_table('params', source=source)
+    summ_table = load_grid_table('summ', source=source, burst_analyser=burst_analyser)
+
+    if len(param_table) != len(summ_table):
+        raise RuntimeError('param and summ tables are different lengths')
+
+    print('Combining summ and params tables')
+    combined_table = pd.concat([param_table, summ_table], axis=1)
+
+    path = grid_strings.get_source_path(source)
+    filename = f'grid_table_{source}.txt'
+    filepath = os.path.join(path, filename)
+    write_pandas_table(combined_table, filepath)
+
+
 def reduce_table(table, params, exclude_any=None, exclude_all=None):
     """Returns the subset of a table that satisfy the specified variables
 

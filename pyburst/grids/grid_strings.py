@@ -9,6 +9,7 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 # TODO: rename all "gets"
 
+
 def source_shorthand(source):
     """Expands source aliases (e.g. 4u ==> 4u1820)
     """
