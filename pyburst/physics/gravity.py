@@ -9,7 +9,6 @@ from pyburst.misc.pyprint import print_title, print_dashes
 
 # Constants in cgs units
 G = const.G.to(u.cm**3/(u.g*u.s**2))
-G_kmsun = const
 c = const.c.to(u.cm/u.s)
 Msun = const.M_sun.to(u.g)
 
