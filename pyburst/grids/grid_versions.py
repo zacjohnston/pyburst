@@ -96,9 +96,12 @@ version_definitions = {
             },
             'res1': {
                 1: {
+                    'batch': [6, 7],  # gs1826 models
                     'accdepth': 1e21
                 },
-                2: {},
+                2: {
+                    'batch': [1, 2, 3, 4, 5]   # 4u1820 models
+                },
             },
             'triplets': {},
         },
