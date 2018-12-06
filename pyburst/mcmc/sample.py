@@ -9,7 +9,12 @@ from scipy.interpolate import interp1d
 from pyburst.grids import grid_analyser, grid_strings
 from pyburst.mcmc import burstfit, mcmc_tools
 
-import ctools
+# Concord
+try:
+    import ctools
+except ModuleNotFoundError:
+    print("pyburst/MCMC: Concord not installed, some functionality won't be available")
+
 
 # TODO convert to observable (use F_b, redshift)
 
@@ -26,9 +31,6 @@ class Ksample:
         self.batches = batches
         self.params = load_param_sample(self.source, self.batches)
         self.verbose = verbose
-
-        # !!! Hack fix
-        # self.batches = (3, 2, 1)
 
         if runs is None:
             sub_batch = self.grid.get_params(self.batches[0])
