@@ -12,9 +12,6 @@ from pyburst.misc.pyprint import print_title, print_dashes
 from pyburst.qnuc import qnuc_tools
 from pyburst.physics import gravity
 
-# Concord
-import define_sources
-
 # ====================================
 # Kepler batch Generator
 # --------------------
@@ -28,9 +25,6 @@ import define_sources
 flt2 = '{:.2f}'.format
 flt4 = '{:.4f}'.format
 flt8 = '{:.8f}'.format
-# FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
-#               'tshift': flt2, 'qb': flt4, 'acc_mult': flt2, 'qb_delay': flt2,
-#               'mass': flt2}
 
 FORMATTERS = {'z': flt8, 'y': flt8, 'x': flt8, 'accrate': flt8,
               'tshift': flt2, 'qb': flt8, 'acc_mult': flt2, 'qb_delay': flt2,
@@ -44,45 +38,6 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 # TODO: Allow enumerating over multiple parameters, create_batches()
 
 param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
-
-def print_batch(batch, source):
-    print_title()
-    print_title()
-    print(f'Batch: {batch}')
-    print_title()
-    print_title()
-
-
-def create_epoch_grid(batch0, dv, params, source, kgrid=None,
-                      split_qos=True, qos='medium', **kwargs):
-    """Generate a set of batches differing only by accrate,
-    corresponding to different source epochs
-    """
-    batches = grid_tools.expand_batches(batches=batch0, source=source)
-    source_object = define_sources.Source(source=source)
-    mdots = source_object.mdots
-    qos_list = []
-    n_epochs = source_object.n_epochs
-
-    if kgrid is None:
-        print('No kgrid provided. Loading:')
-        kgrid = grid_analyser.Kgrid(load_lc=False, source=source)
-
-    # ===== split qos approximately in half =====
-    if split_qos:
-        split = int(n_epochs / 2)
-        for i in range(split):
-            qos_list += ['general']
-        for i in range(n_epochs - split):
-            qos_list += ['medium']
-    else:
-        for i in range(n_epochs):
-            qos_list += [qos]
-
-    for i, batch in enumerate(batches):
-        params['accrate'] = [mdots[i]]
-        create_batch(batch0=batch, dv=dv, params=params, source=source,
-                     qos=qos_list[i], kgrid=kgrid, **kwargs)
 
 
 def create_batch(batch, dv, source,
@@ -684,3 +639,11 @@ def sync_model_restarts(source, basename='xrb', verbose=True,
 
     if not dry_run:
         subprocess.run(command)
+
+
+def print_batch(batch, source):
+    print_title()
+    print_title()
+    print(f'Batch: {batch}')
+    print_title()
+    print_title()
