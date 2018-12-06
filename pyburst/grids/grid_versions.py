@@ -31,6 +31,7 @@ version_defaults = {
         'test1': {},
         'heat': {'batch': [1]},
         'triplets': {},
+        'he1': {},
     },
 
     'exclude_all': {
@@ -49,6 +50,7 @@ version_defaults = {
         'res1': [{}],
         'test1': [{}],
         'triplets': [{}],
+        'he1': {},
     },
 }
 
@@ -104,6 +106,7 @@ version_definitions = {
                 },
             },
             'triplets': {},
+            'he1': {},
         },
     'exclude_all':
         {
@@ -119,6 +122,7 @@ version_definitions = {
             'res1': {},
             'test1': {},
             'triplets': {},
+            'he1': {},
         }
 }
 
