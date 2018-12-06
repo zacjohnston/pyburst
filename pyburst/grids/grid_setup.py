@@ -47,15 +47,14 @@ def create_batch(batch, dv, source,
                          'qb_delay': [0.0], 'mass': [1.4],
                          'accmass': [1e16], 'accdepth': [1e20]},
                  lburn=1, t_end=1.3e5, exclude={}, basename='xrb',
-                 walltime=96, qos='normal', nstop=10000000,
-                 check_params=False, nsdump=500,
+                 walltime=96, qos='normal', nstop=10000000, nsdump=500,
                  auto_t_end=True, notes='No notes given', debug=False,
                  nbursts=20, parallel=False, ntasks=8, kgrid=None,
                  nuc_heat=True, setup_test=False, predict_qnuc=False,
                  grid_version=None, qnuc_source='heat', minzone=51,
                  zonermax=10, zonermin=-1, thickfac=0.001,
                  substrate='fe54', substrate_off=True, adapnet_filename=None,
-                 bdat_filename=None, ibdatov=1, params_full=None, **kwargs):
+                 bdat_filename=None, ibdatov=1, params_full=None):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -108,17 +107,6 @@ def create_batch(batch, dv, source,
     if kgrid is None:
         print('No kgrid provided. Loading:')
         kgrid = grid_analyser.Kgrid(load_lc=False, source=source)
-
-    if check_params:
-        print('Checking existing grid models for params')
-        temp_params_full = dict(params_full)
-        del (temp_params_full['accmass'])
-        params_exist = check_grid_params(params_full=temp_params_full, source=source,
-                                         kgrid=kgrid)
-        if params_exist:
-            cont = input('XXX Continue anyway? XXX [y/n]: ')
-            if cont == 'n' or cont == 'N':
-                sys.exit()
 
     params_full['y'] = 1 - params_full['x'] - params_full['z']  # helium-4 values
     params_full['geemult'] = params_full['mass'] / mass_ref  # Gravity multiplier
