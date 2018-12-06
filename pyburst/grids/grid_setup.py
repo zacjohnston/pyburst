@@ -10,6 +10,7 @@ from pyburst.mcmc import mcmc_versions, mcmc_tools
 from pyburst.kepler import kepler_jobscripts, kepler_files
 from pyburst.misc.pyprint import print_title, print_dashes
 from pyburst.qnuc import qnuc_tools
+from pyburst.physics import gravity
 
 # Concord
 import define_sources
@@ -129,7 +130,9 @@ def create_batch(batch, dv, source,
     # TODO: Overhaul/tidy up
     # TODO: use pd table instead of dicts of arrays
     source = grid_strings.source_shorthand(source=source)
-    mass_ref = 1.4  # reference NS mass (in Msun)
+    mass_ref = 1.4  # reference NS mass (Msun)
+    radius_ref = 10  # default NS radius (km)
+
     print_batch(batch=batch, source=source)
 
     if params_full is None:
@@ -142,10 +145,10 @@ def create_batch(batch, dv, source,
 
         params_full = grid_tools.enumerate_params(params_expanded)
 
-    n = len(params_full['x'])
+    n_models = len(params_full['x'])
 
-    if parallel and (n % ntasks != 0):
-        raise ValueError(f'n_models ({n}) not divisible by ntasks ({ntasks})')
+    if parallel and (n_models % ntasks != 0):
+        raise ValueError(f'n_models ({n_models}) not divisible by ntasks ({ntasks})')
 
     if kgrid is None:
         print('No kgrid provided. Loading:')
@@ -165,13 +168,18 @@ def create_batch(batch, dv, source,
     params_full['y'] = 1 - params_full['x'] - params_full['z']  # helium-4 values
     params_full['geemult'] = params_full['mass'] / mass_ref  # Gravity multiplier
 
+    gravities = gravity.get_acceleration_newtonian(r=radius_ref,
+                                                   m=params_full['mass']).value
+    params_full['radius'] = np.full(n_models, radius_ref)
+    params_full['gravity'] = gravities
+
     # TODO: rewrite properly (use tables)
     if predict_qnuc:
         if len(params['qnuc']) > 1:
             raise ValueError('Cannot provide multiple "qnuc" in params if predict_qnuc=True')
 
         linr_qnuc = qnuc_tools.linregress_qnuc(qnuc_source, grid_version=grid_version)
-        for i in range(n):
+        for i in range(n_models):
             params_qnuc = {}
             for param in param_list:
                 params_qnuc[param] = params_full[param][i]
@@ -188,19 +196,19 @@ def create_batch(batch, dv, source,
     grid_tools.try_mkdir(logpath)
 
     # ===== Write parameter table MODELS.txt and NOTES.txt=====
-    write_model_table(n=n, params=params_full, lburn=lburn, path=batch_model_path)
+    write_model_table(n=n_models, params=params_full, lburn=lburn, path=batch_model_path)
     filepath = os.path.join(batch_model_path, 'NOTES.txt')
     with open(filepath, 'w') as f:
         f.write(notes)
 
     job_runs = []
     if parallel:
-        n_jobs = int(n / ntasks)
+        n_jobs = int(n_models / ntasks)
         for i in range(n_jobs):
             start = i * ntasks
             job_runs += [[start + 1, start + ntasks]]
     else:
-        job_runs += [[1, n]]
+        job_runs += [[1, n_models]]
 
     print_dashes()
     for runs in job_runs:
@@ -215,7 +223,7 @@ def create_batch(batch, dv, source,
                                                       bdat_filename=bdat_filename)
 
     # ===== Directories and templates for each model =====
-    for i in range(n):
+    for i in range(n_models):
         # ==== Create directory tree ====
         print_dashes()
         model = i + 1
@@ -517,8 +525,8 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
     p['lburn'] = lburn_list
 
     cols = ['run', 'z', 'y', 'x', 'accrate', 'qb', 'qnuc',
-            'tshift', 'acc_mult', 'qb_delay', 'mass', 'lburn',
-            'accmass', 'accdepth']
+            'tshift', 'acc_mult', 'qb_delay', 'mass', 'radius', 'gravity',
+            'lburn', 'accmass', 'accdepth']
     ptable = pd.DataFrame(p)
     ptable = ptable[cols]  # Fix column order
 
