@@ -29,7 +29,9 @@ version_defaults = {
         'sample5': {},
         'res1': {},
         'test1': {},
-        'heat': {'batch': [1]},
+        'heat': {
+            'batch': [1]
+        },
         'triplets': {},
         'he1': {},
     },
@@ -50,7 +52,7 @@ version_defaults = {
         'res1': [{}],
         'test1': [{}],
         'triplets': [{}],
-        'he1': {},
+        'he1': [{}],
     },
 }
 
