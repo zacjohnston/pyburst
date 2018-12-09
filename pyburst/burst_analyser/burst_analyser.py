@@ -82,6 +82,7 @@ class BurstRun(object):
                            'max_shock_iterations': 100,  # max cycles in get_burst_candidates()
                            'dump_time_offset': 0.0,  # time offset (s) from burst start
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
+                           'min_rise_steps': 20,  # min time steps between t_pre and t_peak
                            }
         self.overwrite_parameters(set_paramaters)
 
@@ -602,7 +603,8 @@ class BurstRun(object):
 
         for burst in self.bursts.itertuples():
             rise_steps = burst.t_peak_i - burst.t_pre_i
-            if rise_steps < 50 or (burst.peak / burst.lum_pre) < self.parameters['peak_frac']:
+            if rise_steps < self.parameters['min_rise_steps'] \
+                    or (burst.peak / burst.lum_pre) < self.parameters['peak_frac']:
                 self.printv(f'Excluding micro-burst at t={burst.t_peak:.0f} s '
                             + f'({burst.t_peak/3600:.1f} hr)')
                 try:
