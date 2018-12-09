@@ -496,7 +496,7 @@ class Kgrid:
     def print_params(self, batch, run):
         """Prints essential params for given batch-run
         """
-        cols = ['batch', 'run', 'accrate', 'z', 'x', 'qb', 'mass']
+        cols = ['batch', 'run', 'accrate', 'z', 'x', 'qb', 'mass', 'qnuc']
         params = self.get_params(batch=batch, run=run)
         out_string = params.to_string(columns=cols, index=False)
         print(out_string)
