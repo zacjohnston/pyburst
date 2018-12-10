@@ -122,18 +122,7 @@ class BurstFit:
     def extract_obs_values(self):
         """Unpacks observed burst properties (dt, fper, etc.) from data
         """
-        def strip_units(x):
-            if type(x) is u.quantity.Quantity:
-                x = x.value
-            return x
-
         self.debug.start_function('extract_obs_values')
-        hr_day = 24
-        key_map = {'dt': 'tdel', 'u_dt': 'tdel_err',
-                   'fper': 'fper', 'u_fper': 'fper_err',
-                   'fluence': 'fluen', 'u_fluence': 'fluen_err',
-                   'peak': 'F_pk', 'u_peak': 'F_pk_err',
-                   'cbol': 'cbol', 'u_cbol': 'cbol_err'}
 
         if self.mcmc_version.synthetic:
             self.obs_data = synth.extract_obs_data(self.source,
