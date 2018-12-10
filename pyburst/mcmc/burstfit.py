@@ -439,7 +439,8 @@ class BurstFit:
         self.debug.end_function()
         return lh.sum()
 
-    def plot_compare(self, model, u_model, obs, u_obs, bprop, ax=None, title=False,
+    @staticmethod
+    def plot_compare(model, u_model, obs, u_obs, bprop, ax=None, title=False,
                      display=True, xlabel=False, legend=False):
         """Plots comparison of modelled and observed burst property
 
