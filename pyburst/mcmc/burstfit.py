@@ -468,7 +468,6 @@ class BurstFit:
                    'fluence': r'$10^{-6}$ erg cm$^{-2}$',
                    'peak': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
                    'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$'}.get(bprop)
-        xlims = {''}
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 
@@ -481,10 +480,9 @@ class BurstFit:
                     marker='o', capsize=capsize, color='C0', label='Observed',
                     markersize=markersize)
 
-        # ax.set_xlim([2008, 1997])
         ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
-
         ax.set_xticks(epochs)
+
         if xlabel:
             ax.set_xticklabels(['2007', '2000', '1998'])
             ax.set_xlabel('Epoch year', fontsize=fontsize)
