@@ -23,8 +23,6 @@ obs_source_map = {
     'grid4': 'gs1826',
     'grid5': 'gs1826',
     'grid6': 'gs1826',
-    'sim_test': 'biggrid2',
-    'sim10': 'biggrid2',
     'heat': 'gs1826',
     'he1': '4u1820',
 }
@@ -129,12 +127,6 @@ class BurstFit:
                                                    self.mcmc_version.synth_version,
                                                    group=self.mcmc_version.synth_group)
             self.n_epochs = len(self.obs_data['fluence'])
-        elif self.source == 'sim_test':
-            self.n_epochs = 1
-            filepath = os.path.join(GRIDS_PATH, 'obs_data', 'sim1', 'sim_test_summary.p')
-            self.obs_data = pickle.load(open(filepath, 'rb'))
-            self.debug.end_function()
-            return
         else:
             obs_source = obs_source_map.get(self.source, self.source)
             filename = f'{obs_source}.dat'
@@ -148,7 +140,7 @@ class BurstFit:
             for key, item in self.obs_data.items():
                 self.obs_data[key] = np.array(item)
 
-            # ===== Apply bollometric corrections (cbol) to fper ======
+            # ===== Apply bolometric corrections (cbol) to fper ======
             u_fper_frac = np.sqrt((self.obs_data['u_cbol']/self.obs_data['cbol'])**2
                                   + (self.obs_data['u_fper']/self.obs_data['fper'])**2)
 
@@ -255,7 +247,10 @@ class BurstFit:
         params : 1darray
             parameters (see param_keys)
 
-        Note: in special case bprop='fper', 'values' must be local accrate
+
+        Notes
+        ------
+        In special case bprop='fper', 'values' must be local accrate
                 as fraction of Eddington rate.
         """
         self.debug.start_function('shift_to_observer')
