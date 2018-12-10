@@ -4,7 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.constants as const
-import pickle
 from matplotlib.ticker import NullFormatter
 
 # kepler_grids
@@ -12,7 +11,7 @@ from pyburst.interpolator import interpolator
 from .mcmc_versions import McmcVersion
 from pyburst.mcmc.mcmc_tools import print_params
 from pyburst.misc import pyprint
-from pyburst.synth import synth_data, synth
+from pyburst.synth import synth
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 PYBURST_PATH = os.environ['PYBURST']
@@ -210,7 +209,7 @@ class BurstFit:
                 self.plot_compare(model=model, u_model=u_model, obs=self.obs_data[bprop],
                                   u_obs=self.obs_data[u_bprop], bprop=bprop,
                                   ax=ax[np.where(plot_map == i)][0], display=False,
-                                  legend=True if i==0 else False)
+                                  legend=True if i == 0 else False)
 
         # ===== compare predicted persistent flux with observed =====
         fper = self.shift_to_observer(values=epoch_params[:, self.interp_idxs['mdot']],
