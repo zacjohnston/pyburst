@@ -15,7 +15,7 @@ from pyburst.misc import pyprint
 from pyburst.synth import synth_data, synth
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
-PYBURST_PATH = os.environ['PYBURST_PATH']
+PYBURST_PATH = os.environ['PYBURST']
 
 obs_source_map = {
     'biggrid1': 'gs1826',  # alias for the source being modelled
