@@ -33,7 +33,9 @@ version_defaults = {
             'batch': [1]
         },
         'triplets': {},
-        'he1': {},
+        'he1': {
+            'qb': [0.0, 0.4],
+        },
     },
 
     'exclude_all': {
