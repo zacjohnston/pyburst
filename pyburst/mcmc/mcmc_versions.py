@@ -195,6 +195,7 @@ prior_pdfs = {
 
 
 # ===== initial position of walkers =====
+# TODO : flip epoch order
 initial_position = {
     1: {
         1: (0.162, 0.138, 0.102,

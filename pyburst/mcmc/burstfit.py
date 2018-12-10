@@ -438,8 +438,7 @@ class BurstFit:
         self.debug.end_function()
         return lh.sum()
 
-    @staticmethod
-    def plot_compare(model, u_model, obs, u_obs, bprop, ax=None, title=False,
+    def plot_compare(self, model, u_model, obs, u_obs, bprop, ax=None, title=False,
                      display=True, xlabel=False, legend=False):
         """Plots comparison of modelled and observed burst property
 
@@ -471,7 +470,7 @@ class BurstFit:
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 
-        epochs = np.array([1998, 2000, 2007])
+        epochs = np.array(self.obs.epoch)
         x = epochs
 
         ax.errorbar(x=x - dx, y=model/yscale, yerr=n_sigma*u_model/yscale, ls='none', marker='o',
@@ -480,7 +479,7 @@ class BurstFit:
                     marker='o', capsize=capsize, color='C0', label='Observed',
                     markersize=markersize)
 
-        ax.set_xlim([2008, 1997])
+        # ax.set_xlim([2008, 1997])
         ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
 
         ax.set_xticks(epochs)
