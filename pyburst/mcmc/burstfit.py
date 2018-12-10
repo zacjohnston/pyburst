@@ -26,6 +26,7 @@ obs_source_map = {
     'sim_test': 'biggrid2',
     'sim10': 'biggrid2',
     'heat': 'gs1826',
+    'he1': '4u1820',
 }
 
 c = const.c.to(u.cm / u.s)
