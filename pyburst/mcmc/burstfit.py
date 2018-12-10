@@ -181,9 +181,12 @@ class BurstFit:
             self.debug.end_function()
             return self.zero_lhood * self.lhood_factor
 
-        plot_map = np.arange(4)
+        n_bprops = len(self.mcmc_version.bprops) + 1
         if plot:
-            fig, ax = plt.subplots(4, 1, figsize=(6, 9))
+            plot_width = 6
+            plot_height = 2.25
+            fig, ax = plt.subplots(n_bprops, 1, sharex=True,
+                                   figsize=(plot_width, plot_height*n_bprops))
         else:
             fig = ax = None
 
@@ -208,7 +211,7 @@ class BurstFit:
             if plot:
                 self.plot_compare(model=model, u_model=u_model, obs=self.obs_data[bprop],
                                   u_obs=self.obs_data[u_bprop], bprop=bprop,
-                                  ax=ax[np.where(plot_map == i)][0], display=False,
+                                  ax=ax[i], display=False,
                                   legend=True if i == 0 else False)
 
         # ===== compare predicted persistent flux with observed =====
@@ -225,7 +228,7 @@ class BurstFit:
         if plot:
             self.plot_compare(model=fper, u_model=u_fper, bprop='fper',
                               obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'],
-                              ax=ax[np.where(plot_map == 3)][0], display=False,
+                              ax=ax[n_bprops - 1], display=False,
                               xlabel=True)
             plt.show(block=False)
             self.debug.end_function()
@@ -253,7 +256,6 @@ class BurstFit:
                 as fraction of Eddington rate.
         """
         self.debug.start_function('shift_to_observer')
-
         redshift = params[self.param_idxs['redshift']]
 
         if bprop in ('dt', 'u_dt'):
