@@ -463,7 +463,8 @@ class BurstRun(object):
         self.get_burst_starts()
         self.get_burst_ends()
         self.get_recurrence_times()
-
+        self.get_burst_rates()
+        
         try:
             self.check_n_bursts()
         except NoBursts:
@@ -590,6 +591,14 @@ class BurstRun(object):
             self.bursts['dt'] = np.concatenate(([np.nan], dt))  # Recurrence times (s)
         elif self.n_bursts == 1:
             self.bursts['dt'] = np.nan
+
+    def get_burst_rates(self):
+        """Calculates burst rates (per day)
+        """
+        if self.n_bursts > 1:
+            self.bursts['rate'] = (24*3600) / self.bursts['dt']
+        elif self.n_bursts == 1:
+            self.bursts['rate'] = np.nan
 
     def get_burst_starts(self):
         """Finds first point in lightcurve that reaches a given fraction of the peak
@@ -1005,7 +1014,7 @@ class BurstRun(object):
             return
 
         y_units = {'tDel': 'hr', 'dt': 'hr', 'fluence': '10$^{39}$ erg',
-                   'peak': '10$^{38}$ erg/s'}
+                   'peak': '10$^{38}$ erg/s', 'rate': 'day$^{-1}$'}
         y_scales = {'tDel': 3600, 'dt': 3600,
                     'fluence': 1e39, 'peak': 1e38}
 
