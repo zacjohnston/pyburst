@@ -51,6 +51,7 @@ class BurstFit:
                  re_interp=False, u_fper_frac=0.0, zero_lhood=-np.inf, **kwargs):
 
         self.source = source
+        self.source_obs = obs_source_map.get(self.source, self.source)
         self.version = version
         self.verbose = verbose
         self.debug = pyprint.Debugger(debug=debug)
@@ -127,10 +128,9 @@ class BurstFit:
                                                    group=self.mcmc_version.synth_group)
             self.n_epochs = len(self.obs_data['fluence'])
         else:
-            obs_source = obs_source_map.get(self.source, self.source)
-            filename = f'{obs_source}.dat'
+            filename = f'{self.source_obs}.dat'
             filepath = os.path.join(PYBURST_PATH, 'files', 'obs_data',
-                                    obs_source, filename)
+                                    self.source_obs, filename)
 
             self.obs = pd.read_csv(filepath, delim_whitespace=True)
             self.n_epochs = len(self.obs)
@@ -468,7 +468,7 @@ class BurstFit:
                    'fluence': r'$10^{-6}$ erg cm$^{-2}$',
                    'peak': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
                    'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$'}.get(bprop)
-
+        xlims = {''}
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 
