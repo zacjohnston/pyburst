@@ -5,19 +5,25 @@ version_defaults = {
     'param_keys': {
         'grid5': ['accrate', 'x', 'z', 'qb', 'mass'],
         'grid6': ['accrate', 'x', 'z', 'qb', 'mass'],
+        'he1': ['accrate', 'x', 'z', 'qb', 'mass'],
     },
     'bprops': {
         'grid5': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         'grid6': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+        'he1': ('rate', 'u_rate'),
     },
     'exclude_any': {
         'grid5': {},
         'grid6': {},
+        'he1': {
+            'qb': [0.0, 0.4],
+        },
 
     },
     'exclude_all': {
         'grid5': [{}],
         'grid6': [{}],
+        'he1': [{}],
     },
 }
 
@@ -26,11 +32,13 @@ version_definitions = {
     'param_keys': {  # This will set the order of params when calling interpolator
         'grid5': {},
         'grid6': {},
+        'he1': {},
     },
 
     'bprops': {
         'grid5': {},
         'grid6': {},
+        'he1': {},
     },
 
     'exclude_any': {
@@ -44,11 +52,13 @@ version_definitions = {
             },
         },
         'grid6': {},
+        'he1': {},
     },
 
     'exclude_all': {
         'grid5': {},
         'grid6': {},
+        'he1': {},
     },
 }
 
