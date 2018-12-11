@@ -464,7 +464,7 @@ class BurstRun(object):
         self.get_burst_ends()
         self.get_recurrence_times()
         self.get_burst_rates()
-        
+
         try:
             self.check_n_bursts()
         except NoBursts:
@@ -1159,25 +1159,28 @@ class BurstRun(object):
 
             np.savetxt(filepath, lightcurve, header=header)
 
-    def plot_lightcurves(self, bursts, save=False, display=True, log=False,
+    def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
                          zero_time=True, fontsize=14, **kwargs):
         """Plot individual burst lightcurve
 
         parameters
         ----------
-        bursts : [int]
-            list of burst indices to plot
-        save : bool
-        display : bool
-        log : bool
-        zero_time : bool
-        fontsize : int
+        bursts : [int] (optional)
+            list of burst indices to plot. Defaults to plotting all bursts
+        save : bool (optional)
+        display : bool (optional)
+        log : bool (optional)
+        zero_time : bool (optional)
+        fontsize : int (optional)
         """
         self.ensure_analysed_is(True)
-        fig, ax = plt.subplots(figsize=(8, 5))
+        if bursts is None:
+            bursts = np.arange(1, self.n_bursts)
 
+        fig, ax = plt.subplots(figsize=(8, 5))
         ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
         ax.set_xlabel('Time (s)', fontsize=fontsize)
+
         if log:
             ax.set_yscale('log')
             ax.set_ylim([1e34, 1e39])
@@ -1185,7 +1188,7 @@ class BurstRun(object):
         for burst in bursts:
             self.add_lightcurve(burst, ax, zero_time=zero_time, **kwargs)
 
-        ax.set_xlim(xmin=-5)
+        ax.set_xlim(xmin=-5, xmax=20)
         plot_path = os.path.join(self.paths['plots'], 'lightcurves', self.batch_str)
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
