@@ -16,7 +16,7 @@ version_defaults = {
         'grid5': {},
         'grid6': {},
         'he1': {
-            'qb': [0.0, 0.4],
+            'qb': [0.0],
         },
 
     },
