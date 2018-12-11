@@ -552,6 +552,10 @@ class BurstRun(object):
             self.printv('Truncating super-Eddington luminosities')
             self.lum[:, 1][mask] = self.l_edd
 
+            # ----- reset burst peaks -----
+            peak_mask = self.bursts['peak'] > self.l_edd
+            self.bursts.loc[peak_mask, 'peak'] = self.l_edd
+
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
 
     def get_lum_maxima(self):
