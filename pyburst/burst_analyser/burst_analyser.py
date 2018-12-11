@@ -1174,6 +1174,8 @@ class BurstRun(object):
         fontsize : int (optional)
         """
         self.ensure_analysed_is(True)
+        if not self.flags['lum_loaded']:
+            self.load_lum_file()
         if bursts is None:
             bursts = np.arange(1, self.n_bursts)
 
