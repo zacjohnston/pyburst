@@ -173,11 +173,17 @@ class BurstRun(object):
     def load_model_params(self):
         """Load model parameters from grid table
         """
-        param_table = grid_tools.load_grid_table('params', source=self.source)
+        try:
+            param_table = grid_tools.load_grid_table('params', source=self.source)
+        except FileNotFoundError:
+            self.print_warn('Model parameter table not found. '
+                            'Has the source grid been analysed yet?')
+            return
+
         model_row = grid_tools.reduce_table(param_table, params={'run': self.run,
                                                                  'batch': self.batch})
         params_dict = model_row.to_dict(orient='list')
-        
+
         for key, value in params_dict.items():
             params_dict[key] = value[0]
 
