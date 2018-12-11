@@ -159,8 +159,8 @@ prior_bounds = {
             (0.2, 0.4),  # mdot2
             (0.01, 0.10),  # x
             (0.005, 0.015),  # z
-            (0.1, 0.4),  # qb1
-            (0.1, 0.4),  # qb2
+            (0.1, 0.3),  # qb1
+            (0.1, 0.3),  # qb2
             (1.4 / 1.4, 2.6 / 1.4),  # g
             (1.2, 1.5),  # redshift
             (1, 15),  # f_b
@@ -283,14 +283,14 @@ source_defaults = {
         'grid5': ('rate', 'fluence', 'peak'),
         'grid6': ('rate', 'fluence', 'peak'),
         'synth5': ('rate', 'fluence', 'peak'),
-        'he1': ('rate',),
+        'he1': ('rate', 'fluence', 'peak'),
     },
 
     'weights': {
         'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         'grid6': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         'synth5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-        'he1': {'rate': 1.0, 'fper': 1.0},
+        'he1': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
     },
 
     'disc_model': {},
