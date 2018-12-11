@@ -10,13 +10,13 @@ version_defaults = {
     'bprops': {
         'grid5': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         'grid6': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
-        'he1': ('rate', 'u_rate'),
+        'he1': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
     },
     'exclude_any': {
         'grid5': {},
         'grid6': {},
         'he1': {
-            'qb': [0.0],
+            'qb': [0.0, 0.4],
         },
 
     },
