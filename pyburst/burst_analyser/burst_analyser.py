@@ -12,6 +12,7 @@ from . import burst_tools
 from pyburst.grids import grid_tools, grid_strings
 from pyburst.kepler import kepler_tools
 from pyburst.kepler import kepler_plot
+from pyburst.physics import accretion
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -37,7 +38,7 @@ class BurstRun(object):
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
                  load_dumps=False, set_paramaters=None, auto_discard=False,
-                 get_slopes=False):
+                 get_slopes=False, load_model_params=True):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -60,6 +61,7 @@ class BurstRun(object):
                         'try_mkdir_plots': try_mkdir_plots,
                         'auto_discard': auto_discard,
                         'get_slopes': get_slopes,
+                        'load_model_params': load_model_params,
                         }
 
         self.parameters = {'lum_cutoff': 1e36,  # luminosity cutoff for burst detection
@@ -119,6 +121,7 @@ class BurstRun(object):
         self.lum = None
         self.lumf = None
         self.new_lum = None
+        self.model_params = None
         self.load_bursts = load_bursts
         self.load_summary = load_summary
         self.load_dumps = load_dumps
@@ -140,6 +143,9 @@ class BurstRun(object):
         self.discard = None
 
         # ====== Loading things ======
+        if self.options['load_model_params']:
+            self.load_model_params()
+
         if load_lum:
             self.load_lum_file()
 
@@ -164,6 +170,19 @@ class BurstRun(object):
     # ===========================================================
     # Loading/setup
     # ===========================================================
+    def load_model_params(self):
+        """Load model parameters from grid table
+        """
+        param_table = grid_tools.load_grid_table('params', source=self.source)
+        model_row = grid_tools.reduce_table(param_table, params={'run': self.run,
+                                                                 'batch': self.batch})
+        params_dict = model_row.to_dict(orient='list')
+        
+        for key, value in params_dict.items():
+            params_dict[key] = value[0]
+
+        self.model_params = params_dict
+
     def load_lum_file(self):
         """Load luminosity data from kepler simulation
         """
