@@ -508,21 +508,3 @@ class BurstFit:
         ax.legend()
         plt.tight_layout()
         plt.show(block=False)
-
-
-def plot_obs(bfit, obs=0):
-    fig, ax = plt.subplots(1, 3)
-    nullfmt = NullFormatter()
-    for i, bprop in enumerate(('dt', 'fluence', 'peak')):
-        y_scale = {'dt': 1.0,
-                   'fluence': 1e-6,
-                   'peak': 1e-8,
-                   'fper': 1e-9,
-                   }[bprop]
-        u_bprop = f'u_{bprop}'
-        ax[i].errorbar([0], bfit.obs_data[bprop][obs] / y_scale,
-                       yerr=bfit.obs_data[u_bprop][obs] / y_scale,
-                       marker='o', capsize=3, color='C0')
-        ax[i].xaxis.set_major_formatter(nullfmt)
-    plt.tight_layout()
-    plt.show(block=False)
