@@ -1182,6 +1182,7 @@ class BurstRun(object):
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
         ax.set_xlabel('Time (s)', fontsize=fontsize)
+        ax.set_title(self.model_str)
 
         if log:
             ax.set_yscale('log')
@@ -1191,7 +1192,7 @@ class BurstRun(object):
             self.add_lightcurve(burst, ax, zero_time=zero_time, **kwargs)
 
         ax.set_xlim(xmin=-5, xmax=20)
-        plot_path = os.path.join(self.paths['plots'], 'lightcurves', self.batch_str)
+        plot_path = os.path.join(self.paths['plots'], 'lightcurves')
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
                            path=plot_path, extra='')
