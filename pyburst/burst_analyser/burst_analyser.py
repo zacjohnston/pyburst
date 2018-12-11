@@ -1160,7 +1160,7 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
-                         zero_time=True, fontsize=14, **kwargs):
+                         zero_time=True, fontsize=14, ylims=(-1,6), **kwargs):
         """Plot individual burst lightcurve
 
         parameters
@@ -1172,6 +1172,7 @@ class BurstRun(object):
         log : bool (optional)
         zero_time : bool (optional)
         fontsize : int (optional)
+        ylims : [int, int] (optional)
         """
         self.ensure_analysed_is(True)
         if not self.flags['lum_loaded']:
@@ -1192,6 +1193,7 @@ class BurstRun(object):
             self.add_lightcurve(burst, ax, zero_time=zero_time, **kwargs)
 
         ax.set_xlim(xmin=-5, xmax=20)
+        ax.set_ylim(ylims[0], ylims[1])
         plot_path = os.path.join(self.paths['plots'], 'lightcurves')
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
