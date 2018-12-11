@@ -38,7 +38,7 @@ class BurstRun(object):
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
                  load_dumps=False, set_paramaters=None, auto_discard=False,
-                 get_slopes=False, load_model_params=True):
+                 get_slopes=False, load_model_params=True, truncate_edd=True):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -62,6 +62,7 @@ class BurstRun(object):
                         'auto_discard': auto_discard,
                         'get_slopes': get_slopes,
                         'load_model_params': load_model_params,
+                        'truncate_edd': truncate_edd,
                         }
 
         self.parameters = {'lum_cutoff': 1e36,  # luminosity cutoff for burst detection
@@ -121,6 +122,7 @@ class BurstRun(object):
         self.lum = None
         self.lumf = None
         self.new_lum = None
+        self.l_edd = None
         self.model_params = None
         self.load_bursts = load_bursts
         self.load_summary = load_summary
@@ -161,6 +163,9 @@ class BurstRun(object):
                                 + 'not gauranteed to match the burst properties.'
                                 + '\nTHIS IS NOT RECOMMENDED')
             self.load_summary_table()
+
+        if truncate_edd:
+            self.l_edd = accretion.eddington_lum(mass=self.model_params['mass'], x=0.0)
 
         if analyse:
             self.analyse()
@@ -447,10 +452,16 @@ class BurstRun(object):
         self.ensure_analysed_is(False)
         if not self.load_bursts:
             self.identify_bursts()
+
+            if self.options['truncate_edd']:
+                self.truncate_eddington()
+
             self.get_fluences()
             self.identify_outliers()
+
             if self.options['get_slopes']:
                 self.get_bprop_slopes()
+
             self.get_burst_dumps()
 
         if self.options['auto_discard']:
@@ -526,6 +537,16 @@ class BurstRun(object):
         print(f'Shock removal iterations: {count}')
         self.candidates = candidates
         self.shocks = np.array(self.shocks)
+
+    def truncate_eddington(self):
+        """Truncates all super-Eddington luminosities from model lightcurve
+        """
+        mask = self.lum[:, 1] > self.l_edd
+        if True in mask:
+            self.printv('Truncating super-Eddington luminosities')
+            self.lum[:, 1][mask] = self.l_edd
+
+        self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
 
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
@@ -1189,7 +1210,7 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
-                         zero_time=True, fontsize=14, ylims=(-1,6), **kwargs):
+                         zero_time=True, fontsize=14, ylims=(-1, 8), **kwargs):
         """Plot individual burst lightcurve
 
         parameters
