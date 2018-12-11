@@ -198,6 +198,15 @@ class BurstRun(object):
 
         self.model_params = params_dict
 
+    def check_lum_loaded(self):
+        """Checks if luminosity file has been loaded
+        """
+        if not self.flags['lum_loaded']:
+            if self.flags['lum_does_not_exist']:
+                return
+            else:
+                self.load_lum_file()
+
     def load_lum_file(self):
         """Load luminosity data from kepler simulation
         """
@@ -463,6 +472,8 @@ class BurstRun(object):
                 self.get_bprop_slopes()
 
             self.get_burst_dumps()
+        elif self.options['truncate_edd']:
+            self.truncate_eddington()
 
         if self.options['auto_discard']:
             self.discard = self.get_discard()
@@ -486,13 +497,8 @@ class BurstRun(object):
            4. Identify short-wait bursts (below some fraction of mean dt)
            5. Get start/end times (discard final burst if cut off)
         """
-        if not self.flags['lum_loaded']:
-            if self.flags['lum_does_not_exist']:
-                return
-            else:
-                self.load_lum_file()
-
         self.printv('Identifying bursts')
+        self.check_lum_loaded()
         self.get_burst_candidates()
 
         try:
