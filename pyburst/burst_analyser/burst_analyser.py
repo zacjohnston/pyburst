@@ -1080,7 +1080,7 @@ class BurstRun(object):
         y_scales = {'tDel': 3600, 'dt': 3600,
                     'fluence': 1e39, 'peak': 1e38}
 
-        fig, ax = plt.subplots(len(bprops), 1, figsize=(6, 8), sharex=True)
+        fig, ax = plt.subplots(len(bprops), 1, figsize=(6, 8), sharex='all')
         bursts = self.clean_bursts()
 
         bursts_discard = self.clean_bursts(exclude_discard=True)
@@ -1098,6 +1098,8 @@ class BurstRun(object):
                     ax[i].set_xticklabels([])
 
             if show_mean:
+                mean = None
+                std = None
                 for burst in bursts_discard.itertuples():
                     bslice = bursts_discard.loc[:burst.Index][bprop]
                     mean = np.mean(bslice) / y_scale
@@ -1153,7 +1155,7 @@ class BurstRun(object):
             self.printv('Slopes not yet calculated')
             self.get_bprop_slopes()
 
-        fig, ax = plt.subplots(3, 1, figsize=(6, 8), sharex=True)
+        fig, ax = plt.subplots(3, 1, figsize=(6, 8), sharex='all')
         markersize = 8
         markeredgecolor = '0'
         fontsize = 14
@@ -1272,6 +1274,9 @@ class BurstRun(object):
         ax : matplotlib axis
             axis object to add lightcurves to
         zero_time : bool
+        color : str
+        alpha : flt
+        linewidth : flt
         """
         yscale = 1e38
         if burst > self.n_bursts - 1\

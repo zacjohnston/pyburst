@@ -13,7 +13,7 @@ import time
 # kepler_grids
 from . import burst_analyser
 from . import burst_tools
-from pyburst.grids import grid_tools, grid_strings, grid_analyser
+from pyburst.grids import grid_tools, grid_strings
 from pyburst.misc.pyprint import print_title
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
