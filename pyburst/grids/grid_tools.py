@@ -440,11 +440,9 @@ def check_finished(batches, source, efficiency=True, show='all',
     print_strings = []
     print_idx = {'finished': [], 'not_finished': [],
                  'started': [], 'not_started': []}
-
     for batch in batches:
         n_runs = get_nruns(batch=batch, source=source)
         print_strings += [f'===== Batch {batch} =====']
-        batch_path = grid_strings.get_batch_models_path(batch, source)
 
         for run in range(1, n_runs + 1):
             run_str = grid_strings.get_run_string(run, basename)
@@ -458,6 +456,7 @@ def check_finished(batches, source, efficiency=True, show='all',
             cmd_file = f'{run_str}.cmd'
             cmd_filepath = os.path.join(run_path, cmd_file)
 
+            t_end = None
             try:
                 with open(cmd_filepath) as f:
                     lines = f.readlines()
