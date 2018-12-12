@@ -365,11 +365,6 @@ def get_unique_param(param, source):
 def combine_grid_tables(batches, table_basename, source, **kwargs):
     """Reads table files of batches and combines them into a single file
     """
-    def get_filepath(base, source, batch, table_path):
-        filename = grid_strings.get_batch_filename(prefix=base, batch=batch, source=source,
-                                                   extension='.txt')
-        return os.path.join(table_path, filename)
-
     source = grid_strings.source_shorthand(source=source)
     path = kwargs.get('path', GRIDS_PATH)
     table_path = os.path.join(path, 'sources', source, table_basename)
@@ -377,8 +372,10 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
     print(f'Combining grid tables for: {table_basename}')
 
     # ===== writing column names =====
-    filepath = get_filepath(base=table_basename, source=source, batch=batches[0], table_path=table_path)
-    table_in = ascii.read(filepath)
+    filename_in = grid_strings.get_batch_filename(prefix=table_basename, batch=batches[0],
+                                               source=source, extension='.txt')
+    filepath_in = os.path.join(table_path, filename_in)
+    table_in = ascii.read(filepath_in)
     cols = np.concatenate([['batch'], table_in.colnames])
     table_out = pd.DataFrame(columns=cols)
 
@@ -386,9 +383,10 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
     last = batches[-1]
     for batch in batches:
         sys.stdout.write(f'\r{source} {batch}/{last}')
-        filepath = get_filepath(base=table_basename, source=source, batch=batch, table_path=table_path)
-
-        table_in = ascii.read(filepath)
+        filename_batch = grid_strings.get_batch_filename(prefix=table_basename, batch=batch,
+                                                         source=source, extension='.txt')
+        filepath_batch = os.path.join(table_path, filename_batch)
+        table_in = ascii.read(filepath_batch)
         data = table_in.to_pandas()
         data['batch'] = batch
         table_out = pd.concat([table_out, data])
@@ -396,9 +394,9 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
 
     # ===== Ensure column order =====
     table_out = table_out[cols]
-    filename = grid_strings.get_source_filename(source, table_basename, extension='.txt')
-    filepath = os.path.join(table_path, filename)
-    write_pandas_table(table_out, filepath)
+    filename_out = grid_strings.get_source_filename(source, table_basename, extension='.txt')
+    filepath_out = os.path.join(table_path, filename_out)
+    write_pandas_table(table_out, filepath_out)
 
 
 def check_finished(batches, source, efficiency=True, show='all',
