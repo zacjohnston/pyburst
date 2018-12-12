@@ -19,28 +19,6 @@ def show_plot(fig, save, savepath, savename):
         plt.show(block=False)
 
 
-def save_grid_params(source, param_list=('x', 'z', 'qb', 'mass')):
-    """Iterates over grid parameters and plots grid points
-    """
-    kgrid = grid_analyser.Kgrid(source=source, exclude_test_batches=False,
-                                powerfits=False, verbose=False)
-    unique = kgrid.unique_params
-    savepath = os.path.join(GRIDS_PATH, 'sources', source, 'plots', 'grid')
-
-    for param in param_list:
-        not_param = [x for x in param_list if x != param]
-        fixed = {}
-
-        # Just use the second of the other params (to avoid border values)
-        for not_p in not_param:
-            fixed[not_p] = unique[not_p][1]
-
-        fig, ax = kgrid.plot_grid_params(var=['accrate', param], fixed=fixed,
-                                         show=False)
-        filename = f'grid_{source}_{param}.pdf'
-        show_plot(fig, save=True, savepath=savepath, savename=filename)
-
-
 def plot_flags(kgrid, fixed=None, flag='short_waits'):
     """Map out parameters where short-wait bursts occur
     """
