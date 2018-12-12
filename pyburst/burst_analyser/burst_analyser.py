@@ -51,6 +51,7 @@ class BurstRun(object):
                       'shocks': False,
                       'zeros': False,
                       'calculated_slopes': False,
+                      'super_eddington': False,
                       }
 
         self.options = {'verbose': verbose,
@@ -550,6 +551,7 @@ class BurstRun(object):
         mask = self.lum[:, 1] > self.l_edd
         if True in mask:
             self.printv('Truncating super-Eddington luminosities')
+            self.flags['super_eddington'] = True
             self.lum[:, 1][mask] = self.l_edd
 
             # ----- reset burst peaks -----
