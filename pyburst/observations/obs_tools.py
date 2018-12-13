@@ -56,9 +56,19 @@ def load_epoch_lightcurve(epoch, source):
     return table
 
 
-def interpolate_lightcurve(lc_table):
+def extract_lightcurve_array(lc_table):
+    """Returns simple LC array with [time, flux, u_flux] columns
+    """
+    x = np.array(lc_table['time'] + 0.5 * lc_table['dt'])
+    y = np.array(lc_table['flux'])
+    u_y = np.array(lc_table['u_flux'])
+    return np.stack([x, y, u_y], axis=1)
+
+
+def interpolate_lightcurve(lc_table, lc_array=None):
     """Returns linear interpolator of epoch lightcurve
     """
-    x = np.array(lc_table['time'] + 0.5*lc_table['dt'])
-    y = np.array(lc_table['flux'])
-    return interp1d(x=x, y=y)
+    if lc_array is None:
+        lc_array = extract_lightcurve_array(lc_table)
+
+    return interp1d(x=lc_array[:, 0], y=lc_array[:, 1])
