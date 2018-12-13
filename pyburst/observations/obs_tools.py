@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from scipy.interpolate import interp1d
 import os
 
 
@@ -53,3 +54,11 @@ def load_epoch_lightcurve(epoch, source):
     for key, item in factors.items():
         table[key] *= item
     return table
+
+
+def interpolate_lightcurve(lc_table):
+    """Returns linear interpolator of epoch lightcurve
+    """
+    x = np.array(lc_table['time'] + 0.5*lc_table['dt'])
+    y = np.array(lc_table['flux'])
+    return interp1d(x=x, y=y)
