@@ -56,6 +56,20 @@ def load_epoch_lightcurve(epoch, source):
     return table
 
 
+def fill_lightcurve(lc_table, n_x=1000):
+    """Returns lightcurve [time, flux] with higher time-sampling (interpolated)
+    """
+    lc_array = extract_lightcurve_array(lc_table)
+    interp = interpolate_lightcurve(lc_array=lc_array)
+
+    t0 = lc_array[0, 0]
+    t1 = lc_array[-1, 0]
+    x = np.linspace(t0, t1, n_x)
+    y = interp(x)
+
+    return np.stack([x, y], axis=1)
+
+
 def extract_lightcurve_array(lc_table):
     """Returns simple LC array with [time, flux, u_flux] columns
     """
