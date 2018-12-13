@@ -56,6 +56,17 @@ def load_epoch_lightcurve(epoch, source):
     return table
 
 
+def get_peak_length(lc_table, peak_frac=0.75):
+    """Returns peak length for given lightcurve table
+    """
+    lc_filled = fill_lightcurve(lc_table)
+    peak = np.max(lc_table.flux)
+    mask = lc_filled[:, 1] > peak_frac*peak
+    time_slice = lc_filled[mask, 0]
+
+    return time_slice[-1] - time_slice[0]
+
+
 def fill_lightcurve(lc_table, n_x=1000):
     """Returns lightcurve [time, flux] with higher time-sampling (interpolated)
     """
