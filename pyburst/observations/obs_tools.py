@@ -43,11 +43,13 @@ def load_epoch_lightcurve(epoch, source):
     epoch : int
     source : str
     """
-    # Time [s], dt [s], average flux and error [10^-9 erg/cm^2/s], average
-    # blackbody temperature and error [keV], average blackbody normalisation
-    # and error [(km/d_10kpc)^2]
     columns = ('time', 'dt', 'flux', 'u_flux', 'kt', 'u_kt', 'normal', 'u_normal', 'chi2')
+    factors = {'flux': 1e-9, 'u_flux': 1e-9}
+
     filepath = obs_strings.epoch_filepath(epoch=epoch, source=source)
     table = pd.read_csv(filepath, delim_whitespace=True, comment='#', header=None,
                         names=columns)
+
+    for key, item in factors.items():
+        table[key] *= item
     return table
