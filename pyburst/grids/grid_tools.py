@@ -28,11 +28,11 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 # TODO: rewrite docstrings
 
 
-def write_pandas_table(table, filepath):
+def write_pandas_table(table, filepath, justify='left'):
     """Write a given pandas table to file
     """
     print(f'Writing: {filepath}')
-    table_str = table.to_string(index=False, formatters=FORMATTERS)
+    table_str = table.to_string(index=False, formatters=FORMATTERS, justify=justify)
     with open(filepath, 'w') as f:
         f.write(table_str)
 
