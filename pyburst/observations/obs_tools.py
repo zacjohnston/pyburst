@@ -65,10 +65,13 @@ def extract_lightcurve_array(lc_table):
     return np.stack([x, y, u_y], axis=1)
 
 
-def interpolate_lightcurve(lc_table, lc_array=None):
+def interpolate_lightcurve(lc_table=None, lc_array=None):
     """Returns linear interpolator of epoch lightcurve
     """
     if lc_array is None:
-        lc_array = extract_lightcurve_array(lc_table)
+        if lc_table is None:
+            raise ValueError('Must provide one of [lc_table, lc_array]')
+        else:
+            lc_array = extract_lightcurve_array(lc_table)
 
     return interp1d(x=lc_array[:, 0], y=lc_array[:, 1])
