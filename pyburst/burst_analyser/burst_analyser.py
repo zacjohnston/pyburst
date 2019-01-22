@@ -8,7 +8,7 @@ from scipy.signal import argrelextrema
 from scipy.stats import linregress
 
 # kepler_grids
-from . import burst_tools
+from pyburst.burst_analyser import burst_tools
 from pyburst.grids import grid_tools, grid_strings
 from pyburst.kepler import kepler_tools
 from pyburst.kepler import kepler_plot
