@@ -158,10 +158,11 @@ def get_potential_newtonian(r, m):
     return phi_newton
 
 
-def get_potential_gr(r, m):
+def get_potential_gr(r, m, redshift=None):
     """Returns gravitational potentials (phi) given R and M (GR)
     """
-    redshift = get_redshift(r=r, m=m)
+    if redshift is None:
+        redshift = get_redshift(r=r, m=m)
     phi_gr = -(redshift-1)*c**2 / redshift
     return phi_gr
 
@@ -205,6 +206,5 @@ def gravity_summary(r, m):
     print_dashes()
     print('potential (GR, erg/g)')
     print(f'{phi_gr:.3e}')
-
 
     return g_newton, g_gr, phi_newton, phi_gr
