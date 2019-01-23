@@ -1,4 +1,5 @@
 import numpy as np
+from astropy import units
 
 from pyburst.grids import grid_analyser
 from pyburst.physics import gravity
@@ -10,16 +11,26 @@ def add_alpha(kgrid):
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     """
-    pass
+    add_redshift_radius_gr(kgrid)
+    add_phi(kgrid)
+    add_accretion_luminosity(kgrid)
 
 
-def add_accretion_energy(kgrid):
-    """Adds redshift (1+z) column to given Kgrid
+def add_accretion_luminosity(kgrid):
+    """Adds accretion luminosity column to given Kgrid
 
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     """
-    pass
+    mdot_edd = 1.75e-8  # M_sun / yr
+    msunyr_to_gramsec = (units.M_sun / units.year).to(units.g / units.s)
+
+    if 'phi' not in kgrid.params.columns:
+        raise ValueError('No phi column in kgrid.params, try using add_phi()')
+
+    mdot = kgrid.params.accrate * mdot_edd * msunyr_to_gramsec
+    lum_acc = -mdot * kgrid.params.phi
+    kgrid.params['lum_acc'] = lum_acc
 
 
 def add_redshift_radius_gr(kgrid, m_ratio=1.0):
@@ -54,8 +65,8 @@ def add_phi(kgrid):
         grid object containing model data
     """
     if 'redshift' not in kgrid.params.columns:
-        raise ValueError('No redshift column in kgrid.params. '
-                         'Try running add_redshift_radius_gr()')
+        raise ValueError('No redshift column in kgrid.params, '
+                         'Try using add_redshift_radius_gr()')
 
     phi = gravity.get_potential_gr(redshift=kgrid.params.redshift)
     kgrid.params['phi'] = phi
