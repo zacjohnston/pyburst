@@ -8,6 +8,8 @@ from pyburst.physics import gravity
 def add_alpha(kgrid):
     """Adds alpha column to given Kgrid
 
+    parameters
+    ----------
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     """
@@ -20,6 +22,8 @@ def add_alpha(kgrid):
 def add_lum_acc(kgrid):
     """Adds accretion luminosity column to given Kgrid
 
+    parameters
+    ----------
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     """
@@ -35,6 +39,8 @@ def add_lum_acc(kgrid):
 def add_acc_energy(kgrid):
     """Adds accretion energy column to given Kgrid
 
+    parameters
+    ----------
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     """
@@ -45,6 +51,8 @@ def add_acc_energy(kgrid):
 def add_redshift(kgrid, m_ratio=1.0):
     """Adds redshift (1+z) column to given Kgrid
 
+    parameters
+    ----------
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     m_ratio : flt (optional)
@@ -68,6 +76,8 @@ def add_redshift(kgrid, m_ratio=1.0):
 def add_phi(kgrid):
     """Adds phi (gravitational potential) column to given Kgrid
 
+    parameters
+    ----------
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     """
@@ -79,6 +89,17 @@ def add_phi(kgrid):
 
 def check_column(table, column, label, remedy):
     """Checks if column exists in table
+
+    parameters
+    ----------
+    table : pd.DataFrame
+        table to check for columns
+    column : str
+        name of column to check for
+    label : str
+        name of table
+    remedy : str
+        suggested function to use
     """
     if column not in table.columns:
         raise ValueError(f'No {column} column in kgrid.{label}, try using {remedy}')
