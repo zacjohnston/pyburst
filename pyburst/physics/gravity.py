@@ -158,11 +158,14 @@ def get_potential_newtonian(r, m):
     return phi_newton
 
 
-def get_potential_gr(r, m, redshift=None):
+def get_potential_gr(r=None, m=None, redshift=None):
     """Returns gravitational potentials (phi) given R and M (GR)
     """
     if redshift is None:
+        if None in [r, m]:
+            raise ValueError('Must provide either redshift, or both r and m')
         redshift = get_redshift(r=r, m=m)
+
     phi_gr = -(redshift-1)*c**2 / redshift
     return phi_gr
 
