@@ -24,13 +24,20 @@ def add_accretion_luminosity(kgrid):
     """
     mdot_edd = 1.75e-8  # M_sun / yr
     msunyr_to_gramsec = (units.M_sun / units.year).to(units.g / units.s)
-
-    if 'phi' not in kgrid.params.columns:
-        raise ValueError('No phi column in kgrid.params, try using add_phi()')
+    check_column(kgrid.params, column='phi', label='params', remedy='add_phi()')
 
     mdot = kgrid.params.accrate * mdot_edd * msunyr_to_gramsec
     lum_acc = -mdot * kgrid.params.phi
     kgrid.params['lum_acc'] = lum_acc
+
+
+def add_accretion_energy(kgrid):
+    """Adds accretion energy column to given Kgrid
+
+    kgrid : grid_analyser.Kgrid
+        grid object containing model data
+    """
+    pass
 
 
 def add_redshift_radius_gr(kgrid, m_ratio=1.0):
@@ -64,9 +71,15 @@ def add_phi(kgrid):
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     """
-    if 'redshift' not in kgrid.params.columns:
-        raise ValueError('No redshift column in kgrid.params, '
-                         'Try using add_redshift_radius_gr()')
+    check_column(kgrid.params, column='redshift', label='params',
+                 remedy='add_redshift_radius_gr()')
 
     phi = gravity.get_potential_gr(redshift=kgrid.params.redshift)
     kgrid.params['phi'] = phi
+
+
+def check_column(table, column, label, remedy):
+    """Checks if column exists in table
+    """
+    if column not in table.columns:
+        raise ValueError(f'No {column} column in kgrid.{label}, try using {remedy}')
