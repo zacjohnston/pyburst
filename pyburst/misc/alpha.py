@@ -13,7 +13,7 @@ def add_alpha(kgrid):
     pass
 
 
-def add_redshift(kgrid, m_ratio=1.0, radius=None):
+def add_redshift_radius_gr(kgrid, m_ratio=1.0):
     """Adds redshift (1+z) column to given Kgrid
 
     kgrid : grid_analyser.Kgrid
@@ -23,12 +23,17 @@ def add_redshift(kgrid, m_ratio=1.0, radius=None):
     radius : flt | array
         newtonian radius of models
     """
-    if radius is None:
-        print('Using default radius=10km')
-        radius = 10
+    default_radius = 10
 
+    if 'radius' not in kgrid.params.columns:
+        print('Using default radius=10km')
+        kgrid.params['radius'] = default_radius
+
+    radii = np.array(kgrid.params.radius)
     masses = np.array(kgrid.params.mass)
-    r_ratios, redshifts = gravity.gr_corrections(r=radius, m=masses, phi=m_ratio)
+
+    r_ratios, redshifts = gravity.gr_corrections(r=radii, m=masses, phi=m_ratio)
+    kgrid.params['radius_gr'] = radii * r_ratios
     kgrid.params['redshift'] = redshifts
 
 
