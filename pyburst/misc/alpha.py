@@ -11,7 +11,7 @@ def add_alpha(kgrid):
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     """
-    add_redshift_radius_gr(kgrid)
+    add_redshift(kgrid)
     add_phi(kgrid)
     add_lum_acc(kgrid)
     add_acc_energy(kgrid)
@@ -42,7 +42,7 @@ def add_acc_energy(kgrid):
     kgrid.summ['acc_energy'] = kgrid.params.lum_acc * kgrid.summ.dt
 
 
-def add_redshift_radius_gr(kgrid, m_ratio=1.0):
+def add_redshift(kgrid, m_ratio=1.0):
     """Adds redshift (1+z) column to given Kgrid
 
     kgrid : grid_analyser.Kgrid
@@ -67,14 +67,11 @@ def add_redshift_radius_gr(kgrid, m_ratio=1.0):
 
 def add_phi(kgrid):
     """Adds phi (gravitational potential) column to given Kgrid
-        Requires kgrid.params columns: radius_gr, redshift
-        If these don't exist, run add_phi()
 
     kgrid : grid_analyser.Kgrid
         grid object containing model data
     """
-    check_column(kgrid.params, column='redshift', label='params',
-                 remedy='add_redshift_radius_gr()')
+    check_column(kgrid.params, column='redshift', label='params', remedy='add_redshift()')
 
     phi = gravity.get_potential_gr(redshift=kgrid.params.redshift)
     kgrid.params['phi'] = phi
