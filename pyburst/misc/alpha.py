@@ -18,6 +18,11 @@ def add_alpha(kgrid):
     add_lum_acc(kgrid)
     add_acc_energy(kgrid)
 
+    summ = kgrid.summ
+    kgrid.summ['alpha'] = summ.acc_energy / summ.fluence
+    kgrid.summ['u_alpha'] = summ.alpha * np.sqrt((summ.u_acc_energy / summ.acc_energy)**2
+                                                 + (summ.u_fluence / summ.fluence)**2)
+
 
 def add_lum_acc(kgrid):
     """Adds accretion luminosity column to given Kgrid
