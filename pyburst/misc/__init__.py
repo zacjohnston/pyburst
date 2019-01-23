@@ -7,6 +7,7 @@ from . import best_lc
 from . import resolution
 from . import reaclib
 from . import anisotropy_tools
+from . import alpha
 
 __all__ = ['pyprint',
            'misc',
@@ -17,4 +18,5 @@ __all__ = ['pyprint',
            'resolution',
            'reaclib',
            'anisotropy_tools',
+           'alpha',
            ]
