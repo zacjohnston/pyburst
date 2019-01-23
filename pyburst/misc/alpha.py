@@ -13,6 +13,15 @@ def add_alpha(kgrid):
     pass
 
 
+def add_accretion_energy(kgrid):
+    """Adds redshift (1+z) column to given Kgrid
+
+    kgrid : grid_analyser.Kgrid
+        grid object containing model data
+    """
+    pass
+
+
 def add_redshift_radius_gr(kgrid, m_ratio=1.0):
     """Adds redshift (1+z) column to given Kgrid
 
@@ -43,12 +52,10 @@ def add_phi(kgrid):
 
     kgrid : grid_analyser.Kgrid
         grid object containing model data
-    m_ratio : flt
-        mass ratio, M_gr / M_newton
     """
-    if ('radius_gr' not in kgrid.params.columns) \
-            or ('redshift' not in kgrid.params.columns):
-        add_redshift_radius_gr(kgrid)
+    if 'redshift' not in kgrid.params.columns:
+        raise ValueError('No redshift column in kgrid.params. '
+                         'Try running add_redshift_radius_gr()')
 
     phi = gravity.get_potential_gr(redshift=kgrid.params.redshift)
     kgrid.params['phi'] = phi
