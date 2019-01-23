@@ -133,6 +133,7 @@ def gr_corrections(r, m, phi=1.0, verbose=False):
         Newtonian radius (km)
     phi : flt
         Ratio of GR mass to Newtonian mass (NOTE: unrelated to grav potential phi)
+    verbose : bool
     """
     zeta = get_zeta(r=r, m=m)
 
