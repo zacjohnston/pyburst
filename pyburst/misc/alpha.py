@@ -14,6 +14,7 @@ def add_alpha(kgrid):
     add_redshift_radius_gr(kgrid)
     add_phi(kgrid)
     add_lum_acc(kgrid)
+    add_acc_energy(kgrid)
 
 
 def add_lum_acc(kgrid):
@@ -31,7 +32,7 @@ def add_lum_acc(kgrid):
     kgrid.params['lum_acc'] = lum_acc
 
 
-def add_accretion_energy(kgrid):
+def add_acc_energy(kgrid):
     """Adds accretion energy column to given Kgrid
 
     kgrid : grid_analyser.Kgrid
