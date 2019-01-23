@@ -46,6 +46,7 @@ def add_acc_energy(kgrid):
     """
     check_column(kgrid.params, column='lum_acc', label='params', remedy='add_lum_acc()')
     kgrid.summ['acc_energy'] = kgrid.params.lum_acc * kgrid.summ.dt
+    kgrid.summ['u_acc_energy'] = kgrid.params.lum_acc * kgrid.summ.u_dt
 
 
 def add_redshift(kgrid, m_ratio=1.0):
