@@ -143,12 +143,9 @@ def gr_corrections(r, m, phi=1.0, verbose=False):
     redshift = xi**2/phi    # NOTE: xi unrelated to anisotropy factor
 
     if verbose:
-        print_title(f'Using R={r:.3f} and M={m}:')
-        print_dashes()
+        print_title(f'Using R={r:.3f}, M={m}, M_GR={m*phi}:')
         print(f'    R_GR = {r*xi:.2f} km')
         print(f'(1+z)_GR = {redshift:.3f}')
-        print_dashes()
-
     return xi, redshift
 
 
