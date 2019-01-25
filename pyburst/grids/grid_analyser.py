@@ -158,6 +158,7 @@ class Kgrid:
         linear_rate = pd.DataFrame()
         enum_params = grid_tools.enumerate_params(params)
         n = len(enum_params[param_list[0]])
+
         for p in params:
             linear_rate[p] = enum_params[p]
 
@@ -169,6 +170,10 @@ class Kgrid:
             sub_params = {'qb': row.qb, 'z': row.z, 'x': row.x, 'mass': row.mass}
             table_params = self.get_params(params=sub_params)
             table_summ = self.get_summ(params=sub_params)
+
+            nan_mask = np.array(np.isnan(table_summ['rate']))  # Remove nans
+            table_summ = table_summ.iloc[~nan_mask]
+            table_params = table_params.iloc[~nan_mask]
 
             if len(table_params) < 2:
                 continue
