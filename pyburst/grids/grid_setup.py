@@ -480,18 +480,25 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
         f.write(table_str)
 
 
-def extend_runs(summ_table, source, nbursts=40, basename='xrb', nstop=9999999,
-                nsdump=500, walltime=96, do_cmd_files=True, do_jobscripts=True,
-                adapnet_filename=None):
+def extend_runs(summ_table, source, nbursts=None, t_end=None,
+                basename='xrb', nstop=9999999, nsdump=500, walltime=96,
+                do_cmd_files=True, do_jobscripts=True, adapnet_filename=None):
     """Modifies existing models (in summ_table) for resuming, to simulate more bursts
     """
     source = grid_strings.source_shorthand(source)
-    mask = summ_table['num'] < nbursts
-    short_table = summ_table[mask]
+
+    if t_end is None:
+        if nbursts is None:
+            raise ValueError('Must supply one of nbursts, t_end')
+        mask = summ_table['num'] < nbursts
+        short_table = summ_table[mask]
+    else:
+        short_table = summ_table
 
     if do_cmd_files:
         for model in short_table.itertuples():
-            t_end = (nbursts + 0.75) * model.dt
+            if nbursts is not None:
+                t_end = (nbursts + 0.75) * model.dt
             lines = [f'p nstop {nstop}', f'p nsdump {nsdump}',
                      f'@time>{t_end:.3e}', 'end']
             overwrite_cmd(model.run, model.batch, source=source, lines=lines, basename=basename)
@@ -575,7 +582,7 @@ def sync_model_restarts(source, basename='xrb', verbose=True,
     sync_model_tables : bool
         sync MODELS.txt files
     dry_run : bool
-        do everything but actually send the files (for sanity checking)
+        do everything except actually send the files (for sanity checking)
     modelfiles : list
         the model files (by extension) which will be synced
     """
