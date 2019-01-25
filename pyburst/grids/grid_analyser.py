@@ -357,13 +357,15 @@ class Kgrid:
         uncertainty_keys = {False: {'tDel': 'uTDel', 'fluence': 'uFluence',
                                     'peakLum': 'uPeakLum'},
                             True: {'dt': 'u_dt', 'fluence': 'u_fluence',
-                                   'peak': 'u_peak', 'rate': 'u_rate'},
+                                   'peak': 'u_peak', 'rate': 'u_rate',
+                                   'alpha': 'u_alpha'},
                             }.get(self.burst_analyser)
 
         y_label = {'dt': r'$\Delta t$ (hr)',
                    'fluence': r'$E_b$ ($10^{39}$ erg)',
                    'peak': r'$L_{peak}$ ($10^{38}$ erg s$^{-1}$)',
-                   'rate': 'Burst rate (day$^{-1}$)'
+                   'rate': 'Burst rate (day$^{-1}$)',
+                   'alpha': r'$\alpha$',
                    }.get(bprop)
 
         unit_f = {'tDel': 3600, 'dt': 3600,
