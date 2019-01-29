@@ -38,7 +38,8 @@ class BurstRun(object):
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
                  load_dumps=False, set_paramaters=None, auto_discard=False,
-                 get_slopes=False, load_model_params=True, truncate_edd=True):
+                 get_slopes=False, load_model_params=True, truncate_edd=True,
+                 check_stable_burning=True):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -52,6 +53,7 @@ class BurstRun(object):
                       'zeros': False,
                       'calculated_slopes': False,
                       'super_eddington': False,
+                      'stable_burning': False,
                       }
 
         self.options = {'verbose': verbose,
@@ -64,6 +66,7 @@ class BurstRun(object):
                         'get_slopes': get_slopes,
                         'load_model_params': load_model_params,
                         'truncate_edd': truncate_edd,
+                        'check_stable_burning': check_stable_burning,
                         }
 
         self.parameters = {'lum_cutoff': 1e36,  # luminosity cutoff for burst detection
@@ -87,6 +90,7 @@ class BurstRun(object):
                            'dump_time_offset': 0.0,  # time offset (s) from burst start
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
                            'min_rise_steps': 20,  # min time steps between t_pre and t_peak
+                           'stable_dt_frac': 10,  # no. of dt's from last burst to end of model to flag stable burning
                            }
         self.overwrite_parameters(set_paramaters)
 
@@ -485,6 +489,10 @@ class BurstRun(object):
 
         if not self.load_summary:
             self.setup_summary()
+
+        if self.options['check_stable_burning']:
+            self.check_stable_burning()
+
         self.flags['analysed'] = True
 
     def identify_bursts(self):
@@ -940,6 +948,25 @@ class BurstRun(object):
             cycle, time = self.dump_table.iloc[idx]
             if (time - burst.t_start) < self.parameters['dump_time_min']:
                 self.bursts.loc[burst.Index, 'dump_start'] = cycle
+
+    def check_stable_burning(self):
+        """Attempts to identify if the model has become stable
+        """
+        self.printv('Checking for stable burning')
+
+        if self.flags['too_few_bursts']:
+            self.printv('Too few bursts to check for stable burning')
+
+        last_burst = self.bursts.t_peak.iloc[-1]
+        last_timestep = self.lum[-1, 0]
+        n_dt = (last_timestep - last_burst) / self.summary['dt']
+
+        if n_dt > self.parameters['stable_dt_frac']:
+            self.flags['stable_burning'] = True
+            self.summary['stable_burning'] = True
+            self.print_warn('Stable burning regime detected. Consider verifying')
+        else:
+            self.summary['stable_burning'] = False
 
     # ===========================================================
     # Plotting
