@@ -113,7 +113,12 @@ version_definitions = {
             },
             'triplets': {},
             'he1': {},
-            'alpha1': {},
+            'alpha1': {
+                1: {
+                    'accrate': [0.01, 0.05, 0.1],
+                    'x': [0.5, 0.6, 0.7],
+                },
+            },
         },
     'exclude_all':
         {
