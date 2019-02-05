@@ -344,7 +344,7 @@ class Kgrid:
 
     def plot_burst_property(self, bprop, var, fixed, xaxis='accrate', save=False,
                             show=True, linear_rates=False, interpolate=True,
-                            shaded=True, xlims=(0.075, 0.245)):
+                            shaded=True, xlims=(0.075, 0.245), exclude_stable=True):
         """Plots given burst property against accretion rate
         
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
@@ -407,6 +407,8 @@ class Kgrid:
                 subset = self.get_params(params=params)
                 idxs = subset.index
 
+                if exclude_stable and self.summ.iloc[idxs]['stable_burning'].bool():
+                    continue
                 # mdot_tmp = np.array(x_value * subset['acc_mult'])
                 mdot_tmp = np.full(len(subset), x_value)
                 prop_tmp = np.array(self.summ.iloc[idxs][bprop] / unit_f)
