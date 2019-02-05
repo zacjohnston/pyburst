@@ -366,17 +366,16 @@ class Kgrid:
                                    'alpha': 'u_alpha'},
                             }.get(self.burst_analyser)
 
+        u_prop = uncertainty_keys.get(bprop, f'u_{bprop}')
         y_label = {'dt': r'$\Delta t$ (hr)',
                    'fluence': r'$E_b$ ($10^{39}$ erg)',
                    'peak': r'$L_{peak}$ ($10^{38}$ erg s$^{-1}$)',
                    'rate': 'Burst rate (day$^{-1}$)',
                    'alpha': r'$\alpha$',
-                   }.get(bprop)
+                   }.get(bprop, bprop)
 
         unit_f = {'tDel': 3600, 'dt': 3600,
                   'fluence': 1e39, 'peak': 1e38}.get(bprop, 1.0)
-
-        u_prop = uncertainty_keys.get(bprop)
 
         fig, ax = plt.subplots(figsize=(6, 4))
         title = ''
