@@ -37,6 +37,7 @@ version_defaults = {
             'qb': [0.0, 0.4],
         },
         'alpha1': {},
+        'alpha2': {},
     },
 
     'exclude_all': {
@@ -57,6 +58,7 @@ version_defaults = {
         'triplets': [{}],
         'he1': [{}],
         'alpha1': [{}],
+        'alpha2': [{}],
     },
 }
 
@@ -119,6 +121,7 @@ version_definitions = {
                     'x': [0.5, 0.6, 0.7],
                 },
             },
+            'alpha2': {},
         },
     'exclude_all':
         {
@@ -136,6 +139,7 @@ version_definitions = {
             'triplets': {},
             'he1': {},
             'alpha1': {},
+            'alpha2': {},
         }
 }
 
