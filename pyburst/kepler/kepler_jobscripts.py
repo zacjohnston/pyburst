@@ -171,8 +171,8 @@ fi"""
 
 N=$SLURM_ARRAY_TASK_ID
 EXE_PATH=$KEPLER_PATH/gfortran/keplery
-ADAPNET_PATH=$KEPLER_GRIDS/pyburst/files/{adapnet_filename}
-BDAT_PATH=$KEPLER_GRIDS/pyburst/files/{bdat_filename}
+ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
+BDAT_PATH=$PYBURST/files/{bdat_filename}
 
 cd $KEPLER_MODELS/{source}_{batch}/{basename}$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
@@ -196,8 +196,8 @@ $EXE_PATH {basename}$N {cmd_str} {debug_str}"""
 ###################################
 N=$SLURM_ARRAY_TASK_ID
 EXE_PATH=$KEPLER_PATH/gfortran/keplery
-ADAPNET_PATH=$KEPLER_GRIDS/pyburst/files/{adapnet_filename}
-BDAT_PATH=$KEPLER_GRIDS/pyburst/files/{bdat_filename}
+ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
+BDAT_PATH=$PYBURST/files/{bdat_filename}
 
 {dependency_bash}
 cd $KEPLER_MODELS/{source}_{batch}/xrb$N/
@@ -236,8 +236,8 @@ def write_parallel_script(run0, run1, batch, path, source, restart, debug=False,
 
 exe_path=$KEPLER_PATH/gfortran/keplery
 batch_dir=$KEPLER_MODELS/{source}_{batch}
-ADAPNET_PATH=$KEPLER_GRIDS/pyburst/files/{adapnet_filename}
-BDAT_PATH=$KEPLER_GRIDS/pyburst/files/{bdat_filename}
+ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
+BDAT_PATH=$PYBURST/files/{bdat_filename}
 
 for run in $(seq {run0} {run1}); do
    run_str="{basename}${{run}}"
