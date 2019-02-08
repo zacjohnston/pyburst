@@ -959,6 +959,8 @@ class BurstRun(object):
 
         if self.flags['too_few_bursts']:
             self.printv('Too few bursts to check for stable burning')
+            self.summary['stable_burning'] = False
+            return
 
         last_burst = self.bursts.t_peak.iloc[-1]
         last_timestep = self.lum[-1, 0]
