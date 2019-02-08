@@ -571,8 +571,11 @@ class BurstRun(object):
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
         """
-        thresh_i = np.where(self.lum[:, 1] > self.parameters['lum_cutoff'])[0]
-        lum_cut = self.lum[thresh_i]
+        radius = self.parameters['shock_radius']
+        lum = self.lum[radius:-radius]
+
+        thresh_i = np.where(lum[:, 1] > self.parameters['lum_cutoff'])[0]
+        lum_cut = lum[thresh_i]
 
         maxima_i = argrelextrema(lum_cut[:, 1], np.greater)[0]
         return lum_cut[maxima_i]
