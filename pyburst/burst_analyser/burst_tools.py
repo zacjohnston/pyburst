@@ -52,7 +52,7 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     else:
         try:
             lum = load_ascii(presaved_filepath)
-        except FileNotFoundError:
+        except (FileNotFoundError, OSError):
             print('No preloaded file found. Reloading binary')
             try:
                 lum = load_save(binary_filepath, presaved_filepath)
