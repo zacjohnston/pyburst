@@ -1330,13 +1330,17 @@ class BurstRun(object):
         for burst in range(self.n_bursts):
             self.plot_lightcurves(burst, save=True, display=False, **kwargs)
 
-    def plot_temp_profile(self, discard=5, legend=False, relative=False, **kwargs):
+    def plot_temp_profile(self, discard=5, legend=False, relative=False, plot_all=False,
+                          **kwargs):
         """Plots temperature profile at each dump_start
 
         discard : int
             number of initial burst dumps to discard
         """
-        cycles = np.array(self.dumps_starts().index)
+        if plot_all:
+            cycles = self.dump_table.cycle
+        else:
+            cycles = np.array(self.dumps_starts().index)
         kepler_plot.plot_dump_profile(run=self.run, batch=self.batch, source=self.source,
                                       cycles=cycles[discard:], legend=legend,
                                       relative=relative, y_param='tn', **kwargs)
