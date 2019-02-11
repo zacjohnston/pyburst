@@ -1087,7 +1087,7 @@ class BurstRun(object):
             ax.legend(loc=1, framealpha=1, edgecolor='0')
         self.show_save_fig(fig, display=display, save=save, plot_name='model')
 
-    def plot_convergence(self, bprops=('dt', 'fluence', 'peak'), discard=None,
+    def plot_convergence(self, bprops=('rate', 'fluence', 'peak'), discard=None,
                          legend=False, display=True, save=False, fix_xticks=False,
                          short_waits=False, outliers=False, show_mean=False,
                          shaded=True, frac=True):
