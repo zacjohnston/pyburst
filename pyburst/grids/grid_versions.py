@@ -37,7 +37,9 @@ version_defaults = {
             'qb': [0.0, 0.4],
         },
         'alpha1': {},
-        'alpha2': {},
+        'alpha2': {
+            'accrate': 0.05,
+        },
     },
 
     'exclude_all': {
@@ -147,7 +149,7 @@ version_definitions = {
 class GridVersion:
     """Class for defining different interpolator versions
 
-    Conventions
+    Conventions (NOT enforced)
     -----------
     version = -1: No models excluded from grid. Entire grid accessible.
     version = 0: Defaults excluded from grid
