@@ -60,10 +60,9 @@ class Kgrid:
         self.printv(self.grid_version)
 
         # ==== Load tables of models attributes ====
-        self.params = grid_tools.load_grid_table(tablename='params',
-                                                 source=source, verbose=verbose)
-        self.summ = grid_tools.load_grid_table(tablename='summ', source=source,
-                                               verbose=verbose, burst_analyser=burst_analyser)
+        self.params = None
+        self.summ = None
+        self.load_tables()
 
         # ===== extract the unique parameters =====
         self.unique_params = {}
@@ -96,6 +95,23 @@ class Kgrid:
         """
         return len(self.get_params(batch=batch))
 
+    def load_tables(self):
+        """Loads grid tables of model inputs and outputs, excluding models as defined
+            in grid_version
+        """
+
+        params_all = grid_tools.load_grid_table(tablename='params',
+                                                source=self.source, verbose=self.verbose)
+        summ_all = grid_tools.load_grid_table(tablename='summ', source=self.source,
+                                              verbose=self.verbose,
+                                              burst_analyser=self.burst_analyser)
+
+        self.params = grid_tools.reduce_table(table=params_all, params={},
+                                              exclude_any=self.grid_version.exclude_any,
+                                              exclude_all=self.grid_version.exclude_all)
+        idxs = self.params.index.values
+        self.summ = summ_all.loc[idxs]
+
     def get_params(self, batch=None, run=None, params=None, exclude_any=None,
                    exclude_all=None):
         """Returns models with given batch/run/params
@@ -120,18 +136,13 @@ class Kgrid:
 
         if batch is not None:
             params_full['batch'] = batch
-
         if run is not None:
             params_full['run'] = run
-
         if params is not None:
             params_full = {**params_full, **params}
 
         exclude_any = add_optional(exclude_any, empty={})
-        exclude_any = {**exclude_any, **self.grid_version.exclude_any}
-
         exclude_all = add_optional(exclude_all, empty=[])
-        exclude_all = exclude_all + self.grid_version.exclude_all
 
         models = grid_tools.reduce_table(table=self.params, params=params_full,
                                          exclude_any=exclude_any,
@@ -145,7 +156,7 @@ class Kgrid:
         subset = self.get_params(batch=batch, run=run, params=params,
                                  exclude_any=exclude_any, exclude_all=exclude_all)
         idxs = subset.index.values
-        return self.summ.iloc[idxs]
+        return self.summ.loc[idxs]
 
     def linregress_burst_rate(self):
         """Calculate linear fits to burst rate versus accretion rate
@@ -344,7 +355,7 @@ class Kgrid:
 
     def plot_burst_property(self, bprop, var, fixed, xaxis='accrate', save=False,
                             show=True, linear_rates=False, interpolate=True,
-                            shaded=True, xlims=(0.075, 0.245), exclude_stable=True):
+                            shaded=True, exclude_stable=True):
         """Plots given burst property against accretion rate
         
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
@@ -384,7 +395,6 @@ class Kgrid:
             title += f'{p}={pv:.{precision}f}, '
 
         fontsize = 14
-        # ax.set_xlim(xlims)
         ax.set_xlabel(xlabel, fontsize=fontsize)
         ax.set_ylabel(y_label, fontsize=fontsize)
         ax.set_title(title, fontsize=14)
@@ -406,12 +416,11 @@ class Kgrid:
                 subset = self.get_params(params=params)
                 idxs = subset.index
 
-                if exclude_stable and self.summ.iloc[idxs]['stable_burning'].bool():
+                if exclude_stable and self.summ.loc[idxs]['stable_burning'].bool():
                     continue
-                # mdot_tmp = np.array(x_value * subset['acc_mult'])
                 mdot_tmp = np.full(len(subset), x_value)
-                prop_tmp = np.array(self.summ.iloc[idxs][bprop] / unit_f)
-                u_tmp = np.array(self.summ.iloc[idxs][u_prop] / unit_f)
+                prop_tmp = np.array(self.summ.loc[idxs][bprop] / unit_f)
+                u_tmp = np.array(self.summ.loc[idxs][u_prop] / unit_f)
 
                 mdot_x = np.concatenate([mdot_x, mdot_tmp])
                 prop_y = np.concatenate([prop_y, prop_tmp])
@@ -431,6 +440,7 @@ class Kgrid:
             del (params[xaxis])
 
         if linear_rates:
+            xlims = (0.0, 1.0)
             ax.set_prop_cycle(None)  # reset color cycle
             linear = grid_tools.reduce_table(self.linear_rates, params=fixed)
             for row in linear.itertuples():
