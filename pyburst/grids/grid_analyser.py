@@ -57,9 +57,9 @@ class Kgrid:
         self.verbose = verbose
         self.burst_analyser = burst_analyser
         self.grid_version = grid_versions.GridVersion(source, grid_version)
+        self.printv(self.grid_version)
 
         # ==== Load tables of models attributes ====
-        self.printv('Loading kgrid')
         self.params = grid_tools.load_grid_table(tablename='params',
                                                  source=source, verbose=verbose)
         self.summ = grid_tools.load_grid_table(tablename='summ', source=source,
@@ -389,7 +389,7 @@ class Kgrid:
         ax.set_ylabel(y_label, fontsize=fontsize)
         ax.set_title(title, fontsize=14)
         plt.tight_layout()
-        # TODO: make more generic (other xaxis variables)
+
         for v in var_unique:
             # ===== check if any models exist =====
             params[var] = v
