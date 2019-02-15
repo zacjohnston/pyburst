@@ -664,6 +664,10 @@ class BurstRun(object):
 
             if self.n_bursts == 0:
                 raise NoBursts
+        elif (self.n_bursts - self.parameters['min_discard']) < 1:
+            self.print_warn('n_bursts < min_discard, most analysis will be skipped')
+            self.flags['too_few_bursts'] = True
+            self.flags['regress_too_few_bursts'] = True
 
     def get_recurrence_times(self):
         """Finds recurence times (dt (s), time between bursts)
