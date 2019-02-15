@@ -482,7 +482,7 @@ class BurstRun(object):
             self.truncate_eddington()
 
         if self.options['auto_discard']:
-            self.discard = self.get_discard()
+            self.discard = self.get_auto_discard()
         else:
             self.printv("Discarding default initial bursts, "
                         f"min_discard={self.parameters['min_discard']}")
@@ -860,7 +860,7 @@ class BurstRun(object):
         finally:
             self.flags['calculated_slopes'] = True
 
-    def get_discard(self):
+    def get_auto_discard(self):
         """Returns min no. of bursts to discard, to achieve zero slope in bprops
         """
         if not self.flags['calculated_slopes']:
