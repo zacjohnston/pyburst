@@ -78,11 +78,13 @@ class BurstRun(object):
                            'maxima_radius': 60,  # bursts are largest maxima within (sec)
                            'pre_time': 60,  # look for burst rise within sec before peak
                            'start_frac': 0.25,  # burst start as frac of peak lum above lum_pre
-                           'peak_frac': 10,  # peak must be larger than pre_lum by this frac
+                           'peak_frac': 2,  # peak must be larger than pre_lum by this frac
                            'end_frac': 0.01,  # burst end lum is this frac of peak lum
                            'min_length': 5,  # min time between burst peak and end (sec)
                            'short_wait_frac': 0.5,  # short_waits below frac of following dt
                            'min_discard': 2,  # min num of bursts to discard
+                           'ideal_discard': 20,  # no. bursts to attempt to discard, but fall back on min_discard
+                           'min_bursts': 10,  # min no. bursts (after discards) to calculate mean properties
                            'min_regress': 20,  # min num of bursts to do linear regression
                            'n_bimodal': 20,  # n_bursts to check for bimodality
                            'bimodal_sigma': 3,  # number of std's modes are separated by
@@ -489,7 +491,9 @@ class BurstRun(object):
         elif self.options['truncate_edd']:
             self.truncate_eddington()
 
-        if self.options['auto_discard']:
+        if self.options['quick_discard']:
+            self.discard = self.quick_discard()
+        elif self.options['auto_discard']:
             self.discard = self.get_auto_discard()
         else:
             self.printv("Discarding default initial bursts, "
@@ -882,6 +886,28 @@ class BurstRun(object):
                 too_few()
         finally:
             self.flags['calculated_slopes'] = True
+
+    def quick_discard(self):
+        """Returns no. of bursts to discard based on simple criteria
+        """
+        self.printv('Finding quick number of bursts to discard')
+
+        ideal_discard = self.parameters['ideal_discard']
+        min_discard = self.parameters['min_discard']
+        too_few_str = f'Too few bursts for ideal_discard, using min_discard={min_discard}'
+
+        if self.flags['too_few_bursts']:
+            self.printv(too_few_str)
+            return min_discard
+
+        n_remaining = self.n_bursts - ideal_discard
+
+        if n_remaining < self.parameters['min_bursts']:
+            self.printv(too_few_str)
+            return min_discard
+        else:
+            self.printv(f"Using ideal_discard={ideal_discard}")
+            return ideal_discard
 
     def get_auto_discard(self):
         """Returns min no. of bursts to discard to achieve zero slope in bprops
