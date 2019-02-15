@@ -807,18 +807,26 @@ class BurstRun(object):
         Note: bursts up to min_discard and short_waits will not be included
                 in the calculation of the mean
         """
-        self.bursts['outlier'] = np.full(self.n_bursts, False)
-        if self.flags['too_few_bursts']:
+        def too_few():
             self.printv('Too few bursts to get outliers')
+            self.n_outliers = 0
+            self.n_outliers_unique = 0
+
+        self.bursts['outlier'] = np.full(self.n_bursts, False)
+
+        if self.flags['too_few_bursts']:
+            too_few()
             return
 
         outliers = self.bursts.copy()['outlier']
 
         for bprop in self.parameters['outlier_bprops']:
             clean = self.clean_bursts(exclude_outliers=False)[bprop]
+
             if len(clean) == 0:
-                self.printv('Too few bursts to get outliers')
+                too_few()
                 return
+
             percentiles = burst_tools.get_quartiles(clean, self.parameters['outlier_distance'])
 
             outliers = ((self.bursts[bprop] < percentiles[0])
@@ -869,7 +877,7 @@ class BurstRun(object):
             self.flags['calculated_slopes'] = True
 
     def get_auto_discard(self):
-        """Returns min no. of bursts to discard, to achieve zero slope in bprops
+        """Returns min no. of bursts to discard to achieve zero slope in bprops
         """
         if not self.flags['calculated_slopes']:
             self.get_bprop_slopes()
