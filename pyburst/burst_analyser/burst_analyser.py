@@ -395,6 +395,7 @@ class BurstRun(object):
         exclude_min_regress : bool (optional)
         exclude_discard : bool (optional)
         """
+        # Fall back on default options
         if exclude_short_wait is None:
             exclude_short_wait = self.options['exclude_short_wait']
         if exclude_outliers is None:
@@ -1179,7 +1180,7 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
 
     def plot_linregress(self, display=True, save=False, short_waits=True,
-                        outliers=True, legend=False):
+                        outliers=True, legend=False, sigma=1):
         if self.flags['regress_too_few_bursts']:
             self.printv("Can't plot linregress: too few bursts to get slopes")
             return
@@ -1200,7 +1201,7 @@ class BurstRun(object):
         for i, bprop in enumerate(self.regress_bprops):
             ax[i].plot([0, self.n_bursts], [0, 0], ls='--', c='0', markersize=markersize)
             y = bursts_clean[f'slope_{bprop}']
-            y_err = bursts_clean[f'slope_{bprop}_err']
+            y_err = bursts_clean[f'slope_{bprop}_err'] * sigma
             ax[i].set_ylabel(bprop, fontsize=fontsize)
 
             if outliers:
