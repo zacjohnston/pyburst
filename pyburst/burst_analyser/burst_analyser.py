@@ -39,7 +39,7 @@ class BurstRun(object):
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
                  load_dumps=False, set_paramaters=None, auto_discard=False,
                  get_slopes=False, load_model_params=True, truncate_edd=True,
-                 check_stable_burning=True):
+                 check_stable_burning=True, quick_discard=True):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -67,7 +67,9 @@ class BurstRun(object):
                         'load_model_params': load_model_params,
                         'truncate_edd': truncate_edd,
                         'check_stable_burning': check_stable_burning,
+                        'quick_discard': quick_discard,
                         }
+        self.check_options()
 
         self.parameters = {'lum_cutoff': 1e36,  # luminosity cutoff for burst detection
                            'shock_radius': 2,  # neighbour zones to compare for shocks
@@ -180,6 +182,12 @@ class BurstRun(object):
     # ===========================================================
     # Loading/setup
     # ===========================================================
+    def check_options(self):
+        """Checks consistency of selected options
+        """
+        if self.options['quick_discard'] and self.options['auto_discard']:
+            raise ValueError('Only one of (quick_discard, auto_discard) can be activated')
+
     def load_model_params(self):
         """Load model parameters from grid table
         """
