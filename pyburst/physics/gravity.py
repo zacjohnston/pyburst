@@ -34,8 +34,8 @@ def get_redshift(r, m):
 def get_zeta(r, m):
     """Returns zeta factor (GM/Rc^2) for given radius and mass
     """
-    R, M = apply_units(r=r, m=m)
-    zeta = (G * M) / (R * c**2)
+    r_u, m_u = apply_units(r=r, m=m)
+    zeta = (G * m_u) / (r_u * c**2)
 
     if True in zeta >= 0.5:
         raise ValueError(f'R, M ({r:.2f}, {m:.2f}) returns zeta >= 0.5')
@@ -52,10 +52,10 @@ def get_mass_radius(g, redshift):
     red2 = redshift**2
     red2m1 = red2 - 1
 
-    R = (c**2 / (2 * g)) * (red2m1 / redshift)
-    M = (g * R**2) / (G * redshift)
+    r_u = (c**2 / (2 * g)) * (red2m1 / redshift)
+    m_u = (g * r_u**2) / (G * redshift)
 
-    return M.to(u.M_sun), R.to(u.km)
+    return m_u.to(u.M_sun), r_u.to(u.km)
 
 
 def get_accelerations(r, m):
@@ -69,8 +69,8 @@ def get_accelerations(r, m):
 def get_acceleration_newtonian(r, m):
     """Returns gravitational accelerations (Newtonian), given R and M
     """
-    R, M = apply_units(r=r, m=m)
-    g_newton = G*M/R**2
+    r_u, m_u = apply_units(r=r, m=m)
+    g_newton = G*m_u/r_u**2
     return g_newton
 
 
@@ -86,25 +86,24 @@ def get_acceleration_gr(r, m):
 def inverse_acceleration(g, m=None, r=None):
     """Returns R or M, given g and one of R or M
     """
-    def root(r, m, g):
-        return get_acceleration_gr(r=r, m=m).value - g.value
+    def root(r_root, m_root, g_root):
+        return get_acceleration_gr(r=r_root, m=m_root).value - g_root.value
 
-    if (m == None) and (r == None):
+    if (m is None) and (r is None):
         print('ERROR: need to specify one of m or r')
-    if (m != None) and (r != None):
+    if (m is not None) and (r is not None):
         print('Error: can only specify one of m or r')
 
     g *= 1e14 * u.cm/u.s/u.s
 
-    if r == None:
+    if r is None:
         r = brentq(root, 6, 50, args=(m, g))
         return r
 
 def plot_g():
     """Plots g=constant curves against R, M
     """
-    # g_li3.2/st = [1.0, 1.5, 2.0, 3.0]
-    g_list = [1.06, 1.33, 21.858, 2.66, 3.45, 4.25]
+    g_list = [1.06, 1.33, 2.1, 2.66, 3.45, 4.25]
     m_list = np.linspace(1, 2, 50)
     r_list = np.zeros(50)
 
@@ -132,7 +131,8 @@ def gr_corrections(r, m, phi=1.0, verbose=False):
     r   : flt
         Newtonian radius (km)
     phi : flt
-        Ratio of GR mass to Newtonian mass: M_GR / M_NW (NOTE: unrelated to grav potential phi)
+        Ratio of GR mass to Newtonian mass: M_GR / M_NW
+        (NOTE: unrelated to grav potential phi)
     verbose : bool
     """
     zeta = get_zeta(r=r, m=m)
@@ -153,8 +153,8 @@ def gr_corrections(r, m, phi=1.0, verbose=False):
 def get_potential_newtonian(r, m):
     """Returns gravitational potentials (phi) given R and M (Newton)
     """
-    R, M = apply_units(r=r, m=m)
-    phi_newton = -G*M/R
+    r_u, m_u = apply_units(r=r, m=m)
+    phi_newton = -G*m_u/r_u
     return phi_newton
 
 
@@ -182,7 +182,6 @@ def gravity_summary(r, m):
     """Prints summary gravitational properties given R, M
     """
     redshift = get_redshift(r=r, m=m)
-    zeta = get_zeta(r=r, m=m)
     phi_newton, phi_gr = get_potentials(r=r, m=m)
     g_newton, g_gr = get_accelerations(r=r, m=m)
 
