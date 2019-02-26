@@ -6,12 +6,13 @@ import astropy.units as u
 import astropy.constants as const
 from matplotlib.ticker import NullFormatter
 
-# kepler_grids
+# pyburst
 from pyburst.interpolator import interpolator
 from .mcmc_versions import McmcVersion
 from pyburst.mcmc.mcmc_tools import print_params
 from pyburst.misc import pyprint
 from pyburst.synth import synth
+from pyburst.physics import gravity
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 PYBURST_PATH = os.environ['PYBURST']
@@ -41,6 +42,7 @@ def default_plt_options():
 
 default_plt_options()
 
+# TODO: Docstrings
 
 class BurstFit:
     """Class for comparing modelled bursts to observed bursts
@@ -48,8 +50,14 @@ class BurstFit:
 
     def __init__(self, source, version, verbose=True,
                  lhood_factor=1, debug=False, priors_only=False,
-                 re_interp=False, u_fper_frac=0.0, zero_lhood=-np.inf, **kwargs):
-
+                 re_interp=False, u_fper_frac=0.0, zero_lhood=-np.inf,
+                 reference_mass=1.4, reference_radius=10, **kwargs):
+        """
+        reference_mass : float
+            mass (Msun) that 'g' factor is relative to (i.e. mass used in Kepler)
+        reference_radius : float
+            Newtonian radius (km) used in Kepler
+        """
         self.source = source
         self.source_obs = obs_source_map.get(self.source, self.source)
         self.version = version
@@ -59,6 +67,8 @@ class BurstFit:
         self.param_idxs = {}
         self.interp_idxs = {}
         self.get_param_indexes()
+        self.reference_mass = reference_mass
+        self.reference_radius = reference_radius
         self.has_g = 'g' in self.mcmc_version.param_keys
         self.has_logz = 'logz' in self.mcmc_version.param_keys
         self.has_xi_ratio = 'xi_ratio' in self.mcmc_version.param_keys
@@ -257,6 +267,7 @@ class BurstFit:
         """
         self.debug.start_function('shift_to_observer')
         redshift = params[self.param_idxs['redshift']]
+        # TODO: save reused values
 
         if bprop in ('dt', 'u_dt'):
             shifted = values * redshift / 3600
@@ -281,15 +292,21 @@ class BurstFit:
                 flux_factor_p = xi_p * d**2
                 flux_factor_b = xi_b * d**2
 
+            mass_nw = self.reference_mass * params[self.param_idxs['g']]
+            g_nw = gravity.get_acceleration_newtonian(r=self.reference_radius, m=mass_nw)
+            mass_gr = gravity.mass(g=g_nw, redshift=redshift).value
+            mass_ratio = mass_gr / mass_nw  # "phi" factor in GR-corrections
+
             if bprop in ('fluence', 'u_fluence'):  # (erg) --> (erg / cm^2)
-                shifted = values / (4*np.pi * flux_factor_b)
+                shifted = (values * mass_ratio) / (4*np.pi * flux_factor_b)
 
             elif bprop in ('peak', 'u_peak'):  # (erg/s) --> (erg / cm^2 / s)
-                shifted = values / (redshift * 4*np.pi * flux_factor_b)
+                shifted = (values * mass_ratio) / (redshift * 4*np.pi * flux_factor_b)
 
             elif bprop in 'fper':  # mdot --> (erg / cm^2 / s)
                 phi = (redshift - 1) * c.value ** 2 / redshift  # gravitational potential
-                shifted = (values * mdot_edd * phi) / (redshift * 4*np.pi * flux_factor_p)
+                lum_acc = values * mdot_edd * phi
+                shifted = (lum_acc * mass_ratio) / (redshift * 4*np.pi * flux_factor_p)
             else:
                 raise ValueError('bprop must be one of (dt, u_dt, rate, u_rate, '
                                  + 'fluence, u_fluence, '
@@ -344,21 +361,19 @@ class BurstFit:
         self.debug.end_function()
         return params[self.param_idxs[key]]
 
-    def transform_aliases(self, epoch_params, reference_mass=1.4):
+    def transform_aliases(self, epoch_params):
         """Transforms any alias params into the correct model form
 
         parameters
         ----------
         epoch_params : nparray
             set of parameters to be parsed to interpolator
-        reference_mass : float
-            mass (Msun) that 'g' factor is relative to
         """
         self.debug.start_function('transform_aliases')
         self.debug.variable('epoch params in', epoch_params, formatter='')
 
         if self.has_g:
-            epoch_params[:, self.interp_idxs['mass']] *= reference_mass
+            epoch_params[:, self.interp_idxs['mass']] *= self.reference_mass
         if self.has_logz:
             idx = self.interp_idxs['z']
             epoch_params[:, idx] = z_sun * 10**epoch_params[:, idx]
