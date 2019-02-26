@@ -45,15 +45,14 @@ def get_zeta(r, m):
 
 def get_mass_radius(g, redshift):
     """Return GR mass and radius for given gravity and redshift
+         Eq. B24, Keek & Heger (2011)
 
     g : gravitational acceleration
     redshift : (1+z) redshift factor
     """
-    red2 = redshift**2
-    red2m1 = red2 - 1
-
-    r_u = (c**2 / (2 * g)) * (red2m1 / redshift)
-    m_u = (g * r_u**2) / (G * redshift)
+    z = redshift - 1
+    m_u = (c**4 * z**2 * (z + 2)**2) / (4 * G * g * redshift**3)
+    r_u = (c**2 * z * (z + 2)) / (2 * g * redshift)
 
     return m_u.to(u.M_sun), r_u.to(u.km)
 
