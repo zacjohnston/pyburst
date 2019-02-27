@@ -1,6 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import anisotropy
+
+try:
+    import anisotropy
+except ModuleNotFoundError:
+    print('Concord python module "anisotropy" not found. Some functionality disabled.')
 
 
 def load_models(models=None):
