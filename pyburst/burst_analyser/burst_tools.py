@@ -7,7 +7,10 @@ import multiprocessing as mp
 import time
 
 # kepler
-import lcdata
+try:
+    import lcdata
+except ModuleNotFoundError:
+    print('Kepler python module "lcdata" not found. Some functionality disabled.')
 
 # pyburst
 from pyburst.misc import pyprint
