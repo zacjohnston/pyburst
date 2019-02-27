@@ -5,8 +5,11 @@ import sys
 from scipy.interpolate import interp1d
 
 # kepler
-import kepdump
-
+try:
+    import kepdump
+except ModuleNotFoundError:
+    print('Kepler python module "kepdump" not found. Some functionality disabled.')
+    
 # kepler_grids
 from pyburst.grids import grid_strings
 from pyburst.misc.pyprint import printv

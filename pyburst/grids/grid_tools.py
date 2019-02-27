@@ -12,7 +12,10 @@ from pyburst.physics import gravity
 from . import grid_strings
 
 # kepler
-import kepdump
+try:
+    import kepdump
+except ModuleNotFoundError:
+    print('Kepler python module "kepdump" not found. Some functionality disabled.')
 
 flt2 = '{:.2f}'.format
 flt4 = '{:.4f}'.format
