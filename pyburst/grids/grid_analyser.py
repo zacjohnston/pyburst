@@ -20,6 +20,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 
 # -----------------------------------
 # TODO:
+#       - Check for grid "completeness" (missing parameter combinations)
 #       - plot mean lightcurve for given params
 # -----------------------------------
 
