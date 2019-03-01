@@ -26,7 +26,7 @@ formatters = {'fluence': exp5}
 def resave_obs(source, obs_data=None):
     ref_source = {'gs1826': 'grid5',
                   '4u1820': '4u1820'}
-    epochs = {'gs1826': (1998, 2000, 2002),
+    epochs = {'gs1826': (1998, 2000, 2007),
               '4u1820': (1997, 2009)}
     col_order = ['epoch', 'dt', 'fluence', 'fper', 'cbol', 'peak', 'rate',
                  'u_dt', 'u_fluence', 'u_fper', 'u_cbol', 'u_peak', 'u_rate']
