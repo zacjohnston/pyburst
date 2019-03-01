@@ -499,7 +499,7 @@ class BurstFit:
         ax.set_xticks(epochs)
 
         if xlabel:
-            ax.set_xticklabels(['2007', '2000', '1998'])
+            ax.set_xticklabels([f'{year}' for year in epochs])
             ax.set_xlabel('Epoch year', fontsize=fontsize)
         else:
             ax.set_xticklabels([])
