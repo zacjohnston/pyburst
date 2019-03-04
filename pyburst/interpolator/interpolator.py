@@ -32,7 +32,8 @@ class Kemulator:
         setup interpolator
     """
 
-    def __init__(self, source, version, verbose=True, re_interp=True, burst_analyser=True):
+    def __init__(self, source, version, verbose=True, re_interp=True, burst_analyser=True,
+                 check_complete=True):
         self.verbose = verbose
         source = grid_strings.source_shorthand(source)
         self.source = source
@@ -56,6 +57,9 @@ class Kemulator:
         summ = summ.loc[idxs_kept]
         self.summ = summ
         self.params = params
+
+        if check_complete:
+            self.check_completeness()
 
         if re_interp:
             self.setup_interpolator(self.bprops)
@@ -134,6 +138,22 @@ class Kemulator:
         """
         check_params_length(params, length=len(self.version_def.param_keys))
         return self.interpolator(params)
+
+    def check_completeness(self):
+        """Checks for completeness of model grid, and raises an error if incomplete
+        """
+        self.printv('Checking model grid completeness')
+        product = 1
+        n_models = len(self.params)
+
+        for param in self.version_def.param_keys:
+            product *= len(np.unique(self.params[param]))
+
+        if product != n_models:
+            raise RuntimeError(f'Model grid is not complete! Expected {product} models, '
+                               f'but only have {n_models}. '
+                               'Some parameter combinations are missing. '
+                               "Use arg check_complete=False to disable this check.")
 
 
 def check_params_length(params, length=5):
