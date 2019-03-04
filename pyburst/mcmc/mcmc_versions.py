@@ -129,7 +129,7 @@ prior_bounds = {
         3: ((0.1, 0.20),  # mdot1
             (0.1, 0.20),  # mdot2
             (0.1, 0.20),  # mdot3
-            (0.7, 0.74),  # x
+            (0.67, 0.74),  # x
             (0.0075, 0.015),  # z
             (0.0, 0.2),  # qb2
             (0.0, 0.2),  # qb1
@@ -195,7 +195,6 @@ prior_pdfs = {
 
 
 # ===== initial position of walkers =====
-# TODO : flip epoch order
 initial_position = {
     1: {
         1: (0.102, 0.138, 0.162,
@@ -225,9 +224,9 @@ initial_position = {
         1: (0.11, 0.15, 0.17,
             0.69, 0.007, 0.16, 0.09, 0.1, 1.6, 1.5, 8.0, 1.0),
         2: (0.11, 0.14, 0.16,
-            0.735, 0.012, 0.08, 0.01, 0.02, 1.65, 1.56, 7.2, 1.1),
-        3: (0.107, 0.143, 0.165,
-            0.72, 0.01, 0.1, 0.05, 0.05, 1.6, 1.5, 7.0, 1.1),
+            0.73, 0.012, 0.08, 0.01, 0.04, 1.65, 1.56, 7.2, 1.2),
+        3: (0.107, 0.14, 0.162,
+            0.705, 0.014, 0.08, 0.01, 0.05, 1.6, 1.7, 8.0, 1.3),
         4: (0.10, 0.14, 0.16,
             0.73, 0.0065, 0.01, 0.01, 0.08, 1.44, 1.42, 7., 1.6),
         5: (0.12, 0.12, 0.12,
@@ -369,8 +368,9 @@ source_defaults = {
 #   8  : as 5, but xi_ratio instead of f_p
 #   7  : as 5, with 10x weight on burst rate
 #   9  : as 8, with 10x weight on burst rate
-#   10 : as 8, with flat xi_ratio prior
-#   11 : as 9, with flat xi_ratio prior
+#   10 : Sparse grid
+#   11 : extended grid
+#   12 : as 11, without weight on burst rate
 
 version_definitions = {
     'interpolator': {
@@ -378,6 +378,7 @@ version_definitions = {
             9: 3,
             10: 4,
             11: 2,
+            12: 2,
         },
         'grid6': {},
         'synth5': {},
@@ -417,6 +418,7 @@ version_definitions = {
             9: 8,
             10: 8,
             11: 8,
+            12: 8,
         },
         'grid6': {},
         'synth5': {},
@@ -440,6 +442,7 @@ version_definitions = {
             9: 4,
             10: 4,
             11: 4,
+            12: 4,
         },
         'grid6': {},
         'synth5': {},
@@ -464,6 +467,7 @@ version_definitions = {
             9: prior_bounds[5][2],
             10: prior_bounds[5][3],
             11: prior_bounds[5][4],
+            12: 11,
         },
         'grid6': {},
         'synth5': {},
@@ -478,6 +482,7 @@ version_definitions = {
              9: {'xi_ratio': flat_prior},
              10: {'xi_ratio': flat_prior},
              11: {'xi_ratio': flat_prior},
+             12: {'xi_ratio': flat_prior},
          },
          'grid6': {
              2: {'xi_ratio': prior_pdfs['xi_ratio'][2]},
@@ -496,7 +501,8 @@ version_definitions = {
             8: initial_position[5][1],
             9: initial_position[5][2],
             10: initial_position[5][3],
-            11: initial_position[5][2],
+            11: 9,
+            12: 9,
         },
         'grid6': {
             4: initial_position[5][4],
