@@ -139,18 +139,18 @@ prior_bounds = {
             (1, 20),  # d_b
             (0.1, 10),  # xi_ratio
             ),
-        4: ((0.085, 0.11),  # mdot1
-            (0.12, 0.14),  # mdot2
-            (0.14, 0.175),  # mdot3
-            (0.68, 0.72),  # x
-            (0.003, 0.007),  # z
-            (0.02, 0.18),  # qb1
-            (0.02, 0.18),  # qb2
-            (0.02, 0.18),  # qb3
-            (1.5/1.4, 2.2/1.4),  # g
-            (1.25, 1.4),  # redshift
-            (2.0, 10),  # d_b
-            (0.8, 6),  # xi_ratio
+        4: ((0.1, 0.18),  # mdot1
+            (0.1, 0.18),  # mdot2
+            (0.1, 0.18),  # mdot3
+            (0.67, 0.76),  # x
+            (0.0075, 0.015),  # z
+            (0.0, 0.2),  # qb1
+            (0.0, 0.2),  # qb2
+            (0.0, 0.2),  # qb3
+            (1.7 / 1.4, 2.6 / 1.4),  # g
+            (1.2, 2.0),  # redshift
+            (1, 15),  # d_b
+            (0.1, 10),  # xi_ratio
             ),
     },
 
@@ -377,6 +377,7 @@ version_definitions = {
         'grid5': {
             9: 3,
             10: 4,
+            11: 2,
         },
         'grid6': {},
         'synth5': {},
@@ -395,6 +396,7 @@ version_definitions = {
             7: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
             9: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
             10: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+            11: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         },
         'grid6': {
             4: {'rate': 5.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
@@ -414,6 +416,7 @@ version_definitions = {
             8: param_keys[5],
             9: 8,
             10: 8,
+            11: 8,
         },
         'grid6': {},
         'synth5': {},
@@ -436,6 +439,7 @@ version_definitions = {
             8: 4,
             9: 4,
             10: 4,
+            11: 4,
         },
         'grid6': {},
         'synth5': {},
@@ -459,6 +463,7 @@ version_definitions = {
             8: prior_bounds[5][1],
             9: prior_bounds[5][2],
             10: prior_bounds[5][3],
+            11: prior_bounds[5][4],
         },
         'grid6': {},
         'synth5': {},
@@ -472,6 +477,7 @@ version_definitions = {
              4: {'z': flat_prior},
              9: {'xi_ratio': flat_prior},
              10: {'xi_ratio': flat_prior},
+             11: {'xi_ratio': flat_prior},
          },
          'grid6': {
              2: {'xi_ratio': prior_pdfs['xi_ratio'][2]},
@@ -490,6 +496,7 @@ version_definitions = {
             8: initial_position[5][1],
             9: initial_position[5][2],
             10: initial_position[5][3],
+            11: initial_position[5][2],
         },
         'grid6': {
             4: initial_position[5][4],
