@@ -38,7 +38,7 @@ class BurstRun(object):
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
                  load_dumps=False, set_paramaters=None, auto_discard=False,
-                 get_slopes=False, load_model_params=True, truncate_edd=True,
+                 get_slopes=False, load_model_params=True, truncate_edd=False,
                  check_stable_burning=True, quick_discard=True):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
@@ -93,7 +93,7 @@ class BurstRun(object):
                            'max_shock_iterations': 100,  # max cycles in get_burst_candidates()
                            'dump_time_offset': 0.0,  # time offset (s) from burst start
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
-                           'min_rise_steps': 20,  # min time steps between t_pre and t_peak
+                           'min_rise_steps': 5,  # min time steps between t_pre and t_peak
                            'stable_dt_frac': 10,  # no. of dt's from last burst to end of model to flag stable burning
                            }
         self.overwrite_parameters(set_paramaters)
@@ -1338,7 +1338,7 @@ class BurstRun(object):
         for burst in bursts:
             self.add_lightcurve(burst, ax, zero_time=zero_time, **kwargs)
 
-        ax.set_xlim(xmin=-5, xmax=20)
+        ax.set_xlim(left=-5, right=20)
         ax.set_ylim(ylims[0], ylims[1])
         plot_path = os.path.join(self.paths['plots'], 'lightcurves')
 
