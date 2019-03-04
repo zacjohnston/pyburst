@@ -115,19 +115,14 @@ class Kemulator:
 
         t0 = time.time()
         self.printv(f'Creating interpolator:')
+
         for i, bp in enumerate(bprops):
             if not self.burst_analyser:
                 key = key_map[bp]
             else:
                 key = bp
-            # !!!
-            # TODO
-            # Testing forced uncertainty
-            # if key[0] == 'u':
-            #     values[:, i] = 0.02 * self.summ[key.strip('u_')]
-            # else:
             values[:, i] = self.summ[key]  # * 0.9
-            # !!!
+
         self.interpolator = LinearNDInterpolator(points, values)
         t1 = time.time()
         self.printv(f'Setup time: {t1-t0:.1f} s')
