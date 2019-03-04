@@ -107,7 +107,7 @@ class BurstRun(object):
                         'dumps': 'C0',
                         }
 
-        self.cols = ['n', 'dt', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
+        self.cols = ['n', 'dt', 'rate', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
                      't_pre', 't_pre_i', 'lum_pre', 't_start', 't_start_i',
                      'lum_start', 't_end', 't_end_i', 'lum_end', 'slope_dt',
                      'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
