@@ -265,7 +265,7 @@ source_defaults = {
     },
 
     'epoch_unique': {
-        'grid5': epoch_unique[1],
+        'grid5': epoch_unique[2],
         'grid6': epoch_unique[2],
         'synth5': epoch_unique[2],
         'he1': epoch_unique[2],
@@ -433,17 +433,7 @@ version_definitions = {
     },
 
     'epoch_unique': {
-        'grid5': {
-            4: epoch_unique[2],
-            5: 4,
-            6: 4,
-            7: 4,
-            8: 4,
-            9: 4,
-            10: 4,
-            11: 4,
-            12: 4,
-        },
+        'grid5': {},
         'grid6': {},
         'synth5': {},
         'he1': {},
