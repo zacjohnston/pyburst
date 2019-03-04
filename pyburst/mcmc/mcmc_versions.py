@@ -312,7 +312,7 @@ source_defaults = {
         'grid5': {
           'z': prior_pdfs['z'][1],
           'd_b': flat_prior,
-          'xi_ratio': prior_pdfs['xi_ratio'][1],
+          'xi_ratio': flat_prior,
         },
 
         'grid6': {
@@ -466,13 +466,7 @@ version_definitions = {
 
     'prior_pdfs': {
          'grid5': {
-             2: {'z': flat_prior},
-             3: {'xi_ratio': flat_prior},
-             4: {'z': flat_prior},
-             9: {'xi_ratio': flat_prior},
-             10: {'xi_ratio': flat_prior},
-             11: {'xi_ratio': flat_prior},
-             12: {'xi_ratio': flat_prior},
+             8: {'xi_ratio': prior_pdfs['xi_ratio'][1]},
          },
          'grid6': {
              2: {'xi_ratio': prior_pdfs['xi_ratio'][2]},
