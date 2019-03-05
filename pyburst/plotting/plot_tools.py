@@ -51,8 +51,14 @@ def mcmc_label(quantity):
         'redshift': r'$(1+z)$',
         'd_b': r'$d_\mathrm{b}$',
         'xi_ratio': r'$\xi_\mathrm{p} / \xi_\mathrm{b}$',
+        'm_gr': r'$M_\mathrm{GR}$'
     }
-    return labels.get(quantity, quantity)
+
+    # assumes last character is a single integer specifying epoch
+    if ('qb' in quantity)or ('mdot' in quantity):
+        return rf'${quantity[:-1]}_{quantity[-1]}$'
+    else:
+        return labels.get(quantity, quantity)
 
 
 def convert_mcmc_labels(param_keys):
