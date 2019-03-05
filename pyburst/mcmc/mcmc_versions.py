@@ -21,6 +21,7 @@ param_keys = {
     4: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'f_b', 'f_p'],
     5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'd_b', 'xi_ratio'],
     6: ['mdot1', 'mdot2', 'x', 'z', 'qb1', 'qb2', 'g', 'redshift', 'd_b', 'xi_ratio'],
+    7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'm_gr', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -167,6 +168,22 @@ prior_bounds = {
             (0.1, 10),  # xi_ratio
             ),
     },
+
+    7: {
+        1: ((0.1, 0.18),  # mdot1
+            (0.1, 0.18),  # mdot2
+            (0.1, 0.18),  # mdot3
+            (0.67, 0.76),  # x
+            (0.0075, 0.015),  # z
+            (0.0, 0.2),  # qb1
+            (0.0, 0.2),  # qb2
+            (0.0, 0.2),  # qb3
+            (1.7 / 1.4, 2.6 / 1.4),  # g
+            (1.0, 2.2),  # m_gr
+            (1, 15),  # d_b
+            (0.1, 10),  # xi_ratio
+            ),
+    },
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -236,6 +253,11 @@ initial_position = {
     6: {
       1: (0.23, 0.36,
           0.04, 0.008, 0.25, 0.12, 1.2, 1.4, 5.0, 1.0),
+    },
+
+    7: {
+        1: (0.105, 0.13, 0.15,
+            0.75, 0.01, 0.16, 0.09, 0.07, 1.8, 2.05, 6.0, 1.0),
     },
 }
 
@@ -379,6 +401,7 @@ version_definitions = {
             10: 4,
             11: 2,
             12: 2,
+            13: 4,
         },
         'grid6': {},
         'synth5': {},
@@ -419,6 +442,7 @@ version_definitions = {
             10: 8,
             11: 8,
             12: 8,
+            13: param_keys[7],
         },
         'grid6': {},
         'synth5': {},
@@ -458,6 +482,7 @@ version_definitions = {
             10: prior_bounds[5][3],
             11: prior_bounds[5][4],
             12: 11,
+            13: prior_bounds[7][1],
         },
         'grid6': {},
         'synth5': {},
@@ -487,6 +512,7 @@ version_definitions = {
             10: initial_position[5][3],
             11: 9,
             12: 9,
+            13: initial_position[7][1],
         },
         'grid6': {
             4: initial_position[5][4],
