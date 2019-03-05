@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.constants as const
 from matplotlib.ticker import NullFormatter
+import functools
 
 # pyburst
 from pyburst.interpolator import interpolator
@@ -69,12 +70,15 @@ class BurstFit:
         self.get_param_indexes()
         self.reference_mass = reference_mass
         self.reference_radius = reference_radius
+
+        # TODO: better way to do this?
         self.has_g = 'g' in self.mcmc_version.param_keys
         self.has_logz = 'logz' in self.mcmc_version.param_keys
         self.has_xi_ratio = 'xi_ratio' in self.mcmc_version.param_keys
         self.has_one_f = 'f' in self.mcmc_version.param_keys
         self.has_two_f = ('f_b' in self.mcmc_version.param_keys
                           and 'f_p' in self.mcmc_version.param_keys)
+        self.has_m_gr = 'm_gr' in self.mcmc_version.param_keys
 
         self.kpc_to_cm = u.kpc.to(u.cm)
         self.zero_lhood = zero_lhood
@@ -265,9 +269,25 @@ class BurstFit:
         In special case bprop='fper', 'values' must be local accrate
                 as fraction of Eddington rate.
         """
+        def gr_factors():
+            mass_nw = self.reference_mass * params[self.param_idxs['g']]
+
+            if self.has_m_gr:
+                mass_gr = params[self.param_idxs['m_gr']]
+                m_ratio = mass_gr / mass_nw
+                red = gravity.gr_corrections(r=self.reference_radius, m=mass_nw,
+                                             phi=m_ratio)[1]
+            else:
+                red = params[self.param_idxs['redshift']]
+                g_nw = gravity.get_acceleration_newtonian(r=self.reference_radius, m=mass_nw)
+                mass_gr = gravity.mass(g=g_nw, redshift=red).value
+                m_ratio = mass_gr / mass_nw
+
+            return m_ratio, red
+
+        # TODO: cache other reused values
         self.debug.start_function('shift_to_observer')
-        redshift = params[self.param_idxs['redshift']]
-        # TODO: save reused values
+        mass_ratio, redshift = gr_factors()
 
         if bprop in ('dt', 'u_dt'):
             shifted = values * redshift / 3600
@@ -291,11 +311,6 @@ class BurstFit:
                 d *= u.kpc.to(u.cm)
                 flux_factor_p = xi_p * d**2
                 flux_factor_b = xi_b * d**2
-
-            mass_nw = self.reference_mass * params[self.param_idxs['g']]
-            g_nw = gravity.get_acceleration_newtonian(r=self.reference_radius, m=mass_nw)
-            mass_gr = gravity.mass(g=g_nw, redshift=redshift).value
-            mass_ratio = mass_gr / mass_nw  # "phi" factor in GR-corrections
 
             if bprop in ('fluence', 'u_fluence'):  # (erg) --> (erg / cm^2)
                 shifted = (values * mass_ratio) / (4*np.pi * flux_factor_b)
