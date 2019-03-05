@@ -83,7 +83,7 @@ class BurstRun(object):
                            'min_length': 5,  # min time between burst peak and end (sec)
                            'short_wait_frac': 0.5,  # short_waits below frac of following dt
                            'min_discard': 2,  # min num of bursts to discard
-                           'ideal_discard': 20,  # no. bursts to attempt to discard, but fall back on min_discard
+                           'ideal_discard': 10,  # no. bursts to attempt to discard, but fall back on min_discard
                            'min_bursts': 10,  # min no. bursts (after discards) to calculate mean properties
                            'min_regress': 20,  # min num of bursts to do linear regression
                            'n_bimodal': 20,  # n_bursts to check for bimodality
