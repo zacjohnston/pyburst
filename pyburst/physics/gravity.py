@@ -142,7 +142,8 @@ def plot_g():
 
 
 def gr_corrections(r, m, phi=1.0, verbose=False):
-    """Returns GR correction factors given R, M (Eq. B5, Keek & Heger 2007)
+    """Returns GR correction factors (xi, 1+z) given Newtonian R, M
+        Ref: Eq. B5, Keek & Heger 2011
 
     parameters
     ----------
