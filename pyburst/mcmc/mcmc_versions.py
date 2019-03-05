@@ -258,6 +258,8 @@ initial_position = {
     7: {
         1: (0.105, 0.13, 0.15,
             0.75, 0.01, 0.16, 0.09, 0.07, 1.8, 2.05, 6.0, 1.0),
+        2: (0.105, 0.14, 0.16,
+            0.73, 0.008, 0.18, 0.09, 0.09, 1.8, 2.05, 6.5, 1.0),
     },
 }
 
@@ -393,6 +395,8 @@ source_defaults = {
 #   10 : Sparse grid
 #   11 : extended grid
 #   12 : as 11, without weight on burst rate
+#   13 : as 10, but using m_gr
+#   14 : as 12, but using m_gr
 
 version_definitions = {
     'interpolator': {
@@ -402,6 +406,7 @@ version_definitions = {
             11: 2,
             12: 2,
             13: 4,
+            14: 2,
         },
         'grid6': {},
         'synth5': {},
@@ -443,6 +448,7 @@ version_definitions = {
             11: 8,
             12: 8,
             13: param_keys[7],
+            14: 13,
         },
         'grid6': {},
         'synth5': {},
@@ -483,6 +489,7 @@ version_definitions = {
             11: prior_bounds[5][4],
             12: 11,
             13: prior_bounds[7][1],
+            14: 13,
         },
         'grid6': {},
         'synth5': {},
@@ -513,6 +520,7 @@ version_definitions = {
             11: 9,
             12: 9,
             13: initial_position[7][1],
+            14: initial_position[7][2],
         },
         'grid6': {
             4: initial_position[5][4],
