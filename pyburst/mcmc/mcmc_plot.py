@@ -322,28 +322,36 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None,
 
 
 def get_mass_radius(chain, discard, source, version, cap=None):
-    """Returns mass and radius given a chain containing gravity and redshift
+    """Returns GR mass and radius given a chain containing gravity and redshift
 
     Returns ndarray of equivalent form to input chain (after slicing discard/cap)
     """
-    mass_reference = 1.4
-    radius_reference = 10
-    g_reference = gravity.get_acceleration_newtonian(r=radius_reference, m=mass_reference)
+    ref_mass = 1.4
+    ref_radius = 10
 
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_walkers, n_steps, n_dimensions = chain.shape
     chain_flat = chain.reshape((-1, n_dimensions))
-
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
-    redshift = chain_flat[:, pkeys.index('redshift')]
-    g = chain_flat[:, pkeys.index('g')] * g_reference
-    mass, radius = gravity.get_mass_radius(g=g, redshift=redshift)
+    if 'm_gr' in pkeys:
+        mass_nw = ref_mass * chain_flat[:, pkeys.index('g')]
+        mass_gr = chain_flat[:, pkeys.index('m_gr')]
+        m_ratio = mass_gr / mass_nw
+        xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
+        radius_gr = ref_radius * xi
+    else:
+        redshift = chain_flat[:, pkeys.index('redshift')]
+        g_reference = gravity.get_acceleration_newtonian(r=ref_radius, m=ref_mass)
+        g = chain_flat[:, pkeys.index('g')] * g_reference
+        mass_gr, radius_gr = gravity.get_mass_radius(g=g, redshift=redshift)
+        mass_gr = mass_gr.value
+        radius_gr = radius_gr.value
 
     # reshape back into chain
     new_shape = (n_walkers, n_steps)
-    mass_reshape = mass.value.reshape(new_shape)
-    radius_reshape = radius.value.reshape(new_shape)
+    mass_reshape = mass_gr.reshape(new_shape)
+    radius_reshape = radius_gr.reshape(new_shape)
 
     return np.dstack((mass_reshape, radius_reshape))
 
@@ -351,9 +359,9 @@ def get_mass_radius(chain, discard, source, version, cap=None):
 def get_mass_radius_point(params, source, version):
     """Returns the mass, radius for a single walker point
     """
-    mass_reference = 1.4
-    radius_reference = 10
-    g_reference = gravity.get_acceleration_newtonian(r=radius_reference, m=mass_reference)
+    ref_mass = 1.4
+    ref_radius = 10
+    g_reference = gravity.get_acceleration_newtonian(r=ref_radius, m=ref_mass)
 
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
