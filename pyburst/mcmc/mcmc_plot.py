@@ -96,9 +96,10 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
     """
     default_plt_options()
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+    pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
     # TODO: re-use the loaded chainconsumer here instead of reloading
-    cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap,
-                             smoothing=smoothing)
+    cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
+                             cap=cap, smoothing=smoothing)
 
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
