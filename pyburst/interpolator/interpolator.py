@@ -1,6 +1,6 @@
 # standard
 import numpy as np
-from scipy.interpolate import LinearNDInterpolator
+from scipy.interpolate import LinearNDInterpolator, RegularGridInterpolator
 import os
 import time
 import pickle
@@ -107,7 +107,7 @@ class Kemulator:
         points = []
 
         for param in self.version_def.param_keys:
-            param_points = self.params[param]
+            param_points = np.array(self.params[param])
             points += [param_points]
             self.printv(f'{param}:  {np.unique(param_points)}')
 
@@ -125,8 +125,7 @@ class Kemulator:
                 key = key_map[bp]
             else:
                 key = bp
-            values[:, i] = self.summ[key]  # * 0.9
-
+            values[:, i] = np.array(self.summ[key])  # * 0.9
         self.interpolator = LinearNDInterpolator(points, values)
         t1 = time.time()
         self.printv(f'Setup time: {t1-t0:.1f} s')
@@ -136,7 +135,7 @@ class Kemulator:
 
         params : [acc, x, z, qb, mass]
         """
-        check_params_length(params, length=len(self.version_def.param_keys))
+        # check_params_length(params, length=len(self.version_def.param_keys))
         return self.interpolator(params)
 
     def check_completeness(self):
