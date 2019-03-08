@@ -174,16 +174,30 @@ prior_bounds = {
             (0.1, 0.18),  # mdot2
             (0.1, 0.18),  # mdot3
             (0.67, 0.76),  # x
-            (0.0075, 0.015),  # z
+            (0.005, 0.015),  # z
             (0.0, 0.2),  # qb1
             (0.0, 0.2),  # qb2
             (0.0, 0.2),  # qb3
             (1.7 / 1.4, 2.6 / 1.4),  # g
-            (1.0, 2.2),  # m_gr
+            (1.0, 2.1),  # m_gr
+            (1, 15),  # d_b
+            (0.1, 10),  # xi_ratio
+            ),
+        2: ((0.1, 0.18),  # mdot1
+            (0.1, 0.18),  # mdot2
+            (0.1, 0.18),  # mdot3
+            (0.67, 0.76),  # x
+            (0.005, 0.015),  # z
+            (0.0, 0.2),  # qb1
+            (0.0, 0.2),  # qb2
+            (0.0, 0.2),  # qb3
+            (2.0 / 1.4, 2.6 / 1.4),  # g
+            (1.0, 2.1),  # m_gr
             (1, 15),  # d_b
             (0.1, 10),  # xi_ratio
             ),
     },
+
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -256,10 +270,10 @@ initial_position = {
     },
 
     7: {
-        1: (0.105, 0.13, 0.15,
-            0.75, 0.01, 0.16, 0.09, 0.07, 1.8, 2.05, 6.0, 1.0),
-        2: (0.105, 0.14, 0.16,
-            0.73, 0.008, 0.18, 0.09, 0.09, 1.8, 2.05, 6.5, 1.0),
+        1: (0.108, 0.14, 0.16,
+            0.73, 0.008, 0.1, 0.05, 0.05, 1.6, 2.05, 6.8, 1.0),
+        2: (0.102, 0.14, 0.155,
+            0.73, 0.008, 0.1, 0.05, 0.05, 1.8, 2.0, 6.5, 1.0),
     },
 }
 
@@ -390,13 +404,13 @@ source_defaults = {
 # -------
 # grid5:
 #   8  : as 5, but xi_ratio instead of f_p
-#   7  : as 5, with 10x weight on burst rate
-#   9  : as 8, with 10x weight on burst rate
-#   10 : Sparse grid
-#   11 : extended grid
-#   12 : as 11, without weight on burst rate
-#   13 : as 10, but using m_gr
-#   14 : as 12, but using m_gr
+#   9  : with redshift, with weight
+#   10 : with redshift, with weight (sparse)
+#   11 : with redshift, with weight (extended grid)
+#   12 : with redshift, no weight
+#   13 : with m_gr, no weight (sparse)
+#   14 : with m_gr, no weight
+#   15 : with m_gr, with weight
 
 version_definitions = {
     'interpolator': {
@@ -407,6 +421,7 @@ version_definitions = {
             12: 2,
             13: 4,
             14: 2,
+            15: 2,
         },
         'grid6': {},
         'synth5': {},
@@ -426,6 +441,7 @@ version_definitions = {
             9: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
             10: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
             11: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+            15: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         },
         'grid6': {
             4: {'rate': 5.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
@@ -449,6 +465,7 @@ version_definitions = {
             12: 8,
             13: param_keys[7],
             14: 13,
+            15: 13,
         },
         'grid6': {},
         'synth5': {},
@@ -488,8 +505,9 @@ version_definitions = {
             10: prior_bounds[5][3],
             11: prior_bounds[5][4],
             12: 11,
-            13: prior_bounds[7][1],
-            14: 13,
+            13: prior_bounds[7][2],
+            14: prior_bounds[7][1],
+            15: 14,
         },
         'grid6': {},
         'synth5': {},
@@ -519,8 +537,9 @@ version_definitions = {
             10: initial_position[5][3],
             11: 9,
             12: 9,
-            13: initial_position[7][1],
+            13: initial_position[7][2],
             14: initial_position[7][2],
+            15: initial_position[7][1],
         },
         'grid6': {
             4: initial_position[5][4],
