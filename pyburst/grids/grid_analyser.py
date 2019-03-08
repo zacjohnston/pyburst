@@ -478,23 +478,23 @@ class Kgrid:
         ax.set_title(f'{self.source}_V{self.grid_version.version}')
         plt.show(block=False)
 
-    def save_all_plots(self, fixed=None, bprops=('dt', 'fluence', 'peak'), **kwargs):
-        """Saves all lhood and var plots for given z,qb
+    def save_all_plots(self, fixed=None, bprops=('rate', 'fluence', 'peak'),
+                       unique=('qb', 'mass', 'x'), var='z', **kwargs):
+        """Saves burst_property plots for various iterations of parameters
         """
 
         def use_unique():
             print("Defaulting to unique params")
             fix = {}
-            for p in ('x', 'z', 'qb', 'mass'):
+            for p in unique:
                 fix[p] = self.unique_params[p]
             return fix
 
         self.printv('Saving lhood and bprop plots:')
         if fixed is None:
-            default_fixed = {'grid5': {''}
-                             }
+            default_fixed = {}
             fixed = default_fixed.get(self.source, use_unique())
-
+        # return fixed
         for var in fixed:
             self.printv(f'Saving plot var={var}')
             not_vars = get_not_vars(var)
@@ -595,7 +595,8 @@ def check_var_fixed(var, fixed):
     return var, fixed
 
 
-def get_not_vars(var):
-    p_list = ['x', 'z', 'qb', 'mass']
+def get_not_vars(var, var2='', var3=''):
+    # TODO: more elegant way to do this
+    p_list = ['x', 'z', 'qb', 'mass', 'accrate']
     return [p for p in p_list
-            if (p != var)]
+            if (p != var) and (p != var2) and (p != var3)]
