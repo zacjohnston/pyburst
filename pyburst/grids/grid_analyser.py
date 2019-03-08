@@ -478,39 +478,26 @@ class Kgrid:
         ax.set_title(f'{self.source}_V{self.grid_version.version}')
         plt.show(block=False)
 
-    def save_all_plots(self, fixed=None, bprops=('rate', 'fluence', 'peak'),
-                       unique=('qb', 'mass', 'x'), var='z', **kwargs):
+    def save_all_plots(self, fixed=('x', 'mass', 'qb'), var='z', x_var='accrate',
+                       bprops=('rate', 'fluence', 'peak'), **kwargs):
         """Saves burst_property plots for various iterations of parameters
         """
+        # TODO: docstring
+        self.printv('Saving bprop plots:')
+        unique = {}
+        for p in fixed:
+            unique[p] = self.unique_params[p]
 
-        def use_unique():
-            print("Defaulting to unique params")
-            fix = {}
-            for p in unique:
-                fix[p] = self.unique_params[p]
-            return fix
+        full_fixed = grid_tools.enumerate_params(unique)
+        n_fixed = len(full_fixed[fixed[0]])
 
-        self.printv('Saving lhood and bprop plots:')
-        if fixed is None:
-            default_fixed = {}
-            fixed = default_fixed.get(self.source, use_unique())
-        # return fixed
-        for var in fixed:
-            self.printv(f'Saving plot var={var}')
-            not_vars = get_not_vars(var)
-            sub_fixed = {v: fixed[v] for v in not_vars}
-
-            full_fixed = grid_tools.enumerate_params(sub_fixed)
-            n_fixed = len(full_fixed[not_vars[0]])
-
-            for i in range(n_fixed):
-                fixed_input = {x: full_fixed[x][i]
-                               for x in full_fixed}
-                for bprop in bprops:
-                    self.plot_burst_property(bprop=bprop, var=var,
-                                             fixed=fixed_input,
-                                             save=True, show=False, **kwargs)
-                plt.close('all')
+        for i in range(n_fixed):
+            fixed_input = {x: full_fixed[x][i] for x in full_fixed}
+            
+            for bprop in bprops:
+                self.plot_burst_property(bprop=bprop, var=var, xaxis=x_var, save=True,
+                                         fixed=fixed_input, show=False, **kwargs)
+            plt.close('all')
 
     def print_params(self, batch, run):
         """Prints essential params for given batch-run
