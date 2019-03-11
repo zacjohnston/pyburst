@@ -356,7 +356,7 @@ class Kgrid:
 
     def plot_burst_property(self, bprop, var, fixed, xaxis='accrate', save=False,
                             show=True, linear_rates=False, interpolate=True,
-                            shaded=True, exclude_stable=True):
+                            shaded=True, exclude_stable=True, legend=True):
         """Plots given burst property against accretion rate
         
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
@@ -448,7 +448,8 @@ class Kgrid:
                 rate = row.m * np.array(xlims) + row.y0
                 ax.plot(xlims, rate)
 
-        ax.legend(fontsize=fontsize-2)
+        if legend:
+            ax.legend(fontsize=fontsize-2)
         plt.tight_layout()
         if show:
             plt.show(block=False)
@@ -493,7 +494,7 @@ class Kgrid:
 
         for i in range(n_fixed):
             fixed_input = {x: full_fixed[x][i] for x in full_fixed}
-            
+
             for bprop in bprops:
                 self.plot_burst_property(bprop=bprop, var=var, xaxis=x_var, save=True,
                                          fixed=fixed_input, show=False, **kwargs)
