@@ -392,7 +392,7 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
         table_in = ascii.read(filepath_batch)
         data = table_in.to_pandas()
         data['batch'] = batch
-        table_out = pd.concat([table_out, data])
+        table_out = pd.concat([table_out, data], sort=False)
     sys.stdout.write('\n')
 
     # ===== Ensure column order =====
