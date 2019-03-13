@@ -20,7 +20,7 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
 
-def run_analysis(batches, source, copy_params=True, reload=True, multithread=True,
+def run_analysis(batches, source, copy_params=False, reload=True, multithread=True,
                  analyse=True, save_plots=True, collect=True, load_bursts=False,
                  load_summary=False, auto_last_batch=True, basename='xrb',
                  new_models=False):
