@@ -30,8 +30,10 @@ if [ "${cluster}" == "monarch" ]; then
   TARGET='m2:/home/zacpetej/id43/kepler/runs'
 elif [ "${cluster}" == "icer" ]; then
   TARGET='icer:/mnt/home/f0003004/kepler/runs'
+elif [ "${cluster}" == "oz" ]; then
+  TARGET='oz:~/kepler/runs'
 else
-  echo "Must choose one of (icer, monarch)"
+  echo "Must choose one of (icer, monarch, oz)"
   exit 1
 fi
 
