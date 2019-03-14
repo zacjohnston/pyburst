@@ -183,7 +183,7 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
               version=version, display=display)
 
 
-def plot_walkers(chain, source, version, params=None, n_lines=100, xlim=-1,
+def plot_walkers(chain, source, version, params=None, n_lines=30, xlim=-1,
                  display=True, save=False, label=''):
     """Plots walkers vs steps (i.e. "time")
 
