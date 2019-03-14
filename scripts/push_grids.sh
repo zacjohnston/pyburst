@@ -31,7 +31,7 @@ if [ "${cluster}" == "monarch" ]; then
 elif [ "${cluster}" == "icer" ]; then
   TARGET='icer:/mnt/home/f0003004/kepler/runs'
 elif [ "${cluster}" == "oz" ]; then
-  TARGET='oz:~/kepler/runs'
+  TARGET='oz:/fred/oz011/zac/kepler/runs'
 else
   echo "Must choose one of (icer, monarch, oz)"
   exit 1
