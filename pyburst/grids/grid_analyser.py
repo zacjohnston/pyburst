@@ -356,7 +356,8 @@ class Kgrid:
 
     def plot_burst_property(self, bprop, var, fixed, xaxis='accrate', save=False,
                             show=True, linear_rates=False, interpolate=True,
-                            shaded=True, exclude_stable=True, legend=True):
+                            shaded=True, exclude_stable=True, legend=True,
+                            fix_ylims=True):
         """Plots given burst property against accretion rate
         
         bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
@@ -385,6 +386,9 @@ class Kgrid:
                    'rate': 'Burst rate (day$^{-1}$)',
                    'alpha': r'$\alpha$',
                    }.get(bprop, bprop)
+        ylims = {'rate': [2.5, 18],
+                 'fluence': [4.5, 13],
+                 'peak': [1, 5.5]}
 
         unit_f = {'tDel': 3600, 'dt': 3600,
                   'fluence': 1e39, 'peak': 1e38}.get(bprop, 1.0)
@@ -450,10 +454,14 @@ class Kgrid:
 
         if legend:
             ax.legend(fontsize=fontsize-2)
+
+        ylim = ylims.get(bprop)
+        if fix_ylims and (ylim is not None):
+            ax.set_ylim(ylim)
+
         plt.tight_layout()
         if show:
             plt.show(block=False)
-
         if save:
             fixed_str = ''
             for p, v in fixed.items():
