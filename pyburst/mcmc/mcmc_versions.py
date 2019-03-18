@@ -170,31 +170,31 @@ prior_bounds = {
     },
 
     7: {
-        1: ((0.1, 0.18),  # mdot1
-            (0.1, 0.18),  # mdot2
-            (0.1, 0.18),  # mdot3
+        1: ((0.08, 0.2),  # mdot1
+            (0.08, 0.2),  # mdot2
+            (0.08, 0.2),  # mdot3
             (0.67, 0.76),  # x
-            (0.005, 0.015),  # z
-            (0.0, 0.2),  # qb1
-            (0.0, 0.2),  # qb2
-            (0.0, 0.2),  # qb3
-            (1.7 / 1.4, 2.6 / 1.4),  # g
+            (0.0025, 0.015),  # z
+            (0.0, 0.3),  # qb1
+            (0.0, 0.3),  # qb2
+            (0.0, 0.3),  # qb3
+            (1.4 / 1.4, 2.9 / 1.4),  # g    #!!!
             (1.0, 2.1),  # m_gr
-            (1, 15),  # d_b
-            (0.1, 10),  # xi_ratio
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
             ),
-        2: ((0.1, 0.18),  # mdot1
-            (0.1, 0.18),  # mdot2
-            (0.1, 0.18),  # mdot3
+        2: ((0.08, 0.2),  # mdot1
+            (0.08, 0.2),  # mdot2
+            (0.08, 0.2),  # mdot3
             (0.67, 0.76),  # x
-            (0.005, 0.015),  # z
-            (0.0, 0.2),  # qb1
-            (0.0, 0.2),  # qb2
-            (0.0, 0.2),  # qb3
-            (2.0 / 1.4, 2.6 / 1.4),  # g
+            (0.0025, 0.0125),  # z
+            (0.0, 0.3),  # qb1
+            (0.0, 0.3),  # qb2
+            (0.0, 0.3),  # qb3
+            (1.4 / 1.4, 2.9 / 1.4),  # g
             (1.0, 2.1),  # m_gr
-            (1, 15),  # d_b
-            (0.1, 10),  # xi_ratio
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
             ),
     },
 
@@ -270,10 +270,8 @@ initial_position = {
     },
 
     7: {
-        1: (0.108, 0.14, 0.16,
-            0.73, 0.008, 0.1, 0.05, 0.05, 1.6, 2.05, 6.8, 1.0),
-        2: (0.102, 0.14, 0.155,
-            0.73, 0.008, 0.1, 0.05, 0.05, 1.8, 2.0, 6.5, 1.0),
+        1: (0.103, 0.137, 0.155,
+            0.72, 0.005, 0.2, 0.1, 0.1, 1.7, 2.0, 6.2, 0.9),
     },
 }
 
@@ -289,7 +287,7 @@ initial_position = {
 # TODO: reform into tables (saved as files), and a function to add versions (rows)
 source_defaults = {
     'param_keys': {
-        'grid5': param_keys[1],
+        'grid5': param_keys[7],
         'grid6': param_keys[5],
         'synth5': param_keys[5],
         'he1': param_keys[6],
@@ -340,7 +338,7 @@ source_defaults = {
     },
 
     'prior_bounds': {
-        'grid5': prior_bounds[1][1],
+        'grid5': prior_bounds[7][1],
         'grid6': prior_bounds[5][3],
         'synth5': prior_bounds[5][1],
         'he1': prior_bounds[6][1],
@@ -373,7 +371,7 @@ source_defaults = {
     },
 
     'initial_position': {
-        'grid5': initial_position[1][1],
+        'grid5': initial_position[7][1],
         'grid6': initial_position[5][3],
         'synth5': initial_position[5][5],
         'he1': initial_position[6][1],
@@ -403,25 +401,17 @@ source_defaults = {
 # Summary
 # -------
 # grid5:
-#   8  : as 5, but xi_ratio instead of f_p
-#   9  : with redshift, with weight
-#   10 : with redshift, with weight (sparse)
-#   11 : with redshift, with weight (extended grid)
-#   12 : with redshift, no weight
+#   1  : (successor to 14)
+#   2  : (successor to 13)
 #   13 : with m_gr, no weight (sparse)
 #   14 : with m_gr, no weight
-#   15 : with m_gr, with weight
 
 version_definitions = {
     'interpolator': {
         'grid5': {
-            9: 3,
-            10: 4,
-            11: 2,
-            12: 2,
-            13: 4,
-            14: 2,
-            15: 2,
+            2: 2,
+            3: 3,
+            13: 2,
         },
         'grid6': {},
         'synth5': {},
@@ -436,13 +426,7 @@ version_definitions = {
     },
 
     'weights': {
-        'grid5': {
-            7: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-            9: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-            10: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-            11: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-            15: {'rate': 10.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-        },
+        'grid5': {},
         'grid6': {
             4: {'rate': 5.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         },
@@ -454,18 +438,6 @@ version_definitions = {
     'param_keys': {
         'grid5': {
             -1: param_keys[5],  # dummy version for synth reference
-            4: param_keys[4],
-            5: 4,
-            6: 4,
-            7: 4,
-            8: param_keys[5],
-            9: 8,
-            10: 8,
-            11: 8,
-            12: 8,
-            13: param_keys[7],
-            14: 13,
-            15: 13,
         },
         'grid6': {},
         'synth5': {},
@@ -496,18 +468,9 @@ version_definitions = {
     'prior_bounds': {
         'grid5': {
             -1: prior_bounds[5][4],
-            4: prior_bounds[4][1],
-            5: 4,
-            6: 4,
-            7: 4,
-            8: prior_bounds[5][1],
-            9: prior_bounds[5][2],
-            10: prior_bounds[5][3],
-            11: prior_bounds[5][4],
-            12: 11,
-            13: prior_bounds[7][2],
-            14: prior_bounds[7][1],
-            15: 14,
+            2: prior_bounds[7][2],
+            3: 2,
+            13: 2,
         },
         'grid6': {},
         'synth5': {},
@@ -516,7 +479,6 @@ version_definitions = {
 
     'prior_pdfs': {
          'grid5': {
-             8: {'xi_ratio': prior_pdfs['xi_ratio'][1]},
          },
          'grid6': {
              2: {'xi_ratio': prior_pdfs['xi_ratio'][2]},
@@ -527,20 +489,7 @@ version_definitions = {
     },
 
     'initial_position': {
-        'grid5': {
-            4: initial_position[4][1],
-            5: 4,
-            6: initial_position[4][2],
-            7: initial_position[4][3],
-            8: initial_position[5][1],
-            9: initial_position[5][2],
-            10: initial_position[5][3],
-            11: 9,
-            12: 9,
-            13: initial_position[7][2],
-            14: initial_position[7][2],
-            15: initial_position[7][1],
-        },
+        'grid5': {},
         'grid6': {
             4: initial_position[5][4],
         },
