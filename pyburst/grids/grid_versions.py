@@ -5,25 +5,13 @@ import numpy as np
 version_defaults = {
     'exclude_any': {
         'adelle': {},
-
-        'biggrid2': {
-            'accrate': np.concatenate((np.arange(5, 10)/100, np.arange(11, 24, 2)/100)),
-            'qb': [0.025, 0.075, 0.125, 0.2],
-            'z': [0.001, 0.0175],
-            'x': [0.5, 0.6, 0.75, 0.77, 0.8],
-            'mass': [0.8, 1.4, 3.2, 2.6],
+        'biggrid2': {},
+        'biggrid3': {},
+        'grid4': {},
+        'grid5': {
+            'x': [0.74], 'qb': [0.05, 0.15],
+            'mass': [2.5]
         },
-
-        'biggrid3': {
-            'batch': [1],
-            'accrate': 0.1,
-        },
-
-        'grid4': {
-            'accrate': [0.22],
-            'mass': [2.0],
-        },
-        'grid5': {},
         'grid6': {},
         'synth5': {},
         'sample5': {},
@@ -37,19 +25,14 @@ version_defaults = {
             'qb': [0.0, 0.4],
         },
         'alpha1': {},
-        'alpha2': {
-            'accrate': 0.05,
-        },
+        'alpha2': {},
     },
 
     'exclude_all': {
         'adelle': [{}],
         'biggrid2': [{}],
         'biggrid3': [{}],
-        'grid4': [
-            {'x': 0.72, 'accdepth': 1e20},
-            {'x': 0.73, 'accdepth': 1e20},
-         ],
+        'grid4': [{}],
         'grid5': [{}],
         'grid6': [{}],
         'synth5': [{}],
@@ -69,21 +52,18 @@ version_definitions = {
     'exclude_any':
         {
             'adelle': {},
-            'biggrid2': {
-                1: {},
-            },
+            'biggrid2': {},
             'biggrid3': {},
             'test1': {},
             'grid4': {},
             'grid5': {
-                1: {
-                    'z': [0.0025], 'x': [0.74], 'qb': [0.05, 0.15],
-                    'mass': [1.4, 2.5], 'accrate': [0.08],
+                2: {  # sparse grid
+                    'accrate': [0.1, 0.14, 0.18], 'z': [0.005, 0.01, 0.015], 'x': [0.7, 0.74],
+                    'qb': [0.05, 0.1, 0.15, 0.2], 'mass': [1.7, 2.0, 2.5, 2.6],
                 },
-                2: {
-                    'z': [0.0025, 0.005, 0.01, 0.0125], 'x': [0.7, 0.73, 0.74],
-                    'qb': [0.05, 0.1, 0.15], 'mass': [1.4, 2.3, 2.5],
-                    'accrate': [0.08],
+                3: {  # semi-sparse grid
+                    'accrate': [0.1, 0.14, 0.18], 'z': [0.005, 0.01, 0.015], 'x': [0.74],
+                    'qb': [0.05, 0.1, 0.15, 0.2], 'mass': [1.7, 2.0, 2.5, 2.6],
                 },
             },
             'grid6': {},
@@ -115,12 +95,7 @@ version_definitions = {
             },
             'triplets': {},
             'he1': {},
-            'alpha1': {
-                1: {
-                    'accrate': [0.01, 0.05, 0.1],
-                    'x': [0.5, 0.6, 0.7],
-                },
-            },
+            'alpha1': {},
             'alpha2': {},
         },
     'exclude_all':

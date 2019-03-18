@@ -1,12 +1,12 @@
 # standard
 import numpy as np
-from scipy.interpolate import LinearNDInterpolator, RegularGridInterpolator
+from scipy.interpolate import LinearNDInterpolator
 import os
 import time
 import pickle
 
 # kepler_grids
-from pyburst.grids import grid_tools, grid_strings
+from pyburst.grids import grid_tools, grid_strings, grid_versions
 from . import interp_versions
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -44,14 +44,16 @@ class Kemulator:
         summ = grid_tools.load_grid_table('summ', source=source, burst_analyser=burst_analyser)
         params = grid_tools.load_grid_table('params', source=source)
 
-        self.version_def = interp_versions.InterpVersion(source, version)
+        self.version_def = interp_versions.InterpVersion(source=source, version=version)
+        self.grid_def = grid_versions.GridVersion(source=source,
+                                                  version=self.version_def.grid_version)
         self.bprops = self.version_def.bprops
 
         params = grid_tools.exclude_params(table=params,
-                                           params=self.version_def.exclude_any,
+                                           params=self.grid_def.exclude_any,
                                            logic='any')
         params = grid_tools.exclude_params(table=params,
-                                           params=self.version_def.exclude_all,
+                                           params=self.grid_def.exclude_all,
                                            logic='all')
         idxs_kept = params.index
         summ = summ.loc[idxs_kept]
