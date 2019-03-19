@@ -19,6 +19,8 @@ if [ "${CLUSTER}" == "monarch" ]; then
     FILE_TARGET=m:/home/zacpetej/id43/kepler_grids/sources/${SOURCE}/interpolator/
 elif [ "${CLUSTER}" == "icer" ]; then
     FILE_TARGET=isync:/mnt/home/f0003004/kepler_grids/sources/${SOURCE}/interpolator/
+elif [ "${CLUSTER}" == "oz" ]; then
+    FILE_TARGET=oz:/fred/oz011/zac/kepler_grids/sources/${SOURCE}/interpolator/
 fi
 
 rsync -av --info=progress2 ${FILE_SOURCE}/ ${FILE_TARGET}
