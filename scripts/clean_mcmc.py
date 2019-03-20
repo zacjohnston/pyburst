@@ -28,8 +28,8 @@ print(source_path)
 for file_ in file_list:
     if (source in file_
             and file_ not in ['.keep', '.gitignore']
-            and f'V{version}' in file_
-            and f'S{keep_step}' not in file_):
+            and f'_V{version}_' in file_
+            and f'_S{keep_step}.' not in file_):
         discard += [file_]
 
     elif (source in file_
