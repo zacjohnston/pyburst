@@ -387,7 +387,7 @@ class Kgrid:
                    'rate': 'Burst rate (day$^{-1}$)',
                    'alpha': r'$\alpha$',
                    }.get(bprop, bprop)
-        ylims = {'rate': [2.5, 18],
+        ylims = {'rate': [2.5, 20],
                  'fluence': [4.5, 13],
                  'peak': [1, 5.5]}
 
@@ -478,14 +478,31 @@ class Kgrid:
         print(bprop)
         return ax
 
-    def plot_summ(self, var):
-        """Plot any column from summ stable, versus batch
+    def plot_summ(self, var, batch=None):
+        """Plot any column from summ stable, versus batch/run
+
+        Parameters
+        ----------
+        var : str
+            variable from summ table to plot on y-axis
+        batch : int (optional)
+            if specified, plot only this batch, with its runs on the x-axis
         """
+        title = f'{self.source}_V{self.grid_version.version}'
+
+        if batch is None:
+            summ_table = self.summ
+            x_axis = 'batch'
+        else:
+            summ_table = self.get_summ(batch=batch)
+            x_axis = 'run'
+            title = f'{title} Batch_{batch}'
+
         fig, ax = plt.subplots()
-        ax.plot(self.summ['batch'], self.summ[var], marker='o', ls='none')
-        ax.set_xlabel('Batch')
+        ax.plot(summ_table[x_axis], summ_table[var], marker='o', ls='none')
+        ax.set_xlabel(x_axis)
         ax.set_ylabel(f'{var}')
-        ax.set_title(f'{self.source}_V{self.grid_version.version}')
+        ax.set_title(title)
         plt.show(block=False)
 
     def save_all_plots(self, fixed=('x', 'mass', 'qb'), var='z', x_var='accrate',
