@@ -478,7 +478,7 @@ class Kgrid:
         print(bprop)
         return ax
 
-    def plot_summ(self, var, batch=None):
+    def plot_summ(self, var, batch=None, v_lines=True):
         """Plot any column from summ stable, versus batch/run
 
         Parameters
@@ -487,6 +487,8 @@ class Kgrid:
             variable from summ table to plot on y-axis
         batch : int (optional)
             if specified, plot only this batch, with its runs on the x-axis
+        v_lines : bool
+            plot vertical lines between x-axis and points, if plotting single batch
         """
         title = f'{self.source}_V{self.grid_version.version}'
 
@@ -499,6 +501,10 @@ class Kgrid:
             title = f'{title} Batch_{batch}'
 
         fig, ax = plt.subplots()
+        if v_lines and (batch is not None):
+            for row in summ_table.itertuples():
+                ax.plot([row.run, row.run], [0, row.num], color='black')
+
         ax.plot(summ_table[x_axis], summ_table[var], marker='o', ls='none')
         ax.set_xlabel(x_axis)
         ax.set_ylabel(f'{var}')
