@@ -513,6 +513,8 @@ def extend_runs(summ_table, source, nbursts=None, t_end=None,
                                                       walltime=walltime, restart=True,
                                                       adapnet_filename=adapnet_filename)
 
+    return short_table
+
 
 def add_to_cmd(run, batch, source, add_line, basename='xrb'):
     """Prepends command to model .cmd file, for changing params on restart
@@ -593,6 +595,7 @@ def sync_model_restarts(source, basename='xrb', verbose=True,
         batches = np.unique(short_model_table['batch'])
 
     target_path = 'isync:~/kepler/runs/'
+    # target_path = 'oz:/fred/oz011/zac/kepler/runs/'
     sync_paths = []
 
     for batch in batches:
