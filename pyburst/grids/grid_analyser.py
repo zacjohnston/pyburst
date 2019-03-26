@@ -487,9 +487,10 @@ class Kgrid:
             variable from summ table to plot on y-axis
         batch : int (optional)
             if specified, plot only this batch, with its runs on the x-axis
-        vlines : bool
+        vlines : bool (optional)
             plot vertical lines between x-axis and points, if plotting single batch
-        hline
+        hline : int (optional)
+            place to plot horizontal bar (if None, don't plot)
         """
         title = f'{self.source}_V{self.grid_version.version}'
 
