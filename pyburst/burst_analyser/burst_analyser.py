@@ -39,7 +39,8 @@ class BurstRun(object):
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
                  load_dumps=False, set_paramaters=None, auto_discard=False,
                  get_slopes=False, load_model_params=True, truncate_edd=False,
-                 check_stable_burning=True, quick_discard=True):
+                 check_stable_burning=True, quick_discard=True,
+                 check_lumfile_monotonic=True):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -68,6 +69,7 @@ class BurstRun(object):
                         'truncate_edd': truncate_edd,
                         'check_stable_burning': check_stable_burning,
                         'quick_discard': quick_discard,
+                        'check_lumfile_monotonic': check_lumfile_monotonic,
                         }
         self.check_options()
 
@@ -228,7 +230,8 @@ class BurstRun(object):
         self.lum = burst_tools.load_lum(run=self.run, batch=self.batch,
                                         source=self.source, basename=self.basename,
                                         save=self.options['save_lum'],
-                                        reload=self.options['reload'])
+                                        reload=self.options['reload'],
+                                        check_monotonic=self.options['check_lumfile_monotonic'])
 
         if self.lum is None:
             self.flags['lum_does_not_exist'] = True
@@ -1140,7 +1143,7 @@ class BurstRun(object):
     def plot_convergence(self, bprops=('rate', 'fluence', 'peak'), discard=None,
                          legend=False, display=True, save=False, fix_xticks=False,
                          short_waits=False, outliers=False, show_mean=False,
-                         shaded=True, frac=True):
+                         shaded=True, frac=True, line_style=''):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
@@ -1217,7 +1220,7 @@ class BurstRun(object):
                            label='Short waits')
 
             ax[i].plot(bursts['n'], bursts[bprop] / y_scale,
-                       marker='o', c=self.colours['bursts'], ls='none',
+                       marker='o', c=self.colours['bursts'], ls=line_style,
                        markersize=markersize, markeredgecolor=markeredgecolor,
                        label='Bursts')
         if legend:
