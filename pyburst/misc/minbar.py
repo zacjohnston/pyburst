@@ -31,6 +31,13 @@ class Minbar:
         self.table = load_table()
         self.sources = np.unique(self.table['name'])
 
+    def check_col(self, col):
+        """Checks if given column is in the table
+        """
+        if col not in self.table.columns:
+            raise ValueError(f'column "{col}" not in table. '
+                             'Check self.table.columns for full list')
+
     def get_source(self, source):
         """Returns subset of minbar table for given source
         """
@@ -40,21 +47,37 @@ class Minbar:
 
         return grid_tools.reduce_table(self.table, params={'name': source})
 
-    def plot_time(self, var, source):
-        """Plots given burst var versus time (MJD)
+    def plot_time(self, col, source):
+        """Plots given burst col versus time (MJD)
         """
-        if var not in self.table.columns:
-            raise ValueError(f'var "{var}" not in table. '
-                             'Check self.table.columns for full list')
+        self.check_col(col)
 
         source_table = self.get_source(source)
-        yscale = y_scales.get(var, 1.0)
+        yscale = y_scales.get(col, 1.0)
 
         fig, ax = plt.subplots()
         ax.set_xlabel('Time (MJD)')
-        ax.set_ylabel(var)
+        ax.set_ylabel(col)
 
-        ax.plot(source_table['time'], source_table[var]/yscale, marker='o', ls='')
-
+        ax.plot(source_table['time'], source_table[col]/yscale, marker='o', ls='')
         plt.show(block=False)
+
+    def plot_histogram(self, col, source, bins=30, cutoff=None):
+        """Plots histogram for give col, source
+        """
+        self.check_col(col)
+
+        source_table = self.get_source(source)
+
+        if cutoff is not None:
+            source_table = source_table.iloc[np.where(source_table[col] < cutoff)]
+
+        fig, ax = plt.subplots()
+        ax.set_xlabel(f'{col}')
+        ax.set_ylabel('N Bursts')
+
+        ax.hist(source_table[col], bins=bins)
+        plt.show(block=False)
+
+
 
