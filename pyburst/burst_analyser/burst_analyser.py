@@ -1143,7 +1143,7 @@ class BurstRun(object):
     def plot_convergence(self, bprops=('rate', 'fluence', 'peak'), discard=None,
                          legend=False, display=True, save=False, fix_xticks=False,
                          short_waits=False, outliers=False, show_mean=False,
-                         shaded=True, frac=True, line_style=''):
+                         shaded=True, frac=True, line_style='-'):
         """Plots individual and average burst properties along the burst sequence
         """
         self.ensure_analysed_is(True)
