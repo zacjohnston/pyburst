@@ -707,7 +707,7 @@ class BurstRun(object):
             rise_steps = burst.t_peak_i - burst.t_pre_i
             if rise_steps < self.parameters['min_rise_steps'] \
                     or (burst.peak / burst.lum_pre) < self.parameters['peak_frac']:
-                self.printv(f'Excluding micro-burst at t={burst.t_peak:.0f} s '
+                self.printv(f'Discarding micro-burst at t={burst.t_peak:.0f} s '
                             + f'({burst.t_peak/3600:.1f} hr)')
                 try:
                     self.delete_burst(burst.Index)
