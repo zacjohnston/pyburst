@@ -740,9 +740,9 @@ class BurstRun(object):
             pre_lum = self.lum[burst.t_pre_i, 1]
 
             peak_t, peak_lum = lum_slice[0]
-            lum_diff = peak_lum - pre_lum
-
             time_from_peak = lum_slice[:, 0] - peak_t
+
+            lum_diff = peak_lum - pre_lum
             threshold_lum = pre_lum + (self.parameters['end_frac'] * lum_diff)
             thresh_i = np.where(lum_slice[:, 1] < threshold_lum)[0]
 
