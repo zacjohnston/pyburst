@@ -73,7 +73,7 @@ class BurstRun(object):
                         }
         self.check_options()
 
-        self.parameters = {'lum_cutoff': 1e36,  # luminosity cutoff for burst detection
+        self.parameters = {'lum_cutoff': 1e37,  # luminosity cutoff for burst detection
                            'shock_radius': 2,  # neighbour zones to compare for shocks
                            'shock_frac': 2.0,  # lum factor that shocks exceed neighbours by
                            'zero_replacement': 1e35,  # zero lums set to this
