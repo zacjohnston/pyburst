@@ -744,10 +744,10 @@ class BurstRun(object):
 
             lum_diff = peak_lum - pre_lum
             threshold_lum = pre_lum + (self.parameters['end_frac'] * lum_diff)
-            thresh_i = np.where(lum_slice[:, 1] < threshold_lum)[0]
+            threshold_i = np.where(lum_slice[:, 1] < threshold_lum)[0]
 
             min_length_i = np.where(time_from_peak > self.parameters['min_length'])[0]
-            intersection = list(set(thresh_i).intersection(min_length_i))
+            intersection = list(set(threshold_i).intersection(min_length_i))
 
             if len(intersection) == 0:
                 if burst.Index == self.bursts.index[-1]:
