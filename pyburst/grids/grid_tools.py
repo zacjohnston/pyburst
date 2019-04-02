@@ -492,7 +492,7 @@ def check_finished(batches, source, efficiency=True, show='all',
                     print_idx['finished'] += [string_idx]
                 else:
                     print_idx['not_finished'] += [string_idx]
-            except:
+            except FileNotFoundError:
                 progress = 0
                 timeused = 0
                 remaining = 0
