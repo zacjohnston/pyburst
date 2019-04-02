@@ -564,7 +564,7 @@ def get_table_subset(table, batches):
     return table.iloc[idxs]
 
 
-def sync_model_restarts(source, basename='xrb', verbose=True,
+def sync_model_restarts(source, target, basename='xrb', verbose=True,
                         batches=None, runs=None, short_model_table=None,
                         sync_model_files=True, sync_jobscripts=True, sync_model_tables=True,
                         dry_run=False, modelfiles=('.cmd', '.lc', 'z1')):
@@ -594,8 +594,12 @@ def sync_model_restarts(source, basename='xrb', verbose=True,
     else:
         batches = np.unique(short_model_table['batch'])
 
-    target_path = 'isync:~/kepler/runs/'
-    # target_path = 'oz:/fred/oz011/zac/kepler/runs/'
+    targets = {
+        'icer': 'isync:~/kepler/runs/',
+        'oz': 'oz:/fred/oz011/zac/kepler/runs/',
+        'monarch': 'm2:/home/zacpetej/id43/kepler/runs/',
+        'carbon': f'zac@carbon.sci.monash.edu:/home/zac/{source}'}
+    target_path = targets[target]
     sync_paths = []
 
     for batch in batches:
