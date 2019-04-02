@@ -142,16 +142,16 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
     restart_str = {True: 'restart_', False: ''}[restart]
     debug_str = {True: 'x', False: ''}[debug]
 
-    dependency_str = ''
-    dependency_bash = ''
-    if dependency:
-        dependency_str = '#SBATCH --dependency=singleton'
-        dependency_bash = """if (( $N == 1 ))
-then
-    sleep 60
-    cd $KEPLER_MODELS/{source}_{batch}/logs
-    sbatch icer_restart_{source}_{batch}_{span_str}.qsub
-fi"""
+#     dependency_str = ''
+#     dependency_bash = ''
+#     if dependency:
+#         dependency_str = '#SBATCH --dependency=singleton'
+#         dependency_bash = """if (( $N == 1 ))
+# then
+#     sleep 60
+#     cd $KEPLER_MODELS/{source}_{batch}/logs
+#     sbatch icer_restart_{source}_{batch}_{span_str}.qsub
+# fi"""
 
     if cluster == 'monarch':
         return f"""#!/bin/bash
@@ -187,9 +187,7 @@ $EXE_PATH {basename}$N {cmd_str} {debug_str}"""
 #SBATCH --time={time_str}
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --constraint=intel16
-{dependency_str}
-#SBATCH --exclude=lac-217,lac-356,lac-357,lac-358
+#SBATCH --constraint=intel18
 #SBATCH --mem-per-cpu=1024
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=zac.johnston@monash.edu
@@ -199,11 +197,11 @@ EXE_PATH=$KEPLER_PATH/gfortran/keplery
 ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
 BDAT_PATH=$PYBURST/files/{bdat_filename}
 
-{dependency_bash}
 cd $KEPLER_MODELS/{source}_{batch}/xrb$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
 ln -sf $BDAT_PATH ./bdat
-$EXE_PATH {basename}$N {cmd_str}"""
+$EXE_PATH {basename}$N {cmd_str}
+"""
     else:
         raise ValueError('invalid cluster. Must be one of [monarch, icer]')
 
