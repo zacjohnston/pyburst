@@ -166,7 +166,7 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
                                         source=source, version=version, cap=cap)
 
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['M', 'R'])
+    cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['R', 'M'])
     if not smoothing:
         cc.configure(kde=False, smooth=0)
 
@@ -354,7 +354,7 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     mass_reshape = mass_gr.reshape(new_shape)
     radius_reshape = radius_gr.reshape(new_shape)
 
-    return np.dstack((mass_reshape, radius_reshape))
+    return np.dstack((radius_reshape, mass_reshape))
 
 
 def get_mass_radius_point(params, source, version):
@@ -362,14 +362,21 @@ def get_mass_radius_point(params, source, version):
     """
     ref_mass = 1.4
     ref_radius = 10
-    g_reference = gravity.get_acceleration_newtonian(r=ref_radius, m=ref_mass)
-
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
-    redshift = params[pkeys.index('redshift')]
-    g = params[pkeys.index('g')] * g_reference
-    mass, radius = gravity.get_mass_radius(g=g, redshift=redshift)
-    return mass.value, radius.value
+    if 'm_gr' in pkeys:
+        mass_gr = params[pkeys.index('m_gr')]
+        mass_nw = ref_mass * mass_gr
+        m_ratio = mass_gr / mass_nw
+        xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
+        radius_gr = ref_radius * xi
+    else:
+        g_reference = gravity.get_acceleration_newtonian(r=ref_radius, m=ref_mass)
+        redshift = params[pkeys.index('redshift')]
+        g = params[pkeys.index('g')] * g_reference
+        mass_gr, radius_gr = (x.value for x in gravity.get_mass_radius(g=g,
+                                                                       redshift=redshift))
+    return radius_gr, mass_gr
 
 
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=False,
