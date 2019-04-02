@@ -387,8 +387,8 @@ class Kgrid:
                    'rate': 'Burst rate (day$^{-1}$)',
                    'alpha': r'$\alpha$',
                    }.get(bprop, bprop)
-        ylims = {'rate': [2.5, 20],
-                 'fluence': [4.5, 13],
+        ylims = {'rate': [2.5, 24],
+                 'fluence': [3.5, 20],
                  'peak': [1, 5.5]}
 
         unit_f = {'tDel': 3600, 'dt': 3600,
