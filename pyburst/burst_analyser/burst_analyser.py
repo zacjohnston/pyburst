@@ -97,6 +97,7 @@ class BurstRun(object):
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
                            'min_rise_steps': 5,  # min time steps between t_pre and t_peak
                            'stable_dt_frac': 10,  # no. of dt's from last burst to end of model to flag stable burning
+                           'short_wait_dt': 45,  # threshold for short-wait bursts (minutes)
                            }
         self.overwrite_parameters(set_paramaters)
 
@@ -784,23 +785,23 @@ class BurstRun(object):
 
     def identify_short_wait_bursts(self):
         """Identify bursts which have unusually short recurrence times
-            Here defined as less than 'min_dt_frac' of the following burst
+            i.e. less than short_wait_dt (min)
         """
         self.bursts['short_wait'] = np.full(self.n_bursts, False)
-        if self.n_bursts < 3:
+        if self.n_bursts < 2:
             self.printv('Too few bursts to identify short-waits')
             self.n_short_wait = 0
             return
 
-        dt_0 = np.array(self.bursts.iloc[1:-1]['dt'])
-        dt_1 = np.array(self.bursts.iloc[2:]['dt'])
-        short_wait = dt_0 < (self.parameters['short_wait_frac'] * dt_1)
-
-        self.bursts.loc[self.bursts.index[1]:self.bursts.index[-2], 'short_wait'] = short_wait
+        self.bursts['short_wait'] = self.bursts['dt']/60 < self.parameters['short_wait_dt']
         self.n_short_wait = len(self.short_waits())
 
         if self.n_short_wait > 0:
-            self.printv(f'{self.n_short_wait} short-wait bursts detected')
+            if np.mean(self.bursts['dt']/60) < 1.5 * self.parameters['short_wait_dt']:
+                self.print_warn('Short-wait bursts detected, but mean model recurrence '
+                                'time is also very short. Check model to confirm!')
+            else:
+                self.printv(f'{self.n_short_wait} short-wait bursts detected')
             self.flags['short_waits'] = True
 
     def get_fluences(self):
