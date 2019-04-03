@@ -153,6 +153,7 @@ class BurstRun(object):
         self.candidates = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.shocks = []
+        self.n_shocks = None
         self.shock_maxima = []
         self.dumpfiles = None
         self.dump_table = None
@@ -664,20 +665,21 @@ class BurstRun(object):
             local maxima to check (t, lum)
         """
         t_radius = self.parameters['shock_radius_t']
-        # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
 
-        maxima_t = maxima[:,0]
+        maxima_t = maxima[:, 0]
         maxima_lum = maxima[:, 1]
 
         left_lum = self.lumf(maxima_t - t_radius)
         right_lum = self.lumf(maxima_t + t_radius)
         frac = self.parameters['shock_frac']
 
+        # find maxima that are more than [frac] larger than neighbour points
         spike_mask = np.logical_or(maxima_lum > frac * left_lum,
                                    maxima_lum > frac * right_lum)
 
         self.shock_maxima = maxima[spike_mask]
-        self.printv('Shocks detected and ignored from burst analysis')
+        self.n_shocks = len(self.shock_maxima)
+        self.printv(f'{self.n_shocks} shock maxima detected and ignored from analysis')
         self.flags['shocks'] = True
         return maxima[np.logical_not(spike_mask)]
 
