@@ -40,7 +40,7 @@ class BurstRun(object):
                  load_dumps=False, set_paramaters=None, auto_discard=False,
                  get_slopes=False, load_model_params=True, truncate_edd=False,
                  check_stable_burning=True, quick_discard=True,
-                 check_lumfile_monotonic=True):
+                 check_lumfile_monotonic=True, remove_shocks=True):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -70,6 +70,7 @@ class BurstRun(object):
                         'check_stable_burning': check_stable_burning,
                         'quick_discard': quick_discard,
                         'check_lumfile_monotonic': check_lumfile_monotonic,
+                        'remove_shocks': remove_shocks,
                         }
         self.check_options()
 
@@ -551,22 +552,24 @@ class BurstRun(object):
     def get_burst_candidates(self):
         """Identify potential bursts, while removing shocks in lightcurve
         """
-        old_candidates = [0]
         candidates = self.get_lum_maxima()
-        count = 0
 
-        while not np.array_equal(old_candidates, candidates):
-            old_candidates = candidates
-            self.remove_shocks(candidates)
-            candidates = self.get_lum_maxima()
+        if self.options['remove_shocks']:
+            old_candidates = [0]
+            count = 0
+            while not np.array_equal(old_candidates, candidates):
+                old_candidates = candidates
+                self.remove_shocks(candidates)
+                candidates = self.get_lum_maxima()
 
-            count += 1
-            if count == self.parameters['max_shock_iterations']:
-                self.print_warn('Reached maximum iterations of shock-removal, '
-                                + 'lightcurve should be verified')
-                break
+                count += 1
+                if count == self.parameters['max_shock_iterations']:
+                    self.print_warn('Reached maximum iterations of shock-removal, '
+                                    + 'lightcurve should be verified')
+                    break
 
-        print(f'Shock removal iterations: {count}')
+            print(f'Shock removal iterations: {count}')
+
         self.candidates = candidates
         self.shocks = np.array(self.shocks)
 
