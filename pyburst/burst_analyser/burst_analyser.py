@@ -100,6 +100,7 @@ class BurstRun(object):
                            'min_rise_steps': 5,  # min time steps between t_pre and t_peak
                            'stable_dt_frac': 10,  # no. of dt's from last burst to end of model to flag stable burning
                            'short_wait_dt': 45,  # threshold for short-wait bursts (minutes)
+                           'shock_radius_t': 0.1,  # radius in s around maxima to check for shock conditions
                            }
         self.overwrite_parameters(set_paramaters)
 
@@ -110,6 +111,7 @@ class BurstRun(object):
                         'burst_stages': 'C2',
                         'shocks': 'C3',
                         'dumps': 'C0',
+                        'shock_maxima': 'C3',
                         }
 
         self.cols = ['n', 'dt', 'rate', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
@@ -151,6 +153,7 @@ class BurstRun(object):
         self.candidates = None
         self.bprops = ['dt', 'fluence', 'peak', 'length']
         self.shocks = []
+        self.shock_maxima = []
         self.dumpfiles = None
         self.dump_table = None
 
@@ -250,7 +253,7 @@ class BurstRun(object):
         """Creates interpolator function of model lightcurve
         """
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
-        
+
     def remove_zero_lum(self):
         """kepler outputs random zero luminosity (for some reason...)
         """
@@ -587,6 +590,8 @@ class BurstRun(object):
                     break
 
             print(f'Shock removal iterations: {count}')
+        else:
+            candidates = self.discard_shock_maxima(candidates)
 
         self.candidates = candidates
         self.shocks = np.array(self.shocks)
@@ -648,34 +653,33 @@ class BurstRun(object):
                 self.lum[idx, 1] = new_lum
                 self.shocks.append([idx, t, lum])
 
-    def discard_spikes(self, maxima):
+    def discard_shock_maxima(self, maxima):
         """Check for and discard maxima that are just spikes in luminosity
+
+            returns array of maxima with spikes excluded
 
         parameters
         ----------
         maxima : nparray(n,2)
             local maxima to check (t, lum)
         """
-        radius = self.parameters['spike_radius']
+        t_radius = self.parameters['shock_radius_t']
         # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
-        for max_i in maxima:
-            t, lum = max_i
-            idx = np.searchsorted(self.lum[:, 0], t)
 
-            left = self.lum[idx - radius: idx, 1]  # left neighbours
-            right = self.lum[idx + 1: idx + radius + 1, 1]  # right neighbours
-            neighbours = np.concatenate([left, right])
+        maxima_t = maxima[:,0]
+        maxima_lum = maxima[:, 1]
 
-            if True in (lum > self.parameters['shock_frac'] * neighbours):
-                if not self.flags['shocks']:
-                    self.printv('Shocks detected and removed: consider verifying'
-                                ' with self.plot(shocks=True)')
-                    self.flags['shocks'] = True
+        left_lum = self.lumf(maxima_t - t_radius)
+        right_lum = self.lumf(maxima_t + t_radius)
+        frac = self.parameters['shock_frac']
 
-                new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
-                max_i[1] = new_lum
-                self.lum[idx, 1] = new_lum
-                self.shocks.append([idx, t, lum])
+        spike_mask = np.logical_or(maxima_lum > frac * left_lum,
+                                   maxima_lum > frac * right_lum)
+
+        self.shock_maxima = maxima[spike_mask]
+        self.printv('Shocks detected and ignored from burst analysis')
+        self.flags['shocks'] = True
+        return maxima[np.logical_not(spike_mask)]
 
     def get_burst_peaks(self):
         """Keep largest maxima within some time-window
@@ -1072,7 +1076,8 @@ class BurstRun(object):
     def plot(self, peaks=True, display=True, save=False, log=True,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
              short_wait=True, shocks=False, fontsize=14, title=True,
-             outliers=True, show_all=False, dumps=False, dump_start=False):
+             outliers=True, show_all=False, dumps=False, dump_start=False,
+             shock_maxima=False):
         """Plots overall model lightcurve, with detected bursts
         """
         if not self.flags['lum_loaded']:
@@ -1162,6 +1167,11 @@ class BurstRun(object):
                 ax.plot(shock_slice[:, 0]/timescale, shock_slice[:, 1]/yscale,
                         c=self.colours['shocks'],
                         label='shocks' if (i == 0) else '_nolegend_')
+
+        if shock_maxima:
+            ax.plot(self.shock_maxima[:, 0]/timescale, self.shock_maxima[:, 1]/yscale,
+                    marker='o', markersize=markersize, markeredgecolor=markeredgecolor,
+                    label='shock_maxima', ls='none', color=self.colours['shock_maxima'])
 
         if dumps:
             if not self.flags['dumps_loaded']:
