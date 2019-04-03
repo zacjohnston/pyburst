@@ -684,19 +684,19 @@ class BurstRun(object):
         return maxima[np.logical_not(spike_mask)]
 
     def get_burst_peaks(self):
-        """Keep largest maxima within some time-window
+        """Keep only largest candidates within some time-window
         """
         t_radius = self.parameters['maxima_radius']
         peaks = []
 
-        for maxi in self.candidates:
-            t, lum = maxi
-            i_left = np.searchsorted(self.lum[:, 0], t - t_radius)
-            i_right = np.searchsorted(self.lum[:, 0], t + t_radius)
+        for candidate in self.candidates:
+            t, lum = candidate
+            i_left = np.searchsorted(self.candidates[:, 0], t - t_radius)
+            i_right = np.searchsorted(self.candidates[:, 0], t + t_radius)
 
-            maxx = np.max(self.lum[i_left:i_right, 1])
+            maxx = np.max(self.candidates[i_left:i_right, 1])
             if maxx == lum:
-                peaks.append(maxi)
+                peaks.append(candidate)
 
         peaks = np.array(peaks)
         self.n_bursts = len(peaks)
