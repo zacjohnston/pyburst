@@ -40,7 +40,8 @@ class BurstRun(object):
                  load_dumps=False, set_paramaters=None, auto_discard=False,
                  get_slopes=False, load_model_params=True, truncate_edd=False,
                  check_stable_burning=True, quick_discard=True,
-                 check_lumfile_monotonic=True, remove_shocks=True):
+                 check_lumfile_monotonic=True, remove_shocks=True,
+                 remove_zero_lum=True):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -163,6 +164,8 @@ class BurstRun(object):
 
         if load_lum:
             self.load_lum_file()
+            if remove_zero_lum:
+                self.remove_zero_lum()
 
         if self.load_bursts:
             self.load_burst_table()
@@ -242,6 +245,16 @@ class BurstRun(object):
 
         self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
         self.flags['lum_loaded'] = True
+
+    def remove_zero_lum(self):
+        """kepler outputs random zero luminosity (for some reason...)
+        """
+        zeros = np.where(self.lum[:, 1] == 0.0)[0]
+        n_zeros = len(zeros)
+        if n_zeros > 0:
+            self.printv(f'{n_zeros} points with zero luminosity replaced')
+            self.flags['zeros'] = True
+            self.lum[zeros, 1] = self.parameters['zero_replacement']
 
     def overwrite_parameters(self, set_parameters):
         """Overwrite default analysis parameters
@@ -609,7 +622,6 @@ class BurstRun(object):
         maxima : nparray(n,2)
             local maxima to check (t, lum)
         """
-        self.remove_zeros()
         radius = self.parameters['shock_radius']
         # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
         for max_i in maxima:
@@ -630,16 +642,6 @@ class BurstRun(object):
                 max_i[1] = new_lum
                 self.lum[idx, 1] = new_lum
                 self.shocks.append([idx, t, lum])
-
-    def remove_zeros(self):
-        """During shocks, kepler can also give zero luminosity (for some reason...)
-        """
-        zeros = np.where(self.lum[:, 1] == 0.0)
-        if len(zeros) > 0:
-            if not self.flags['zeros']:
-                self.printv(f'Zeros removed from luminosity')
-                self.flags['zeros'] = True
-            self.lum[zeros, 1] = self.parameters['zero_replacement']
 
     def get_burst_peaks(self):
         """Keep largest maxima within some time-window
