@@ -40,7 +40,7 @@ class BurstRun(object):
                  load_dumps=False, set_paramaters=None, auto_discard=False,
                  get_slopes=False, load_model_params=True, truncate_edd=False,
                  check_stable_burning=True, quick_discard=True,
-                 check_lumfile_monotonic=True, remove_shocks=True,
+                 check_lumfile_monotonic=True, remove_shocks=False,
                  remove_zero_lum=True):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
@@ -666,16 +666,19 @@ class BurstRun(object):
         """
         t_radius = self.parameters['shock_radius_t']
 
-        maxima_t = maxima[:, 0]
-        maxima_lum = maxima[:, 1]
+        # ignore maxima too close to start/end
+        buffer_idxs = np.searchsorted(maxima[:, 0], [self.lum[0, 0] + t_radius,
+                                                     self.lum[-1, 0] - t_radius])
 
-        left_lum = self.lumf(maxima_t - t_radius)
-        right_lum = self.lumf(maxima_t + t_radius)
+        maxima = maxima[buffer_idxs[0]:buffer_idxs[1]]
+
+        left_lum = self.lumf(maxima[:, 0] - t_radius)
+        right_lum = self.lumf(maxima[:, 0] + t_radius)
         frac = self.parameters['shock_frac']
 
         # find maxima that are more than [frac] larger than neighbour points
-        spike_mask = np.logical_or(maxima_lum > frac * left_lum,
-                                   maxima_lum > frac * right_lum)
+        spike_mask = np.logical_or(maxima[:, 1] > frac * left_lum,
+                                   maxima[:, 1] > frac * right_lum)
 
         self.shock_maxima = maxima[spike_mask]
         self.n_shocks = len(self.shock_maxima)
