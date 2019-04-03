@@ -243,9 +243,14 @@ class BurstRun(object):
             self.n_bursts = 0
             return
 
-        self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
+        self.setup_lum_interpolator()
         self.flags['lum_loaded'] = True
 
+    def setup_lum_interpolator(self):
+        """Creates interpolator function of model lightcurve
+        """
+        self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
+        
     def remove_zero_lum(self):
         """kepler outputs random zero luminosity (for some reason...)
         """
@@ -599,7 +604,7 @@ class BurstRun(object):
             peak_mask = self.bursts['peak'] > self.l_edd
             self.bursts.loc[peak_mask, 'peak'] = self.l_edd
 
-        self.lumf = interpolate.interp1d(self.lum[:, 0], self.lum[:, 1])
+        self.setup_lum_interpolator()
 
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
@@ -623,6 +628,35 @@ class BurstRun(object):
             local maxima to check (t, lum)
         """
         radius = self.parameters['shock_radius']
+        # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
+        for max_i in maxima:
+            t, lum = max_i
+            idx = np.searchsorted(self.lum[:, 0], t)
+
+            left = self.lum[idx - radius: idx, 1]  # left neighbours
+            right = self.lum[idx + 1: idx + radius + 1, 1]  # right neighbours
+            neighbours = np.concatenate([left, right])
+
+            if True in (lum > self.parameters['shock_frac'] * neighbours):
+                if not self.flags['shocks']:
+                    self.printv('Shocks detected and removed: consider verifying'
+                                ' with self.plot(shocks=True)')
+                    self.flags['shocks'] = True
+
+                new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
+                max_i[1] = new_lum
+                self.lum[idx, 1] = new_lum
+                self.shocks.append([idx, t, lum])
+
+    def discard_spikes(self, maxima):
+        """Check for and discard maxima that are just spikes in luminosity
+
+        parameters
+        ----------
+        maxima : nparray(n,2)
+            local maxima to check (t, lum)
+        """
+        radius = self.parameters['spike_radius']
         # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
         for max_i in maxima:
             t, lum = max_i
