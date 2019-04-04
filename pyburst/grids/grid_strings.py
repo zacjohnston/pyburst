@@ -121,9 +121,9 @@ def get_batch_filename(prefix, batch, source, run=None, extension=''):
     return f'{prefix}_{batch_str}{extension}'
 
 
-def batch_analysis_filepath(batch, source):
+def batch_table_filepath(batch, source, table_name):
     analysis_path = batch_analysis_path(batch, source)
-    filename = get_batch_filename('burst_analysis', batch=batch,
+    filename = get_batch_filename(table_name, batch=batch,
                                   source=source, extension='.txt')
     return os.path.join(analysis_path, filename)
 
