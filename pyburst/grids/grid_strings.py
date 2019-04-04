@@ -102,6 +102,19 @@ def get_source_subdir(source, dir_):
 # Misc. files
 # ======================================================
 def get_batch_filename(prefix, batch, source, run=None, extension=''):
+    """Returns standard filename for a batch and (optional) run
+
+    parameters
+    ----------
+    prefix : str
+        any string to prepend filename (e.g., 'summary', 'bursts')
+    batch : int
+    source : str
+    run : int (optional)
+        if provided, also specify run number in filename
+    extension : str (optional)
+        any string to append to filename (e.g., '.txt', '.data')
+    """
     batch_str = get_batch_string(batch, source)
     if run is not None:
         batch_str += f'_{run}'
