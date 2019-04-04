@@ -199,7 +199,7 @@ def combine_run_summaries(batch, source):
     combined_table = pd.concat(table_list, ignore_index=True)
     table_str = combined_table.to_string(index=False, justify='left')
 
-    filepath = get_table_filepath(batch, source)
+    filepath = burst_analysis_table_filepath(batch, source)
     print(f'Saving: {filepath}')
     with open(filepath, 'w') as f:
         f.write(table_str)
@@ -223,11 +223,11 @@ def load_run_table(run, batch, source, table):
 def load_batch_table(batch, source):
     """Loads summary table of batch from file and returns as pd table
     """
-    filepath = get_table_filepath(batch, source)
+    filepath = burst_analysis_table_filepath(batch, source)
     return pd.read_csv(filepath, delim_whitespace=True)
 
 
-def get_table_filepath(batch, source):
+def burst_analysis_table_filepath(batch, source):
     analysis_path = grid_strings.batch_analysis_path(batch, source)
     filename = grid_strings.get_batch_filename('burst_analysis', batch=batch,
                                                source=source, extension='.txt')
