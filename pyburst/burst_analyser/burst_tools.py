@@ -167,9 +167,9 @@ def combine_batch_summaries(batches, source):
         sys.stdout.write(f'\r{source} {batch}/{batches[-1]}')
         batch_table = load_batch_table(batch, source)
         table_list += [batch_table]
+    sys.stdout.write('\n')
 
     combined_table = pd.concat(table_list, ignore_index=True)
-    sys.stdout.write('\n')
     table_str = combined_table.to_string(index=False, justify='left')
 
     filename = f'burst_analysis_{source}.txt'
@@ -180,6 +180,7 @@ def combine_batch_summaries(batches, source):
 
     return combined_table
 
+# TODO: Combine these two functions (diff: load_run_table, load_batch_table)
 
 def combine_run_summaries(batch, source):
     """Combines summary files of individual batch runs into a single table
@@ -187,15 +188,15 @@ def combine_run_summaries(batch, source):
     print(f'Combining model summary tables:')
     n_runs = grid_tools.get_nruns(batch, source)
     runs = np.arange(n_runs) + 1
-    run_tables = []
+    table_list = []
 
     for run in runs:
         sys.stdout.write(f'\r{source}{batch} {run}/{runs[-1]}')
-        table = load_run_table(run, batch, source=source, table='summary')
-        run_tables += [table]
-
+        run_table = load_run_table(run, batch, source=source, table='summary')
+        table_list += [run_table]
     sys.stdout.write('\n')
-    combined_table = pd.concat(run_tables, ignore_index=True)
+
+    combined_table = pd.concat(table_list, ignore_index=True)
     table_str = combined_table.to_string(index=False, justify='left')
 
     filepath = get_table_filepath(batch, source)
