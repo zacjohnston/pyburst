@@ -161,15 +161,16 @@ def combine_batch_summaries(batches, source):
     """
     print('Combining batch summary tables:')
     source_path = grid_strings.get_source_path(source)
-    big_table = pd.DataFrame()
+    table_list = []
 
     for batch in batches:
         sys.stdout.write(f'\r{source} {batch}/{batches[-1]}')
         batch_table = load_batch_table(batch, source)
-        big_table = pd.concat((big_table, batch_table), ignore_index=True)
+        table_list += [batch_table]
 
+    combined_table = pd.concat(table_list, ignore_index=True)
     sys.stdout.write('\n')
-    table_str = big_table.to_string(index=False, justify='left')
+    table_str = combined_table.to_string(index=False, justify='left')
 
     filename = f'burst_analysis_{source}.txt'
     filepath = os.path.join(source_path, 'burst_analysis', filename)
@@ -177,7 +178,7 @@ def combine_batch_summaries(batches, source):
     with open(filepath, 'w') as f:
         f.write(table_str)
 
-    return big_table
+    return combined_table
 
 
 def combine_run_summaries(batch, source):
