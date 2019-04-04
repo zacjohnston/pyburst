@@ -190,7 +190,8 @@ def combine_run_summaries(batch, source):
 
     for run in runs:
         sys.stdout.write(f'\r{source}{batch} {run}/{runs[-1]}')
-        run_tables += [load_run_table(run, batch, source=source, table='summary')]
+        table = load_run_table(run, batch, source=source, table='summary')
+        run_tables += [table]
 
     sys.stdout.write('\n')
     combined_table = pd.concat(run_tables, ignore_index=True)
