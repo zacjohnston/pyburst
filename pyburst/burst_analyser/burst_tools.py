@@ -165,7 +165,7 @@ def combine_batch_summaries(batches, source):
 
     for batch in batches:
         sys.stdout.write(f'\r{source} {batch}/{batches[-1]}')
-        batch_table = load_batch_table(batch, source)
+        batch_table = load_batch_analysis_table(batch, source)
         table_list += [batch_table]
     sys.stdout.write('\n')
 
@@ -220,7 +220,7 @@ def load_run_table(run, batch, source, table):
     return pd.read_csv(filepath, delim_whitespace=True)
 
 
-def load_batch_table(batch, source):
+def load_batch_analysis_table(batch, source):
     """Loads summary table of batch from file and returns as pd table
     """
     filepath = grid_strings.batch_analysis_filepath(batch, source)
