@@ -55,7 +55,7 @@ def run_analysis(batches, source, copy_params=False, reload=True, multithread=Tr
             last_batch = batches[-1]  # Assumes last batch is the last for whole grid
 
         burst_tools.combine_batch_tables(np.arange(last_batch) + 1, source=source,
-                                            table_name='burst_analysis')
+                                         table_name='burst_analysis')
 
 
 def extract_batches(source, batches=None, save_plots=True, multithread=True,
@@ -96,7 +96,9 @@ def extract_batches(source, batches=None, save_plots=True, multithread=True,
                          load_bursts=load_bursts, load_summary=load_summary,
                          basename=basename)
 
-        burst_tools.combine_run_tables(batch, source, table_name='summary')
+        print_title('Combining run tables')
+        for table_name in ('summary', 'bursts'):
+            burst_tools.combine_run_tables(batch, source, table_name=table_name)
 
     t1 = time.time()
     dt = t1 - t0
@@ -109,7 +111,7 @@ def extract_runs(runs, batch, source, save_plots=True, reload=False, load_bursts
     """
     runs = grid_tools.ensure_np_list(runs)
     for run in runs:
-        print_title(f'Run {run}')
+        print_title(f'Run {run}', character='-', n=50)
         model = burst_analyser.BurstRun(run, batch, source, analyse=True,
                                         reload=reload, load_bursts=load_bursts,
                                         basename=basename, load_summary=load_summary)
