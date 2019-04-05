@@ -54,7 +54,7 @@ def run_analysis(batches, source, copy_params=False, reload=True, multithread=Tr
         else:
             last_batch = batches[-1]  # Assumes last batch is the last for whole grid
 
-        burst_tools.combine_batch_summaries(np.arange(last_batch) + 1, source=source,
+        burst_tools.combine_batch_tables(np.arange(last_batch) + 1, source=source,
                                             table_name='burst_analysis')
 
 
@@ -96,7 +96,7 @@ def extract_batches(source, batches=None, save_plots=True, multithread=True,
                          load_bursts=load_bursts, load_summary=load_summary,
                          basename=basename)
 
-        burst_tools.combine_run_summaries(batch, source, table_name='summary')
+        burst_tools.combine_run_tables(batch, source, table_name='summary')
 
     t1 = time.time()
     dt = t1 - t0

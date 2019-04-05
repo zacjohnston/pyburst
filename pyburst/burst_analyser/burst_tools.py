@@ -158,7 +158,7 @@ def multi_save(table, source, basename='xrb'):
 
 # TODO: rename to combine_batch/run_tables()
 
-def combine_batch_summaries(batches, source, table_name):
+def combine_batch_tables(batches, source, table_name):
     """Combines summary files of given batches into single table
     """
     print('Combining batch summary tables:')
@@ -184,7 +184,7 @@ def combine_batch_summaries(batches, source, table_name):
 
 # TODO: Combine these two functions (diff: load_run_table, load_batch_table)
 
-def combine_run_summaries(batch, source, table_name):
+def combine_run_tables(batch, source, table_name):
     """Combine summary files of runs into a batch table
     """
     # TODO: rename all instances of burst_analysis to summary (in directory tree)
