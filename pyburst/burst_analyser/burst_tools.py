@@ -156,8 +156,6 @@ def multi_save(table, source, basename='xrb'):
     print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
-# TODO: rename to combine_batch/run_tables()
-
 def combine_batch_tables(batches, source, table_name):
     """Combines summary files of given batches into single table
     """
@@ -183,6 +181,14 @@ def combine_batch_tables(batches, source, table_name):
     return combined_table
 
 # TODO: Combine these two functions (diff: load_run_table, load_batch_table)
+
+def combine_all_run_tables(batches, source, table_name):
+    """Combine the runs from multiple batches into batch tables
+    """
+    print('Combining the run tables of multiple batches')
+    for batch in batches:
+        combine_run_tables(batch, source=source, table_name=table_name)
+
 
 def combine_run_tables(batch, source, table_name):
     """Combine summary files of runs into a batch table
