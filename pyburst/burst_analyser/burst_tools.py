@@ -156,7 +156,9 @@ def multi_save(table, source, basename='xrb'):
     print(f'Time taken: {dt:.1f} s ({dt/60:.2f} min)')
 
 
-def combine_batch_summaries(batches, source):
+# TODO: rename to combine_batch/run_tables()
+
+def combine_batch_summaries(batches, source, table_name):
     """Combines summary files of given batches into single table
     """
     print('Combining batch summary tables:')
@@ -165,15 +167,15 @@ def combine_batch_summaries(batches, source):
 
     for batch in batches:
         sys.stdout.write(f'\r{source} {batch}/{batches[-1]}')
-        batch_table = load_batch_analysis_table(batch, source)
+        batch_table = load_batch_table(batch, source=source, table_name=table_name)
         table_list += [batch_table]
     sys.stdout.write('\n')
 
     combined_table = pd.concat(table_list, ignore_index=True)
     table_str = combined_table.to_string(index=False, justify='left')
 
-    filename = f'burst_analysis_{source}.txt'
-    filepath = os.path.join(source_path, 'burst_analysis', filename)
+    filename = f'{table_name}_{source}.txt'
+    filepath = os.path.join(source_path, table_name, filename)
     print(f'Saving: {filepath}')
     with open(filepath, 'w') as f:
         f.write(table_str)
@@ -185,6 +187,7 @@ def combine_batch_summaries(batches, source):
 def combine_run_summaries(batch, source, table_name):
     """Combine summary files of runs into a batch table
     """
+    # TODO: rename all instances of burst_analysis to summary (in directory tree)
     print(f'Combining model summary tables:')
     n_runs = grid_tools.get_nruns(batch, source)
     runs = np.arange(n_runs) + 1
@@ -199,7 +202,10 @@ def combine_run_summaries(batch, source, table_name):
     combined_table = pd.concat(table_list, ignore_index=True)
     table_str = combined_table.to_string(index=False, justify='left')
 
-    filepath = grid_strings.batch_table_filepath(batch, source, table_name='burst_analysis')
+    if table_name == 'summary':  # hack fix for now TODO: !!!
+        table_name = 'burst_analysis'
+
+    filepath = grid_strings.batch_table_filepath(batch, source, table_name=table_name)
     print(f'Saving: {filepath}')
     with open(filepath, 'w') as f:
         f.write(table_str)
@@ -220,10 +226,10 @@ def load_run_table(run, batch, source, table):
     return pd.read_csv(filepath, delim_whitespace=True)
 
 
-def load_batch_analysis_table(batch, source):
+def load_batch_table(batch, source, table_name):
     """Loads summary table of batch from file and returns as pd table
     """
-    filepath = grid_strings.batch_table_filepath(batch, source, table_name='burst_analysis')
+    filepath = grid_strings.batch_table_filepath(batch, source, table_name=table_name)
     return pd.read_csv(filepath, delim_whitespace=True)
 
 

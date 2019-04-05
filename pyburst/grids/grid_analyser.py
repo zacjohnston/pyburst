@@ -478,7 +478,7 @@ class Kgrid:
         print(bprop)
         return ax
 
-    def plot_summ(self, var, batch=None, vlines=True, hline=32):
+    def plot_summ(self, var, batch=None, vlines=True, hline=30):
         """Plot any column from summ stable, versus batch/run
 
         Parameters
