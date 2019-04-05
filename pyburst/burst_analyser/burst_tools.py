@@ -171,7 +171,7 @@ def combine_batch_tables(batches, source, table_name):
     table_str = combined_table.to_string(index=False, justify='left')
 
     filename = f'{table_name}_{source}.txt'
-    filepath = os.path.join(source_path, table_name, filename)
+    filepath = os.path.join(source_path, 'burst_analysis', filename)
     print(f'Saving: {filepath}')
     with open(filepath, 'w') as f:
         f.write(table_str)
