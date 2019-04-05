@@ -267,14 +267,14 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
 def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
                       ref_mcmc_version, kgrid, constant=None,
                       epoch_independent=('x', 'z', 'mass'),
-                      epoch_dependent=('accrate', 'qb'), discard=200, cap=None):
+                      epoch_dependent=('accrate', 'qb'), discard=1000, cap=None):
     """Creates batches of models, with random sample of params drawn from MCMC chain
     """
     ref_mass = 1.4
     aliases = {'mass': 'g', 'accrate': 'mdot'}
     if constant is None:
         constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
-                    'accmass': 1e16, 'accdepth': 1e19}
+                    'accmass': 1e16, 'accdepth': 1e20}
 
     mv = mcmc_versions.McmcVersion(source=ref_source, version=ref_mcmc_version)
     params_full = {}
@@ -301,9 +301,9 @@ def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
             mv_key = f'{mv_key}{i+1}'
             params_full[key] = get_mcmc_params(mv_key, param_sample=param_sample, mv=mv)
 
-        create_batch(batch0+i, dv={}, params={}, source=source, nbursts=30, kgrid=kgrid,
+        create_batch(batch0+i, dv={}, params={}, source=source, nbursts=35, kgrid=kgrid,
                      qos='normal', walltime=96, setup_test=False, nsdump=500,
-                     nuc_heat=True, predict_qnuc=False, grid_version=0,
+                     nuc_heat=True, predict_qnuc=False,
                      substrate_off=True, ibdatov=1, params_full=params_full,
                      notes=idx_string)
 
