@@ -62,7 +62,7 @@ class Minbar:
         ax.plot(source_table['time'], source_table[col]/yscale, marker='o', ls='')
         plt.show(block=False)
 
-    def plot_histogram(self, col, source, bins=30, cutoff=None):
+    def plot_histogram(self, col, source, bins=30, cutoff=None, factor=1, range=None):
         """Plots histogram for give col, source
         """
         self.check_col(col)
@@ -76,7 +76,7 @@ class Minbar:
         ax.set_xlabel(f'{col}')
         ax.set_ylabel('N Bursts')
 
-        ax.hist(source_table[col], bins=bins)
+        ax.hist(source_table[col]/factor, bins=bins, range=range)
         plt.show(block=False)
 
 
