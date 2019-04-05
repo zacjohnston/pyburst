@@ -34,7 +34,6 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
                 print("Can't save preloaded luminosity file, path not found")
         return lum_loaded
 
-    pyprint.print_dashes()
     batch_str = grid_strings.get_batch_string(batch, source)
     analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
     input_path = os.path.join(analysis_path, batch_str, 'input')
@@ -69,7 +68,6 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
             pyprint.print_warning('Lightcurve timesteps are not in order. '
                                   + 'Something has gone horribly wrong!', n=80)
             raise RuntimeError('Lightcurve timesteps are not in order')
-    pyprint.print_dashes()
     return lum
 
 
