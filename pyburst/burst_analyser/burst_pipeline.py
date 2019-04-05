@@ -95,7 +95,7 @@ def extract_batches(source, batches=None, save_plots=True, multithread=True,
                          load_bursts=load_bursts, load_summary=load_summary,
                          basename=basename)
 
-        burst_tools.combine_run_summaries(batch, source)
+        burst_tools.combine_run_summaries(batch, source, table_name='summary')
 
     t1 = time.time()
     dt = t1 - t0
@@ -116,6 +116,6 @@ def extract_runs(runs, batch, source, save_plots=True, reload=False, load_bursts
         model.save_summary_table()
 
         if save_plots:
-            model.plot(display=False, save=True)
+            model.plot(display=False, save=True, log=False)
             model.plot_convergence(display=False, save=True)
             model.plot_lightcurves(display=False, save=True)
