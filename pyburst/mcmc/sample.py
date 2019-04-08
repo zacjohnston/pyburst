@@ -170,7 +170,15 @@ class Ksample:
 
     def plot(self, residuals=True, shaded=True, alpha_lines=0.3, alpha_shaded=0.7,
              fontsize=16):
-        fig, ax = plt.subplots(self.n_epochs, 2, sharex=True, figsize=(14, 10))
+        n_subplots = {True: 2, False: 1}.get(residuals)
+        fig, ax = plt.subplots(self.n_epochs, n_subplots, sharex=True, figsize=(14, 10))
+
+        if residuals:
+            lc_ax = ax[:, 0]
+            res_ax = ax[:, 1]
+        else:
+            lc_ax = ax[:]
+            res_ax = None
 
         for epoch_i in range(self.n_epochs):
             batch = self.batches[epoch_i]
@@ -191,34 +199,35 @@ class Ksample:
 
                 # ====== Plot model lightcurves ======
                 if shaded:
-                    ax[epoch_i][0].fill_between(m_x, m_y_lower, m_y_upper, color='0.7',
+                    lc_ax[epoch_i].fill_between(m_x, m_y_lower, m_y_upper, color='0.7',
                                                 alpha=alpha_shaded)
-                ax[epoch_i][0].plot(m_x, m_y, color='black', alpha=alpha_lines)
+                lc_ax[epoch_i].plot(m_x, m_y, color='black', alpha=alpha_lines)
 
                 # ====== Plot residuals ======
                 if residuals:
+                    res_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
+                    res_ax[1].set_ylabel(r'Residuals (erg cm$^{-2}$ s$^{-1}$)',
+                                         fontsize=fontsize)
                     # y_residuals = m_y - self.interp_lc['obs'][epoch_i]['flux'](m_x)
                     y_residuals = self.interp_lc[batch][run]['flux'](obs_x-t_shift) - obs_y
                     y_residuals_err = self.interp_lc[batch][run]['flux_err'](obs_x-t_shift)
 
-                    ax[epoch_i][1].plot(obs_x, y_residuals, color='black', alpha=alpha_lines)
+                    res_ax[epoch_i].plot(obs_x, y_residuals, color='black', alpha=alpha_lines)
 
                     if shaded:
-                        ax[epoch_i][1].fill_between(obs_x, y_residuals - y_residuals_err,
-                                                    y_residuals + y_residuals_err,
-                                                    color='0.7', alpha=alpha_shaded)
+                        res_ax[epoch_i].fill_between(obs_x, y_residuals - y_residuals_err,
+                                                     y_residuals + y_residuals_err,
+                                                     color='0.7', alpha=alpha_shaded)
+
+                    res_ax[epoch_i].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
+                                             ls='none', capsize=3, color='C1')
 
             # ====== Plot observed lightcurves ======
-            ax[epoch_i][1].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
-                                    ls='none', capsize=3, color='C1')
+            lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
 
-            ax[epoch_i][0].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
-
-        ax[-1][0].set_xlabel('Time (s)', fontsize=fontsize)
-        ax[-1][1].set_xlabel('Time (s)', fontsize=fontsize)
-        ax[1][0].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
-        ax[1][1].set_ylabel(r'Residuals (erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
-        ax[-1][0].set_xlim([-10, 200])
+        lc_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
+        lc_ax[1].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
+        lc_ax[-1].set_xlim([-10, 200])
         plt.tight_layout()
         plt.show(block=False)
 
