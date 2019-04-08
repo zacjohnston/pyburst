@@ -137,7 +137,8 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     plt.show(block=False)
 
 
-def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
+def save_temps(run, batch, source, zero_times=True, cycles=None,
+               ylims=(2e7, 1.5e9), xlims=(2e12, 1e3), **kwargs):
     """Iterate through cycles and save temperature profile plots
     """
     batch_str = grid_strings.get_batch_string(batch, source)
@@ -156,7 +157,8 @@ def save_temps(run, batch, source, zero_times=True, cycles=None, **kwargs):
         title = f'cycle={cycle},  t={times[i]:.6f}'
         fig = kepler_plot.plot_dump_profile(cycles=[cycle], run=run, batch=batch,
                                             source=source, title=title, y_param='tn',
-                                            display=False, **kwargs)
+                                            display=False, ylims=ylims, xlims=xlims,
+                                            **kwargs)
 
         filename = f'temp_{source}_{batch}_{run}_{i:04}.png'
         filepath = os.path.join(path, filename)
