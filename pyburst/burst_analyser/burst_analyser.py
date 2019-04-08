@@ -1114,6 +1114,7 @@ class BurstRun(object):
             ax.set_ylabel('Luminosity (erg s$^{-1}$)', fontsize=fontsize)
         else:
             ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
+            ax.set_ylim([-0.2, 7.5])
             yscale = 1e38
 
         ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='black')
