@@ -7,7 +7,7 @@ from pyburst.kepler import kepler_tools
 def plot_dump_profile(run, batch, source, y_param, x_param='y', cycles=None,
                       basename='xrb', title=None,
                       display=True, prefix='', fontsize=14, marker='', relative=False,
-                      xlims=None, ylims=None, legend=True):
+                      xlims=None, ylims=None, legend=True, color='C3'):
     """Plot profile of given cycle dump, for some radial (zonal) quantity
 
     relative : bool
@@ -44,7 +44,7 @@ def plot_dump_profile(run, batch, source, y_param, x_param='y', cycles=None,
         if relative:
             y = y - interp0(x)
 
-        ax.plot(x, y, label=f'#{cycle}', marker=marker)
+        ax.plot(x, y, label=f'#{cycle}', marker=marker, color=color)
 
     if title is None:
         title = f'{source}_{batch}_{run}'
