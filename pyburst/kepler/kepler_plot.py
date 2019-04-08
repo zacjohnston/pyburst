@@ -67,3 +67,38 @@ def plot_dump_profile(run, batch, source, y_param, x_param='y', cycles=None,
     if display:
         plt.show(block=False)
     return fig
+
+
+def plot_composition_profile(dumpfile, title=None,
+                             display=True, fontsize=14, marker='',
+                             xlims=(1.5e12, 2e3), ylims=(5e-3, 1.5), legend=True,
+                             ions=('h1', 'he4', 'c12', 'n14', 'o16', 'fe54')):
+    fig, ax = plt.subplots()
+    i0 = 2
+    i1 = -3
+
+    for ion in ions:
+        x = dumpfile.y[i0:i1]
+        y = dumpfile.abu[ion][i0:i1]
+
+        ax.plot(x, y, label=f'{ion}', marker=marker)
+
+    x_str = r'y (g cm$^{-2}$)'
+    y_str = 'Mass fraction'
+
+    ax.set_xlim(xlims)
+    ax.set_ylim(ylims)
+    ax.set_yscale('log')
+    ax.set_xscale('log')
+
+    ax.set_title(title, fontsize=fontsize)
+    ax.set_xlabel(x_str, fontsize=fontsize)
+    ax.set_ylabel(y_str, fontsize=fontsize)
+
+    if legend:
+        ax.legend(fontsize=fontsize)
+    plt.tight_layout()
+
+    if display:
+        plt.show(block=False)
+    return fig
