@@ -1078,7 +1078,7 @@ class BurstRun(object):
     # ===========================================================
     # Plotting
     # ===========================================================
-    def plot(self, peaks=True, display=True, save=False, log=True,
+    def plot(self, peaks=True, display=True, save=False, log=False,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
              short_wait=True, shocks=False, fontsize=14, title=True,
              outliers=True, show_all=False, dumps=False, dump_start=False,
