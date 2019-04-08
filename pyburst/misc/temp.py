@@ -137,6 +137,16 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
     plt.show(block=False)
 
 
+def uniform_time_cycles(dump_table, t0, t1, n_frames, t_offset):
+    """Returns list of times and cycles following a uniform timelapse
+    """
+    times = np.linspace(t0 + t_offset, t1 + t_offset, n_frames)
+    cyc_idxs = np.searchsorted(dump_table.time, times)
+    cycles = np.array(dump_table.cycle[cyc_idxs])
+
+    return times, cycles
+
+
 def save_temps(run, batch, source, zero_times=True, cycles=None,
                ylims=(2e7, 1.5e9), xlims=(2e12, 1e3), times=None, **kwargs):
     """Iterate through cycles and save temperature profile plots
