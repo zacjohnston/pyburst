@@ -138,7 +138,7 @@ def plot_temp_multi(cycles, runs, batches, sources, basename='xrb', prefix='',
 
 
 def save_temps(run, batch, source, zero_times=True, cycles=None,
-               ylims=(2e7, 1.5e9), xlims=(2e12, 1e3), **kwargs):
+               ylims=(2e7, 1.5e9), xlims=(2e12, 1e3), times=None, **kwargs):
     """Iterate through cycles and save temperature profile plots
     """
     batch_str = grid_strings.get_batch_string(batch, source)
@@ -146,7 +146,8 @@ def save_temps(run, batch, source, zero_times=True, cycles=None,
     grid_tools.try_mkdir(path, skip=True)
 
     cycles = kepler_tools.check_cycles(cycles, run=run, batch=batch, source=source)
-    times = kepler_tools.get_cycle_times(cycles, run=run, batch=batch, source=source)
+    if times is None:
+        times = kepler_tools.get_cycle_times(cycles, run=run, batch=batch, source=source)
 
     if zero_times:
         times = times - times[0]
