@@ -1367,7 +1367,8 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
-                         zero_time=True, fontsize=14, ylims=(-1, 8), **kwargs):
+                         zero_time=True, fontsize=14, ylims=(-1, 8), title=True,
+                         **kwargs):
         """Plot individual burst lightcurve
 
         parameters
@@ -1390,7 +1391,8 @@ class BurstRun(object):
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
         ax.set_xlabel('Time (s)', fontsize=fontsize)
-        ax.set_title(self.model_str)
+        if title:
+            ax.set_title(self.model_str)
 
         if log:
             ax.set_yscale('log')
