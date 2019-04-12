@@ -31,11 +31,10 @@ def load_dumps(run, batch, source, cycles=None, basename='xrb'):
 
 def load_dump(cycle, run, batch, source, basename='xrb',
               prefix='', verbose=False):
-    batch_str = grid_strings.get_batch_string(batch, source)
-    run_str = grid_strings.get_run_string(run, basename)
     filename = get_dump_filename(cycle, run, basename, prefix=prefix)
-
-    filepath = os.path.join(MODELS_PATH, batch_str, run_str, filename)
+    model_path = grid_strings.get_model_path(run=run, batch=batch, source=source,
+                                             basename=basename)
+    filepath = os.path.join(model_path, filename)
     printv(f'Loading: {filepath}', verbose=verbose)
     return kepdump.load(filepath, graphical=False, silent=True)
 
