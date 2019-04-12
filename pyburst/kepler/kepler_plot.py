@@ -71,7 +71,7 @@ def plot_dump_profile(run, batch, source, y_param, x_param='y', cycles=None,
 
 def plot_composition_profile(dumpfile, title=None,
                              display=True, fontsize=14, marker='',
-                             xlims=(1.5e12, 2e3), ylims=(5e-3, 1.5), legend=True,
+                             xlims=(5e9, 2e5), ylims=(5e-3, 1.5), legend=True,
                              ions=('h1', 'he4', 'c12', 'n14', 'o16', 'fe54')):
     fig, ax = plt.subplots()
     i0 = 2
