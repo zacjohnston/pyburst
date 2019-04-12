@@ -110,7 +110,7 @@ class BurstRun(object):
                         'short_waits': 'C4',
                         'burst_stages': 'C2',
                         'shocks': 'C3',
-                        'dumps': 'C0',
+                        'dumps': 'C3',
                         'shock_maxima': 'C3',
                         }
 
@@ -1092,7 +1092,7 @@ class BurstRun(object):
         time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
         markersize = 10
         markeredgecolor = '0'
-        dump_y = 1e37  # y-value to plot dump markers
+        dump_ylims = [0, 1e39]  # y-values to plot dump markers
 
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.set_xlabel(f'Time ({time_label})', fontsize=fontsize)
@@ -1181,18 +1181,15 @@ class BurstRun(object):
                     marker='o', markersize=markersize, markeredgecolor=markeredgecolor,
                     label='shock_maxima', ls='none', color=self.colours['shock_maxima'])
 
-        if dumps:
-            if not self.flags['dumps_loaded']:
-                self.load_dumpfiles()
-            times = self.dump_table['time']
-            ax.scatter(times/timescale, np.full_like(times, dump_y), marker='D',
-                       color=self.colours['dumps'], label='dumps')
+        if dumps or dump_start:
+            self.check_dumpfiles()
+            dump_times = {True: self.dump_table['time'],
+                          False: self.dumps_starts()['time']}.get(dumps)
+            label = {True: 'dumps',
+                     False: 'burst_dumps'}.get(dumps)
 
-        if dump_start:
-            burst_dumps = self.dumps_starts()
-            times = burst_dumps['time']
-            ax.scatter(times/timescale, np.full_like(times, dump_y), marker='D',
-                       color='red', label='burst_dumps')
+            ax.vlines(dump_times/timescale, dump_ylims[0]/yscale, dump_ylims[1]/yscale,
+                      color=self.colours['dumps'], label=label)
 
         if legend:
             ax.legend(loc=1, framealpha=1, edgecolor='0')
