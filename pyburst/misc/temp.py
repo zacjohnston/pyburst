@@ -177,6 +177,35 @@ def save_temps(run, batch, source, zero_times=True, cycles=None,
         plt.close('all')
 
 
+def save_comps(run, batch, source, dumpfiles, zero_times=True, cycles=None, times=None):
+    """Iterate through cycles and save temperature profile plots
+    """
+    batch_str = grid_strings.get_batch_string(batch, source)
+    path = os.path.join(grid_strings.plots_path(source), 'composition', batch_str, str(run))
+    grid_tools.try_mkdir(path, skip=True)
+
+    cycles = kepler_tools.check_cycles(cycles, run=run, batch=batch, source=source)
+
+    if times is None:
+        times = kepler_tools.get_cycle_times(cycles, run=run, batch=batch, source=source)
+    if zero_times:
+        times = times - times[0]
+
+    for i, cycle in enumerate(cycles):
+        kepler_tools.print_cycle_progress(cycle=cycle, cycles=cycles, i=i,
+                                          prefix='Saving plots: ')
+        # dumpfile = kepler_tools.load_dump(cycle, run, batch, source=source,
+        #                                   basename='xrb')
+        dumpfile = dumpfiles[cycle]
+        title = f'cycle={cycle},  t={times[i]:.6f}'
+        fig = kepler_plot.plot_composition_profile(dumpfile, title=title, display=False)
+
+        filename = f'composition_{source}_{batch}_{run}_{i:04}.png'
+        filepath = os.path.join(path, filename)
+        fig.savefig(filepath)
+        plt.close('all')
+
+
 def plot_base_temp_multi(runs, batches, sources, cycles=None, legend=True, linear=False,
                          depth=None):
     fig, ax = plt.subplots()
