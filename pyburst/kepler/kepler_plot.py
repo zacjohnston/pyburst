@@ -79,7 +79,7 @@ def plot_composition_profile(dumpfile, title=None,
 
     for ion in ions:
         x = dumpfile.y[i0:i1]
-        y = dumpfile.abu[ion][i0:i1]
+        y = dumpfile.abub[ion][i0:i1]
 
         ax.plot(x, y, label=f'{ion}', marker=marker)
 
