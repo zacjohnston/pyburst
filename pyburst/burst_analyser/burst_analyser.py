@@ -1340,6 +1340,7 @@ class BurstRun(object):
     def save_burst_lightcurves(self, path=None):
         """Saves burst lightcurves to txt files. Excludes 'pre' bursts
         """
+        # TODO: obsolete?
         self.ensure_analysed_is(True)
         if path is None:  # default to model directory
             path = self.paths['batch_models']
@@ -1440,7 +1441,7 @@ class BurstRun(object):
         for burst in range(self.n_bursts):
             self.plot_lightcurves(burst, save=True, display=False, **kwargs)
 
-    def plot_temp_profile(self, discard=5, legend=False, relative=False, plot_all=False,
+    def plot_temp_profile(self, discard=0, legend=False, relative=False, plot_all=False,
                           **kwargs):
         """Plots temperature profile at each dump_start
 
