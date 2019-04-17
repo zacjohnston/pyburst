@@ -54,7 +54,7 @@ def write_individual_scripts(batches, runs, source, walltime, **kwargs):
     for i, batch in enumerate(batches):
         run = runs[i]
         batch_str = grid_strings.get_batch_string(batch, source)
-        path = os.path.join(MODELS_PATH, batch_str, 'logs')
+        path = os.path.join(MODELS_PATH, source, batch_str, 'logs')
 
         write_submission_script(batch, run0=run, run1=run, source=source,
                                 walltime=walltime, path=path, **kwargs)
@@ -84,7 +84,7 @@ def write_submission_script(batch, source, walltime, path=None,
 
     batch_str = grid_strings.get_batch_string(batch, source)
     if path is None:
-        path = os.path.join(MODELS_PATH, batch_str, 'logs')
+        path = os.path.join(MODELS_PATH, source, batch_str, 'logs')
 
     if parallel:
         if n_runs > max_tasks:
