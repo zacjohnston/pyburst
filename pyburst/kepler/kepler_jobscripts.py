@@ -174,7 +174,7 @@ EXE_PATH=$KEPLER_PATH/gfortran/keplery
 ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
 BDAT_PATH=$PYBURST/files/{bdat_filename}
 
-cd $KEPLER_MODELS/{source}_{batch}/{basename}$N/
+cd $KEPLER_MODELS/{source}/{source}_{batch}/{basename}$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
 ln -sf $BDAT_PATH ./bdat
 $EXE_PATH {basename}$N {cmd_str} {debug_str}"""
@@ -197,7 +197,7 @@ EXE_PATH=$KEPLER_PATH/gfortran/keplery
 ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
 BDAT_PATH=$PYBURST/files/{bdat_filename}
 
-cd $KEPLER_MODELS/{source}_{batch}/xrb$N/
+cd $KEPLER_MODELS/{source}/{source}_{batch}/xrb$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
 ln -sf $BDAT_PATH ./bdat
 $EXE_PATH {basename}$N {cmd_str}
