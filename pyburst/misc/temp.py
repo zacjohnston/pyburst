@@ -12,7 +12,6 @@ from pyburst.kepler import kepler_tools, kepler_plot
 from pyburst.burst_analyser import burst_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
-MODELS_PATH = os.environ['KEPLER_MODELS']
 PROJECT_PATH = '/home/zacpetej/projects/oscillations/'
 
 # TODO: implement module as proper pyburst module
