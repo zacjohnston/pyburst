@@ -26,7 +26,7 @@ RUN_NAME='xrb'
 echo "Deleting ascii dumps:"
 for g in $(seq ${GRID_FIRST} ${GRID_LAST})
 do
-    gpath="${GRID_DIR}/${GRID_NAME}_${g}"
+    gpath="${GRID_DIR}/${GRID_NAME}/${GRID_NAME}_${g}"
     nruns=$(wc -l < ${gpath}/MODELS.txt)
     for r in $(seq ${nruns})
     do
