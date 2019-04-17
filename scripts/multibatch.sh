@@ -47,7 +47,7 @@ fi
 
 for i in $(seq ${batch1} ${batch2})
 do
-  cd ${LOC_DIR}/${source}_${i}/logs
+  cd ${LOC_DIR}/${source}/${source}_${i}/logs
   sbatch ${CLUSTER}_${prefix}_${i}_${filestring}
 done
 
