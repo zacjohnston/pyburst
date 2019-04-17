@@ -24,10 +24,6 @@ FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
               'tshift': flt2, 'qb': flt4, 'acc_mult': flt2, 'qb_delay': flt2,
               'mass': flt2, 'accmass': exp2, 'accdepth': exp2}
 
-GRIDS_PATH = os.environ['KEPLER_GRIDS']
-MODELS_PATH = os.environ['KEPLER_MODELS']
-
-
 # TODO: rewrite docstrings
 
 
@@ -39,6 +35,10 @@ def write_pandas_table(table, filepath, justify='left'):
     with open(filepath, 'w') as f:
         f.write(table_str)
 
+
+# TODO:
+#   - load bursts table
+#   - switch "burst_analyser" flag to "lampe" flag
 
 def load_grid_table(tablename, source, verbose=True, burst_analyser=False):
     """Returns file of model parameters as pandas DataFrame
@@ -369,7 +369,8 @@ def combine_grid_tables(batches, table_basename, source, **kwargs):
     """Reads table files of batches and combines them into a single file
     """
     source = grid_strings.source_shorthand(source=source)
-    path = kwargs.get('path', GRIDS_PATH)
+    grids_path = grid_strings.kepler_grids_path()
+    path = kwargs.get('path', grids_path)
     table_path = os.path.join(path, 'sources', source, table_basename)
 
     print(f'Combining grid tables for: {table_basename}')
