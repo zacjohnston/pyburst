@@ -90,7 +90,6 @@ def create_batch(batch, dv, source,
     print_batch(batch=batch, source=source)
 
     if params_full is None:
-        params = dict(params)
         params_expanded, var = expand_params(dv, params)
 
         # ===== Cut out any excluded values =====
