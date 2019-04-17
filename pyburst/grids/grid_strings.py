@@ -49,6 +49,9 @@ def get_model_string(run, batch, source, b_tag='', r_tag=''):
 # ======================================================
 # Top level paths
 # ======================================================
+def kepler_grids_path():
+    return GRIDS_PATH
+
 def top_path(sub_dir, source):
     return os.path.join(GRIDS_PATH, sub_dir, source)
 
@@ -73,7 +76,8 @@ def get_obs_data_path(source):
 # ======================================================
 def get_batch_models_path(batch, source):
     batch_str = get_batch_string(batch, source)
-    return os.path.join(MODELS_PATH, batch_str)
+    # TODO: make this consistent with dirs, cluster syncs
+    return os.path.join(MODELS_PATH, source, batch_str)
 
 
 def get_model_path(run, batch, source, basename='xrb'):
