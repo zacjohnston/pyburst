@@ -16,8 +16,6 @@ except ModuleNotFoundError:
 from pyburst.misc import pyprint
 from pyburst.grids import grid_strings, grid_tools
 
-MODELS_PATH = os.environ['KEPLER_MODELS']
-GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 # TODO: Move to kepler_tools.py?
 def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
