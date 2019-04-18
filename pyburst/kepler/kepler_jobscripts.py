@@ -73,7 +73,6 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
     source = grid_strings.source_shorthand(source=source)
     span_str = get_span_string(run0, run1, runs=runs)
 
-    # TODO: check if adapnet/bdat exists
     if adapnet_filename is None:
         adapnet_filename = 'adapnet_alex_email_dec.5.2016.cfg'
     if bdat_filename is None:
@@ -83,6 +82,7 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
     cmd_str = {True: 'z1', False: 'xrb_g'}[restart]
     debug_str = {True: 'x', False: ''}[debug]
 
+    # TODO: combine monarch and icer scripts
     if cluster == 'monarch':
         return f"""#!/bin/bash
 ###################################
@@ -103,6 +103,13 @@ N=$SLURM_ARRAY_TASK_ID
 EXE_PATH=$KEPLER_PATH/gfortran/keplery
 ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
 BDAT_PATH=$PYBURST/files/{bdat_filename}
+
+for FILE in ${{ADAPNET_PATH}} ${{BDAT_PATH}}; do
+    if [ ! -f ${{FILE}} ]; then
+        echo "File not found: ${{FILE}}"
+        exit 1
+    fi
+done
 
 cd $KEPLER_MODELS/{source}/{source}_{batch}/{basename}$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
@@ -126,6 +133,13 @@ N=$SLURM_ARRAY_TASK_ID
 EXE_PATH=$KEPLER_PATH/gfortran/keplery
 ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
 BDAT_PATH=$PYBURST/files/{bdat_filename}
+
+for FILE in ${{ADAPNET_PATH}} ${{BDAT_PATH}}; do
+    if [ ! -f ${{FILE}} ]; then
+        echo "File not found: ${{FILE}}"
+        exit 1
+    fi
+done
 
 cd $KEPLER_MODELS/{source}/{source}_{batch}/xrb$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
