@@ -41,7 +41,7 @@ def write_jobscripts(batch, source, walltime, path=None, run0=None, run1=None,
     job_str = get_jobstring(batch=batch, run0=run0, run1=run1, source=source)
     time_str = f'{walltime:02}:00:00'
 
-    # TODO: combine clusters into single 'slurm' script
+    # TODO: combine clusters into single 'slurm' script (how to handle constraints?)
     for cluster in ['monarch', 'icer']:
         print('Writing submission script for cluster:', cluster)
         script_str = get_submission_str(run0=run0, run1=run1, runs=runs, source=source,
