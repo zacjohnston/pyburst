@@ -79,7 +79,7 @@ def create_batch(batch, dv, source,
     mass_ref = 1.4  # reference NS mass (Msun)
     radius_ref = 10  # default NS radius (km)
 
-    print_batch(batch=batch, source=source)
+    print_batch(batch=batch)
 
     if params_full is None:
         params_expanded, var = expand_params(dv, params)
@@ -620,7 +620,7 @@ def sync_model_restarts(source, target, basename='xrb', verbose=True,
         subprocess.run(command)
 
 
-def print_batch(batch, source):
+def print_batch(batch):
     print_title()
     print_title()
     print(f'Batch: {batch}')
