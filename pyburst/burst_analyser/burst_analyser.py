@@ -1366,7 +1366,7 @@ class BurstRun(object):
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
                          zero_time=True, fontsize=14, ylims=(-1, 8), title=True,
-                         **kwargs):
+                         color=None, **kwargs):
         """Plot individual burst lightcurve
 
         parameters
@@ -1379,12 +1379,15 @@ class BurstRun(object):
         zero_time : bool (optional)
         fontsize : int (optional)
         ylims : [int, int] (optional)
+        title : bool (optional)
+        color : str (optional)
+            colour of all curves. If None, use default pyplot color cycle
         """
         self.ensure_analysed_is(True)
         if not self.flags['lum_loaded']:
             self.load_lum_file()
         if bursts is None:
-            bursts = np.arange(1, self.n_bursts)
+            bursts = np.arange(self.n_bursts)
 
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
@@ -1397,7 +1400,7 @@ class BurstRun(object):
             ax.set_ylim([1e34, 1e39])
 
         for burst in bursts:
-            self.add_lightcurve(burst, ax, zero_time=zero_time, **kwargs)
+            self.add_lightcurve(burst, ax, zero_time=zero_time, color=color, **kwargs)
 
         ax.set_xlim(left=-5, right=20)
         ax.set_ylim(ylims[0], ylims[1])
@@ -1453,7 +1456,7 @@ class BurstRun(object):
             cycles = self.dump_table.cycle
         elif cycles is None:
             cycles = np.array(self.dumps_starts().index)
-            
+
         kepler_plot.plot_dump_profile(run=self.run, batch=self.batch, source=self.source,
                                       cycles=cycles[discard:], legend=legend,
                                       relative=relative, y_param='tn', **kwargs)
