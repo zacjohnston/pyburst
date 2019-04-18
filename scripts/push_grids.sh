@@ -1,6 +1,6 @@
 #!/bin/bash
 #=============================================
-# Pushes kepler models to remote monarch (assumes set of 3 batches)
+# Pushes kepler models to remote monarch
 #=============================================
 if [[ "$1" == "-h" ]]; then
   echo "usage: `basename $0` [source] [batch0] [batch1]

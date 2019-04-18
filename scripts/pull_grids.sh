@@ -2,6 +2,8 @@
 #=============================================
 # Pulls kepler models from remote clusters
 #=============================================
+# TODO: run rmascii on cluster before syncing
+
 if [[ "$1" == "-h" ]]; then
   echo "usage: `basename $0` [source] [batch0] [batch1]
 where:
