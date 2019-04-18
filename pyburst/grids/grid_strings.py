@@ -76,7 +76,6 @@ def get_obs_data_path(source):
 # ======================================================
 def get_batch_models_path(batch, source):
     batch_str = get_batch_string(batch, source)
-    # TODO: make this consistent with dirs, cluster syncs
     return os.path.join(MODELS_PATH, source, batch_str)
 
 
