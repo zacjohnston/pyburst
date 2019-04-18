@@ -50,7 +50,7 @@ def create_batch(batch, dv, source,
                          'qb': [0.125], 'acc_mult': [1.0], 'qnuc': [5.0],
                          'qb_delay': [0.0], 'mass': [1.4],
                          'accmass': [1e16], 'accdepth': [1e20]},
-                 lburn=1, t_end=1.3e5, exclude={}, basename='xrb', walltime=96,
+                 lburn=1, t_end=1.3e5, exclude=None, basename='xrb', walltime=96,
                  nstop=10000000, nsdump=500, auto_t_end=True, notes='No notes given',
                  nbursts=20, kgrid=None, nuc_heat=True, setup_test=False,
                  predict_qnuc=False, grid_version=None, qnuc_source='heat', minzone=51,
@@ -89,6 +89,8 @@ def create_batch(batch, dv, source,
         params_expanded, var = expand_params(dv, params)
 
         # ===== Cut out any excluded values =====
+        if exclude is None:
+            exclude = {}
         cut_params(params=params_expanded, exclude=exclude)
         print_grid_params(params_expanded)
 
