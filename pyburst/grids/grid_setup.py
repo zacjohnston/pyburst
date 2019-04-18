@@ -7,7 +7,7 @@ from . import grid_analyser
 from . import grid_tools
 from . import grid_strings
 from pyburst.mcmc import mcmc_versions, mcmc_tools
-from pyburst.kepler import kepler_jobscripts, kepler_files
+from pyburst.kepler import kepler_jobs, kepler_files
 from pyburst.misc.pyprint import print_title, print_dashes
 from pyburst.qnuc import qnuc_tools
 from pyburst.physics import gravity
@@ -133,11 +133,11 @@ def create_batch(batch, dv, source,
         f.write(notes)
 
     print_dashes()
-    kepler_jobscripts.write_both_jobscripts(run0=1, run1=n_models, batch=batch,
-                                            source=source, basename=basename,
-                                            path=logpath, walltime=walltime,
-                                            adapnet_filename=adapnet_filename,
-                                            bdat_filename=bdat_filename)
+    kepler_jobs.write_both_jobscripts(run0=1, run1=n_models, batch=batch,
+                                      source=source, basename=basename,
+                                      path=logpath, walltime=walltime,
+                                      adapnet_filename=adapnet_filename,
+                                      bdat_filename=bdat_filename)
 
     # ===== Directories and templates for each model =====
     for i in range(n_models):
@@ -482,10 +482,10 @@ def extend_runs(summ_table, source, nbursts=None, t_end=None,
         for batch in batches:
             batch_table = grid_tools.reduce_table(short_table, params={'batch': batch})
             runs = np.array(batch_table['run'])
-            kepler_jobscripts.write_jobscripts(batch, run0=runs[0], run1=runs[-1],
-                                               runs=runs, source=source,
-                                               walltime=walltime, restart=True,
-                                               adapnet_filename=adapnet_filename)
+            kepler_jobs.write_jobscripts(batch, run0=runs[0], run1=runs[-1],
+                                         runs=runs, source=source,
+                                         walltime=walltime, restart=True,
+                                         adapnet_filename=adapnet_filename)
 
     return short_table
 
@@ -588,7 +588,7 @@ def sync_model_restarts(source, target, basename='xrb', verbose=True,
             runs = np.array(batch_table['run'])
 
         if sync_jobscripts:
-            span_str = kepler_jobscripts.get_span_string(runs[0], runs[-1])
+            span_str = kepler_jobs.get_span_string(runs[0], runs[-1])
             jobscript = f'icer_restart_{source}_{batch}_{span_str}.qsub'
             jobscript_path = os.path.join(batch_path, 'logs', jobscript)
             sync_paths += [jobscript_path]
