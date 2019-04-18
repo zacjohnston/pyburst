@@ -68,9 +68,10 @@ def write_submission_script(batch, source, walltime, path=None,
             f.write(script_str)
 
 
-def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
-                       qos, time_str, job_str, debug, restart,
-                       adapnet_filename=None, bdat_filename=None):
+def get_submission_str(run0, run1, source, runs, batch, basename, cluster, time_str,
+                       job_str, restart, adapnet_filename=None, bdat_filename=None):
+    """Returns string of submission script contents
+    """
     source = grid_strings.source_shorthand(source=source)
     span_str = get_span_string(run0, run1, runs=runs)
 
