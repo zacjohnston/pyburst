@@ -46,15 +46,13 @@ def create_batch(batch, dv, source,
                          'qb': [0.125], 'acc_mult': [1.0], 'qnuc': [5.0],
                          'qb_delay': [0.0], 'mass': [1.4],
                          'accmass': [1e16], 'accdepth': [1e20]},
-                 lburn=1, t_end=1.3e5, exclude={}, basename='xrb',
-                 walltime=96, qos='normal', nstop=10000000, nsdump=500,
-                 auto_t_end=True, notes='No notes given', debug=False,
-                 nbursts=20, kgrid=None, nuc_heat=True,
-                 setup_test=False, predict_qnuc=False,
-                 grid_version=None, qnuc_source='heat', minzone=51,
-                 zonermax=10, zonermin=-1, thickfac=0.001,
-                 substrate='fe54', substrate_off=True, adapnet_filename=None,
-                 bdat_filename=None, ibdatov=1, params_full=None):
+                 lburn=1, t_end=1.3e5, exclude={}, basename='xrb', walltime=96,
+                 nstop=10000000, nsdump=500, auto_t_end=True, notes='No notes given',
+                 nbursts=20, kgrid=None, nuc_heat=True, setup_test=False,
+                 predict_qnuc=False, grid_version=None, qnuc_source='heat', minzone=51,
+                 zonermax=10, zonermin=-1, thickfac=0.001, substrate='fe54',
+                 substrate_off=True, adapnet_filename=None, bdat_filename=None,
+                 ibdatov=1, params_full=None):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -68,8 +66,6 @@ def create_batch(batch, dv, source,
         specify any parameter values to exclude from grid
     params : {}
         mass of NS (in Msun). Only changes geemult (gravity multiplier)
-    qos : str
-        quality of service (slurm), one of ['general', 'medium', 'short']
     auto_t_end : bool
         auto-choose t_end based on predicted recurrence time
     kgrid : Kgrid
@@ -139,8 +135,7 @@ def create_batch(batch, dv, source,
     print_dashes()
     kepler_jobscripts.write_both_submission_scripts(run0=1, run1=n_models, batch=batch,
                                                     source=source, basename=basename,
-                                                    path=logpath, qos=qos,
-                                                    walltime=walltime, debug=debug,
+                                                    path=logpath, walltime=walltime,
                                                     adapnet_filename=adapnet_filename,
                                                     bdat_filename=bdat_filename)
 
@@ -238,9 +233,9 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
                                                                 n_models=n_models, mv=mv)
 
         create_batch(batch0+i, dv={}, params={}, source=source, nbursts=30, kgrid=kgrid,
-                     qos='normal', walltime=96, setup_test=False, nsdump=500,
-                     nuc_heat=True, predict_qnuc=False, grid_version=0,
-                     substrate_off=True, ibdatov=1, params_full=params_full)
+                     walltime=96, setup_test=False, nsdump=500, nuc_heat=True,
+                     predict_qnuc=False, grid_version=0, substrate_off=True, ibdatov=1,
+                     params_full=params_full)
 
 
 def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
@@ -281,10 +276,9 @@ def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
             params_full[key] = get_mcmc_params(mv_key, param_sample=param_sample, mv=mv)
 
         create_batch(batch0+i, dv={}, params={}, source=source, nbursts=35, kgrid=kgrid,
-                     qos='normal', walltime=96, setup_test=False, nsdump=500,
-                     nuc_heat=True, predict_qnuc=False,
-                     substrate_off=True, ibdatov=1, params_full=params_full,
-                     notes=idx_string)
+                     walltime=96, setup_test=False, nsdump=500, nuc_heat=True,
+                     predict_qnuc=False, substrate_off=True, ibdatov=1,
+                     params_full=params_full, notes=idx_string)
 
 
 def save_sample_array(param_sample, source, batch0, batch1):

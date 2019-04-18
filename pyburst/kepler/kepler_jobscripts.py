@@ -8,22 +8,19 @@ from pyburst.grids import grid_strings
 
 
 def write_both_submission_scripts(batch, source, walltime, path=None, run0=None,
-                                  run1=None, runs=None, qos='normal', basename='xrb',
-                                  debug=False, adapnet_filename=None, bdat_filename=None):
+                                  run1=None, runs=None, basename='xrb',
+                                  adapnet_filename=None, bdat_filename=None):
     """Iterates write_submission_script() for both restart=True/False
     """
     for restart in [True, False]:
         write_submission_script(run0=run0, run1=run1, runs=runs, restart=restart,
-                                batch=batch, source=source, basename=basename,
-                                path=path, qos=qos, walltime=walltime, debug=debug,
-                                adapnet_filename=adapnet_filename,
+                                batch=batch, source=source, basename=basename, path=path,
+                                walltime=walltime, adapnet_filename=adapnet_filename,
                                 bdat_filename=bdat_filename)
 
 
-def write_submission_script(batch, source, walltime, path=None,
-                            run0=None, run1=None, runs=None,
-                            qos='normal', basename='xrb',
-                            restart=False, debug=False,
+def write_submission_script(batch, source, walltime, path=None, run0=None, run1=None,
+                            runs=None, basename='xrb', restart=False,
                             adapnet_filename=None, bdat_filename=None):
     """Writes jobscripts to execute on MONARCH/ICER cluster
 
@@ -52,9 +49,8 @@ def write_submission_script(batch, source, walltime, path=None,
         ext = extensions[cluster]
 
         script_str = get_submission_str(run0=run0, run1=run1, runs=runs, source=source,
-                                        batch=batch, basename=basename, qos=qos,
-                                        time_str=time_str, job_str=job_str,
-                                        cluster=cluster, debug=debug, restart=restart,
+                                        batch=batch, basename=basename, time_str=time_str,
+                                        job_str=job_str, cluster=cluster, restart=restart,
                                         adapnet_filename=adapnet_filename,
                                         bdat_filename=bdat_filename)
 
