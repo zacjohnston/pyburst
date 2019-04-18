@@ -1,8 +1,9 @@
+import os
 import numpy as np
 import pandas as pd
-import subprocess, sys, os
+import subprocess
 
-# kepler_grids
+# pyburst
 from . import grid_analyser
 from . import grid_tools
 from . import grid_strings
