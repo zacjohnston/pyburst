@@ -49,8 +49,8 @@ def create_batch(batch, dv, source,
                  lburn=1, t_end=1.3e5, exclude={}, basename='xrb',
                  walltime=96, qos='normal', nstop=10000000, nsdump=500,
                  auto_t_end=True, notes='No notes given', debug=False,
-                 nbursts=20, parallel=False, ntasks=8, kgrid=None,
-                 nuc_heat=True, setup_test=False, predict_qnuc=False,
+                 nbursts=20, kgrid=None, nuc_heat=True,
+                 setup_test=False, predict_qnuc=False,
                  grid_version=None, qnuc_source='heat', minzone=51,
                  zonermax=10, zonermin=-1, thickfac=0.001,
                  substrate='fe54', substrate_off=True, adapnet_filename=None,
@@ -72,10 +72,6 @@ def create_batch(batch, dv, source,
         quality of service (slurm), one of ['general', 'medium', 'short']
     auto_t_end : bool
         auto-choose t_end based on predicted recurrence time
-    parallel : bool
-        utilise parallel independent kepler tasks
-    ntasks : int
-        no. of tasks in each parallel job (split up by this)
     kgrid : Kgrid
         pre-loaded Kgrid object, optional (avoids reloading)
     """
@@ -99,9 +95,6 @@ def create_batch(batch, dv, source,
         params_full = grid_tools.enumerate_params(params_expanded)
 
     n_models = len(params_full['x'])
-
-    if parallel and (n_models % ntasks != 0):
-        raise ValueError(f'n_models ({n_models}) not divisible by ntasks ({ntasks})')
 
     if kgrid is None:
         print('No kgrid provided. Loading:')
@@ -143,26 +136,16 @@ def create_batch(batch, dv, source,
     with open(filepath, 'w') as f:
         f.write(notes)
 
-    job_runs = []
-    if parallel:
-        n_jobs = int(n_models / ntasks)
-        for i in range(n_jobs):
-            start = i * ntasks
-            job_runs += [[start + 1, start + ntasks]]
-    else:
-        job_runs += [[1, n_models]]
-
     print_dashes()
-    for runs in job_runs:
-        for restart in [True, False]:
-            kepler_jobscripts.write_submission_script(run0=runs[0], run1=runs[1],
-                                                      restart=restart, batch=batch,
-                                                      source=source, basename=basename,
-                                                      path=logpath, qos=qos,
-                                                      walltime=walltime,
-                                                      parallel=parallel, debug=debug,
-                                                      adapnet_filename=adapnet_filename,
-                                                      bdat_filename=bdat_filename)
+    for restart in [True, False]:
+        # TODO: fold restart=True/False into single function
+        kepler_jobscripts.write_submission_script(run0=1, run1=n_models,
+                                                  restart=restart, batch=batch,
+                                                  source=source, basename=basename,
+                                                  path=logpath, qos=qos,
+                                                  walltime=walltime, debug=debug,
+                                                  adapnet_filename=adapnet_filename,
+                                                  bdat_filename=bdat_filename)
 
     # ===== Directories and templates for each model =====
     for i in range(n_models):

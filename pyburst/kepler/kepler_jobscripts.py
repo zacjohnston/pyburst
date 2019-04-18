@@ -36,22 +36,17 @@ def get_jobstring(batch, run0, run1, source, include_source=True):
 
 def write_submission_script(batch, source, walltime, path=None,
                             run0=None, run1=None, runs=None,
-                            parallel=False, qos='normal', basename='xrb',
-                            restart=False, max_tasks=16, debug=False,
-                            adapnet_filename=None, bdat_filename=None,
-                            dependency=False):
+                            qos='normal', basename='xrb',
+                            restart=False, debug=False,
+                            adapnet_filename=None, bdat_filename=None):
     """Writes jobscripts to execute on MONARCH/ICER cluster
 
     Parameter:
     ----------
     runs : list (optional)
         specify an arbitrary list of runs, instead of a span from run0-run1
-    parallel : bool
-        launch parallel independent kepler tasks
     path : str
         target path for slurm script
-    max_tasks : int
-        max number of tasks allowed on one node
     """
     source = grid_strings.source_shorthand(source=source)
     run0, run1, runs, n_runs = check_runs(run0, run1, runs)
@@ -59,10 +54,6 @@ def write_submission_script(batch, source, walltime, path=None,
     if path is None:
         batch_path = grid_strings.get_batch_models_path(batch=batch, source=source)
         path = os.path.join(batch_path, 'logs')
-
-    if parallel:
-        if n_runs > max_tasks:
-            raise ValueError(f'ntasks ({n_runs}) larger than max_tasks ({max_tasks})')
 
     extensions = {'monarch': '.sh', 'icer': '.qsub'}
 
@@ -76,11 +67,9 @@ def write_submission_script(batch, source, walltime, path=None,
         script_str = get_submission_str(run0=run0, run1=run1, runs=runs, source=source,
                                         batch=batch, basename=basename, qos=qos,
                                         time_str=time_str, job_str=job_str,
-                                        cluster=cluster, parallel=parallel,
-                                        debug=debug, restart=restart,
+                                        cluster=cluster, debug=debug, restart=restart,
                                         adapnet_filename=adapnet_filename,
-                                        bdat_filename=bdat_filename,
-                                        dependency=dependency)
+                                        bdat_filename=bdat_filename)
 
         span = get_span_string(run0, run1)
         prepend_str = {True: 'restart_'}.get(restart, '')
@@ -91,20 +80,13 @@ def write_submission_script(batch, source, walltime, path=None,
         with open(filepath, 'w') as f:
             f.write(script_str)
 
-    if parallel:
-        write_parallel_script(run0=run0, run1=run1, batch=batch, path=path,
-                              restart=restart, basename=basename, source=source,
-                              debug=debug, adapnet_filename=adapnet_filename,
-                              bdat_filename=bdat_filename)
-
 
 def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
-                       qos, time_str, parallel, job_str, debug, restart,
-                       adapnet_filename=None, bdat_filename=None, dependency=False):
+                       qos, time_str, job_str, debug, restart,
+                       adapnet_filename=None, bdat_filename=None):
     source = grid_strings.source_shorthand(source=source)
     span_str = get_span_string(run0, run1, runs=runs)
-    batch_str = get_jobstring(batch=batch, run0=run0, run1=run1, source=source,
-                              include_source=False)
+
     # TODO: check if adapnet/bdat exists
     if adapnet_filename is None:
         adapnet_filename = 'adapnet_alex_email_dec.5.2016.cfg'
@@ -113,7 +95,6 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
 
     # ===== restart parameters =====
     cmd_str = {True: 'z1', False: 'xrb_g'}[restart]
-    restart_str = {True: 'restart_', False: ''}[restart]
     debug_str = {True: 'x', False: ''}[debug]
 
     if cluster == 'monarch':
