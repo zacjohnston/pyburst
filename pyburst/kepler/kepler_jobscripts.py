@@ -1,13 +1,12 @@
+# ========================================================
+# Functions for writing job submission scripts on cluster (e.g. monarch, ICER)
+# ========================================================
 import os
 import subprocess
 
 # kepler_grids
 from pyburst.grids import grid_strings
 
-# ========================================================
-# Functions for writing job submission scripts on cluster (e.g. monarch, ICER)
-# ========================================================
-MODELS_PATH = os.environ['KEPLER_MODELS']
 
 def get_span_string(run0, run1, runs=None):
     """Returns string of run0-run1, (or run0 if run0 == run1)
@@ -57,9 +56,9 @@ def write_submission_script(batch, source, walltime, path=None,
     source = grid_strings.source_shorthand(source=source)
     run0, run1, runs, n_runs = check_runs(run0, run1, runs)
 
-    batch_str = grid_strings.get_batch_string(batch, source)
     if path is None:
-        path = os.path.join(MODELS_PATH, source, batch_str, 'logs')
+        batch_path = grid_strings.get_batch_models_path(batch=batch, source=source)
+        path = os.path.join(batch_path, 'logs')
 
     if parallel:
         if n_runs > max_tasks:
