@@ -137,15 +137,12 @@ def create_batch(batch, dv, source,
         f.write(notes)
 
     print_dashes()
-    for restart in [True, False]:
-        # TODO: fold restart=True/False into single function
-        kepler_jobscripts.write_submission_script(run0=1, run1=n_models,
-                                                  restart=restart, batch=batch,
-                                                  source=source, basename=basename,
-                                                  path=logpath, qos=qos,
-                                                  walltime=walltime, debug=debug,
-                                                  adapnet_filename=adapnet_filename,
-                                                  bdat_filename=bdat_filename)
+    kepler_jobscripts.write_both_submission_scripts(run0=1, run1=n_models, batch=batch,
+                                                    source=source, basename=basename,
+                                                    path=logpath, qos=qos,
+                                                    walltime=walltime, debug=debug,
+                                                    adapnet_filename=adapnet_filename,
+                                                    bdat_filename=bdat_filename)
 
     # ===== Directories and templates for each model =====
     for i in range(n_models):

@@ -2,36 +2,22 @@
 # Functions for writing job submission scripts on cluster (e.g. monarch, ICER)
 # ========================================================
 import os
-import subprocess
 
-# kepler_grids
+# pyburst
 from pyburst.grids import grid_strings
 
 
-def get_span_string(run0, run1, runs=None):
-    """Returns string of run0-run1, (or run0 if run0 == run1)
+def write_both_submission_scripts(batch, source, walltime, path=None, run0=None,
+                                  run1=None, runs=None, qos='normal', basename='xrb',
+                                  debug=False, adapnet_filename=None, bdat_filename=None):
+    """Iterates write_submission_script() for both restart=True/False
     """
-    if runs is not None:
-        string = ''
-        for run in runs:
-            string += f'{run},'
-        return string
-
-    elif run0 == run1:
-        return f'{run0}'
-    else:
-        return f'{run0}-{run1}'
-
-
-def get_jobstring(batch, run0, run1, source, include_source=True):
-    source = grid_strings.source_shorthand(source=source)
-    span = get_span_string(run0, run1)
-    source_str = ''
-
-    if include_source:
-        source_str = f'{source[:2]}_'
-
-    return f'{source_str}{batch}_{span}'
+    for restart in [True, False]:
+        write_submission_script(run0=run0, run1=run1, runs=runs, restart=restart,
+                                batch=batch, source=source, basename=basename,
+                                path=path, qos=qos, walltime=walltime, debug=debug,
+                                adapnet_filename=adapnet_filename,
+                                bdat_filename=bdat_filename)
 
 
 def write_submission_script(batch, source, walltime, path=None,
@@ -49,7 +35,7 @@ def write_submission_script(batch, source, walltime, path=None,
         target path for slurm script
     """
     source = grid_strings.source_shorthand(source=source)
-    run0, run1, runs, n_runs = check_runs(run0, run1, runs)
+    run0, run1, runs = check_runs(run0, run1, runs)
 
     if path is None:
         batch_path = grid_strings.get_batch_models_path(batch=batch, source=source)
@@ -158,7 +144,7 @@ def check_runs(run0, run1, runs):
         if runs is not None: use runs specified
 
     Returns:
-        run0, run1, runs, n_runs
+        run0, run1, runs
     """
     if (run0 is None
             and run1 is None
@@ -166,6 +152,32 @@ def check_runs(run0, run1, runs):
         raise ValueError('Must provide both run0 and run1, or runs')
 
     if runs is None:
-        return run0, run1, runs, (run1 - run0 + 1)
+        return run0, run1, runs
     else:
-        return runs[0], runs[-1], runs, len(runs)
+        return runs[0], runs[-1], runs
+
+
+def get_span_string(run0, run1, runs=None):
+    """Returns string of run0-run1, (or run0 if run0 == run1)
+    """
+    if runs is not None:
+        string = ''
+        for run in runs:
+            string += f'{run},'
+        return string
+
+    elif run0 == run1:
+        return f'{run0}'
+    else:
+        return f'{run0}-{run1}'
+
+
+def get_jobstring(batch, run0, run1, source, include_source=True):
+    source = grid_strings.source_shorthand(source=source)
+    span = get_span_string(run0, run1)
+    source_str = ''
+
+    if include_source:
+        source_str = f'{source[:2]}_'
+
+    return f'{source_str}{batch}_{span}'
