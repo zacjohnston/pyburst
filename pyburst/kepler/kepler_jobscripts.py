@@ -35,31 +35,6 @@ def get_jobstring(batch, run0, run1, source, include_source=True):
     return f'{source_str}{batch}_{span}'
 
 
-def write_individual_scripts(batches, runs, source, walltime, **kwargs):
-    """Writes multiple jobscripts for individual models
-
-    Created for the purpose of resubmitting particular jobs that
-        failed to start.
-
-    e.g. batches=[1,2,2,3], runs=[3,4,5,3] will write scripts for the models:
-        batch_1_3, batch_2_4, batch_2_5, batch_3_3
-
-    Parameters
-    ----------
-    batches : 1darray
-        array of batches to write scripts for
-    runs : 1darray
-        array of runs corresponding to each batch in 'batches'
-    """
-    for i, batch in enumerate(batches):
-        run = runs[i]
-        batch_str = grid_strings.get_batch_string(batch, source)
-        path = os.path.join(MODELS_PATH, source, batch_str, 'logs')
-
-        write_submission_script(batch, run0=run, run1=run, source=source,
-                                walltime=walltime, path=path, **kwargs)
-
-
 def write_submission_script(batch, source, walltime, path=None,
                             run0=None, run1=None, runs=None,
                             parallel=False, qos='normal', basename='xrb',
