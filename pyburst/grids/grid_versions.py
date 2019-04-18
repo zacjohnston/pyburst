@@ -24,6 +24,7 @@ version_defaults = {
         'he1': {
             'qb': [0.0, 0.4],
         },
+        'he2': {},
         'alpha1': {},
         'alpha2': {},
     },
@@ -42,6 +43,7 @@ version_defaults = {
         'test1': [{}],
         'triplets': [{}],
         'he1': [{}],
+        'he2': {},
         'alpha1': [{}],
         'alpha2': [{}],
     },
@@ -106,6 +108,7 @@ version_definitions = {
             },
             'triplets': {},
             'he1': {},
+            'he2': {},
             'alpha1': {},
             'alpha2': {},
         },
@@ -124,6 +127,7 @@ version_definitions = {
             'test1': {},
             'triplets': {},
             'he1': {},
+            'he2': {},
             'alpha1': {},
             'alpha2': {},
         }
