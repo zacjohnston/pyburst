@@ -150,55 +150,6 @@ $EXE_PATH {basename}$N {cmd_str}
         raise ValueError('invalid cluster. Must be one of [monarch, icer]')
 
 
-def write_parallel_script(run0, run1, batch, path, source, restart, debug=False,
-                          basename='xrb', gen_file='xrb_g', adapnet_filename=None,
-                          bdat_filename=None):
-    """========================================================
-    Writes a bash script to launch parallel kepler tasks
-    ========================================================"""
-    source = grid_strings.source_shorthand(source=source)
-    print('Writing MPI script')
-    if adapnet_filename is None:
-        adapnet_filename = 'adapnet_alex_email_dec.5.2016.cfg'
-    if bdat_filename is None:
-        bdat_filename = '20161114Reaclib.bdat5.fixed'
-
-    # ===== restart things =====
-    debug_str = {True: 'x', False: ''}[debug]
-    restart_str = {True: 'restart_', False: ''}[restart]
-    start_str = {True: 'Restarting', False: 'Starting'}[restart]
-    execute_str = {True: f'./k $run_str z1 {debug_str}',
-                   False: f'./k $run_str {gen_file}'}[restart]
-
-    filename = f'parallel_{restart_str}{source}_{batch}_{run0}-{run1}.sh'
-    filepath = os.path.join(path, filename)
-
-    with open(filepath, 'w') as f:
-        f.write(f"""#!/bin/bash
-
-exe_path=$KEPLER_PATH/gfortran/keplery
-batch_dir=$KEPLER_MODELS/{source}_{batch}
-ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
-BDAT_PATH=$PYBURST/files/{bdat_filename}
-
-for run in $(seq {run0} {run1}); do
-   run_str="{basename}${{run}}"
-   echo "{start_str}"
-   cd $batch_dir/$run_str
-   ln -sf $exe_path ./k
-   ln -sf $ADAPNET_PATH ./adapnet.cfg
-   ln -sf $BDAT_PATH ./bdat
-   {execute_str} > ${{run_str}}_std.out &
-done
-
-echo 'Waiting for jobs to finish'
-wait
-echo 'All jobs finished'""")
-
-    # ===== make executable =====
-    subprocess.run(['chmod', '+x', filepath])
-
-
 def check_runs(run0, run1, runs):
     """Checks run parameters, and returns necessary values
 
