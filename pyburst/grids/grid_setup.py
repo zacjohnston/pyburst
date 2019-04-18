@@ -13,12 +13,15 @@ from pyburst.qnuc import qnuc_tools
 from pyburst.physics import gravity
 
 # ====================================
-# Kepler batch Generator
+# Kepler model grid generator
 # --------------------
-# Generates kepler model generator files, in addition to setting up model grids,
-# in particular for running models on the Monarch cluster.
+# Generates kepler model generator files, in addition to setting up model grids
+# and jobscripts
 # --------------------
-# Author: Zac Johnston (2016)
+# Note: This module is a bit of a patchwork and not so nice to look at. Things might
+#           not work elegently or as expected
+# --------------------
+# Author: Zac Johnston
 # Email: zac.johnston@monash.edu
 # ====================================
 
