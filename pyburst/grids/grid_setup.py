@@ -401,6 +401,7 @@ def check_grid_params(params_full, source, precision=6, kgrid=None):
     """
     source = grid_strings.source_shorthand(source=source)
     n_models = len(params_full['x'])
+    any_matches = None
 
     if kgrid is None:
         print('No kgrid provided. Loading:')
