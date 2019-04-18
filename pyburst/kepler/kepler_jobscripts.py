@@ -46,6 +46,7 @@ def write_submission_script(batch, source, walltime, path=None,
     job_str = get_jobstring(batch=batch, run0=run0, run1=run1, source=source)
     time_str = f'{walltime:02}:00:00'
 
+    # TODO: combine clusters into single 'slurm' script
     for cluster in ['monarch', 'icer']:
         print('Writing submission script for cluster:', cluster)
         ext = extensions[cluster]
@@ -78,27 +79,21 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
     if bdat_filename is None:
         bdat_filename = '20161114Reaclib.bdat5.fixed'
 
-    # ===== restart parameters =====
     cmd_str = {True: 'z1', False: 'xrb_g'}[restart]
-    debug_str = {True: 'x', False: ''}[debug]
+    constraint_str = {'icer': 'SBATCH --constraint=intel18'}.get(cluster, '')
 
-    # TODO: combine monarch and icer scripts
-    if cluster == 'monarch':
-        return f"""#!/bin/bash
+    return f"""#!/bin/bash --login
 ###################################
-#SBATCH --job-name={job_str}
-#SBATCH --output=arrayJob_%A_%a.out
-#SBATCH --error=arrayJob_%A_%a.err
+#SBATCH --job-name {job_str}
 #SBATCH --array={span_str}
 #SBATCH --time={time_str}
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --qos={qos}
+#{constraint_str}
 #SBATCH --mem-per-cpu=1024
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=zac.johnston@monash.edu
 ###################################
-
 N=$SLURM_ARRAY_TASK_ID
 EXE_PATH=$KEPLER_PATH/gfortran/keplery
 ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
@@ -114,40 +109,8 @@ done
 cd $KEPLER_MODELS/{source}/{source}_{batch}/{basename}$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
 ln -sf $BDAT_PATH ./bdat
-$EXE_PATH {basename}$N {cmd_str} {debug_str}"""
-
-    elif cluster == 'icer':
-        return f"""#!/bin/bash --login
-###################################
-#SBATCH --job-name {job_str}
-#SBATCH --array={span_str}
-#SBATCH --time={time_str}
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
-#SBATCH --constraint=intel18
-#SBATCH --mem-per-cpu=1024
-#SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --mail-user=zac.johnston@monash.edu
-###################################
-N=$SLURM_ARRAY_TASK_ID
-EXE_PATH=$KEPLER_PATH/gfortran/keplery
-ADAPNET_PATH=$PYBURST/files/{adapnet_filename}
-BDAT_PATH=$PYBURST/files/{bdat_filename}
-
-for FILE in ${{ADAPNET_PATH}} ${{BDAT_PATH}}; do
-    if [ ! -f ${{FILE}} ]; then
-        echo "File not found: ${{FILE}}"
-        exit 1
-    fi
-done
-
-cd $KEPLER_MODELS/{source}/{source}_{batch}/xrb$N/
-ln -sf $ADAPNET_PATH ./adapnet.cfg
-ln -sf $BDAT_PATH ./bdat
 $EXE_PATH {basename}$N {cmd_str}
 """
-    else:
-        raise ValueError('invalid cluster. Must be one of [monarch, icer]')
 
 
 def check_runs(run0, run1, runs):
