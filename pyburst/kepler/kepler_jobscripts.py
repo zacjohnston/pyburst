@@ -7,22 +7,22 @@ import os
 from pyburst.grids import grid_strings
 
 
-def write_both_submission_scripts(batch, source, walltime, path=None, run0=None,
-                                  run1=None, runs=None, basename='xrb',
-                                  adapnet_filename=None, bdat_filename=None):
-    """Iterates write_submission_script() for both restart=True/False
+def write_both_jobscripts(batch, source, walltime, path=None, run0=None,
+                          run1=None, runs=None, basename='xrb',
+                          adapnet_filename=None, bdat_filename=None):
+    """Iterates write_jobscripts() for both restart=True/False
     """
     for restart in [True, False]:
-        write_submission_script(run0=run0, run1=run1, runs=runs, restart=restart,
-                                batch=batch, source=source, basename=basename, path=path,
-                                walltime=walltime, adapnet_filename=adapnet_filename,
-                                bdat_filename=bdat_filename)
+        write_jobscripts(run0=run0, run1=run1, runs=runs, restart=restart,
+                         batch=batch, source=source, basename=basename, path=path,
+                         walltime=walltime, adapnet_filename=adapnet_filename,
+                         bdat_filename=bdat_filename)
 
 
-def write_submission_script(batch, source, walltime, path=None, run0=None, run1=None,
-                            runs=None, basename='xrb', restart=False,
-                            adapnet_filename=None, bdat_filename=None):
-    """Writes jobscripts to execute on MONARCH/ICER cluster
+def write_jobscripts(batch, source, walltime, path=None, run0=None, run1=None,
+                     runs=None, basename='xrb', restart=False,
+                     adapnet_filename=None, bdat_filename=None):
+    """Writes jobscripts to execute on cluster (eg, Monarch, ICER...)
 
     Parameter:
     ----------
@@ -38,16 +38,12 @@ def write_submission_script(batch, source, walltime, path=None, run0=None, run1=
         batch_path = grid_strings.get_batch_models_path(batch=batch, source=source)
         path = os.path.join(batch_path, 'logs')
 
-    extensions = {'monarch': '.sh', 'icer': '.qsub'}
-
     job_str = get_jobstring(batch=batch, run0=run0, run1=run1, source=source)
     time_str = f'{walltime:02}:00:00'
 
     # TODO: combine clusters into single 'slurm' script
     for cluster in ['monarch', 'icer']:
         print('Writing submission script for cluster:', cluster)
-        ext = extensions[cluster]
-
         script_str = get_submission_str(run0=run0, run1=run1, runs=runs, source=source,
                                         batch=batch, basename=basename, time_str=time_str,
                                         job_str=job_str, cluster=cluster, restart=restart,
@@ -57,7 +53,7 @@ def write_submission_script(batch, source, walltime, path=None, run0=None, run1=
         span = get_span_string(run0, run1)
         prepend_str = {True: 'restart_'}.get(restart, '')
 
-        filename = f'{cluster}_{prepend_str}{source}_{batch}_{span}{ext}'
+        filename = f'{cluster}_{prepend_str}{source}_{batch}_{span}.sh'
         filepath = os.path.join(path, filename)
 
         with open(filepath, 'w') as f:

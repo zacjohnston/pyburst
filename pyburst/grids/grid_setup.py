@@ -133,11 +133,11 @@ def create_batch(batch, dv, source,
         f.write(notes)
 
     print_dashes()
-    kepler_jobscripts.write_both_submission_scripts(run0=1, run1=n_models, batch=batch,
-                                                    source=source, basename=basename,
-                                                    path=logpath, walltime=walltime,
-                                                    adapnet_filename=adapnet_filename,
-                                                    bdat_filename=bdat_filename)
+    kepler_jobscripts.write_both_jobscripts(run0=1, run1=n_models, batch=batch,
+                                            source=source, basename=basename,
+                                            path=logpath, walltime=walltime,
+                                            adapnet_filename=adapnet_filename,
+                                            bdat_filename=bdat_filename)
 
     # ===== Directories and templates for each model =====
     for i in range(n_models):
@@ -168,7 +168,7 @@ def create_batch(batch, dv, source,
             print(f'Using predicted dt={tdel/3600:.1f} hr')
             if t_end < 0:
                 print('WARN! negative dt predicted. Defaulting n * 1.5hr')
-                t_end =nbursts * 1.5 * 3600
+                t_end = nbursts * 1.5 * 3600
 
         run = i + 1
         print(f'Writing genfile for xrb{run}')
@@ -482,10 +482,10 @@ def extend_runs(summ_table, source, nbursts=None, t_end=None,
         for batch in batches:
             batch_table = grid_tools.reduce_table(short_table, params={'batch': batch})
             runs = np.array(batch_table['run'])
-            kepler_jobscripts.write_submission_script(batch, run0=runs[0], run1=runs[-1],
-                                                      runs=runs, source=source,
-                                                      walltime=walltime, restart=True,
-                                                      adapnet_filename=adapnet_filename)
+            kepler_jobscripts.write_jobscripts(batch, run0=runs[0], run1=runs[-1],
+                                               runs=runs, source=source,
+                                               walltime=walltime, restart=True,
+                                               adapnet_filename=adapnet_filename)
 
     return short_table
 
@@ -546,20 +546,23 @@ def sync_model_restarts(source, target, basename='xrb', verbose=True,
 
     Parameters
     ----------
-    short_model_table : pd.DataFrame
-        table containing all batches/runs of models with too few n_bursts
     source : str
-    basename : str
-    verbose : bool
-    sync_model_files : bool
+    target : str
+    basename : str (optional)
+    verbose : bool (optional)
+    batches : arraylike (optional)
+    runs : arraylike (optional)
+    short_model_table : pd.DataFrame (optional)
+        table containing all batches/runs of models with too few n_bursts
+    sync_model_files : bool (optional)
         sync model output files (.lc, .cmd, z1, rpabg)
-    sync_jobscripts : bool
+    sync_jobscripts : bool (optional)
         sync jobscript submission files (.qsub)
-    sync_model_tables : bool
+    sync_model_tables : bool (optional)
         sync MODELS.txt files
-    dry_run : bool
+    dry_run : bool (optional)
         do everything except actually send the files (for sanity checking)
-    modelfiles : list
+    modelfiles : list (optional)
         the model files (by extension) which will be synced
     """
     if short_model_table is None:
