@@ -117,17 +117,6 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster,
     restart_str = {True: 'restart_', False: ''}[restart]
     debug_str = {True: 'x', False: ''}[debug]
 
-#     dependency_str = ''
-#     dependency_bash = ''
-#     if dependency:
-#         dependency_str = '#SBATCH --dependency=singleton'
-#         dependency_bash = """if (( $N == 1 ))
-# then
-#     sleep 60
-#     cd $KEPLER_MODELS/{source}_{batch}/logs
-#     sbatch icer_restart_{source}_{batch}_{span_str}.qsub
-# fi"""
-
     if cluster == 'monarch':
         return f"""#!/bin/bash
 ###################################
