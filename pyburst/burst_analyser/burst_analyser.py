@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import ast
 import configparser
 
 from scipy import interpolate, integrate
@@ -163,6 +164,7 @@ class BurstRun(object):
         # ====== Loading things ======
         if load_config:
             self.load_config()
+            self.apply_config()
 
         if self.options['load_model_params']:
             self.load_model_params()
@@ -213,9 +215,16 @@ class BurstRun(object):
         for section in ini.sections():
             config[section] = {}
             for option in ini.options(section):
-                config[section][option] = ini.get(section, option)
+                config[section][option] = ast.literal_eval(ini.get(section, option))
 
         self.config = config
+
+    def apply_config(self):
+        """Applies loaded config parameters
+        """
+        self.printv('Overwriting default parameters with config')
+        for param, val in self.config['parameters'].items():
+            self.parameters[param] = val
 
     def check_options(self):
         """Checks consistency of selected options
