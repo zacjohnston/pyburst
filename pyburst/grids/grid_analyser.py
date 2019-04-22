@@ -357,7 +357,7 @@ class Kgrid:
 
     def plot_burst_property(self, bprop, var, fixed, xaxis='accrate', save=False,
                             show=True, linear_rates=False, interpolate=True,
-                            shaded=True, exclude_stable=True, legend=True,
+                            shaded=True, exclude_stable=False, legend=True,
                             fix_ylims=True):
         """Plots given burst property against accretion rate
         
