@@ -6,6 +6,7 @@ import os
 
 MODELS_PATH = os.environ['KEPLER_MODELS']
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
+pyburst_path = os.environ['PYBURST']
 
 # TODO: rename all "gets"
 
@@ -99,6 +100,15 @@ def get_source_subdir(source, dir_):
     source = check_synth_source(source)
     source_path = get_source_path(source)
     return os.path.join(source_path, dir_)
+
+
+def config_path():
+    return os.path.join(pyburst_path, 'pyburst', 'burst_analyser', 'config')
+
+
+def config_filepath(source):
+    path = config_path()
+    return os.path.join(path, f'{source}.ini')
 
 
 # ======================================================
