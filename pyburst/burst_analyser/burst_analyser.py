@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import configparser
 
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
@@ -14,16 +15,11 @@ from pyburst.kepler import kepler_tools
 from pyburst.kepler import kepler_plot
 from pyburst.physics import accretion
 
-GRIDS_PATH = os.environ['KEPLER_GRIDS']
-MODELS_PATH = os.environ['KEPLER_MODELS']
-
 plt.rc('text', usetex=False)
 plt.rc('font', family='serif')
 
-
 # TODO: Generalise to non-batch organised models
 # TODO: param description docstring
-
 
 class NoBursts(Exception):
     pass
@@ -38,10 +34,11 @@ class BurstRun(object):
                  exclude_outliers=True, exclude_short_wait=True, load_lum=True,
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
                  load_dumps=False, set_paramaters=None, auto_discard=False,
-                 get_slopes=False, load_model_params=True, truncate_edd=False,
-                 check_stable_burning=True, quick_discard=True,
+                 get_slopes=False, load_model_params=True, truncate_edd=True,
+                 check_stable_burning=False, quick_discard=True,
                  check_lumfile_monotonic=True, remove_shocks=False,
-                 remove_zero_lum=True):
+                 remove_zero_lum=True, load_config=True):
+        # TODO: move these into config file
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -99,7 +96,7 @@ class BurstRun(object):
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
                            'min_rise_steps': 5,  # min time steps between t_pre and t_peak
                            'stable_dt_frac': 10,  # no. of dt's from last burst to end of model to flag stable burning
-                           'short_wait_dt': 45,  # threshold for short-wait bursts (minutes)
+                           'short_wait_dt': 20,  # threshold for short-wait bursts (minutes)
                            'shock_radius_t': 0.1,  # radius in s around maxima to check for shock conditions
                            }
         self.overwrite_parameters(set_paramaters)
@@ -127,6 +124,7 @@ class BurstRun(object):
                       'plots': grid_strings.get_source_subdir(source, 'plots'),
                       }
 
+        self.config = None
         self.run = run
         self.batch = batch
         self.source = source
@@ -163,6 +161,9 @@ class BurstRun(object):
         self.discard = None
 
         # ====== Loading things ======
+        if load_config:
+            self.load_config()
+
         if self.options['load_model_params']:
             self.load_model_params()
 
@@ -195,6 +196,27 @@ class BurstRun(object):
     # ===========================================================
     # Loading/setup
     # ===========================================================
+    def load_config(self):
+        """Loads config parameters from file
+        """
+        config_filepath = grid_strings.config_filepath(self.source)
+        self.printv(f'Loading config: {config_filepath}')
+
+        if not os.path.exists(config_filepath):
+            raise FileNotFoundError(f'Config file not found: {config_filepath}'
+                                    '\nEither create one or set load_config=False')
+
+        ini = configparser.ConfigParser()
+        ini.read(config_filepath)
+
+        config = {}
+        for section in ini.sections():
+            config[section] = {}
+            for option in ini.options(section):
+                config[section][option] = ini.get(section, option)
+
+        self.config = config
+
     def check_options(self):
         """Checks consistency of selected options
         """
@@ -1402,8 +1424,8 @@ class BurstRun(object):
         for burst in bursts:
             self.add_lightcurve(burst, ax, zero_time=zero_time, color=color, **kwargs)
 
-        ax.set_xlim(left=-5, right=20)
-        ax.set_ylim(ylims[0], ylims[1])
+        ax.set_xlim(left=-5, right=30)
+ #       ax.set_ylim(ylims[0], ylims[1])
         plot_path = os.path.join(self.paths['plots'], 'lightcurves')
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
