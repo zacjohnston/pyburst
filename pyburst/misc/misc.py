@@ -1,7 +1,5 @@
 import numpy as np
 import pandas as pd
-import astropy.constants as const
-import astropy.units as units
 import os
 import sys
 import matplotlib.pyplot as plt
@@ -9,7 +7,6 @@ import chainconsumer
 
 
 # kepler_grids
-from pyburst.grids import grid_analyser
 from pyburst.mcmc import mcmc_tools, burstfit
 from pyburst.physics import gravity
 from pyburst.burst_analyser import burst_analyser
