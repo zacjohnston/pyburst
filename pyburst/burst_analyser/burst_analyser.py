@@ -36,7 +36,7 @@ class BurstRun(object):
                  load_bursts=False, load_summary=False, try_mkdir_plots=False,
                  load_dumps=False, set_paramaters=None, auto_discard=False,
                  get_slopes=False, load_model_params=True, truncate_edd=True,
-                 check_stable_burning=False, quick_discard=True,
+                 check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True, remove_shocks=False,
                  remove_zero_lum=True, load_config=True):
         # TODO: move these into config file
@@ -97,7 +97,7 @@ class BurstRun(object):
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
                            'min_rise_steps': 5,  # min time steps between t_pre and t_peak
                            'stable_dt_frac': 10,  # no. of dt's from last burst to end of model to flag stable burning
-                           'short_wait_dt': 20,  # threshold for short-wait bursts (minutes)
+                           'short_wait_dt': 45,  # threshold for short-wait bursts (minutes)
                            'shock_radius_t': 0.1,  # radius in s around maxima to check for shock conditions
                            }
         self.overwrite_parameters(set_paramaters)
@@ -201,6 +201,7 @@ class BurstRun(object):
     def load_config(self):
         """Loads config parameters from file
         """
+        # TODO: Load defaults also
         config_filepath = grid_strings.config_filepath(self.source)
         self.printv(f'Loading config: {config_filepath}')
 
