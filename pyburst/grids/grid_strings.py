@@ -102,6 +102,10 @@ def get_source_subdir(source, dir_):
     return os.path.join(source_path, dir_)
 
 
+def burst_analyser_path(source):
+    return get_source_subdir(source, 'burst_analysis')
+
+
 def config_path():
     return os.path.join(pyburst_path, 'pyburst', 'burst_analyser', 'config')
 
