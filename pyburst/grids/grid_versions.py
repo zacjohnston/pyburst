@@ -9,8 +9,7 @@ version_defaults = {
         'biggrid3': {},
         'grid4': {},
         'grid5': {
-            'x': [0.74], 'qb': [0.05, 0.15],
-            'mass': [2.5],
+            'x': [0.74], 'qb': [0.05, 0.15], 'mass': [2.5],
         },
         'grid6': {},
         'synth5': {},
@@ -25,7 +24,7 @@ version_defaults = {
             'qb': [0.0, 0.4],
         },
         'he2': {
-            'qnuc': [5.0]
+            'qnuc': [3.0], 'qb': [0.8],
         },
         'alpha1': {},
         'alpha2': {},
@@ -111,8 +110,8 @@ version_definitions = {
             'triplets': {},
             'he1': {},
             'he2': {
-                2:  {
-                    'qnuc': [3.0],
+                1:  {
+                    'qnuc': [5.0],
                 },
             },
             'alpha1': {},
