@@ -38,24 +38,26 @@ def write_pandas_table(table, filepath, justify='left'):
 
 # TODO:
 #   - load bursts table
+#   - rename 'burst_analysis' folder to 'burst_analyser'
 #   - switch "burst_analyser" flag to "lampe" flag
 
 def load_grid_table(tablename, source, verbose=True, burst_analyser=False):
-    """Returns file of model parameters as pandas DataFrame
+    """Returns table of grid input/output
     
     tablename  = str   : table name (e.g. 'params', 'summ')
     source     = str   : name of source object
     """
     source = grid_strings.source_shorthand(source)
 
+    # TODO: compress this
     if burst_analyser and tablename == 'summ':
-        param_path = grid_strings.get_source_subdir(source, 'burst_analysis')
-        filename = f'burst_analysis_{source}.txt'
-        filepath = os.path.join(param_path, filename)
+        table_path = grid_strings.get_source_subdir(source, 'burst_analysis')
+        filename = f'summary_{source}.txt'
+        filepath = os.path.join(table_path, filename)
     else:
-        param_path = grid_strings.get_source_subdir(source, tablename)
+        table_path = grid_strings.get_source_subdir(source, tablename)
         filename = f'{tablename}_{source}.txt'
-        filepath = os.path.join(param_path, filename)
+        filepath = os.path.join(table_path, filename)
 
     printv(f'Loading {tablename} table: {filepath}', verbose)
     params = pd.read_table(filepath, delim_whitespace=True)

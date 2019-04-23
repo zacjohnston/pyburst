@@ -156,7 +156,6 @@ def combine_batch_tables(batches, source, table_name):
     """Combines summary files of given batches into single table
     """
     print('Combining batch summary tables:')
-    source_path = grid_strings.get_source_path(source)
     table_list = []
 
     for batch in batches:
@@ -168,8 +167,10 @@ def combine_batch_tables(batches, source, table_name):
     combined_table = pd.concat(table_list, ignore_index=True)
     table_str = combined_table.to_string(index=False, justify='left')
 
+    analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
     filename = f'{table_name}_{source}.txt'
-    filepath = os.path.join(source_path, 'burst_analysis', filename)
+    filepath = os.path.join(analysis_path, filename)
+
     print(f'Saving: {filepath}')
     with open(filepath, 'w') as f:
         f.write(table_str)
@@ -189,7 +190,6 @@ def combine_all_run_tables(batches, source, table_name):
 def combine_run_tables(batch, source, table_name):
     """Combine summary files of runs into a batch table
     """
-    # TODO: rename all instances of burst_analysis to summary (in directory tree)
     print(f'Combining model summary tables:')
     n_runs = grid_tools.get_nruns(batch, source)
     runs = np.arange(n_runs) + 1
@@ -203,9 +203,6 @@ def combine_run_tables(batch, source, table_name):
 
     combined_table = pd.concat(table_list, ignore_index=True)
     table_str = combined_table.to_string(index=False, justify='left')
-
-    if table_name == 'summary':  # hack fix for now TODO: !!!
-        table_name = 'burst_analysis'
 
     filepath = grid_strings.batch_table_filepath(batch, source, table_name=table_name)
     print(f'Saving: {filepath}')
