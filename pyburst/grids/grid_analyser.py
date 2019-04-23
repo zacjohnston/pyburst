@@ -41,7 +41,7 @@ class Kgrid:
 
     def __init__(self, source, basename='xrb', grid_version=0,
                  load_lc=False, verbose=True, linregress_burst_rate=False,
-                 lampe_analyser=False, **kwargs):
+                 lampe_analyser=False, load_bursts=False, **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
         basename =  str  : basename of individual models (e.g. xrb)
@@ -57,13 +57,14 @@ class Kgrid:
         self.basename = basename
         self.verbose = verbose
         self.lampe_analyser = lampe_analyser
+        self.bursts = None
         self.grid_version = grid_versions.GridVersion(source, grid_version)
         self.printv(self.grid_version)
 
         # ==== Load tables of models attributes ====
         self.params = None
         self.summ = None
-        self.load_tables()
+        self.load_tables(load_bursts=load_bursts)
 
         # ===== extract the unique parameters =====
         self.unique_params = {}
@@ -96,7 +97,7 @@ class Kgrid:
         """
         return len(self.get_params(batch=batch))
 
-    def load_tables(self):
+    def load_tables(self, load_bursts):
         """Loads grid tables of model inputs and outputs, excluding models as defined
             in grid_version
         """
@@ -106,6 +107,11 @@ class Kgrid:
         summ_all = grid_tools.load_grid_table(tablename='summ', source=self.source,
                                               verbose=self.verbose,
                                               lampe_analyser=self.lampe_analyser)
+
+        if load_bursts:
+            self.bursts = grid_tools.load_grid_table(tablename='bursts', source=self.source,
+                                                     verbose=self.verbose,
+                                                     lampe_analyser=self.lampe_analyser)
 
         self.params = grid_tools.reduce_table(table=params_all, params={},
                                               exclude_any=self.grid_version.exclude_any,
