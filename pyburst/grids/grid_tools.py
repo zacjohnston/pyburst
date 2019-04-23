@@ -36,31 +36,30 @@ def write_pandas_table(table, filepath, justify='left'):
         f.write(table_str)
 
 
-# TODO:
-#   - load bursts table
-#   - switch "burst_analyser" flag to "lampe" flag
-
-def load_grid_table(tablename, source, verbose=True, burst_analyser=False):
+def load_grid_table(tablename, source, verbose=True, burst_analyser=True):
     """Returns table of grid input/output
-    
-    tablename  = str   : table name (e.g. 'params', 'summ')
-    source     = str   : name of source object
-    """
-    source = grid_strings.source_shorthand(source)
 
-    # TODO: compress this
-    if burst_analyser and tablename == 'summ':
+    tablename  = str   : table name (e.g. 'params', 'summ', 'bursts')
+    source     = str   : name of source object
+    burst_analyser = bool  : if the table is from pyburst (as opposed to Lampe's analyser)
+    """
+    # TODO:
+    #   - switch "burst_analyser" flag to "lampe" flag
+    source = grid_strings.source_shorthand(source)
+    prefix_map = {'summ': 'summary'}
+    prefix = prefix_map.get(tablename, tablename)
+
+    if burst_analyser and tablename in ('summ', 'bursts'):
         table_path = grid_strings.burst_analyser_path(source)
-        filename = f'summary_{source}.txt'
-        filepath = os.path.join(table_path, filename)
     else:
         table_path = grid_strings.get_source_subdir(source, tablename)
-        filename = f'{tablename}_{source}.txt'
-        filepath = os.path.join(table_path, filename)
+
+    filename = f'{prefix}_{source}.txt'
+    filepath = os.path.join(table_path, filename)
 
     printv(f'Loading {tablename} table: {filepath}', verbose)
-    params = pd.read_table(filepath, delim_whitespace=True)
-    return params
+    table = pd.read_table(filepath, delim_whitespace=True)
+    return table
 
 
 def expand_runs(runs):
