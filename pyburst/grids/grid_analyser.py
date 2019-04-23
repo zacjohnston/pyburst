@@ -57,14 +57,19 @@ class Kgrid:
         self.basename = basename
         self.verbose = verbose
         self.lampe_analyser = lampe_analyser
-        self.bursts = None
         self.grid_version = grid_versions.GridVersion(source, grid_version)
         self.printv(self.grid_version)
 
         # ==== Load tables of models attributes ====
         self.params = None
         self.summ = None
-        self.load_tables(load_bursts=load_bursts)
+        self.bursts = None
+
+        self.tablenames = ['params', 'summ']
+        if load_bursts:
+            self.tablenames += ['bursts']
+
+        self.load_tables()
 
         # ===== extract the unique parameters =====
         self.unique_params = {}
@@ -97,27 +102,23 @@ class Kgrid:
         """
         return len(self.get_params(batch=batch))
 
-    def load_tables(self, load_bursts):
+    def load_tables(self):
         """Loads grid tables of model inputs and outputs, excluding models as defined
             in grid_version
         """
+        tables = {}
+        for tablename in self.tablenames:
+            tables[tablename] = grid_tools.load_grid_table(tablename=tablename,
+                                                           source=self.source,
+                                                           verbose=self.verbose,
+                                                           lampe_analyser=self.lampe_analyser)
 
-        params_all = grid_tools.load_grid_table(tablename='params',
-                                                source=self.source, verbose=self.verbose)
-        summ_all = grid_tools.load_grid_table(tablename='summ', source=self.source,
-                                              verbose=self.verbose,
-                                              lampe_analyser=self.lampe_analyser)
-
-        if load_bursts:
-            self.bursts = grid_tools.load_grid_table(tablename='bursts', source=self.source,
-                                                     verbose=self.verbose,
-                                                     lampe_analyser=self.lampe_analyser)
-
-        self.params = grid_tools.reduce_table(table=params_all, params={},
+        self.params = grid_tools.reduce_table(table=tables['params'], params={},
                                               exclude_any=self.grid_version.exclude_any,
                                               exclude_all=self.grid_version.exclude_all)
         idxs = self.params.index.values
-        self.summ = summ_all.loc[idxs]
+        self.summ = tables['summ'].loc[idxs]
+        self.bursts = tables.get('bursts')
 
     def get_params(self, batch=None, run=None, params=None, exclude_any=None,
                    exclude_all=None):
