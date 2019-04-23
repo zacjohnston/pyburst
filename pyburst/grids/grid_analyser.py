@@ -106,6 +106,7 @@ class Kgrid:
         """Loads grid tables of model inputs and outputs, excluding models as defined
             in grid_version
         """
+        # TODO: apply exclusions to bursts table
         tables = {}
         for tablename in self.tablenames:
             tables[tablename] = grid_tools.load_grid_table(tablename=tablename,
