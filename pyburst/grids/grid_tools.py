@@ -36,20 +36,18 @@ def write_pandas_table(table, filepath, justify='left'):
         f.write(table_str)
 
 
-def load_grid_table(tablename, source, verbose=True, burst_analyser=True):
+def load_grid_table(tablename, source, verbose=True, lampe_analyser=False):
     """Returns table of grid input/output
 
     tablename  = str   : table name (e.g. 'params', 'summ', 'bursts')
     source     = str   : name of source object
-    burst_analyser = bool  : if the table is from pyburst (as opposed to Lampe's analyser)
+    lampe_analyser = bool  : if the table is from Lampe's analyser (as opposed to pyburst)
     """
-    # TODO:
-    #   - switch "burst_analyser" flag to "lampe" flag
     source = grid_strings.source_shorthand(source)
     prefix_map = {'summ': 'summary'}
     prefix = prefix_map.get(tablename, tablename)
 
-    if burst_analyser and tablename in ('summ', 'bursts'):
+    if tablename in ('summ', 'bursts') and not lampe_analyser:
         table_path = grid_strings.burst_analyser_path(source)
     else:
         table_path = grid_strings.get_source_subdir(source, tablename)
@@ -147,12 +145,12 @@ def add_model_column(batches, source, col_name, col_value, filename='MODELS.txt'
         write_pandas_table(table, filepath)
 
 
-def combine_tables(source, burst_analyser=True, add_radius=True, radius=10,
+def combine_tables(source, lampe_analyser=True, add_radius=True, radius=10,
                    add_gravity=True):
     """Combines summ and params tables
     """
     param_table = load_grid_table('params', source=source)
-    summ_table = load_grid_table('summ', source=source, burst_analyser=burst_analyser)
+    summ_table = load_grid_table('summ', source=source, lampe_analyser=lampe_analyser)
 
     if len(param_table) != len(summ_table):
         raise RuntimeError('param and summ tables are different lengths')

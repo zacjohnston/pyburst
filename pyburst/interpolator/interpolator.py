@@ -32,16 +32,16 @@ class Kemulator:
         setup interpolator
     """
 
-    def __init__(self, source, version, verbose=True, re_interp=True, burst_analyser=True,
-                 check_complete=True):
+    def __init__(self, source, version, verbose=True, re_interp=True,
+                 lampe_analyser=False, check_complete=True):
         self.verbose = verbose
         source = grid_strings.source_shorthand(source)
         self.source = source
         self.version = version
-        self.burst_analyser = burst_analyser
+        self.lampe_analyser = lampe_analyser
         self.interpolator = None
 
-        summ = grid_tools.load_grid_table('summ', source=source, burst_analyser=burst_analyser)
+        summ = grid_tools.load_grid_table('summ', source=source, lampe_analyser=lampe_analyser)
         params = grid_tools.load_grid_table('params', source=source)
 
         self.version_def = interp_versions.InterpVersion(source=source, version=version)
@@ -123,7 +123,7 @@ class Kemulator:
         self.printv(f'Creating interpolator:')
 
         for i, bp in enumerate(bprops):
-            if not self.burst_analyser:
+            if self.lampe_analyser:
                 key = key_map[bp]
             else:
                 key = bp

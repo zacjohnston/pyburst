@@ -21,7 +21,6 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 # -----------------------------------
 # TODO:
 #       - Check for grid "completeness" (missing parameter combinations)
-#       - plot mean lightcurve for given params
 # -----------------------------------
 
 
@@ -42,7 +41,7 @@ class Kgrid:
 
     def __init__(self, source, basename='xrb', grid_version=0,
                  load_lc=False, verbose=True, linregress_burst_rate=False,
-                 burst_analyser=True, **kwargs):
+                 lampe_analyser=False, **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
         basename =  str  : basename of individual models (e.g. xrb)
@@ -57,7 +56,7 @@ class Kgrid:
         self.source = source
         self.basename = basename
         self.verbose = verbose
-        self.burst_analyser = burst_analyser
+        self.lampe_analyser = lampe_analyser
         self.grid_version = grid_versions.GridVersion(source, grid_version)
         self.printv(self.grid_version)
 
@@ -106,7 +105,7 @@ class Kgrid:
                                                 source=self.source, verbose=self.verbose)
         summ_all = grid_tools.load_grid_table(tablename='summ', source=self.source,
                                               verbose=self.verbose,
-                                              burst_analyser=self.burst_analyser)
+                                              lampe_analyser=self.lampe_analyser)
 
         self.params = grid_tools.reduce_table(table=params_all, params={},
                                               exclude_any=self.grid_version.exclude_any,
@@ -334,6 +333,7 @@ class Kgrid:
                   0         1          2       3            4
         """
         batch_str = f'{self.source}_{batch}'
+        analyser_path = grid_strings.get_analyser_path(self.source)
         path = os.path.join(self.source_path, 'mean_lightcurves', batch_str)
         batch_table = self.get_params(batch=batch)
         self.mean_lc[batch] = {}
@@ -373,12 +373,12 @@ class Kgrid:
         var_unique = self.unique_params[var]
         params = dict(fixed)
 
-        uncertainty_keys = {False: {'tDel': 'uTDel', 'fluence': 'uFluence',
-                                    'peakLum': 'uPeakLum'},
-                            True: {'dt': 'u_dt', 'fluence': 'u_fluence',
-                                   'peak': 'u_peak', 'rate': 'u_rate',
-                                   'alpha': 'u_alpha'},
-                            }.get(self.burst_analyser)
+        uncertainty_keys = {True: {'tDel': 'uTDel', 'fluence': 'uFluence',
+                                   'peakLum': 'uPeakLum'},
+                            False: {'dt': 'u_dt', 'fluence': 'u_fluence',
+                                    'peak': 'u_peak', 'rate': 'u_rate',
+                                    'alpha': 'u_alpha'},
+                            }.get(self.lampe_analyser)
 
         u_prop = uncertainty_keys.get(bprop, f'u_{bprop}')
         y_label = {'dt': r'$\Delta t$ (hr)',
