@@ -86,7 +86,7 @@ def copy_lightcurve(run, batch, source, basename='xrb'):
     dashes()
     print('Copying model lightcurve')
 
-    path = grid_strings.get_source_subdir(source, 'burst_analysis')
+    path = grid_strings.burst_analyser_path(source)
     batch_str = grid_strings.get_batch_string(batch, source)
     run_str = get_run_string(run, basename)
     model_string = grid_strings.get_model_string(run=run, batch=batch,

@@ -88,7 +88,7 @@ def get_model_path(run, batch, source, basename='xrb'):
 
 def batch_analysis_path(batch, source):
     batch_str = get_batch_string(batch, source)
-    analysis_path = get_source_subdir(source, 'burst_analysis')
+    analysis_path = burst_analyser_path(source)
     return os.path.join(analysis_path, batch_str)
 
 

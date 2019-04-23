@@ -33,7 +33,7 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
         return lum_loaded
 
     batch_str = grid_strings.get_batch_string(batch, source)
-    analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
+    analysis_path = grid_strings.burst_analyser_path(source)
     input_path = os.path.join(analysis_path, batch_str, 'input')
 
     presaved_filepath = os.path.join(input_path, f'{batch_str}_{run}.txt')
@@ -167,7 +167,7 @@ def combine_batch_tables(batches, source, table_name):
     combined_table = pd.concat(table_list, ignore_index=True)
     table_str = combined_table.to_string(index=False, justify='left')
 
-    analysis_path = grid_strings.get_source_subdir(source, 'burst_analysis')
+    analysis_path = grid_strings.burst_analyser_path(source)
     filename = f'{table_name}_{source}.txt'
     filepath = os.path.join(analysis_path, filename)
 

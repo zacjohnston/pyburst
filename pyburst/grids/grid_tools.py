@@ -38,7 +38,6 @@ def write_pandas_table(table, filepath, justify='left'):
 
 # TODO:
 #   - load bursts table
-#   - rename 'burst_analysis' folder to 'burst_analyser'
 #   - switch "burst_analyser" flag to "lampe" flag
 
 def load_grid_table(tablename, source, verbose=True, burst_analyser=False):
@@ -51,7 +50,7 @@ def load_grid_table(tablename, source, verbose=True, burst_analyser=False):
 
     # TODO: compress this
     if burst_analyser and tablename == 'summ':
-        table_path = grid_strings.get_source_subdir(source, 'burst_analysis')
+        table_path = grid_strings.burst_analyser_path(source)
         filename = f'summary_{source}.txt'
         filepath = os.path.join(table_path, filename)
     else:
