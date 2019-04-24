@@ -7,7 +7,7 @@ from pyburst.kepler import kepler_tools
 def plot_dump_profile(run, batch, source, y_param, x_param='y', cycles=None,
                       basename='xrb', title=None,
                       display=True, prefix='', fontsize=14, marker='', relative=False,
-                      xlims=None, ylims=None, legend=True, color='C3'):
+                      xlims=(1e12, 1e4), ylims=None, legend=True, color='C3'):
     """Plot profile of given cycle dump, for some radial (zonal) quantity
 
     relative : bool
@@ -73,6 +73,8 @@ def plot_composition_profile(dumpfile, title=None,
                              display=True, fontsize=14, marker='',
                              xlims=(5e9, 2e5), ylims=(5e-3, 1.5), legend=True,
                              ions=('h1', 'he4', 'c12', 'n14', 'o16', 'fe54')):
+    """Plots composition profile for a given kepler dump file
+    """
     fig, ax = plt.subplots()
     i0 = 2
     i1 = -3
