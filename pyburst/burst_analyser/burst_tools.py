@@ -164,7 +164,7 @@ def combine_batch_tables(batches, source, table_name):
         table_list += [batch_table]
     sys.stdout.write('\n')
 
-    combined_table = pd.concat(table_list, ignore_index=True)
+    combined_table = pd.concat(table_list, ignore_index=True, sort=False)
     table_str = combined_table.to_string(index=False, justify='left')
 
     analysis_path = grid_strings.burst_analyser_path(source)
@@ -201,7 +201,7 @@ def combine_run_tables(batch, source, table_name):
         table_list += [run_table]
     sys.stdout.write('\n')
 
-    combined_table = pd.concat(table_list, ignore_index=True)
+    combined_table = pd.concat(table_list, ignore_index=True, sort=False)
     table_str = combined_table.to_string(index=False, justify='left')
 
     filepath = grid_strings.batch_table_filepath(batch, source, table_name=table_name)
