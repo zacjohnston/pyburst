@@ -22,12 +22,14 @@ param_keys = {
     5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'redshift', 'd_b', 'xi_ratio'],
     6: ['mdot1', 'mdot2', 'x', 'z', 'qb1', 'qb2', 'g', 'redshift', 'd_b', 'xi_ratio'],
     7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'g', 'm_gr', 'd_b', 'xi_ratio'],
+    8: ['mdot1', 'mdot2', 'x', 'qb1', 'qb2', 'g', 'm_gr', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
 interp_keys = {
     1: ['mdot', 'x', 'z', 'qb', 'mass'],
     2: ['mdot', 'x', 'z', 'mass'],
+    3: ['mdot', 'x', 'qb', 'mass'],
 }
 
 # ===== Define params that are unique for each epoch =====
@@ -211,6 +213,19 @@ prior_bounds = {
             ),
     },
 
+    8: {
+        1: ((0.15, 0.4),  # mdot1
+            (0.15, 0.4),  # mdot2
+            (0.001, 0.05),  # x
+            (0.1, 0.4),  # qb1
+            (0.1, 0.4),  # qb2
+            (1.4 / 1.4, 2.6 / 1.4),  # g
+            (1.0, 2.1),  # m_gr
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+    },
+
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -288,6 +303,11 @@ initial_position = {
         2: (0.093, 0.123, 0.14,
             0.72, 0.0046, 0.43, 0.15, 0.15, 1.7, 2.0, 6.1, 0.9),
     },
+
+    8: {
+        1: (0.25, 0.25,
+            0.01, 0.25, 0.25, 1.4, 1.6, 5.0, 1.0),
+    },
 }
 
 # To add a new version definition, add an entry to each of the parameters
@@ -306,6 +326,7 @@ source_defaults = {
         'grid6': param_keys[5],
         'synth5': param_keys[5],
         'he1': param_keys[6],
+        'he2': param_keys[8],
     },
 
     'interp_keys': {
@@ -313,6 +334,7 @@ source_defaults = {
         'grid6': interp_keys[1],
         'synth5': interp_keys[1],
         'he1': interp_keys[1],
+        'he2': interp_keys[3],
     },
 
     'epoch_unique': {
@@ -320,6 +342,7 @@ source_defaults = {
         'grid6': epoch_unique[2],
         'synth5': epoch_unique[2],
         'he1': epoch_unique[2],
+        'he2': epoch_unique[2],
     },
 
     'param_aliases': {
@@ -327,6 +350,7 @@ source_defaults = {
         'grid6': param_aliases[1],
         'synth5': param_aliases[1],
         'he1': param_aliases[1],
+        'he2': param_aliases[1],
     },
 
     'bprops': {
@@ -334,6 +358,7 @@ source_defaults = {
         'grid6': ('rate', 'fluence', 'peak'),
         'synth5': ('rate', 'fluence', 'peak'),
         'he1': ('rate', 'fluence', 'peak'),
+        'he2': ('rate', 'fluence'),
     },
 
     'weights': {
@@ -341,6 +366,7 @@ source_defaults = {
         'grid6': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         'synth5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         'he1': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+        'he2': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
     },
 
     'disc_model': {},
@@ -350,6 +376,7 @@ source_defaults = {
         'grid6': 1,
         'synth5': 1,
         'he1': 1,
+        'he2': 0,
     },
 
     'prior_bounds': {
@@ -357,6 +384,7 @@ source_defaults = {
         'grid6': prior_bounds[5][3],
         'synth5': prior_bounds[5][1],
         'he1': prior_bounds[6][1],
+        'he2': prior_bounds[8][1],
     },
 
     'prior_pdfs': {
@@ -383,6 +411,11 @@ source_defaults = {
             'xi_ratio': flat_prior,
             'd_b': flat_prior,
         },
+
+        'he2': {
+            'xi_ratio': flat_prior,
+            'd_b': flat_prior,
+        },
     },
 
     'initial_position': {
@@ -390,6 +423,7 @@ source_defaults = {
         'grid6': initial_position[5][3],
         'synth5': initial_position[5][5],
         'he1': initial_position[6][1],
+        'he2': initial_position[8][1],
     },
 
     'synthetic': {  # whether the data being matches is synthetic
@@ -397,6 +431,7 @@ source_defaults = {
         'grid6': False,
         'synth5': True,
         'he1': False,
+        'he2': False,
     },
 
     # ===== Special definitions for synthetic data sources =====
@@ -433,6 +468,7 @@ version_definitions = {
         'grid6': {},
         'synth5': {},
         'he1': {},
+        'he2': {},
     },
 
     'bprops': {
@@ -440,6 +476,7 @@ version_definitions = {
         'grid6': {},
         'synth5': {},
         'he1': {},
+        'he2': {},
     },
 
     'weights': {
@@ -449,6 +486,7 @@ version_definitions = {
         },
         'synth5': {},
         'he1': {},
+        'he2': {},
 
     },
 
@@ -459,6 +497,7 @@ version_definitions = {
         'grid6': {},
         'synth5': {},
         'he1': {},
+        'he2': {},
     },
 
     'interp_keys': {
@@ -466,6 +505,7 @@ version_definitions = {
         'grid6': {},
         'synth5': {},
         'he1': {},
+        'he2': {},
     },
 
     'epoch_unique': {
@@ -473,6 +513,7 @@ version_definitions = {
         'grid6': {},
         'synth5': {},
         'he1': {},
+        'he2': {},
     },
 
     'param_aliases': {
@@ -480,6 +521,7 @@ version_definitions = {
         'grid6': {},
         'synth5': {},
         'he1': {},
+        'he2': {},
     },
 
     'prior_bounds': {
@@ -494,6 +536,7 @@ version_definitions = {
         'grid6': {},
         'synth5': {},
         'he1': {},
+        'he2': {},
     },
 
     'prior_pdfs': {
@@ -505,6 +548,7 @@ version_definitions = {
          },
          'synth5': {},
          'he1': {},
+         'he2': {},
     },
 
     'initial_position': {
@@ -516,6 +560,7 @@ version_definitions = {
         },
         'synth5': {},
         'he1': {},
+        'he2': {},
     },
 
     'disc_model': {},
