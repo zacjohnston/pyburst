@@ -161,9 +161,11 @@ def combine_batch_tables(batches, source, table_name):
     for batch in batches:
         sys.stdout.write(f'\r{source} {batch}/{batches[-1]}')
         batch_table = load_batch_table(batch, source=source, table_name=table_name)
+        if table_name == 'bursts':
+            batch_table['batch'] = batch
         table_list += [batch_table]
-    sys.stdout.write('\n')
 
+    sys.stdout.write('\n')
     combined_table = pd.concat(table_list, ignore_index=True, sort=False)
     table_str = combined_table.to_string(index=False, justify='left')
 
@@ -198,9 +200,11 @@ def combine_run_tables(batch, source, table_name):
     for run in runs:
         sys.stdout.write(f'\r{source}{batch} {run}/{runs[-1]}')
         run_table = load_run_table(run, batch, source=source, table=table_name)
+        if table_name == 'bursts':
+            run_table['run'] = run
         table_list += [run_table]
-    sys.stdout.write('\n')
 
+    sys.stdout.write('\n')
     combined_table = pd.concat(table_list, ignore_index=True, sort=False)
     table_str = combined_table.to_string(index=False, justify='left')
 
