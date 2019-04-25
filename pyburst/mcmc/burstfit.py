@@ -126,6 +126,7 @@ class BurstFit:
         self.debug.end_function()
 
     def setup_priors(self):
+        # TODO: don't hard-code these, use param_keys and set priors for all params
         self.debug.start_function('setup_priors')
         self.z_prior = self.mcmc_version.prior_pdfs['z']
         self.xi_ratio_prior = self.mcmc_version.prior_pdfs['xi_ratio']
@@ -400,6 +401,7 @@ class BurstFit:
     def lnprior(self, params):
         """Return logarithm prior lhood of params
         """
+        # TODO: remove hard-coded dependence on z, etc. (use param_keys)
         self.debug.start_function('lnprior')
         lower_bounds = self.mcmc_version.prior_bounds[:, 0]
         upper_bounds = self.mcmc_version.prior_bounds[:, 1]
