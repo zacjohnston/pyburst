@@ -578,6 +578,7 @@ class BurstRun(object):
            4. Identify short-wait bursts (below some fraction of mean dt)
            5. Get start/end times (discard final burst if cut off)
         """
+        # TODO: add "mass accreted" column to bursts (dt * mdot)
         self.printv('Identifying bursts')
         self.check_lum_loaded()
         self.get_burst_candidates()
@@ -1227,7 +1228,7 @@ class BurstRun(object):
             ax.legend(loc=1, framealpha=1, edgecolor='0')
         self.show_save_fig(fig, display=display, save=save, plot_name='model')
 
-    def plot_convergence(self, bprops=('rate', 'fluence', 'peak'), discard=None,
+    def plot_convergence(self, bprops=('rate', 'fluence', 'dt'), discard=None,
                          legend=False, display=True, save=False, fix_xticks=False,
                          short_waits=False, outliers=False, show_mean=False,
                          shaded=True, frac=True, line_style='-'):
