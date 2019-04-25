@@ -280,13 +280,14 @@ def plot_saxj(x_units='time', dumptimes=True, cycles=None):
     plt.show(block=False)
 
 
-def get_mean_qnuc(cycles, run, batch, source):
+def get_mean_qnuc(run, batch, source, cycles=None, dumps=None):
     """Return energy generation per mass averaged over model (erg/g)
     cycles: length 2 array
     """
-    dumps = []
-    for i, cycle in enumerate(cycles):
-        dumps += [kepler_tools.load_dump(cycle, run=run, batch=batch, source=source)]
+    if dumps is None:
+        dumps = []
+        for i, cycle in enumerate(cycles):
+            dumps += [kepler_tools.load_dump(cycle, run=run, batch=batch, source=source)]
 
     mass_diff = dumps[1].qparm('xmacc') - dumps[0].qparm('xmacc')
     energy_diff = dumps[1].qparm('epro') - dumps[0].qparm('epro')
