@@ -26,6 +26,7 @@ obs_source_map = {
     'grid6': 'gs1826',
     'heat': 'gs1826',
     'he1': '4u1820',
+    'he2': '4u1820',
 }
 
 c = const.c.to(u.cm / u.s)
