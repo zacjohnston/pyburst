@@ -1398,7 +1398,7 @@ class BurstRun(object):
             np.savetxt(filepath, lightcurve, header=header)
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
-                         zero_time=True, fontsize=14, ylims=(-1, 8), title=True,
+                         zero_time=True, fontsize=14, ylims=None, title=True,
                          color=None, **kwargs):
         """Plot individual burst lightcurve
 
@@ -1435,8 +1435,9 @@ class BurstRun(object):
         for burst in bursts:
             self.add_lightcurve(burst, ax, zero_time=zero_time, color=color, **kwargs)
 
-        ax.set_xlim(left=-5, right=30)
- #       ax.set_ylim(ylims[0], ylims[1])
+        ax.set_xlim(left=-2, right=10)
+        if ylims is not None:
+            ax.set_ylim(ylims[0], ylims[1])
         plot_path = os.path.join(self.paths['plots'], 'lightcurves')
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
