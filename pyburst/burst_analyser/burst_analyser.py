@@ -38,7 +38,7 @@ class BurstRun(object):
                  get_slopes=False, load_model_params=True, truncate_edd=True,
                  check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True, remove_shocks=False,
-                 remove_zero_lum=True, load_config=True):
+                 remove_zero_lum=True, subtract_background_lum=False, load_config=True):
         # TODO: move these into config file
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
@@ -70,6 +70,7 @@ class BurstRun(object):
                         'quick_discard': quick_discard,
                         'check_lumfile_monotonic': check_lumfile_monotonic,
                         'remove_shocks': remove_shocks,
+                        'subtract_background_lum': subtract_background_lum,
                         }
         self.check_options()
 
@@ -890,9 +891,14 @@ class BurstRun(object):
         """
         self.bursts['fluence'] = np.zeros(self.n_bursts)
         for burst in self.bursts.itertuples():
-            lum_slice = self.lum[burst.t_pre_i:burst.t_end_i]
-            self.bursts.loc[burst.Index, 'fluence'] = integrate.trapz(y=lum_slice[:, 1],
-                                                                      x=lum_slice[:, 0])
+            subtract = {True: self.lum[burst.t_pre_i, 1],
+                        False: 0.0
+                        }.get(self.options['subtract_background_lum'])
+
+            lum_slice = np.array(self.lum[burst.t_pre_i:burst.t_end_i])
+
+            fluence = integrate.trapz(y=lum_slice[:, 1] - subtract, x=lum_slice[:, 0])
+            self.bursts.loc[burst.Index, 'fluence'] = fluence
 
     def identify_outliers(self):
         """Identify outlier bursts
