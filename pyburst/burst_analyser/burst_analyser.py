@@ -1458,6 +1458,14 @@ class BurstRun(object):
         linewidth : flt
         """
         yscale = 1e38
+        lc = self.extract_lightcurve(burst=burst, zero_time=zero_time)
+
+        ax.plot(lc[:, 0], lc[:, 1] / yscale,
+                label=f'{burst}', color=color, alpha=alpha, linewidth=linewidth)
+
+    def extract_lightcurve(self, burst, zero_time=True):
+        """Returns sliced out burst lightcurve
+        """
         if burst > self.n_bursts - 1\
                 or burst < 0:
             raise ValueError(f'Burst index ({burst}) out of bounds '
@@ -1465,13 +1473,12 @@ class BurstRun(object):
 
         i_start = self.bursts['t_pre_i'][burst]
         i_end = self.bursts['t_end_i'][burst]
-        x = self.lum[i_start:i_end, 0]
-        y = self.lum[i_start:i_end, 1]
+        lc = np.array(self.lum[i_start:i_end])
 
         if zero_time:
-            x = x - self.bursts['t_start'][burst]
-        ax.plot(x, y / yscale, label=f'{burst}', color=color, alpha=alpha,
-                linewidth=linewidth)
+            lc[:, 0] -= self.bursts['t_start'][burst]
+
+        return lc
 
     def save_all_lightcurves(self, **kwargs):
         for burst in range(self.n_bursts):
