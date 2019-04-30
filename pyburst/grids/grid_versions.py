@@ -24,7 +24,7 @@ version_defaults = {
             'qb': [0.0, 0.4],
         },
         'he2': {
-            'qnuc': [3.0], 'qb': [0.8],
+            'qnuc': [3.0], 'qb': [0.5, 0.8],
         },
         'alpha1': {},
         'alpha2': {},
@@ -113,6 +113,9 @@ version_definitions = {
                 1:  {
                     'qnuc': [5.0],
                 },
+                2: {
+                    'qnuc': [3.0], 'qb': [0.5, 0.8],
+                }
             },
             'alpha1': {},
             'alpha2': {},
