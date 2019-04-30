@@ -155,6 +155,16 @@ grid_bounds = {
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
+        3: ((0.15, 0.4),  # mdot1
+            (0.15, 0.4),  # mdot2
+            (0.001, 0.05),  # x
+            (0.05, 0.4),  # qb1
+            (0.05, 0.4),  # qb2
+            (1.1 / 1.4, 2.0 / 1.4),  # g
+            (1.0, 2.1),  # m_gr
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
     },
 
 }
@@ -176,7 +186,7 @@ priors = {
         1: log_z,  # log10-space [z/solar]
     },
     'd_b': {
-        1: norm(loc=5.7, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
+        1: norm(loc=7.6, scale=0.4).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
     },
 }
 
@@ -315,13 +325,16 @@ version_definitions = {
         'he2': {
             1: 1,
             2: 2,
+            3: 3,
         },
     },
 
     'bprops': {
         'grid5': {},
         'synth5': {},
-        'he2': {},
+        'he2': {
+            3: ('rate', 'fluence', 'peak'),
+        },
     },
 
     'weights': {
@@ -369,13 +382,16 @@ version_definitions = {
         'synth5': {},
         'he2': {
             2: grid_bounds[8][2],
+            3: grid_bounds[8][3],
         },
     },
 
     'priors': {
          'grid5': {},
          'synth5': {},
-         'he2': {},
+         'he2': {
+             3: {'d_b': priors['d_b'][1]}
+         },
     },
 
     'initial_position': {

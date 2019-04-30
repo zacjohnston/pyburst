@@ -29,7 +29,9 @@ version_definitions = {
         'grid5': {},
         'grid6': {},
         'he1': {},
-        'he2': {},
+        'he2': {
+            3: ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+        },
     },
 
     # The base grid to interpolate over (see: grids/grid_versions.py)
