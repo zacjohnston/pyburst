@@ -36,7 +36,6 @@ epoch_unique = {
 # ===== Define alias from interp-->param keys =====
 param_aliases = {
     1: {'mass': 'g'},
-    2: {'mass': 'g', 'z': 'logz'},
 }
 
 grid_bounds = {
@@ -174,15 +173,6 @@ priors = {
 
     'd_b': {
         1: norm(loc=5.7, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
-    },
-
-    'xi_ratio': {
-        1: norm(loc=2.3, scale=0.4).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
-        2: norm(loc=1.5, scale=0.3).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
-    },
-
-    'inc': {
-        1: np.sin,
     },
 }
 
