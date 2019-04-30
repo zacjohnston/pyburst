@@ -49,7 +49,7 @@ def mcmc_label(quantity):
         'z': r'$Z_\mathrm{CNO}$',
         'qb': r'$Q_\mathrm{b}$',
         'redshift': r'$(1+z)$',
-        'd_b': r'$d_\mathrm{b}$',
+        'd_b': r'$d \sqrt{\xi_\mathrm{b}}$',
         'xi_ratio': r'$\xi_\mathrm{p} / \xi_\mathrm{b}$',
         'm_gr': r'$M_\mathrm{GR}$'
     }
