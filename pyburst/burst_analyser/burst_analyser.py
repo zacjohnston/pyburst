@@ -38,7 +38,7 @@ class BurstRun(object):
                  get_slopes=False, load_model_params=True, truncate_edd=True,
                  check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True, remove_shocks=False,
-                 remove_zero_lum=True, subtract_background_lum=False, load_config=True):
+                 remove_zero_lum=True, subtract_background_lum=True, load_config=True):
         # TODO: move these into config file
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
@@ -82,7 +82,7 @@ class BurstRun(object):
                            'pre_time': 60,  # look for burst rise within sec before peak
                            'start_frac': 0.25,  # burst start as frac of peak lum above lum_pre
                            'peak_frac': 2,  # peak must be larger than pre_lum by this frac
-                           'end_frac': 0.01,  # burst end lum is this frac of peak lum
+                           'end_frac': 1e-5,  # burst end lum is this frac of peak lum
                            'min_length': 5,  # min time between burst peak and end (sec)
                            'short_wait_frac': 0.5,  # short_waits below frac of following dt
                            'min_discard': 2,  # min num of bursts to discard
