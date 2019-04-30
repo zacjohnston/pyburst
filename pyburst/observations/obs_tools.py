@@ -56,6 +56,18 @@ def load_epoch_lightcurve(epoch, source):
     return table
 
 
+def add_peak_length(source):
+    """Calculcates peak length from lightcurve and adds to summary file
+    """
+    # TODO: finish
+    # table = load_summary(source)
+    #
+    # for epoch in table['epoch']:
+    #     lcurve = load_epoch_lightcurve(epoch=epoch, source=source)
+    #     x = np.linspace()
+    pass
+
+
 def get_peak_length(lc_table, peak_frac=0.75):
     """Returns peak length for given lightcurve table
     """
