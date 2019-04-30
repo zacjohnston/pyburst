@@ -389,7 +389,6 @@ class BurstFit:
     def lnprior(self, params):
         """Return logarithm prior lhood of params
         """
-        # TODO: remove hard-coded dependence on z, etc. (use param_keys)
         self.debug.start_function('lnprior')
         lower_bounds = self.mcmc_version.grid_bounds[:, 0]
         upper_bounds = self.mcmc_version.grid_bounds[:, 1]
@@ -400,14 +399,14 @@ class BurstFit:
             self.debug.end_function()
             return self.zero_lhood
 
+        prior_lhood = 0.0
         if self.has_logz:
             z_input = params[self.param_idxs['logz']]
         else:
             z = params[self.param_idxs['z']]
             z_input = np.log10(z / z_sun)
 
-        prior_lhood = np.log(self.priors['z'](z_input))
-        # prior_lhood = 1.0
+        prior_lhood += np.log(self.priors['z'](z_input))
 
         # ===== anisotropy/inclination priors =====
         if self.has_two_f:
@@ -520,7 +519,6 @@ class BurstFit:
             plt.show(block=False)
 
     def plot_z_prior(self):
-        z_sun = 0.01
         x = np.linspace(0, 0.02, 1000)
         fig, ax = plt.subplots()
         y = self.priors['z'](np.log10(x / z_sun))
