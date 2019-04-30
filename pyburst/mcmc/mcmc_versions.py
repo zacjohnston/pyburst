@@ -10,8 +10,6 @@ from pyburst.grids import grid_strings
 # '***' signifies values that changed over the previous version
 # First layer identifies param_keys
 # -----------------------------------
-z_sun = 0.01
-
 
 # ===== Define order/number of params provided to BurstFit =====
 param_keys = {
@@ -166,11 +164,17 @@ def flat_prior(x):
     return 1
 
 
+log_norm = norm(loc=-0.5, scale=0.25).pdf
+def log_z(z, z_sun=0.01):
+    """PDF of log10(z/z_solar)"""
+    logz = np.log10(z / z_sun)
+    return log_norm(logz)
+
+
 priors = {
     'z': {
-        1: norm(loc=-0.5, scale=0.25).pdf,  # log10-space [z/solar]
+        1: log_z,  # log10-space [z/solar]
     },
-
     'd_b': {
         1: norm(loc=5.7, scale=0.2).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
     },
@@ -187,12 +191,10 @@ initial_position = {
         4: (0.10, 0.14, 0.16, 0.73, 0.0065, 0.01, 0.01, 0.08, 1.44, 1.42, 7., 1.6),
         5: (0.12, 0.12, 0.12, 0.7, 0.005, 0.1, 0.1, 0.1, 1.4, 1.3, 7., 3.),
     },
-
     7: {
         1: (0.103, 0.137, 0.155, 0.72, 0.005, 0.2, 0.1, 0.1, 1.7, 2.0, 6.2, 0.9),
         2: (0.093, 0.123, 0.14, 0.72, 0.0046, 0.43, 0.15, 0.15, 1.7, 2.0, 6.1, 0.9),
     },
-
     8: {
         1: (0.21, 0.29, 0.01, 0.35, 0.14, 1.2, 1.8, 5.5, 1.0),
     },
