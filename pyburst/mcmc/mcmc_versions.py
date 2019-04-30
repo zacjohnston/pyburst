@@ -5,7 +5,7 @@ from scipy.stats import norm
 from pyburst.grids import grid_strings
 
 # -----------------------------------
-# Define different prior boundaries.
+# Define different grid boundaries.
 # Must be in same order as 'params' in BurstFit
 # '***' signifies values that changed over the previous version
 # First layer identifies param_keys
@@ -44,7 +44,7 @@ param_aliases = {
     2: {'mass': 'g', 'z': 'logz'},
 }
 
-prior_bounds = {
+grid_bounds = {
     1: {
         1: ((0.08, 0.18),  # mdot1
             (0.08, 0.18),  # mdot2
@@ -374,12 +374,12 @@ source_defaults = {
         'he2': 0,
     },
 
-    'prior_bounds': {
-        'grid5': prior_bounds[7][1],
-        'grid6': prior_bounds[5][3],
-        'synth5': prior_bounds[5][1],
-        'he1': prior_bounds[6][1],
-        'he2': prior_bounds[8][1],
+    'grid_bounds': {
+        'grid5': grid_bounds[7][1],
+        'grid6': grid_bounds[5][3],
+        'synth5': grid_bounds[5][1],
+        'he1': grid_bounds[6][1],
+        'he2': grid_bounds[8][1],
     },
 
     'prior_pdfs': {
@@ -522,20 +522,20 @@ version_definitions = {
         'he2': {},
     },
 
-    'prior_bounds': {
+    'grid_bounds': {
         'grid5': {
-            -1: prior_bounds[5][4],
-            2: prior_bounds[7][2],
+            -1: grid_bounds[5][4],
+            2: grid_bounds[7][2],
             3: 2,
-            4: prior_bounds[7][3],
-            5: prior_bounds[7][3],
+            4: grid_bounds[7][3],
+            5: grid_bounds[7][3],
             13: 2,
         },
         'grid6': {},
         'synth5': {},
         'he1': {},
         'he2': {
-            2: prior_bounds[8][2],
+            2: grid_bounds[8][2],
         },
     },
 
@@ -600,7 +600,7 @@ class McmcVersion:
         self.bprops = self.get_parameter('bprops')
         self.weights = self.get_parameter('weights')
         self.interpolator = self.get_parameter('interpolator')
-        self.prior_bounds = np.array(self.get_parameter('prior_bounds'))
+        self.grid_bounds = np.array(self.get_parameter('grid_bounds'))
         self.initial_position = self.get_parameter('initial_position')
         self.prior_pdfs = self.get_prior_pdfs()
         self.synthetic = source_defaults['synthetic'][source]

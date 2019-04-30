@@ -116,7 +116,7 @@ def get_random_params(key, n_models, mv):
     """
     idx = mv.param_keys.index(key)
 
-    bounds = mv.prior_bounds[idx]
+    bounds = mv.grid_bounds[idx]
     range_ = np.diff(bounds)
     rand = np.random.random_sample(n_models)
     return rand * range_ + bounds[0]

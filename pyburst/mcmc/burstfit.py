@@ -403,8 +403,8 @@ class BurstFit:
         """
         # TODO: remove hard-coded dependence on z, etc. (use param_keys)
         self.debug.start_function('lnprior')
-        lower_bounds = self.mcmc_version.prior_bounds[:, 0]
-        upper_bounds = self.mcmc_version.prior_bounds[:, 1]
+        lower_bounds = self.mcmc_version.grid_bounds[:, 0]
+        upper_bounds = self.mcmc_version.grid_bounds[:, 1]
         inside_bounds = np.logical_and(params > lower_bounds,
                                        params < upper_bounds)
 
