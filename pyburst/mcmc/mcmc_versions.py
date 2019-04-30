@@ -621,6 +621,11 @@ class McmcVersion:
         else:
             synth_str = ''
 
+        grid_bound_str = '\ngrid bounds      :'
+        for i, param in enumerate(self.param_keys):
+            bounds = self.grid_bounds[i]
+            grid_bound_str += f'\n  {param}\t({bounds[0]:.3f}, {bounds[1]:.3f})'
+
         return (f'MCMC version definitions for {self.source} V{self.version}'
                 + f'\nparam keys       : {self.param_keys}'
                 + f'\ninterp keys      : {self.interp_keys}'
@@ -631,7 +636,7 @@ class McmcVersion:
                 + f'\ninitial position : {self.initial_position}'
                 + f'\ndisc model       : {self.disc_model}'
                 + f'\ninterpolator     : {self.interpolator}'
-                + f'\nprior bounds     : {self.prior_bounds}'
+                + f'{grid_bound_str}'
                 + f'\nprior pdfs       : {self.prior_pdfs}'
                 + f'\nsynthetic        : {self.synthetic}'
                 + synth_str
