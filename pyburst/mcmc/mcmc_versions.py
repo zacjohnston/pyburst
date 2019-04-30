@@ -243,7 +243,7 @@ def flat_prior(x):
     return 1
 
 
-prior_pdfs = {
+priors = {
     'z': {
         1: norm(loc=-0.5, scale=0.25).pdf,  # log10-space [z/solar]
     },
@@ -382,15 +382,15 @@ source_defaults = {
         'he2': grid_bounds[8][1],
     },
 
-    'prior_pdfs': {
+    'priors': {
         'grid5': {
-          'z': prior_pdfs['z'][1],
+          'z': priors['z'][1],
           'd_b': flat_prior,
           'xi_ratio': flat_prior,
         },
 
         'grid6': {
-          'z': prior_pdfs['z'][1],
+          'z': priors['z'][1],
           'xi_ratio': flat_prior,
           'd_b': flat_prior,
         },
@@ -539,12 +539,12 @@ version_definitions = {
         },
     },
 
-    'prior_pdfs': {
+    'priors': {
          'grid5': {
          },
          'grid6': {
-             2: {'xi_ratio': prior_pdfs['xi_ratio'][2]},
-             3: {'d_b': prior_pdfs['d_b'][1]},
+             2: {'xi_ratio': priors['xi_ratio'][2]},
+             3: {'d_b': priors['d_b'][1]},
          },
          'synth5': {},
          'he1': {},
@@ -602,7 +602,7 @@ class McmcVersion:
         self.interpolator = self.get_parameter('interpolator')
         self.grid_bounds = np.array(self.get_parameter('grid_bounds'))
         self.initial_position = self.get_parameter('initial_position')
-        self.prior_pdfs = self.get_prior_pdfs()
+        self.priors = self.get_priors()
         self.synthetic = source_defaults['synthetic'][source]
         self.disc_model = None
 
@@ -637,7 +637,7 @@ class McmcVersion:
                 + f'\ndisc model       : {self.disc_model}'
                 + f'\ninterpolator     : {self.interpolator}'
                 + f'{grid_bound_str}'
-                + f'\nprior pdfs       : {self.prior_pdfs}'
+                + f'\nprior pdfs       : {self.priors}'
                 + f'\nsynthetic        : {self.synthetic}'
                 + synth_str
                 )
@@ -673,8 +673,8 @@ class McmcVersion:
     def get_parameter(self, parameter):
         return get_parameter(self.source, self.version, parameter, verbose=self.verbose)
 
-    def get_prior_pdfs(self):
-        return get_prior_pdfs(self.source, self.version)
+    def get_priors(self):
+        return get_priors(self.source, self.version)
 
 
 def get_parameter(source, version, parameter, verbose=False):
@@ -692,11 +692,11 @@ def get_parameter(source, version, parameter, verbose=False):
         return output
 
 
-def get_prior_pdfs(source, version):
+def get_priors(source, version):
     pdfs = {}
-    for var in source_defaults['prior_pdfs'][source]:
-        default = source_defaults['prior_pdfs'][source][var]
-        v_definition = version_definitions['prior_pdfs'][source].get(version)
+    for var in source_defaults['priors'][source]:
+        default = source_defaults['priors'][source][var]
+        v_definition = version_definitions['priors'][source].get(version)
 
         if v_definition is None:
             value = default
@@ -704,7 +704,7 @@ def get_prior_pdfs(source, version):
             value = v_definition.get(var, default)
 
         if type(value) is int:  # allow pointing to previous versions
-            pdfs[var] = version_definitions['prior_pdfs'][source].get(value, default)
+            pdfs[var] = version_definitions['priors'][source].get(value, default)
         else:
             pdfs[var] = value
 

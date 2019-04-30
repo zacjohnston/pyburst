@@ -128,9 +128,9 @@ class BurstFit:
     def setup_priors(self):
         # TODO: don't hard-code these, use param_keys and set priors for all params
         self.debug.start_function('setup_priors')
-        self.z_prior = self.mcmc_version.prior_pdfs['z']
-        self.xi_ratio_prior = self.mcmc_version.prior_pdfs['xi_ratio']
-        self.d_b_prior = self.mcmc_version.prior_pdfs['d_b']
+        self.z_prior = self.mcmc_version.priors['z']
+        self.xi_ratio_prior = self.mcmc_version.priors['xi_ratio']
+        self.d_b_prior = self.mcmc_version.priors['d_b']
         self.debug.end_function()
 
     def extract_obs_values(self):
