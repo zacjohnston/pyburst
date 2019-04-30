@@ -318,49 +318,37 @@ initial_position = {
 source_defaults = {
     'param_keys': {
         'grid5': param_keys[7],
-        'grid6': param_keys[5],
         'synth5': param_keys[5],
-        'he1': param_keys[6],
         'he2': param_keys[8],
     },
 
     'interp_keys': {
         'grid5': interp_keys[1],
-        'grid6': interp_keys[1],
         'synth5': interp_keys[1],
-        'he1': interp_keys[1],
         'he2': interp_keys[3],
     },
 
     'epoch_unique': {
         'grid5': epoch_unique[2],
-        'grid6': epoch_unique[2],
         'synth5': epoch_unique[2],
-        'he1': epoch_unique[2],
         'he2': epoch_unique[2],
     },
 
     'param_aliases': {
         'grid5': param_aliases[1],
-        'grid6': param_aliases[1],
         'synth5': param_aliases[1],
-        'he1': param_aliases[1],
         'he2': param_aliases[1],
     },
 
     'bprops': {
         'grid5': ('rate', 'fluence', 'peak'),
-        'grid6': ('rate', 'fluence', 'peak'),
         'synth5': ('rate', 'fluence', 'peak'),
-        'he1': ('rate', 'fluence', 'peak'),
         'he2': ('rate', 'fluence'),
     },
 
     'weights': {
         'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-        'grid6': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         'synth5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-        'he1': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         'he2': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
     },
 
@@ -368,45 +356,33 @@ source_defaults = {
 
     'interpolator': {
         'grid5': 1,
-        'grid6': 1,
         'synth5': 1,
-        'he1': 1,
         'he2': 0,
     },
 
     'grid_bounds': {
         'grid5': grid_bounds[7][1],
-        'grid6': grid_bounds[5][3],
         'synth5': grid_bounds[5][1],
-        'he1': grid_bounds[6][1],
         'he2': grid_bounds[8][1],
     },
 
-    'priors': {
+    'priors': {  # if not defined here, the default/fallback will be flat_prior()
         'grid5': {
           'z': priors['z'][1],
         },
-        'grid6': {
-          'z': priors['z'][1],
-        },
         'synth5': {},
-        'he1': {},
         'he2': {},
     },
 
     'initial_position': {
         'grid5': initial_position[7][1],
-        'grid6': initial_position[5][3],
         'synth5': initial_position[5][5],
-        'he1': initial_position[6][1],
         'he2': initial_position[8][1],
     },
 
     'synthetic': {  # whether the data being matches is synthetic
         'grid5': False,
-        'grid6': False,
         'synth5': True,
-        'he1': False,
         'he2': False,
     },
 
@@ -441,9 +417,7 @@ version_definitions = {
             5: 5,
             13: 2,
         },
-        'grid6': {},
         'synth5': {},
-        'he1': {},
         'he2': {
             1: 1,
             2: 2,
@@ -452,19 +426,13 @@ version_definitions = {
 
     'bprops': {
         'grid5': {},
-        'grid6': {},
         'synth5': {},
-        'he1': {},
         'he2': {},
     },
 
     'weights': {
         'grid5': {},
-        'grid6': {
-            4: {'rate': 5.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-        },
         'synth5': {},
-        'he1': {},
         'he2': {},
 
     },
@@ -473,33 +441,25 @@ version_definitions = {
         'grid5': {
             -1: param_keys[5],  # dummy version for synth reference
         },
-        'grid6': {},
         'synth5': {},
-        'he1': {},
         'he2': {},
     },
 
     'interp_keys': {
         'grid5': {},
-        'grid6': {},
         'synth5': {},
-        'he1': {},
         'he2': {},
     },
 
     'epoch_unique': {
         'grid5': {},
-        'grid6': {},
         'synth5': {},
-        'he1': {},
         'he2': {},
     },
 
     'param_aliases': {
         'grid5': {},
-        'grid6': {},
         'synth5': {},
-        'he1': {},
         'he2': {},
     },
 
@@ -512,9 +472,7 @@ version_definitions = {
             5: grid_bounds[7][3],
             13: 2,
         },
-        'grid6': {},
         'synth5': {},
-        'he1': {},
         'he2': {
             2: grid_bounds[8][2],
         },
@@ -522,12 +480,7 @@ version_definitions = {
 
     'priors': {
          'grid5': {},
-         'grid6': {
-             2: {'xi_ratio': priors['xi_ratio'][2]},
-             3: {'d_b': priors['d_b'][1]},
-         },
          'synth5': {},
-         'he1': {},
          'he2': {},
     },
 
@@ -535,11 +488,7 @@ version_definitions = {
         'grid5': {
             4: initial_position[7][2],
         },
-        'grid6': {
-            4: initial_position[5][4],
-        },
         'synth5': {},
-        'he1': {},
         'he2': {},
     },
 
