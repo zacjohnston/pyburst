@@ -385,32 +385,13 @@ source_defaults = {
     'priors': {
         'grid5': {
           'z': priors['z'][1],
-          'd_b': flat_prior,
-          'xi_ratio': flat_prior,
         },
-
         'grid6': {
           'z': priors['z'][1],
-          'xi_ratio': flat_prior,
-          'd_b': flat_prior,
         },
-
-        'synth5': {
-            'z': flat_prior,
-            'xi_ratio': flat_prior,
-            'd_b': flat_prior,
-        },
-
-        'he1': {
-            'z': flat_prior,
-            'xi_ratio': flat_prior,
-            'd_b': flat_prior,
-        },
-
-        'he2': {
-            'xi_ratio': flat_prior,
-            'd_b': flat_prior,
-        },
+        'synth5': {},
+        'he1': {},
+        'he2': {},
     },
 
     'initial_position': {
@@ -540,8 +521,7 @@ version_definitions = {
     },
 
     'priors': {
-         'grid5': {
-         },
+         'grid5': {},
          'grid6': {
              2: {'xi_ratio': priors['xi_ratio'][2]},
              3: {'d_b': priors['d_b'][1]},
@@ -697,19 +677,20 @@ def get_parameter(source, version, parameter, verbose=False):
 
 
 def get_priors(source, version):
+    params = get_parameter(source=source, version=version, parameter='param_keys')
     pdfs = {}
-    for var in source_defaults['priors'][source]:
-        default = source_defaults['priors'][source][var]
+    for param in params:
+        default = source_defaults['priors'][source].get(param, flat_prior)
         v_definition = version_definitions['priors'][source].get(version)
 
         if v_definition is None:
             value = default
         else:
-            value = v_definition.get(var, default)
+            value = v_definition.get(param, default)
 
         if type(value) is int:  # allow pointing to previous versions
-            pdfs[var] = version_definitions['priors'][source].get(value, default)
+            pdfs[param] = version_definitions['priors'][source].get(value, default)
         else:
-            pdfs[var] = value
+            pdfs[param] = value
 
     return pdfs
