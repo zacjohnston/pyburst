@@ -626,6 +626,10 @@ class McmcVersion:
             bounds = self.grid_bounds[i]
             grid_bound_str += f'\n  {param}\t({bounds[0]:.3f}, {bounds[1]:.3f})'
 
+        priors_str = '\nprior pdfs       :'
+        for param, prior in self.priors.items():
+            priors_str += f'\n  {param}   \t{prior}'
+
         return (f'MCMC version definitions for {self.source} V{self.version}'
                 + f'\nparam keys       : {self.param_keys}'
                 + f'\ninterp keys      : {self.interp_keys}'
@@ -637,7 +641,7 @@ class McmcVersion:
                 + f'\ndisc model       : {self.disc_model}'
                 + f'\ninterpolator     : {self.interpolator}'
                 + f'{grid_bound_str}'
-                + f'\nprior pdfs       : {self.priors}'
+                + f'{priors_str}'
                 + f'\nsynthetic        : {self.synthetic}'
                 + synth_str
                 )
