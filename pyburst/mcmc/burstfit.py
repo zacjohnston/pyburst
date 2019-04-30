@@ -101,11 +101,7 @@ class BurstFit:
         self.obs_data = None
         self.extract_obs_values()
 
-        self.z_prior = None
-        self.xi_ratio_prior = None
-        self.inc_prior = None
-        self.d_b_prior = None
-        self.setup_priors()
+        self.priors = self.mcmc_version.priors
 
     def printv(self, string, **kwargs):
         if self.verbose:
@@ -123,14 +119,6 @@ class BurstFit:
         for i, key in enumerate(self.mcmc_version.interp_keys):
             self.interp_idxs[key] = i
 
-        self.debug.end_function()
-
-    def setup_priors(self):
-        # TODO: don't hard-code these, use param_keys and set priors for all params
-        self.debug.start_function('setup_priors')
-        self.z_prior = self.mcmc_version.priors['z']
-        self.xi_ratio_prior = self.mcmc_version.priors['xi_ratio']
-        self.d_b_prior = self.mcmc_version.priors['d_b']
         self.debug.end_function()
 
     def extract_obs_values(self):
@@ -418,17 +406,18 @@ class BurstFit:
             z = params[self.param_idxs['z']]
             z_input = np.log10(z / z_sun)
 
-        prior_lhood = np.log(self.z_prior(z_input))
+        prior_lhood = np.log(self.priors['z'](z_input))
+        # prior_lhood = 1.0
 
         # ===== anisotropy/inclination priors =====
         if self.has_two_f:
             xi_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
-            prior_lhood += np.log(self.xi_ratio_prior(xi_ratio))
+            prior_lhood += np.log(self.priors['xi_ratio'](xi_ratio))
         elif self.has_xi_ratio:
             xi_ratio = params[self.param_idxs['xi_ratio']]
             d_b = params[self.param_idxs['d_b']]
-            prior_lhood += np.log(self.xi_ratio_prior(xi_ratio))
-            prior_lhood += np.log(self.d_b_prior(d_b))
+            prior_lhood += np.log(self.priors['xi_ratio'](xi_ratio))
+            prior_lhood += np.log(self.priors['d_b'](d_b))
 
         self.debug.variable('prior_lhood', prior_lhood, formatter='f')
         self.debug.end_function()
@@ -534,7 +523,7 @@ class BurstFit:
         z_sun = 0.01
         x = np.linspace(0, 0.02, 1000)
         fig, ax = plt.subplots()
-        y = self.z_prior(np.log10(x / z_sun))
+        y = self.priors['z'](np.log10(x / z_sun))
 
         ax.set_xlabel('z (mass fraction)')
         ax.plot(x, y, label='z')
