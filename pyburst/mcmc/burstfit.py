@@ -4,8 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.constants as const
-from matplotlib.ticker import NullFormatter
-import functools
 
 # pyburst
 from pyburst.interpolator import interpolator
@@ -74,11 +72,6 @@ class BurstFit:
 
         # TODO: better way to do this?
         self.has_g = 'g' in self.mcmc_version.param_keys
-        self.has_logz = 'logz' in self.mcmc_version.param_keys
-        self.has_xi_ratio = 'xi_ratio' in self.mcmc_version.param_keys
-        self.has_one_f = 'f' in self.mcmc_version.param_keys
-        self.has_two_f = ('f_b' in self.mcmc_version.param_keys
-                          and 'f_p' in self.mcmc_version.param_keys)
         self.has_m_gr = 'm_gr' in self.mcmc_version.param_keys
 
         self.kpc_to_cm = u.kpc.to(u.cm)
@@ -284,23 +277,8 @@ class BurstFit:
         elif bprop in ('rate', 'u_rate'):
             shifted = values / redshift
         else:
-            if self.has_two_f:  # model uses generalised flux_factors xi*d^2 (x10^45)
-                flux_factor_b = 1e45 * params[self.param_idxs['f_b']]
-                flux_factor_p = 1e45 * params[self.param_idxs['f_p']]
-            elif self.has_one_f:
-                flux_factor_b = 1e45 * params[self.param_idxs['f']]
-                flux_factor_p = flux_factor_b
-            elif self.has_xi_ratio:
-                flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']])**2
-                flux_factor_p = flux_factor_b * params[self.param_idxs['xi_ratio']]
-            else:
-                xi_b = params[self.param_idxs['xi_b']]
-                xi_p = params[self.param_idxs['xi_p']]
-
-                d = params[self.param_idxs['d']]
-                d *= u.kpc.to(u.cm)
-                flux_factor_p = xi_p * d**2
-                flux_factor_b = xi_b * d**2
+            flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']])**2
+            flux_factor_p = flux_factor_b * params[self.param_idxs['xi_ratio']]
 
             if bprop in ('fluence', 'u_fluence'):  # (erg) --> (erg / cm^2)
                 shifted = (values * mass_ratio) / (4*np.pi * flux_factor_b)
@@ -379,9 +357,6 @@ class BurstFit:
 
         if self.has_g:
             epoch_params[:, self.interp_idxs['mass']] *= self.reference_mass
-        if self.has_logz:
-            idx = self.interp_idxs['z']
-            epoch_params[:, idx] = z_sun * 10**epoch_params[:, idx]
 
         self.debug.variable('epoch params out', epoch_params, formatter='')
         self.debug.end_function()
@@ -400,23 +375,10 @@ class BurstFit:
             return self.zero_lhood
 
         prior_lhood = 0.0
-        if self.has_logz:
-            z_input = params[self.param_idxs['logz']]
-        else:
-            z = params[self.param_idxs['z']]
-            z_input = np.log10(z / z_sun)
 
-        prior_lhood += np.log(self.priors['z'](z_input))
-
-        # ===== anisotropy/inclination priors =====
-        if self.has_two_f:
-            xi_ratio = params[self.param_idxs['f_p']] / params[self.param_idxs['f_b']]
-            prior_lhood += np.log(self.priors['xi_ratio'](xi_ratio))
-        elif self.has_xi_ratio:
-            xi_ratio = params[self.param_idxs['xi_ratio']]
-            d_b = params[self.param_idxs['d_b']]
-            prior_lhood += np.log(self.priors['xi_ratio'](xi_ratio))
-            prior_lhood += np.log(self.priors['d_b'](d_b))
+        for param, prior_pdf in self.priors.items():
+            idx = self.param_idxs[param]
+            prior_lhood += np.log(prior_pdf(params[idx]))
 
         self.debug.variable('prior_lhood', prior_lhood, formatter='f')
         self.debug.end_function()
