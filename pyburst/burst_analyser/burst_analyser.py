@@ -39,7 +39,7 @@ class BurstRun(object):
                  check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True, remove_shocks=False,
                  remove_zero_lum=True, subtract_background_lum=True, load_config=True):
-        # TODO: move these into config file
+        # TODO: move these into default config file
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -833,17 +833,13 @@ class BurstRun(object):
             intersection = list(set(threshold_i).intersection(min_length_i))
 
             if len(intersection) == 0:
-                if burst.Index == self.bursts.index[-1]:
-                    self.printv('File ends during burst. Discarding final burst')
-                    try:
-                        self.delete_burst(burst.Index)
-                    except NoBursts:
-                        self.bursts['lum_end'] = np.nan
-                        return
-                    continue
-                else:
-                    raise RuntimeError(f'Failed to find end of burst {burst.Index + 1}, '
-                                       + f't={peak_t:.0f} s ({peak_t/3600:.1f} hr)')
+                self.print_warn(f'Failed to find end of burst {burst.Index + 1}, '
+                                + f't={peak_t:.0f} s ({peak_t/3600:.1f} hr). Discarding.')
+                try:
+                    self.delete_burst(burst.Index)
+                except NoBursts:
+                    self.bursts['lum_end'] = np.nan
+                    return
             else:
                 end_i = np.min(intersection)
                 t_end = lum_slice[end_i, 0]
