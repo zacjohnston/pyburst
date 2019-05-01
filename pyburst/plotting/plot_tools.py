@@ -51,7 +51,8 @@ def mcmc_label(quantity):
         'redshift': r'$(1+z)$',
         'd_b': r'$d \sqrt{\xi_\mathrm{b}}$',
         'xi_ratio': r'$\xi_\mathrm{p} / \xi_\mathrm{b}$',
-        'm_gr': r'$M_\mathrm{GR}$'
+        'm_gr': r'$M_\mathrm{GR}$',
+        'm_nw': r'$M_\mathrm{NW}$',
     }
 
     # assumes last character is a single integer specifying epoch
