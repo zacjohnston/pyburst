@@ -206,7 +206,7 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
     """Creates random sample of model parameters
     """
     ref_mass = 1.4
-    aliases = {'mass': 'g', 'accrate': 'mdot'}
+    aliases = {'mass': 'm_gr', 'accrate': 'mdot'}
     if constant is None:
         constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
                     'accmass': 1e16, 'accdepth': 1e19}
@@ -251,7 +251,7 @@ def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
     """Creates batches of models, with random sample of params drawn from MCMC chain
     """
     ref_mass = 1.4
-    aliases = {'mass': 'g', 'accrate': 'mdot'}
+    aliases = {'mass': 'm_gr', 'accrate': 'mdot'}
     if constant is None:
         constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
                     'accmass': 1e16, 'accdepth': 1e20}

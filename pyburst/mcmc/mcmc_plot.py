@@ -336,7 +336,7 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
     if 'm_gr' in pkeys:
-        mass_nw = ref_mass * chain_flat[:, pkeys.index('g')]
+        mass_nw = chain_flat[:, pkeys.index('m_gr')]
         mass_gr = chain_flat[:, pkeys.index('m_gr')]
         m_ratio = mass_gr / mass_nw
         xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
@@ -344,7 +344,7 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     else:
         redshift = chain_flat[:, pkeys.index('redshift')]
         g_reference = gravity.get_acceleration_newtonian(r=ref_radius, m=ref_mass)
-        g = chain_flat[:, pkeys.index('g')] * g_reference
+        g = chain_flat[:, pkeys.index('m_nw')] * g_reference
         mass_gr, radius_gr = gravity.get_mass_radius(g=g, redshift=redshift)
         mass_gr = mass_gr.value
         radius_gr = radius_gr.value
@@ -373,7 +373,7 @@ def get_mass_radius_point(params, source, version):
     else:
         g_reference = gravity.get_acceleration_newtonian(r=ref_radius, m=ref_mass)
         redshift = params[pkeys.index('redshift')]
-        g = params[pkeys.index('g')] * g_reference
+        g = params[pkeys.index('m_gr')] * g_reference
         mass_gr, radius_gr = (x.value for x in gravity.get_mass_radius(g=g,
                                                                        redshift=redshift))
     return radius_gr, mass_gr
@@ -438,7 +438,7 @@ def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
 def animate_walkers(chain, source, version, stepsize=1, n_steps=100, bin=10, burn=100):
     default_plt_options()
     mv = mcmc_versions.McmcVersion(source, version)
-    g_idx = mv.param_keys.index('g')
+    g_idx = mv.param_keys.index('m_gr')
     red_idx = mv.param_keys.index('redshift')
     save_path = os.path.join(GRIDS_PATH, 'sources', source, 'plots', 'misc', 'walker2')
     cc = chainconsumer.ChainConsumer()
@@ -499,7 +499,7 @@ def animate_walkers(chain, source, version, stepsize=1, n_steps=100, bin=10, bur
             sub_chain = mcmc_tools.slice_chain(chain, discard=burn - bin, cap=i)
 
         cc.add_chain(sub_chain[:, :, [g_idx, red_idx]].reshape(-1, 2),
-                     parameters=['g', 'redshift'])
+                     parameters=['m_gr', 'redshift'])
         cc_fig = cc.plotter.plot_distributions(blind=True)
 
         x_x = cc_fig.axes[0].lines[0].get_data()[0]

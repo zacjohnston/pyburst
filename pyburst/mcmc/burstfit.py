@@ -51,10 +51,8 @@ class BurstFit:
     def __init__(self, source, version, verbose=True,
                  lhood_factor=1, debug=False, priors_only=False,
                  re_interp=False, u_fper_frac=0.0, zero_lhood=-np.inf,
-                 reference_mass=1.4, reference_radius=10, **kwargs):
+                 reference_radius=10, **kwargs):
         """
-        reference_mass : float
-            mass (Msun) that 'g' factor is relative to (i.e. mass used in Kepler)
         reference_radius : float
             Newtonian radius (km) used in Kepler
         """
@@ -67,11 +65,9 @@ class BurstFit:
         self.param_idxs = {}
         self.interp_idxs = {}
         self.get_param_indexes()
-        self.reference_mass = reference_mass
         self.reference_radius = reference_radius
 
         # TODO: better way to do this?
-        self.has_g = 'g' in self.mcmc_version.param_keys
         self.has_m_gr = 'm_gr' in self.mcmc_version.param_keys
 
         self.kpc_to_cm = u.kpc.to(u.cm)
@@ -253,7 +249,7 @@ class BurstFit:
                 as fraction of Eddington rate.
         """
         def gr_factors():
-            mass_nw = self.reference_mass * params[self.param_idxs['g']]
+            mass_nw = params[self.param_idxs['m_nw']]
 
             if self.has_m_gr:
                 mass_gr = params[self.param_idxs['m_gr']]
@@ -354,10 +350,6 @@ class BurstFit:
         """
         self.debug.start_function('transform_aliases')
         self.debug.variable('epoch params in', epoch_params, formatter='')
-
-        if self.has_g:
-            epoch_params[:, self.interp_idxs['mass']] *= self.reference_mass
-
         self.debug.variable('epoch params out', epoch_params, formatter='')
         self.debug.end_function()
 
