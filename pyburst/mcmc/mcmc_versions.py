@@ -13,7 +13,6 @@ from pyburst.grids import grid_strings
 
 # ===== Define order/number of params provided to BurstFit =====
 param_keys = {
-    5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'redshift', 'd_b', 'xi_ratio'],
     7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     8: ['mdot1', 'mdot2', 'x', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
 }
@@ -37,61 +36,6 @@ param_aliases = {
 }
 
 grid_bounds = {
-    5: {
-        1: ((0.08, 0.18),  # mdot1
-            (0.08, 0.18),  # mdot2
-            (0.08, 0.18),  # mdot3
-            (0.67, 0.73),  # x
-            (0.0025, 0.0125),  # z
-            (0.0, 0.2),  # qb1
-            (0.0, 0.2),  # qb2
-            (0.0, 0.2),  # qb3
-            (1.4, 2.5),  # g
-            (1.2, 2.0),  # redshift
-            (1, 15),  # d_b
-            (0.1, 10),  # xi_ratio
-            ),
-        2: ((0.1, 0.18),  # mdot1
-            (0.1, 0.18),  # mdot2
-            (0.1, 0.18),  # mdot3
-            (0.67, 0.74),  # x
-            (0.005, 0.0125),  # z
-            (0.0, 0.2),  # qb1
-            (0.0, 0.2),  # qb2
-            (0.0, 0.2),  # qb3
-            (1.7, 2.5),  # g
-            (1.2, 2.0),  # redshift
-            (1, 15),  # d_b
-            (0.1, 10),  # xi_ratio
-            ),
-        3: ((0.1, 0.20),  # mdot1
-            (0.1, 0.20),  # mdot2
-            (0.1, 0.20),  # mdot3
-            (0.67, 0.74),  # x
-            (0.0075, 0.015),  # z
-            (0.0, 0.2),  # qb2
-            (0.0, 0.2),  # qb1
-            (0.0, 0.2),  # qb3
-            (1.7, 2.6),  # g
-            (1.2, 2.0),  # redshift
-            (1, 20),  # d_b
-            (0.1, 10),  # xi_ratio
-            ),
-        4: ((0.1, 0.18),  # mdot1
-            (0.1, 0.18),  # mdot2
-            (0.1, 0.18),  # mdot3
-            (0.67, 0.76),  # x
-            (0.0075, 0.015),  # z
-            (0.0, 0.2),  # qb1
-            (0.0, 0.2),  # qb2
-            (0.0, 0.2),  # qb3
-            (1.7, 2.6),  # g
-            (1.2, 2.0),  # redshift
-            (1, 15),  # d_b
-            (0.1, 10),  # xi_ratio
-            ),
-    },
-
     7: {
         1: ((0.08, 0.2),  # mdot1
             (0.08, 0.2),  # mdot2
@@ -194,13 +138,6 @@ priors = {
 # ===== initial position of walkers =====
 
 initial_position = {
-    5: {
-        1: (0.11, 0.15, 0.17, 0.69, 0.007, 0.16, 0.09, 0.1, 1.6, 1.5, 8.0, 1.0),
-        2: (0.11, 0.14, 0.16, 0.73, 0.012, 0.08, 0.01, 0.04, 1.65, 1.56, 7.2, 1.2),
-        3: (0.107, 0.14, 0.162, 0.705, 0.014, 0.08, 0.01, 0.05, 1.6, 1.7, 8.0, 1.3),
-        4: (0.10, 0.14, 0.16, 0.73, 0.0065, 0.01, 0.01, 0.08, 1.44, 1.42, 7., 1.6),
-        5: (0.12, 0.12, 0.12, 0.7, 0.005, 0.1, 0.1, 0.1, 1.4, 1.3, 7., 3.),
-    },
     7: {
         1: (0.103, 0.137, 0.155, 0.72, 0.005, 0.2, 0.1, 0.1, 2.3, 2.0, 6.2, 0.9),
         2: (0.09, 0.12, 0.135, 0.71, 0.0046, 0.4, 0.2, 0.2, 1.7, 2.0, 6.0, 0.9),
@@ -222,7 +159,7 @@ initial_position = {
 source_defaults = {
     'param_keys': {
         'grid5': param_keys[7],
-        'synth5': param_keys[5],
+        'synth5': param_keys[7],
         'he2': param_keys[8],
     },
 
@@ -266,7 +203,7 @@ source_defaults = {
 
     'grid_bounds': {
         'grid5': grid_bounds[7][1],
-        'synth5': grid_bounds[5][1],
+        'synth5': grid_bounds[7][1],
         'he2': grid_bounds[8][1],
     },
 
@@ -280,7 +217,7 @@ source_defaults = {
 
     'initial_position': {
         'grid5': initial_position[7][1],
-        'synth5': initial_position[5][5],
+        'synth5': initial_position[7][1],
         'he2': initial_position[8][1],
     },
 
@@ -348,7 +285,7 @@ version_definitions = {
 
     'param_keys': {
         'grid5': {
-            -1: param_keys[5],  # dummy version for synth reference
+            -1: param_keys[7],  # dummy version for synth reference
         },
         'synth5': {},
         'he2': {},
@@ -374,7 +311,7 @@ version_definitions = {
 
     'grid_bounds': {
         'grid5': {
-            -1: grid_bounds[5][4],
+            -1: grid_bounds[7][2],
             2: grid_bounds[7][2],
             3: 2,
             4: grid_bounds[7][3],
