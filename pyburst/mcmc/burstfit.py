@@ -67,9 +67,6 @@ class BurstFit:
         self.get_param_indexes()
         self.reference_radius = reference_radius
 
-        # TODO: better way to do this?
-        self.has_m_gr = 'm_gr' in self.mcmc_version.param_keys
-
         self.kpc_to_cm = u.kpc.to(u.cm)
         self.zero_lhood = zero_lhood
         self.u_fper_frac = u_fper_frac
@@ -250,18 +247,10 @@ class BurstFit:
         """
         def gr_factors():
             mass_nw = params[self.param_idxs['m_nw']]
-
-            if self.has_m_gr:
-                mass_gr = params[self.param_idxs['m_gr']]
-                m_ratio = mass_gr / mass_nw
-                red = gravity.gr_corrections(r=self.reference_radius, m=mass_nw,
-                                             phi=m_ratio)[1]
-            else:
-                red = params[self.param_idxs['redshift']]
-                g_nw = gravity.get_acceleration_newtonian(r=self.reference_radius, m=mass_nw)
-                mass_gr = gravity.mass(g=g_nw, redshift=red).value
-                m_ratio = mass_gr / mass_nw
-
+            mass_gr = params[self.param_idxs['m_gr']]
+            m_ratio = mass_gr / mass_nw
+            red = gravity.gr_corrections(r=self.reference_radius, m=mass_nw,
+                                         phi=m_ratio)[1]
             return m_ratio, red
 
         # TODO: cache other reused values

@@ -1,9 +1,7 @@
 import numpy as np
-import sys
 import os
 import subprocess
 import matplotlib.pyplot as plt
-from matplotlib.ticker import NullFormatter
 import chainconsumer
 from math import ceil
 
@@ -335,19 +333,12 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     chain_flat = chain.reshape((-1, n_dimensions))
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
-    if 'm_gr' in pkeys:
-        mass_nw = chain_flat[:, pkeys.index('m_gr')]
-        mass_gr = chain_flat[:, pkeys.index('m_gr')]
-        m_ratio = mass_gr / mass_nw
-        xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
-        radius_gr = ref_radius * xi
-    else:
-        redshift = chain_flat[:, pkeys.index('redshift')]
-        g_reference = gravity.get_acceleration_newtonian(r=ref_radius, m=ref_mass)
-        g = chain_flat[:, pkeys.index('m_nw')] * g_reference
-        mass_gr, radius_gr = gravity.get_mass_radius(g=g, redshift=redshift)
-        mass_gr = mass_gr.value
-        radius_gr = radius_gr.value
+    mass_nw = chain_flat[:, pkeys.index('m_gr')]
+    mass_gr = chain_flat[:, pkeys.index('m_gr')]
+    m_ratio = mass_gr / mass_nw
+
+    xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
+    radius_gr = ref_radius * xi
 
     # reshape back into chain
     new_shape = (n_walkers, n_steps)
@@ -364,18 +355,13 @@ def get_mass_radius_point(params, source, version):
     ref_radius = 10
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
-    if 'm_gr' in pkeys:
-        mass_gr = params[pkeys.index('m_gr')]
-        mass_nw = ref_mass * mass_gr
-        m_ratio = mass_gr / mass_nw
-        xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
-        radius_gr = ref_radius * xi
-    else:
-        g_reference = gravity.get_acceleration_newtonian(r=ref_radius, m=ref_mass)
-        redshift = params[pkeys.index('redshift')]
-        g = params[pkeys.index('m_gr')] * g_reference
-        mass_gr, radius_gr = (x.value for x in gravity.get_mass_radius(g=g,
-                                                                       redshift=redshift))
+    mass_gr = params[pkeys.index('m_gr')]
+    mass_nw = ref_mass * mass_gr
+    m_ratio = mass_gr / mass_nw
+
+    xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
+    radius_gr = ref_radius * xi
+
     return radius_gr, mass_gr
 
 
