@@ -46,7 +46,7 @@ grid_bounds = {
             (0.0, 0.4),  # qb2
             (0.0, 0.4),  # qb3
             (1.4, 2.9),  # g
-            (1.0, 2.1),  # m_gr
+            (1.0, 2.2),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
@@ -59,7 +59,7 @@ grid_bounds = {
             (0.0, 0.8),  # qb2
             (0.0, 0.8),  # qb3
             (1.7, 2.9),  # g
-            (1.0, 2.1),  # m_gr
+            (1.0, 2.2),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
@@ -125,13 +125,18 @@ def log_z(z, z_sun=0.01):
     return log_norm(logz)
 
 
+def gaussian(mean, std):
+    """Returns function for Gaussian distribution
+    """
+    return norm(loc=mean, scale=std).pdf
+
+
 priors = {
     'z': {
         1: log_z,  # log10-space [z/solar]
     },
-    'd_b': {
-        1: norm(loc=7.6, scale=0.4).pdf,  # f_p/f_b (i.e. xi_p/xi_b)
-    },
+    'd_b': {},
+    'm_gr': {}
 }
 
 
@@ -139,8 +144,8 @@ priors = {
 
 initial_position = {
     7: {
-        1: (0.103, 0.137, 0.155, 0.72, 0.005, 0.2, 0.1, 0.1, 2.3, 2.0, 6.2, 0.9),
-        2: (0.09, 0.12, 0.135, 0.71, 0.0046, 0.4, 0.2, 0.2, 1.7, 2.0, 6.0, 0.9),
+        1: (0.09, 0.12, 0.136, 0.72, 0.005, 0.4, 0.2, 0.2, 2.3, 2.0, 6.0, 0.9),
+        2: (0.09, 0.12, 0.136, 0.72, 0.005, 0.4, 0.2, 0.2, 2.3, 1.4, 5.7, 0.9),
     },
     8: {
         1: (0.21, 0.29, 0.01, 0.35, 0.14, 1.2, 1.8, 5.5, 1.0),
@@ -253,10 +258,7 @@ version_definitions = {
     'interpolator': {
         'grid5': {
             2: 2,
-            3: 3,
-            4: 4,
-            5: 5,
-            13: 2,
+            3: 2,
         },
         'synth5': {},
         'he2': {
@@ -314,9 +316,6 @@ version_definitions = {
             -1: grid_bounds[7][2],
             2: grid_bounds[7][2],
             3: 2,
-            4: grid_bounds[7][3],
-            5: grid_bounds[7][3],
-            13: 2,
         },
         'synth5': {},
         'he2': {
@@ -327,16 +326,19 @@ version_definitions = {
     },
 
     'priors': {
-         'grid5': {},
+         'grid5': {
+             3: {'d_b': gaussian(mean=5.7, std=0.2),
+                 'm_gr': gaussian(mean=1.0, std=0.5)}
+         },
          'synth5': {},
          'he2': {
-             3: {'d_b': priors['d_b'][1]}
+             3: {'d_b': gaussian(mean=7.6, std=0.4)}
          },
     },
 
     'initial_position': {
         'grid5': {
-            4: initial_position[7][2],
+            3: initial_position[7][2],
         },
         'synth5': {},
         'he2': {},
