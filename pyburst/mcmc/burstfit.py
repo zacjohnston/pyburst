@@ -310,7 +310,6 @@ class BurstFit:
                 key = self.mcmc_version.interp_keys[j]
                 epoch_params[i, j] = self.get_interp_param(key, params, epoch_idx=i)
 
-        self.transform_aliases(epoch_params)
         self.debug.variable('epoch_params', epoch_params, formatter='')
         self.debug.end_function()
         return epoch_params
@@ -328,19 +327,6 @@ class BurstFit:
         self.debug.variable('param key', key, formatter='')
         self.debug.end_function()
         return params[self.param_idxs[key]]
-
-    def transform_aliases(self, epoch_params):
-        """Transforms any alias params into the correct model form
-
-        parameters
-        ----------
-        epoch_params : nparray
-            set of parameters to be parsed to interpolator
-        """
-        self.debug.start_function('transform_aliases')
-        self.debug.variable('epoch params in', epoch_params, formatter='')
-        self.debug.variable('epoch params out', epoch_params, formatter='')
-        self.debug.end_function()
 
     def lnprior(self, params):
         """Return logarithm prior lhood of params
