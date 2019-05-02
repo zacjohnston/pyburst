@@ -394,12 +394,14 @@ class Kgrid:
                    'peak': r'$L_{peak}$ ($10^{38}$ erg s$^{-1}$)',
                    'rate': 'Burst rate (day$^{-1}$)',
                    'alpha': r'$\alpha$',
+                   'length': 'Burst length (min)'
                    }.get(bprop, bprop)
         ylims = {'rate': [2.5, 24],
-                 'fluence': [3.5, 20],
-                 'peak': [1, 5.5]}
-
-        unit_f = {'tDel': 3600, 'dt': 3600,
+                 'fluence': [3.0, 15],
+                 'peak': [0.5, 6.0],
+                 'length': [4, 32],
+                 }
+        unit_f = {'tDel': 3600, 'dt': 3600, 'length': 60,
                   'fluence': 1e39, 'peak': 1e38}.get(bprop, 1.0)
 
         fig, ax = plt.subplots(figsize=(6, 4))
