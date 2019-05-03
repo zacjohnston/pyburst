@@ -8,10 +8,44 @@ import matplotlib.pyplot as plt
 from pyburst import kepler
 from pyburst.grids import grid_strings
 
+# ==========================================
+#          Requested data:
+# ==========================================
+# --------------------------------
+#   model info (per model)
+# --------------------------------
+#   - mdot
+#   - surface gravity
+#   - Qb
+# --------------------------------
+#   LC data (one table per model)
+# --------------------------------
+#   - time
+#   - cycle
+# --------------------------------
+#   profile data columns (one table per dump; one row per zone)
+# --------------------------------
+#   - zone_number
+#   - radius
+#   - pressure
+#   - density
+#   - temperature
+#   - heat flux
+#   - velocity
+#   - conductivity or opacity
+#   - energy generation rate
+#   - {composition information}
+# --------------------------------
+# composition information:
+#   - X_H, X_He, X_N, X_Fe (or whatever substrate is used)
+#   - <Z>, <A>
+# ==========================================
+
 
 def profile_path(run, batch, source='frank', basename='xrb'):
     """Return path to directory containing profile data
     """
     path = grid_strings.get_source_subdir(source, 'profiles')
     run_str = grid_strings.get_run_string(run=run, basename=basename)
-    return os.path.join(path, run_str)
+    batch_str = grid_strings.get_batch_string(batch=batch, source=source)
+    return os.path.join(path, batch_str, run_str)
