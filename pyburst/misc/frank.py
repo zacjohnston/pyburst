@@ -49,3 +49,9 @@ def profile_path(run, batch, source='frank', basename='xrb'):
     run_str = grid_strings.get_run_string(run=run, basename=basename)
     batch_str = grid_strings.get_batch_string(batch=batch, source=source)
     return os.path.join(path, batch_str, run_str)
+
+
+def extract_profile(cycle, run, batch, source='frank', basename='xrb'):
+    """Returns DataFrame table of profile information for given dump cycle
+    """
+    pass
