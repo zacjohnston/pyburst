@@ -396,9 +396,9 @@ class Kgrid:
                    'alpha': r'$\alpha$',
                    'length': 'Burst length (min)'
                    }.get(bprop, bprop)
-        ylims = {'rate': [2.5, 24],
-                 'fluence': [3.0, 15],
-                 'peak': [0.5, 6.0],
+        ylims = {'rate': [0.0, 24],  # TODO: set these by source
+                 'fluence': [0.0, 21],
+                 'peak': [0.0, 7.0],
                  'length': [4, 32],
                  }
         unit_f = {'tDel': 3600, 'dt': 3600, 'length': 60,
@@ -464,7 +464,7 @@ class Kgrid:
                 ax.plot(xlims, rate)
 
         if legend:
-            ax.legend(fontsize=fontsize-2)
+            ax.legend(fontsize=fontsize-2, loc='upper right')
 
         ylim = ylims.get(bprop)
         if fix_ylims and (ylim is not None):
