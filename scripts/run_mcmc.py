@@ -76,6 +76,7 @@ for i in range(iterations):
     np.save(filepath, save_chain)
 
     # ===== save sampler state =====
+    #  TODO: delete previous checkpoint after saving
     mcmc_tools.save_sampler_state(sampler, source=source, version=version,
                                   n_steps=step1, n_walkers=n_walkers)
 
