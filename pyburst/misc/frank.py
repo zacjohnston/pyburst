@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # pyburst
-from pyburst import kepler
+from pyburst.kepler import kepler_tools
 from pyburst.grids import grid_strings
 
 # ==========================================
@@ -41,6 +41,7 @@ from pyburst.grids import grid_strings
 #   - <Z>, <A>
 # ==========================================
 
+# TODO: Verify zone centre/interface values
 
 def profile_path(run, batch, source='frank', basename='xrb'):
     """Return path to directory containing profile data
@@ -51,7 +52,30 @@ def profile_path(run, batch, source='frank', basename='xrb'):
     return os.path.join(path, batch_str, run_str)
 
 
-def extract_profile(cycle, run, batch, source='frank', basename='xrb'):
+def extract_profile(cycle, run, batch, source='frank', basename='xrb',
+                    endpoints=(1, -1)):
     """Returns DataFrame table of profile information for given dump cycle
     """
-    pass
+    table = pd.DataFrame()
+
+    dump = kepler_tools.load_dump(cycle=cycle, run=run, batch=batch,
+                                  source=source, basename=basename)
+    _slice = slice(endpoints[0], endpoints[1])
+    n_zones = len(dump.y[_slice])
+
+    # --- Thermodynamics ---
+    table['zone'] = np.arange(n_zones)
+    table['radius'] = dump.rn[_slice]
+    table['pressure'] = dump.pn[_slice]
+    table['density'] = dump.dn[_slice]
+    table['temp'] = dump.tn[_slice]
+    # table['head_flux'] = dump.
+    # table['velocity'] = dump.
+    table['opacity'] = dump.xkn[_slice]
+    table['energy_rate'] = dump.sburn[_slice]  # snn/sburn?
+
+    # --- Composition ---
+    table['zbar'] = dump.zbar[_slice]
+    table['abar'] = dump.abar[_slice]
+
+    return table
