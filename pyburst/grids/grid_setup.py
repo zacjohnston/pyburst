@@ -244,7 +244,7 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
                      params_full=params_full)
 
 
-def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
+def setup_mcmc_sample(batch0, sample_source, chain, n_models_epoch, n_epochs, ref_source,
                       ref_mcmc_version, kgrid, constant=None,
                       epoch_independent=('x', 'z', 'mass'),
                       epoch_dependent=('accrate', 'qb'), discard=1000, cap=None):
@@ -258,10 +258,10 @@ def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
 
     mv = mcmc_versions.McmcVersion(source=ref_source, version=ref_mcmc_version)
     params_full = {}
-    param_sample, idxs = mcmc_tools.get_random_sample(chain, n=n_models,
+    param_sample, idxs = mcmc_tools.get_random_sample(chain, n=n_models_epoch,
                                                       discard=discard, cap=cap)
     batch1 = batch0 + n_epochs - 1
-    save_sample_array(param_sample, source=source, batch0=batch0, batch1=batch1)
+    save_sample_array(param_sample, source=sample_source, batch0=batch0, batch1=batch1)
     idx_string = get_index_str(idxs, discard=discard, cap=cap)
 
     # ===== fill model params =====
@@ -271,7 +271,7 @@ def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
 
     # ===== fill constant params =====
     for key, val in constant.items():
-        params_full[key] = np.full(n_models, val)
+        params_full[key] = np.full(n_models_epoch, val)
 
     params_full['mass'] *= ref_mass
 
@@ -281,9 +281,9 @@ def setup_mcmc_sample(batch0, source, chain, n_models, n_epochs, ref_source,
             mv_key = f'{mv_key}{i+1}'
             params_full[key] = get_mcmc_params(mv_key, param_sample=param_sample, mv=mv)
 
-        create_batch(batch0+i, dv={}, params={}, source=source, nbursts=35, kgrid=kgrid,
-                     walltime=96, setup_test=False, nsdump=500, nuc_heat=True,
-                     predict_qnuc=False, substrate_off=True, ibdatov=1,
+        create_batch(batch0+i, dv={}, params={}, source=sample_source, nbursts=35,
+                     kgrid=kgrid, walltime=96, setup_test=False, nsdump=500,
+                     nuc_heat=True, predict_qnuc=False, substrate_off=True, ibdatov=1,
                      params_full=params_full, notes=idx_string)
 
 
