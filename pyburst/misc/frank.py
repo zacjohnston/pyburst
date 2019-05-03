@@ -69,8 +69,8 @@ def extract_profile(cycle, run, batch, source='frank', basename='xrb',
     table['pressure'] = dump.pn[_slice]
     table['density'] = dump.dn[_slice]
     table['temp'] = dump.tn[_slice]
-    # table['head_flux'] = dump.
-    # table['velocity'] = dump.
+    # table['heat_flux'] = dump.    # xln?
+    table['velocity'] = dump.un[_slice]
     table['opacity'] = dump.xkn[_slice]
     table['energy_rate'] = dump.sburn[_slice]  # snn/sburn?
 
