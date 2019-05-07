@@ -46,7 +46,7 @@ grid_bounds = {
             (0.0, 0.4),  # qb2
             (0.0, 0.4),  # qb3
             (1.4, 2.9),  # g
-            (1.0, 2.2),  # m_gr
+            (1.0, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
@@ -59,7 +59,7 @@ grid_bounds = {
             (0.0, 0.8),  # qb2
             (0.0, 0.8),  # qb3
             (1.7, 2.9),  # g
-            (1.0, 2.5),  # m_gr
+            (1.0, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
@@ -72,7 +72,7 @@ grid_bounds = {
             (0.0, 0.8),  # qb2
             (0.0, 0.8),  # qb3
             (1.7, 2.9),  # g
-            (1.0, 2.5),  # m_gr
+            (1.0, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
@@ -257,7 +257,7 @@ source_defaults = {
 version_definitions = {
     'interpolator': {
         'grid5': {
-            2: 2,
+            2: 3,
             3: 2,
             4: 3,
         },
@@ -315,9 +315,9 @@ version_definitions = {
     'grid_bounds': {
         'grid5': {
             -1: 2,
-            2: grid_bounds[7][2],
+            2: grid_bounds[7][3],
             3: 2,
-            4: grid_bounds[7][3],
+            4: 2,
         },
         'synth5': {},
         'he2': {
