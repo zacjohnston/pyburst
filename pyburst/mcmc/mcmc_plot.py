@@ -325,7 +325,6 @@ def get_mass_radius(chain, discard, source, version, cap=None):
 
     Returns ndarray of equivalent form to input chain (after slicing discard/cap)
     """
-    ref_mass = 1.4
     ref_radius = 10
 
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
@@ -333,7 +332,7 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     chain_flat = chain.reshape((-1, n_dimensions))
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
-    mass_nw = chain_flat[:, pkeys.index('m_gr')]
+    mass_nw = chain_flat[:, pkeys.index('m_nw')]
     mass_gr = chain_flat[:, pkeys.index('m_gr')]
     m_ratio = mass_gr / mass_nw
 
@@ -351,12 +350,11 @@ def get_mass_radius(chain, discard, source, version, cap=None):
 def get_mass_radius_point(params, source, version):
     """Returns the mass, radius for a single walker point
     """
-    ref_mass = 1.4
     ref_radius = 10
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
+    mass_nw = params[pkeys.index('m_nw')]
     mass_gr = params[pkeys.index('m_gr')]
-    mass_nw = ref_mass * mass_gr
     m_ratio = mass_gr / mass_nw
 
     xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
@@ -373,7 +371,7 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
                                                             n_steps=n_steps,
                                                             verbose=verbose,
                                                             return_lhood=True)
-
+    max_params[5] *= 1.4
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False, re_interp=re_interp)
     lhood, fig = bfit.lhood(max_params, plot=True)
 
