@@ -10,7 +10,7 @@ import kepler_analyser
 # Requires a set of models ready for analysis:
 #           - use mdot/analyser_tools.setup_analyser()
 #
-# Usage: python analyse.py [source] [batch_first] [batch_last]
+# Usage: python run_analyser.py [source] [batch_first] [batch_last]
 #           e.g. python run_analyser.py gs1826 5 6
 # =================================================
 # NOTE: Requires python 2.7 (bash: 'source activate python2.7')
