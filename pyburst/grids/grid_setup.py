@@ -205,8 +205,7 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
                   epoch_dependent=('accrate', 'qb'), epoch_chosen=None):
     """Creates random sample of model parameters
     """
-    ref_mass = 1.4
-    aliases = {'mass': 'm_gr', 'accrate': 'mdot'}
+    aliases = {'mass': 'm_nw', 'accrate': 'mdot'}
     if constant is None:
         constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
                     'accmass': 1e16, 'accdepth': 1e19}
@@ -224,8 +223,6 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
     # ===== fill constant params =====
     for key, val in constant.items():
         params_full[key] = np.full(n_models, val)
-
-    params_full['mass'] *= ref_mass
 
     for i in range(n_epochs):
         for key in epoch_dependent:
@@ -250,8 +247,7 @@ def setup_mcmc_sample(batch0, sample_source, chain, n_models_epoch, n_epochs, re
                       epoch_dependent=('accrate', 'qb'), discard=1000, cap=None):
     """Creates batches of models, with random sample of params drawn from MCMC chain
     """
-    ref_mass = 1.4
-    aliases = {'mass': 'm_gr', 'accrate': 'mdot'}
+    aliases = {'mass': 'm_nw', 'accrate': 'mdot'}
     if constant is None:
         constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
                     'accmass': 1e16, 'accdepth': 1e20}
@@ -272,8 +268,6 @@ def setup_mcmc_sample(batch0, sample_source, chain, n_models_epoch, n_epochs, re
     # ===== fill constant params =====
     for key, val in constant.items():
         params_full[key] = np.full(n_models_epoch, val)
-
-    params_full['mass'] *= ref_mass
 
     for i in range(n_epochs):
         for key in epoch_dependent:
