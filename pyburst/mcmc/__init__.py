@@ -4,7 +4,7 @@ from . import mcmc_jobs
 from . import mcmc_plot
 from . import mcmc_tools
 from . import mcmc_versions
-from . import sample
+from . import mcmc_sample
 
 __all__ = ['burstfit',
            'mcmc',
@@ -12,5 +12,5 @@ __all__ = ['burstfit',
            'mcmc_plot',
            'mcmc_tools',
            'mcmc_versions',
-           'sample',
+           'mcmc_sample',
            ]

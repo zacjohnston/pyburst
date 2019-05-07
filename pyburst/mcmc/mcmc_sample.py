@@ -1,13 +1,12 @@
 import os
 import sys
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
 # kepler_grids
 from pyburst.grids import grid_analyser, grid_strings
-from pyburst.mcmc import burstfit, mcmc_tools
+from pyburst.mcmc import burstfit
 
 # Concord
 try:
