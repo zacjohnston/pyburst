@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # pyburst
 from pyburst.kepler import kepler_tools
-from pyburst.grids import grid_strings
+from pyburst.grids import grid_strings, grid_tools
 
 # ==========================================
 #          Requested data:
@@ -66,6 +66,14 @@ def profile_filename(cycle, run, batch, source='frank', basename='xrb'):
     """Returns string for profile filename
     """
     return f'profile_{source}_{batch}_{basename}{run}_{cycle}.txt'
+
+
+def save_profile(table, cycle, run, batch, source='frank', basename='xrb'):
+    """Saves profile table to file
+    """
+    filepath = profile_filepath(cycle=cycle, run=run, batch=batch, source=source,
+                                basename=basename)
+    grid_tools.write_pandas_table(table=table, filepath=filepath)
 
 
 def extract_profile(cycle, run, batch, source='frank', basename='xrb',
