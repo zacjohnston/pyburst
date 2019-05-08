@@ -258,7 +258,7 @@ version_definitions = {
     'interpolator': {
         'grid5': {
             2: 3,
-            3: 2,
+            3: 3,
             4: 3,
         },
         'synth5': {},
@@ -329,8 +329,7 @@ version_definitions = {
 
     'priors': {
          'grid5': {
-             3: {'d_b': gaussian(mean=5.7, std=0.2),
-                 'm_gr': gaussian(mean=1.0, std=0.5)},
+             3: {'d_b': gaussian(mean=5.7, std=0.2)},
              4: {'d_b': gaussian(mean=5.7, std=0.2),
                  'm_gr': gaussian(mean=1.0, std=0.5)},
          },
