@@ -43,6 +43,7 @@ from pyburst.grids import grid_strings
 
 # TODO: Verify zone centre/interface values
 
+
 def profile_path(run, batch, source='frank', basename='xrb'):
     """Return path to directory containing profile data
     """
@@ -50,6 +51,12 @@ def profile_path(run, batch, source='frank', basename='xrb'):
     run_str = grid_strings.get_run_string(run=run, basename=basename)
     batch_str = grid_strings.get_batch_string(batch=batch, source=source)
     return os.path.join(path, batch_str, run_str)
+
+
+def profile_filename(cycle, run, batch, source='frank', basename='xrb'):
+    """Returns string for profile filename
+    """
+    return f'profile_{source}_{batch}_{basename}{run}_{cycle}.txt'
 
 
 def extract_profile(cycle, run, batch, source='frank', basename='xrb',
