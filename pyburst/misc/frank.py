@@ -81,16 +81,37 @@ def profile_filepath(cycle, run, batch, source='frank', basename='xrb'):
 def profile_path(run, batch, source='frank', basename='xrb'):
     """Return path to directory containing profile data
     """
-    path = grid_strings.get_source_subdir(source, 'profiles')
+    path = batch_path()
     run_str = grid_strings.get_run_string(run=run, basename=basename)
+    return os.path.join(path, run_str)
+
+
+def batch_path(batch, source='frank'):
+    """Returns string of path to batch dir
+    """
+    path = grid_strings.get_source_subdir(source, 'profiles')
     batch_str = grid_strings.get_batch_string(batch=batch, source=source)
-    return os.path.join(path, batch_str, run_str)
+    return os.path.join(path, batch_str)
+
+
+def lum_filepath(run, batch, source='frank', basename='xrb'):
+    """Returns string of path to lum table file
+    """
+    path = batch_path(batch=batch, source=source)
+    filename = lum_filename(run=run, batch=batch, source=source, basename=basename)
+    return os.path.join(path, filename)
 
 
 def profile_filename(cycle, run, batch, source='frank', basename='xrb'):
-    """Returns string for profile filename
+    """Returns string for profile table filename
     """
     return f'profile_{source}_{batch}_{basename}{run}_{cycle}.txt'
+
+
+def lum_filename(run, batch, source='frank', basename='xrb'):
+    """Returns string for lum table filename
+    """
+    return f'lum_{source}_{batch}_{basename}{run}.txt'
 
 
 def save_profile(table, cycle, run, batch, source='frank', basename='xrb', verbose=True):
@@ -99,6 +120,14 @@ def save_profile(table, cycle, run, batch, source='frank', basename='xrb', verbo
     filepath = profile_filepath(cycle=cycle, run=run, batch=batch, source=source,
                                 basename=basename)
     grid_tools.write_pandas_table(table=table, filepath=filepath, verbose=verbose)
+
+
+def save_lum(table, run, batch, source='frank', basename='xrb'):
+    """Saves table of luminosity with time to file
+    """
+
+    pass
+
 
 
 def extract_lum(run, batch, source='frank', basename='xrb'):
