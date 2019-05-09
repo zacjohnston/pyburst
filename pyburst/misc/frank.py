@@ -44,6 +44,15 @@ from pyburst.grids import grid_strings, grid_tools
 # TODO: Verify zone centre/interface values
 
 
+def extract_batch_profiles(batch, source='frank', basename='xrb'):
+    """Extracts and saves all profiles of all runs from a batch
+    """
+    nruns = grid_tools.get_nruns(batch=batch, source=source, basename=basename)
+
+    for run in range(1, nruns + 1):
+        extract_run_profiles(run=run, batch=batch, source=source, basename=basename)
+
+
 def extract_run_profiles(run, batch, source='frank', basename='xrb'):
     """Extracts and saves tables for all cycle profiles of a run
     """
