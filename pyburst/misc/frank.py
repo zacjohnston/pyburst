@@ -48,13 +48,16 @@ def extract_run_profiles(run, batch, source='frank', basename='xrb'):
     """Extracts and saves tables for all cycle profiles of a run
     """
     cycles = kepler_tools.get_cycles(run=run, batch=batch, source=source)
+    n_cycles = len(cycles)
 
-    for cycle in cycles:
+    for i, cycle in enumerate(cycles):
+        percent = (i+1) / n_cycles * 100
+        sys.stdout.write(f'\rExtracting profile {source}_{batch}_{run}_{cycle}  ({percent:.2f}%)')
         table = extract_profile(cycle=cycle, run=run, batch=batch, source=source,
                                 basename=basename)
         save_profile(table=table, cycle=cycle, run=run, batch=batch, source=source,
-                     basename=basename)
-
+                     basename=basename, verbose=False)
+    sys.stdout.write('\n')
 
 def profile_filepath(cycle, run, batch, source='frank', basename='xrb'):
     """Returns string for path to profile table file
