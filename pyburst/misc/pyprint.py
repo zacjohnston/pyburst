@@ -1,10 +1,6 @@
-import os
-
 # ========================================================
 # Miscellaneous printing functions
 # ========================================================
-GRIDS_PATH = os.environ['KEPLER_GRIDS']
-
 
 class Debugger:
     def __init__(self, debug):
