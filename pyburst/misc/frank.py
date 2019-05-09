@@ -122,12 +122,11 @@ def save_profile(table, cycle, run, batch, source='frank', basename='xrb', verbo
     grid_tools.write_pandas_table(table=table, filepath=filepath, verbose=verbose)
 
 
-def save_lum(table, run, batch, source='frank', basename='xrb'):
+def save_lum(table, run, batch, source='frank', basename='xrb', verbose=True):
     """Saves table of luminosity with time to file
     """
-
-    pass
-
+    filepath = lum_filepath(run=run, batch=batch, source=source, basename=basename)
+    grid_tools.write_pandas_table(table=table, filepath=filepath, verbose=verbose)
 
 
 def extract_lum(run, batch, source='frank', basename='xrb'):
