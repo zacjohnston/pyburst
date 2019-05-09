@@ -167,7 +167,7 @@ class Ksample:
 
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
-    def plot(self, residuals=True, shaded=True, alpha_lines=0.3, alpha_shaded=0.7,
+    def plot(self, residuals=True, shaded=False, alpha_lines=0.3, alpha_shaded=0.7,
              fontsize=16):
         n_subplots = {True: 2, False: 1}.get(residuals)
         fig, ax = plt.subplots(self.n_epochs, n_subplots, sharex=True, figsize=(14, 10))
