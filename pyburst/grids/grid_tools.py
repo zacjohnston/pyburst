@@ -7,9 +7,10 @@ import subprocess
 from astropy.io import ascii
 
 # kepler_grids
-from pyburst.misc.pyprint import print_dashes
+from pyburst.misc.pyprint import print_dashes, printv
 from pyburst.physics import gravity
 from . import grid_strings
+
 
 # kepler
 try:
@@ -108,7 +109,7 @@ def get_nruns(batch, source, basename='xrb'):
     """
     source = grid_strings.source_shorthand(source=source)
     try:
-        model_table = load_model_table(batch=batch, source=source)
+        model_table = load_model_table(batch=batch, source=source, verbose=False)
         nruns = len(model_table)
     except FileNotFoundError:
         path = grid_strings.get_batch_models_path(batch=batch, source=source)
@@ -118,12 +119,12 @@ def get_nruns(batch, source, basename='xrb'):
     return nruns
 
 
-def load_model_table(batch, source, filename='MODELS.txt'):
+def load_model_table(batch, source, filename='MODELS.txt', verbose=True):
     """Returns the model_table of a batch
     """
     source = grid_strings.source_shorthand(source=source)
     filepath = grid_strings.get_model_table_filepath(batch, source, filename)
-    print(f'Loading: {filepath}')
+    printv(f'Loading: {filepath}', verbose)
     model_table = pd.read_table(filepath, delim_whitespace=True)
     return model_table
 
