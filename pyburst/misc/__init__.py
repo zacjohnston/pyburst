@@ -6,6 +6,8 @@ from . import resolution
 from . import reaclib
 from . import anisotropy_tools
 from . import alpha
+from . import frank
+
 
 __all__ = ['pyprint',
            'misc',
@@ -15,4 +17,5 @@ __all__ = ['pyprint',
            'reaclib',
            'anisotropy_tools',
            'alpha',
+           'frank',
            ]
