@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 # pyburst
 from pyburst.kepler import kepler_tools
 from pyburst.grids import grid_strings, grid_tools
+from pyburst.burst_analyser import burst_tools
 
 # ==========================================
 #          Requested data:
@@ -100,6 +101,21 @@ def save_profile(table, cycle, run, batch, source='frank', basename='xrb', verbo
     grid_tools.write_pandas_table(table=table, filepath=filepath, verbose=verbose)
 
 
+def extract_lum(run, batch, source='frank', basename='xrb'):
+    """Returns nparray for whole model of time, lum, cycle
+    """
+    table = pd.DataFrame()
+    cycles = kepler_tools.get_cycles(run=run, batch=batch, source=source)
+    lum = burst_tools.load_lum(run=run, batch=batch, source=source, basename=basename)
+    lum = lum[1:]  # no dump for zeroth step
+
+    table['cycle'] = cycles
+    table['time'] = lum[:, 0]
+    table['lum'] = lum[:, 1]
+
+    return table
+
+
 def extract_profile(cycle, run, batch, source='frank', basename='xrb',
                     endpoints=(1, -1)):
     """Returns DataFrame table of profile information for given dump cycle
@@ -114,6 +130,7 @@ def extract_profile(cycle, run, batch, source='frank', basename='xrb',
     # --- Thermodynamics ---
     table['zone'] = np.arange(n_zones)
     table['radius'] = dump.rn[_slice]
+    table['column'] = dump.y[_slice]
     table['pressure'] = dump.pn[_slice]
     table['density'] = dump.dn[_slice]
     table['temp'] = dump.tn[_slice]
@@ -121,8 +138,13 @@ def extract_profile(cycle, run, batch, source='frank', basename='xrb',
     table['velocity'] = dump.un[_slice]
     table['opacity'] = dump.xkn[_slice]
     table['energy_rate'] = dump.sburn[_slice]  # snn/sburn?
+    table['gamma'] = dump.gamma[_slice]
 
     # --- Composition ---
+    # table['h1'] = dump.abub['h1'][_slice]
+    # table['he4'] = dump.abub['he4'][_slice]
+    # table['n14'] = dump.abub['n14'][_slice]
+    # table['fe54'] = dump.abub['fe54'][_slice]
     table['zbar'] = dump.zbar[_slice]
     table['abar'] = dump.abar[_slice]
 
