@@ -57,6 +57,9 @@ def extract_batch_profiles(batch, source='frank', basename='xrb'):
 def extract_run_profiles(run, batch, source='frank', basename='xrb'):
     """Extracts and saves tables for all cycle profiles of a run
     """
+    lum_table = extract_lum(run=run, batch=batch, source=source, basename=basename)
+    save_lum(table=lum_table, run=run, batch=batch, source=source, basename=basename)
+
     cycles = kepler_tools.get_cycles(run=run, batch=batch, source=source)
     n_cycles = len(cycles)
 
@@ -81,7 +84,7 @@ def profile_filepath(cycle, run, batch, source='frank', basename='xrb'):
 def profile_path(run, batch, source='frank', basename='xrb'):
     """Return path to directory containing profile data
     """
-    path = batch_path()
+    path = batch_path(batch=batch, source=source)
     run_str = grid_strings.get_run_string(run=run, basename=basename)
     return os.path.join(path, run_str)
 
