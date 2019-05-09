@@ -27,10 +27,11 @@ FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
 # TODO: rewrite docstrings
 
 
-def write_pandas_table(table, filepath, justify='left'):
+def write_pandas_table(table, filepath, justify='left', verbose=True):
     """Write a given pandas table to file
     """
-    print(f'Writing: {filepath}')
+    if verbose:
+        print(f'Writing: {filepath}')
     table_str = table.to_string(index=False, formatters=FORMATTERS, justify=justify)
     with open(filepath, 'w') as f:
         f.write(table_str)
