@@ -103,12 +103,19 @@ def expand_batches(batches, source):
     return batches_out
 
 
-def get_nruns(batch, source):
+def get_nruns(batch, source, basename='xrb'):
     """Returns the number of runs in a batch
     """
     source = grid_strings.source_shorthand(source=source)
-    model_table = load_model_table(batch=batch, source=source)
-    return len(model_table)
+    try:
+        model_table = load_model_table(batch=batch, source=source)
+        nruns = len(model_table)
+    except FileNotFoundError:
+        path = grid_strings.get_batch_models_path(batch=batch, source=source)
+        dir_list = os.listdir(path)
+        runs_list = [x for x in dir_list if basename in x]
+        nruns = len(runs_list)
+    return nruns
 
 
 def load_model_table(batch, source, filename='MODELS.txt'):
