@@ -44,6 +44,18 @@ from pyburst.grids import grid_strings, grid_tools
 # TODO: Verify zone centre/interface values
 
 
+def extract_run_profiles(run, batch, source='frank', basename='xrb'):
+    """Extracts and saves tables for all cycle profiles of a run
+    """
+    cycles = kepler_tools.get_cycles(run=run, batch=batch, source=source)
+
+    for cycle in cycles:
+        table = extract_profile(cycle=cycle, run=run, batch=batch, source=source,
+                                basename=basename)
+        save_profile(table=table, cycle=cycle, run=run, batch=batch, source=source,
+                     basename=basename)
+
+
 def profile_filepath(cycle, run, batch, source='frank', basename='xrb'):
     """Returns string for path to profile table file
     """
@@ -68,12 +80,12 @@ def profile_filename(cycle, run, batch, source='frank', basename='xrb'):
     return f'profile_{source}_{batch}_{basename}{run}_{cycle}.txt'
 
 
-def save_profile(table, cycle, run, batch, source='frank', basename='xrb'):
+def save_profile(table, cycle, run, batch, source='frank', basename='xrb', verbose=True):
     """Saves profile table to file
     """
     filepath = profile_filepath(cycle=cycle, run=run, batch=batch, source=source,
                                 basename=basename)
-    grid_tools.write_pandas_table(table=table, filepath=filepath)
+    grid_tools.write_pandas_table(table=table, filepath=filepath, verbose=verbose)
 
 
 def extract_profile(cycle, run, batch, source='frank', basename='xrb',
