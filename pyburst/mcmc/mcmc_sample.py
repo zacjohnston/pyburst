@@ -14,8 +14,11 @@ try:
 except ModuleNotFoundError:
     print("pyburst/MCMC: Concord not installed, some functionality won't be available")
 
+obs_sources = {
+    'sample5': 'gs1826',
+    'sample2': '4u1820',
+}
 
-# TODO convert to observable (use F_b, redshift)
 
 class Ksample:
     """Testing comparisons of LC from 'best' MCMC sample,
@@ -24,9 +27,10 @@ class Ksample:
     def __init__(self, source, mcmc_source, mcmc_version, batches, runs=None,
                  verbose=True):
         self.source = source
+        self.obs_source = obs_sources[source]
         self.grid = grid_analyser.Kgrid(self.source)
         self.bfit = burstfit.BurstFit(mcmc_source, version=mcmc_version, re_interp=False)
-        self.obs = ctools.load_obs('gs1826')
+        self.obs = ctools.load_obs(self.obs_source)
         self.batches = batches
         self.params = load_param_sample(self.source, self.batches)
         self.verbose = verbose
