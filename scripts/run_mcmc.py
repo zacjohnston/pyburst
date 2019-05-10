@@ -60,7 +60,7 @@ for i in range(iterations):
 
     print('-' * 30)
     print(f'Doing steps: {step0} - {step1}')
-    pos, lnprob, rstate = mcmc.run_sampler(sampler, pos=pos, n_steps=dumpstep)
+    pos, lnprob, rstate, blob = mcmc.run_sampler(sampler, pos=pos, n_steps=dumpstep)
 
     # ===== concatenate loaded chain to current chain =====
     if restart:

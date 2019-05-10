@@ -42,6 +42,7 @@ def default_plt_options():
 
 default_plt_options()
 
+
 # TODO: Docstrings
 
 class BurstFit:
@@ -130,8 +131,8 @@ class BurstFit:
                 self.obs_data[key] = np.array(item)
 
             # ===== Apply bolometric corrections (cbol) to fper ======
-            u_fper_frac = np.sqrt((self.obs_data['u_cbol']/self.obs_data['cbol'])**2
-                                  + (self.obs_data['u_fper']/self.obs_data['fper'])**2)
+            u_fper_frac = np.sqrt((self.obs_data['u_cbol'] / self.obs_data['cbol']) ** 2
+                                  + (self.obs_data['u_fper'] / self.obs_data['fper']) ** 2)
 
             self.obs_data['fper'] *= self.obs_data['cbol']
             self.obs_data['u_fper'] = self.obs_data['fper'] * u_fper_frac
@@ -163,6 +164,7 @@ class BurstFit:
             return self.zero_lhood * self.lhood_factor
 
         # ===== interpolate bursts from model params =====
+        bprop_values = np.zeros((len(self.mcmc_version.bprops) + 1, self.n_epochs))
         epoch_params = self.get_epoch_params(params)
         interp = self.interpolate(interp_params=epoch_params)
 
@@ -176,7 +178,7 @@ class BurstFit:
             plot_width = 6
             plot_height = 2.25
             fig, ax = plt.subplots(n_bprops, 1, sharex=True,
-                                   figsize=(plot_width, plot_height*n_bprops))
+                                   figsize=(plot_width, plot_height * n_bprops))
         else:
             fig = ax = None
 
@@ -184,7 +186,7 @@ class BurstFit:
         lh = 0.0
         for i, bprop in enumerate(self.mcmc_version.bprops):
             u_bprop = f'u_{bprop}'
-            bprop_col = 2*i
+            bprop_col = 2 * i
             u_bprop_col = bprop_col + 1
 
             # ===== shift values to observer frame and units =====
@@ -195,6 +197,7 @@ class BurstFit:
             model = interp[:, bprop_col]
             u_model = interp[:, u_bprop_col]
 
+            bprop_values[i, :] = model
             lh += self.compare(model=model, u_model=u_model,
                                obs=self.obs_data[bprop], bprop=bprop,
                                u_obs=self.obs_data[u_bprop], label=bprop)
@@ -205,10 +208,12 @@ class BurstFit:
                                   legend=True if i == 0 else False)
 
         # ===== compare predicted persistent flux with observed =====
+        # TODO: fold this into above loop?
         fper = self.shift_to_observer(values=epoch_params[:, self.interp_idxs['mdot']],
                                       bprop='fper', params=params)
         u_fper = fper * self.u_fper_frac  # Assign uncertainty to model persistent flux
 
+        bprop_values[-1, :] = fper
         lh += self.compare(model=fper, u_model=u_fper, label='fper',
                            obs=self.obs_data['fper'], bprop='fper',
                            u_obs=self.obs_data['u_fper'])
@@ -225,7 +230,7 @@ class BurstFit:
             return lhood, fig
         else:
             self.debug.end_function()
-            return lhood
+            return lhood, bprop_values
 
     def shift_to_observer(self, values, bprop, params):
         """Returns burst property shifted to observer frame/units
@@ -245,6 +250,7 @@ class BurstFit:
         In special case bprop='fper', 'values' must be local accrate
                 as fraction of Eddington rate.
         """
+
         def gr_factors():
             mass_nw = params[self.param_idxs['m_nw']]
             mass_gr = params[self.param_idxs['m_gr']]
@@ -262,19 +268,19 @@ class BurstFit:
         elif bprop in ('rate', 'u_rate'):
             shifted = values / redshift
         else:
-            flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']])**2
+            flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']]) ** 2
             flux_factor_p = flux_factor_b * params[self.param_idxs['xi_ratio']]
 
             if bprop in ('fluence', 'u_fluence'):  # (erg) --> (erg / cm^2)
-                shifted = (values * mass_ratio) / (4*np.pi * flux_factor_b)
+                shifted = (values * mass_ratio) / (4 * np.pi * flux_factor_b)
 
             elif bprop in ('peak', 'u_peak'):  # (erg/s) --> (erg / cm^2 / s)
-                shifted = (values * mass_ratio) / (redshift * 4*np.pi * flux_factor_b)
+                shifted = (values * mass_ratio) / (redshift * 4 * np.pi * flux_factor_b)
 
             elif bprop in 'fper':  # mdot --> (erg / cm^2 / s)
                 phi = (redshift - 1) * c.value ** 2 / redshift  # gravitational potential
                 lum_acc = values * mdot_edd * phi
-                shifted = (lum_acc * mass_ratio) / (redshift * 4*np.pi * flux_factor_p)
+                shifted = (lum_acc * mass_ratio) / (redshift * 4 * np.pi * flux_factor_p)
             else:
                 raise ValueError('bprop must be one of (dt, u_dt, rate, u_rate, '
                                  + 'fluence, u_fluence, '
@@ -381,7 +387,7 @@ class BurstFit:
         weight = self.mcmc_version.weights[bprop]
         inv_sigma2 = 1 / (u_model ** 2 + u_obs ** 2)
         lh = -0.5 * weight * ((model - obs) ** 2 * inv_sigma2
-                     + np.log(2 * np.pi / inv_sigma2))
+                              + np.log(2 * np.pi / inv_sigma2))
         self.debug.print_(f'lhood breakdown: {label} {lh}')
 
         if plot:
@@ -424,9 +430,9 @@ class BurstFit:
         epochs = np.array(self.obs.epoch)
         x = epochs
 
-        ax.errorbar(x=x - dx, y=model/yscale, yerr=n_sigma*u_model/yscale, ls='none', marker='o',
+        ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
                     capsize=capsize, color='C3', label='Model', markersize=markersize)
-        ax.errorbar(x=x + dx, y=obs/yscale, yerr=n_sigma*u_obs/yscale, ls='none',
+        ax.errorbar(x=x + dx, y=obs / yscale, yerr=n_sigma * u_obs / yscale, ls='none',
                     marker='o', capsize=capsize, color='C0', label='Observed',
                     markersize=markersize)
 
