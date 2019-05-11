@@ -38,7 +38,7 @@ class BurstRun(object):
                  get_slopes=False, load_model_params=True, truncate_edd=True,
                  check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True, remove_shocks=False,
-                 remove_zero_lum=True, subtract_background_lum=True, load_config=True):
+                 remove_zero_lum=True, subtract_background_lum=True, load_config=False):
         # TODO: move these into default config file
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
@@ -115,8 +115,9 @@ class BurstRun(object):
 
         self.cols = ['n', 'dt', 'rate', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
                      't_pre', 't_pre_i', 'lum_pre', 't_start', 't_start_i',
-                     'lum_start', 't_end', 't_end_i', 'lum_end', 'slope_dt',
-                     'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
+                     'lum_start', 't_end', 't_end_i', 'lum_end', 'tail_50', 'tail_25',
+                     'tail_10',
+                     'slope_dt', 'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
                      'slope_peak', 'slope_peak_err', 'short_wait', 'outlier',
                      'dump_start']
 
@@ -151,7 +152,7 @@ class BurstRun(object):
 
         self.summary = {}
         self.candidates = None
-        self.bprops = ['dt', 'fluence', 'peak', 'length']
+        self.bprops = ['dt', 'fluence', 'peak', 'length', 'tail_50', 'tail_25', 'tail_10']
         self.shocks = []
         self.n_shocks = None
         self.shock_maxima = []
@@ -591,6 +592,7 @@ class BurstRun(object):
 
         self.get_burst_starts()
         self.get_burst_ends()
+        self.get_tail_timescales()
         self.get_recurrence_times()
         self.get_burst_rates()
 
@@ -848,6 +850,26 @@ class BurstRun(object):
 
         self.bursts['lum_end'] = self.lum[self.bursts['t_end_i'], 1]
 
+    def get_tail_timescales(self):
+        """Locates timescales in lightcurve tail to fall to certain fractions of peak
+        """
+        self.printv('Finding tail decay timescales')
+        self.bursts['tail_50'] = np.full(self.n_bursts, np.nan)
+        self.bursts['tail_25'] = np.full(self.n_bursts, np.nan)
+
+        for burst in self.bursts.itertuples():
+            lum_tail = self.lum[burst.t_peak_i:burst.t_end_i]
+
+            time_from_peak = lum_tail[:, 0] - burst.t_peak
+            lum_height = burst.peak - burst.lum_pre
+
+            # search tail in reverse
+            for percent in [10, 25, 50]:
+                frac = percent / 100
+                idx = len(lum_tail) - np.searchsorted(lum_tail[::-1, 1],
+                                                      frac * lum_height, side='right')
+                self.bursts.loc[burst.Index, f'tail_{percent}'] = time_from_peak[idx]
+
     def delete_burst(self, burst_i):
         """Removes burst from self.bursts table
         """
@@ -1092,6 +1114,7 @@ class BurstRun(object):
     def check_stable_burning(self):
         """Attempts to identify if the model has become stable
         """
+        # TODO: account for only 1 or fewer bursts (no dt)
         self.printv('Checking for stable burning')
 
         if self.flags['too_few_bursts']:
