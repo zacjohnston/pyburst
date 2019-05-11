@@ -37,15 +37,15 @@ param_aliases = {
 
 grid_bounds = {
     7: {
-        1: ((0.08, 0.2),  # mdot1
-            (0.08, 0.2),  # mdot2
-            (0.08, 0.2),  # mdot3
+        1: ((0.08, 0.18),  # mdot1
+            (0.08, 0.18),  # mdot2
+            (0.08, 0.18),  # mdot3
             (0.67, 0.76),  # x
-            (0.0025, 0.015),  # z
-            (0.0, 0.4),  # qb1
-            (0.0, 0.4),  # qb2
-            (0.0, 0.4),  # qb3
-            (1.4, 2.9),  # g
+            (0.001, 0.015),  # z
+            (0.0, 0.8),  # qb1
+            (0.0, 0.8),  # qb2
+            (0.0, 0.8),  # qb3
+            (1.7, 2.9),  # g
             (1.0, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -146,6 +146,7 @@ initial_position = {
     7: {
         1: (0.09, 0.12, 0.136, 0.72, 0.005, 0.4, 0.2, 0.2, 2.3, 2.0, 6.0, 0.9),
         2: (0.09, 0.12, 0.136, 0.72, 0.005, 0.4, 0.3, 0.2, 2.5, 1.76, 5.7, 0.9),
+        3: (0.09, 0.12, 0.136, 0.73, 0.007, 0.4, 0.2, 0.2, 2.5, 1.9, 5.74, 0.94),
     },
     8: {
         1: (0.21, 0.30, 0.02, 0.35, 0.15, 1.7, 1.9, 7.3, 0.93),
@@ -249,10 +250,11 @@ source_defaults = {
 # Summary
 # -------
 # grid5:
-#   1  : (successor to 14)
-#   2  : (successor to 13)
-#   13 : with m_gr, no weight (sparse)
-#   14 : with m_gr, no weight
+#   2  : priors: z
+#   3  : priors: z, d_b
+#   4  : priors: z, d_b, m_gr
+#   5  : priors: d_b
+#   6  : priors: d_b  (up to z=0.015)
 
 version_definitions = {
     'interpolator': {
@@ -261,6 +263,7 @@ version_definitions = {
             3: 3,
             4: 3,
             5: 3,
+            6: 2,
         },
         'synth5': {},
         'he2': {
@@ -336,6 +339,8 @@ version_definitions = {
                  'm_gr': gaussian(mean=1.0, std=0.5)},
              5: {'d_b': gaussian(mean=5.7, std=0.2),
                  'z': flat_prior},
+             6: {'d_b': gaussian(mean=5.7, std=0.2),
+                 'z': flat_prior},
          },
          'synth5': {},
          'he2': {
@@ -347,7 +352,8 @@ version_definitions = {
         'grid5': {
             3: initial_position[7][2],
             4: 3,
-            5: 3,
+            5: initial_position[7][3],
+            6: 5,
         },
         'synth5': {},
         'he2': {},
