@@ -71,13 +71,17 @@ def add_peak_length(source):
 def add_tail_timescales(source, percent=50):
     """Calculates decay tail timescales from observed lightcurves, and adds to summary
     """
+    # TODO: needs refining, get correct uncertainty statistics
     table = load_summary(source)
 
     for epoch in table.itertuples():
         lcurve = load_epoch_lightcurve(epoch=epoch.epoch, source=source)
-        timescale = get_tail_timescale(lcurve, epoch_row=epoch, frac=percent/100)
+        timescale, u_timescale = get_tail_timescale(lcurve, epoch_row=epoch,
+                                                    frac=percent/100)
         table.loc[epoch.Index, f'tail_{percent}'] = timescale
+        table.loc[epoch.Index, f'u_tail_{percent}'] = u_timescale
 
+    save_summary(table, source=source)
     return table
 
 
@@ -91,11 +95,15 @@ def get_tail_timescale(lc_table, epoch_row, frac=0.5):
 
     lc = lc[peak_idx:]
     time_since_peak = lc[:, 0] - lc[0, 0]
+
     mask = lc[:, 1] < frac_lum
+    mask_left = (lc[:, 1] - lc[:, 2]) < frac_lum
+    mask_right = (lc[:, 1] + lc[:, 2]) < frac_lum
 
     time_diff = time_since_peak[mask][0]
+    u_time_diff = (time_since_peak[mask_right][0] - time_since_peak[mask_left][0])/2
 
-    return time_diff
+    return time_diff, u_time_diff
 
 
 def get_peak_length(lc_table, peak_frac=0.75):
