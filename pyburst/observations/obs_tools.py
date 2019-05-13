@@ -68,6 +68,36 @@ def add_peak_length(source):
     pass
 
 
+def add_tail_timescales(source, percent=50):
+    """Calculates decay tail timescales from observed lightcurves, and adds to summary
+    """
+    table = load_summary(source)
+
+    for epoch in table.itertuples():
+        lcurve = load_epoch_lightcurve(epoch=epoch.epoch, source=source)
+        timescale = get_tail_timescale(lcurve, epoch_row=epoch, frac=percent/100)
+        table.loc[epoch.Index, f'tail_{percent}'] = timescale
+
+    return table
+
+
+def get_tail_timescale(lc_table, epoch_row, frac=0.5):
+    """Returns tail timescales for given lightcurve table
+    """
+    # TODO: Very rough at the moment
+    lc = extract_lightcurve_array(lc_table)
+    frac_lum = epoch_row.peak * frac
+    peak_idx = np.argmax(lc[:, 1])
+
+    lc = lc[peak_idx:]
+    time_since_peak = lc[:, 0] - lc[0, 0]
+    mask = lc[:, 1] < frac_lum
+
+    time_diff = time_since_peak[mask][0]
+
+    return time_diff
+
+
 def get_peak_length(lc_table, peak_frac=0.75):
     """Returns peak length for given lightcurve table
     """
