@@ -255,6 +255,7 @@ source_defaults = {
 #   4  : priors: z, d_b, m_gr
 #   5  : priors: d_b
 #   6  : priors: d_b  (up to z=0.015)
+#   7  : as 3, with tail_50
 
 version_definitions = {
     'interpolator': {
@@ -264,6 +265,7 @@ version_definitions = {
             4: 3,
             5: 3,
             6: 2,
+            7: 4,
         },
         'synth5': {},
         'he2': {
@@ -275,7 +277,9 @@ version_definitions = {
     },
 
     'bprops': {
-        'grid5': {},
+        'grid5': {
+            7: ('rate', 'fluence', 'peak', 'tail_50'),
+        },
         'synth5': {},
         'he2': {
             3: ('rate', 'fluence', 'peak'),
@@ -284,7 +288,9 @@ version_definitions = {
     },
 
     'weights': {
-        'grid5': {},
+        'grid5': {
+            7: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'tail_50': 1.0}
+        },
         'synth5': {},
         'he2': {},
 
@@ -323,6 +329,7 @@ version_definitions = {
             3: 2,
             4: 2,
             5: 2,
+            7: 2,
         },
         'synth5': {},
         'he2': {
@@ -341,6 +348,7 @@ version_definitions = {
                  'z': flat_prior},
              6: {'d_b': gaussian(mean=5.7, std=0.2),
                  'z': flat_prior},
+             7: {'d_b': gaussian(mean=5.7, std=0.2)},
          },
          'synth5': {},
          'he2': {
@@ -354,6 +362,7 @@ version_definitions = {
             4: 3,
             5: initial_position[7][3],
             6: 5,
+            7: 3,
         },
         'synth5': {},
         'he2': {},
