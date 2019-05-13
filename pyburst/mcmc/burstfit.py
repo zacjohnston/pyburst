@@ -267,6 +267,8 @@ class BurstFit:
             shifted = values * redshift / 3600
         elif bprop in ('rate', 'u_rate'):
             shifted = values / redshift
+        elif bprop in ('tail_50', 'u_tail_50'):
+            shifted = values * redshift
         else:
             flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']]) ** 2
             flux_factor_p = flux_factor_b * params[self.param_idxs['xi_ratio']]
@@ -412,18 +414,20 @@ class BurstFit:
         capsize = 3
         n_sigma = 3
         dx = 0.13  # horizontal offset of plot points
-        yscale = {'dt': 1.0, 'rate': 1.0,
+        yscale = {'dt': 1.0, 'rate': 1.0, 'tail_50': 1.0,
                   'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
         ylabel = {'dt': r'$\Delta t$',
                   'rate': 'Burst rate',
                   'fluence': r'$E_b$',
                   'peak': r'$F_{peak}$',
-                  'fper': r'$F_p$'}.get(bprop, bprop)
+                  'fper': r'$F_p$',
+                  'tail_50': r'$t_{50}$'}.get(bprop, bprop)
         y_units = {'dt': 'hr',
                    'rate': 'day$^{-1}$',
                    'fluence': r'$10^{-6}$ erg cm$^{-2}$',
                    'peak': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
-                   'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$'}.get(bprop)
+                   'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$',
+                   'tail_50': 's'}.get(bprop)
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 

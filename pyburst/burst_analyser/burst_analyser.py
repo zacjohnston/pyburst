@@ -102,7 +102,7 @@ class BurstRun(object):
                            'stable_dt_frac': 10,  # no. of dt's from last burst to end of model to flag stable burning
                            'short_wait_dt': 45,  # threshold for short-wait bursts (minutes)
                            'shock_radius_t': 0.1,  # radius in s around maxima to check for shock conditions
-                           't_buffer': 300,  # time buffer (s) from start/end of model to ignore for bursts
+                           't_buffer': 300,  # time buffer (s) from start/end of model to ignore
                            }
         self.overwrite_parameters(set_paramaters)
 
