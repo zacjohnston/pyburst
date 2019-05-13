@@ -38,7 +38,8 @@ class BurstRun(object):
                  get_slopes=False, load_model_params=True, truncate_edd=True,
                  check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True, remove_shocks=False,
-                 remove_zero_lum=True, subtract_background_lum=True, load_config=False):
+                 remove_zero_lum=True, subtract_background_lum=True, load_config=False,
+                 get_tail_timescales=True):
         # TODO: move these into default config file
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
@@ -71,6 +72,7 @@ class BurstRun(object):
                         'check_lumfile_monotonic': check_lumfile_monotonic,
                         'remove_shocks': remove_shocks,
                         'subtract_background_lum': subtract_background_lum,
+                        'get_tail_timescales': get_tail_timescales,
                         }
         self.check_options()
 
@@ -601,7 +603,8 @@ class BurstRun(object):
             return
 
         self.identify_short_wait_bursts()
-        self.get_tail_timescales()
+        if self.options['get_tail_timescales']:
+            self.get_tail_timescales()
         self.bursts.reset_index(inplace=True, drop=True)
 
         self.bursts['length'] = self.bursts['t_end'] - self.bursts['t_start']
