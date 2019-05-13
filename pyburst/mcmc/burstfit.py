@@ -230,7 +230,7 @@ class BurstFit:
             return lhood, fig
         else:
             self.debug.end_function()
-            return lhood, bprop_values
+            return lhood#, bprop_values
 
     def shift_to_observer(self, values, bprop, params):
         """Returns burst property shifted to observer frame/units
