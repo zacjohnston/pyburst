@@ -592,7 +592,6 @@ class BurstRun(object):
 
         self.get_burst_starts()
         self.get_burst_ends()
-        self.get_tail_timescales()
         self.get_recurrence_times()
         self.get_burst_rates()
 
@@ -602,6 +601,7 @@ class BurstRun(object):
             return
 
         self.identify_short_wait_bursts()
+        self.get_tail_timescales()
         self.bursts.reset_index(inplace=True, drop=True)
 
         self.bursts['length'] = self.bursts['t_end'] - self.bursts['t_start']
@@ -858,6 +858,8 @@ class BurstRun(object):
         self.bursts['tail_25'] = np.full(self.n_bursts, np.nan)
 
         for burst in self.bursts.itertuples():
+            if burst.short_wait:
+                continue
             lum_tail = self.lum[burst.t_peak_i:burst.t_end_i]
 
             time_from_peak = lum_tail[:, 0] - burst.t_peak
