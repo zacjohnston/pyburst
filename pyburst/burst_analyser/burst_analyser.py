@@ -102,6 +102,7 @@ class BurstRun(object):
                            'stable_dt_frac': 10,  # no. of dt's from last burst to end of model to flag stable burning
                            'short_wait_dt': 45,  # threshold for short-wait bursts (minutes)
                            'shock_radius_t': 0.1,  # radius in s around maxima to check for shock conditions
+                           't_buffer': 300,  # time buffer (s) from start/end of model to ignore for bursts
                            }
         self.overwrite_parameters(set_paramaters)
 
@@ -236,6 +237,11 @@ class BurstRun(object):
         """
         if self.options['quick_discard'] and self.options['auto_discard']:
             raise ValueError('Only one of (quick_discard, auto_discard) can be activated')
+
+    def check_parameters(self):
+        """Check consistency of analysis parameters
+        """
+        pass
 
     def load_model_params(self):
         """Load model parameters from grid table
@@ -654,8 +660,12 @@ class BurstRun(object):
     def get_lum_maxima(self):
         """Returns all maxima in luminosity above lum_thresh
         """
-        radius = self.parameters['shock_radius']
-        lum = self.lum[radius:-radius]
+        buffer = self.parameters['t_buffer']
+        end_buffer = self.lum[-1, 0] - buffer
+        buffer_idxs = np.searchsorted(self.lum[:, 0], [buffer, end_buffer])
+
+        self.printv(f'Ignoring first and last {buffer} s of model')
+        lum = self.lum[buffer_idxs[0]:buffer_idxs[1]]
 
         thresh_i = np.where(lum[:, 1] > self.parameters['lum_cutoff'])[0]
         lum_cut = lum[thresh_i]

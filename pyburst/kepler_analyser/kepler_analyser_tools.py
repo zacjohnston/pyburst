@@ -80,6 +80,7 @@ def setup_analyser(batch, source, runs=None, basename='xrb', multithread=True):
         grid_tools.try_mkdir(folder, skip=True)
 
     # ====== Extract and write data files (and get no. of cycles) ======
+    # TODO: why does this hang/fail sometimes
     if multithread:
         args = []
         for run in runs:
