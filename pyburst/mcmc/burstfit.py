@@ -124,6 +124,16 @@ class BurstFit:
                                     self.source_obs, filename)
 
             self.obs = pd.read_csv(filepath, delim_whitespace=True)
+
+            # Select single epoch (if applicable)
+            if self.mcmc_version.epoch is not None:
+                self.obs.set_index('epoch', inplace=True, verify_integrity=True)
+                try:
+                    self.obs = self.obs.loc[[self.mcmc_version.epoch]]
+                except KeyError:
+                    raise KeyError(f'epoch [{self.mcmc_version.epoch}] '
+                                   f'not in obs_data table')
+
             self.n_epochs = len(self.obs)
             self.obs_data = self.obs.to_dict(orient='list')
 
