@@ -371,7 +371,6 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
                                                             n_steps=n_steps,
                                                             verbose=verbose,
                                                             return_lhood=True)
-    max_params[5] *= 1.4
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False, re_interp=re_interp)
     lhood, fig = bfit.lhood(max_params, plot=True)
 
