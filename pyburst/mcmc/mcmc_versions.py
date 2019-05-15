@@ -164,7 +164,7 @@ initial_position = {
         1: (0.21, 0.30, 0.02, 0.35, 0.15, 1.7, 1.9, 7.3, 0.93),
     },
     9: {
-        1: (0.095, 0.73, 0.005, 0.4, 2.4, 1.6, 5.7, 1.6),
+        1: (0.095, 0.72, 0.0035, 0.4, 2.6, 1.6, 5.7, 1.6),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
