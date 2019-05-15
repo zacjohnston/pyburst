@@ -124,10 +124,11 @@ class BurstFit:
                                     self.source_obs, filename)
 
             self.obs = pd.read_csv(filepath, delim_whitespace=True)
+            self.obs.set_index('epoch', inplace=True, verify_integrity=True)
 
             # Select single epoch (if applicable)
             if self.mcmc_version.epoch is not None:
-                self.obs.set_index('epoch', inplace=True, verify_integrity=True)
+                # TODO: define/specify epochs for all mcmc versions?
                 try:
                     self.obs = self.obs.loc[[self.mcmc_version.epoch]]
                 except KeyError:
@@ -441,7 +442,7 @@ class BurstFit:
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 
-        epochs = np.array(self.obs.epoch)
+        epochs = np.array(self.obs.index)
         x = epochs
 
         ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
