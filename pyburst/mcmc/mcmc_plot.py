@@ -97,7 +97,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
     pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
     # TODO: re-use the loaded chainconsumer here instead of reloading
     cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
-                             cap=cap, smoothing=smoothing)
+                             cap=cap)
 
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
@@ -119,8 +119,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
 
 
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
-                    display=True, save=False, truth_values=None,
-                    verbose=True, smoothing=False):
+                    display=True, save=False, truth_values=None, verbose=True):
     """Plots posterior distributions of mcmc chain
 
     max_lhood : bool
@@ -133,7 +132,7 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
     cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
-                             cap=cap, smoothing=smoothing)
+                             cap=cap)
     height = 3 * ceil(len(pkeys) / 4)
     if truth_values is not None:
         fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
@@ -154,7 +153,7 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
                      display=True, save=False, max_lhood=False, verbose=True,
-                     smoothing=False):
+                     cloud=True, sigmas=np.linspace(0, 2, 10)):
     """Plots contours of mass versus radius
 
     See: get_mass_radius()
@@ -165,8 +164,7 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['R', 'M'])
-    if not smoothing:
-        cc.configure(kde=False, smooth=0)
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
 
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
@@ -301,8 +299,8 @@ def get_summary(chain, discard, source, version, cap=None):
     return summary
 
 
-def setup_chainconsumer(chain, discard, cap=None, param_labels=None,
-                        source=None, version=None, smoothing=False):
+def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False,
+                        source=None, version=None, sigmas=np.linspace(0, 2, 5)):
     """Return ChainConsumer object set up with given chain and pkeys
     """
     if param_labels is None:
@@ -312,11 +310,10 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None,
 
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_dimensions = chain.shape[2]
+
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(chain[:, :, :].reshape(-1, n_dimensions), parameters=param_labels)
-
-    if not smoothing:
-        cc.configure(kde=False, smooth=0)
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
     return cc
 
 
