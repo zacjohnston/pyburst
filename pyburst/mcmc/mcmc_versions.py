@@ -15,6 +15,7 @@ from pyburst.grids import grid_strings
 param_keys = {
     7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     8: ['mdot1', 'mdot2', 'x', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
+    9: ['mdot1', 'x', 'z', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -45,7 +46,7 @@ grid_bounds = {
             (0.0, 0.8),  # qb1
             (0.0, 0.8),  # qb2
             (0.0, 0.8),  # qb3
-            (1.7, 2.9),  # g
+            (1.7, 2.9),  # m_nw
             (1.0, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -58,7 +59,7 @@ grid_bounds = {
             (0.0, 0.8),  # qb1
             (0.0, 0.8),  # qb2
             (0.0, 0.8),  # qb3
-            (1.7, 2.9),  # g
+            (1.7, 2.9),  # m_nw
             (1.0, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -71,7 +72,7 @@ grid_bounds = {
             (0.0, 0.8),  # qb1
             (0.0, 0.8),  # qb2
             (0.0, 0.8),  # qb3
-            (1.7, 2.9),  # g
+            (1.7, 2.9),  # m_nw
             (1.0, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -84,7 +85,7 @@ grid_bounds = {
             (0.001, 0.05),  # x
             (0.05, 0.4),  # qb1
             (0.05, 0.4),  # qb2
-            (1.1, 2.6),  # g
+            (1.1, 2.6),  # m_nw
             (0.9, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -94,7 +95,7 @@ grid_bounds = {
             (0.001, 0.05),  # x
             (0.1, 0.4),  # qb1
             (0.1, 0.4),  # qb2
-            (1.4, 2.6),  # g
+            (1.4, 2.6),  # m_nw
             (1.0, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -104,7 +105,18 @@ grid_bounds = {
             (0.001, 0.05),  # x
             (0.05, 0.4),  # qb1
             (0.05, 0.4),  # qb2
-            (1.1, 2.0),  # g
+            (1.1, 2.0),  # m_nw
+            (1.0, 2.1),  # m_gr
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+    },
+    9: {
+        1: ((0.08, 0.18),  # mdot1
+            (0.67, 0.76),  # x
+            (0.001, 0.0125),  # z
+            (0.0, 0.8),  # qb1
+            (1.7, 2.9),  # m_nw
             (1.0, 2.1),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -151,6 +163,9 @@ initial_position = {
     8: {
         1: (0.21, 0.30, 0.02, 0.35, 0.15, 1.7, 1.9, 7.3, 0.93),
     },
+    9: {
+        1: (0.095, 0.73, 0.005, 0.4, 2.4, 1.6, 5.7, 1.6),
+    },
 }
 # To add a new version definition, add an entry to each of the parameters
 #   in version_definitions
@@ -179,6 +194,12 @@ source_defaults = {
         'grid5': epoch_unique[2],
         'synth5': epoch_unique[2],
         'he2': epoch_unique[2],
+    },
+
+    'epoch': {
+        'grid5': None,
+        'synth5': None,
+        'he2': None,
     },
 
     'param_aliases': {
@@ -256,6 +277,7 @@ source_defaults = {
 #   5  : priors: d_b
 #   6  : priors: d_b  (up to z=0.015)
 #   7  : as 3, with tail_50
+#   8  : as 3, fitting epoch 1998
 
 version_definitions = {
     'interpolator': {
@@ -266,6 +288,7 @@ version_definitions = {
             5: 3,
             6: 2,
             7: 4,
+            8: 3,
         },
         'synth5': {},
         'he2': {
@@ -299,6 +322,7 @@ version_definitions = {
     'param_keys': {
         'grid5': {
             -1: param_keys[7],  # dummy version for synth reference
+            8: param_keys[9],
         },
         'synth5': {},
         'he2': {},
@@ -312,6 +336,14 @@ version_definitions = {
 
     'epoch_unique': {
         'grid5': {},
+        'synth5': {},
+        'he2': {},
+    },
+
+    'epoch': {
+        'grid5': {
+            8: 1998,
+        },
         'synth5': {},
         'he2': {},
     },
@@ -330,6 +362,7 @@ version_definitions = {
             4: 2,
             5: 2,
             7: 2,
+            8: grid_bounds[9][1],
         },
         'synth5': {},
         'he2': {
@@ -349,6 +382,7 @@ version_definitions = {
              6: {'d_b': gaussian(mean=5.7, std=0.2),
                  'z': flat_prior},
              7: {'d_b': gaussian(mean=5.7, std=0.2)},
+             8: {'d_b': gaussian(mean=5.7, std=0.2)},
          },
          'synth5': {},
          'he2': {
@@ -363,6 +397,7 @@ version_definitions = {
             5: initial_position[7][3],
             6: 5,
             7: 3,
+            8: initial_position[9][1],
         },
         'synth5': {},
         'he2': {},
@@ -401,6 +436,7 @@ class McmcVersion:
         self.param_keys = self.get_parameter('param_keys')
         self.interp_keys = self.get_parameter('interp_keys')
         self.epoch_unique = self.get_parameter('epoch_unique')
+        self.epoch = self.get_parameter('epoch')
         self.param_aliases = self.get_parameter('param_aliases')
         self.bprops = self.get_parameter('bprops')
         self.weights = self.get_parameter('weights')
@@ -438,6 +474,7 @@ class McmcVersion:
         return (f'MCMC version definitions for {self.source} V{self.version}'
                 + f'\nparam keys       : {self.param_keys}'
                 + f'\ninterp keys      : {self.interp_keys}'
+                + f'\nepoch            : {self.epoch}'
                 + f'\nepoch unique     : {self.epoch_unique}'
                 + f'\nparam aliases    : {self.param_aliases}'
                 + f'\nbprops           : {self.bprops}'
@@ -494,7 +531,7 @@ def get_parameter(source, version, parameter, verbose=False):
     if verbose and output is default:
         print(f"mcmc_versions: '{parameter}' not specified. Using default values")
 
-    if parameter not in ('interpolator', 'synth_version', 'synth_group') \
+    if parameter not in ('interpolator', 'synth_version', 'synth_group', 'epoch') \
             and type(output) is int:
         return version_definitions[parameter][source][output]
     else:
