@@ -47,7 +47,6 @@ def mcmc_label(quantity):
     labels = {
         'x': r'$X_0$',
         'z': r'$Z_\mathrm{CNO}$',
-        'qb': r'$Q_\mathrm{b}$',
         'redshift': r'$(1+z)$',
         'd_b': r'$d \sqrt{\xi_\mathrm{b}}$',
         'xi_ratio': r'$\xi_\mathrm{p} / \xi_\mathrm{b}$',
@@ -56,8 +55,10 @@ def mcmc_label(quantity):
     }
 
     # assumes last character is a single integer specifying epoch
-    if ('qb' in quantity)or ('mdot' in quantity):
-        return rf'${quantity[:-1]}_{quantity[-1]}$'
+    if 'qb' in quantity:
+        return r'$Q_\mathrm{b' + f'{quantity[-1]}' + '}$'
+    elif 'mdot' in quantity:
+        return rf'$\dot{{M}}_{quantity[-1]}$'
     else:
         return labels.get(quantity, quantity)
 
