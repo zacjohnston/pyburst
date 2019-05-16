@@ -165,6 +165,7 @@ initial_position = {
     },
     9: {
         1: (0.095, 0.72, 0.0035, 0.4, 2.6, 1.6, 5.7, 1.6),
+        3: (0.14, 0.72, 0.0035, 0.2, 2.6, 1.6, 5.7, 1.6),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -289,6 +290,7 @@ version_definitions = {
             6: 2,
             7: 4,
             8: 3,
+            10: 3,
         },
         'synth5': {},
         'he2': {
@@ -323,6 +325,7 @@ version_definitions = {
         'grid5': {
             -1: param_keys[7],  # dummy version for synth reference
             8: param_keys[9],
+            10: param_keys[9],
         },
         'synth5': {},
         'he2': {},
@@ -343,6 +346,7 @@ version_definitions = {
     'epoch': {
         'grid5': {
             8: 1998,
+            10: 2007,
         },
         'synth5': {},
         'he2': {},
@@ -363,6 +367,7 @@ version_definitions = {
             5: 2,
             7: 2,
             8: grid_bounds[9][1],
+            10: grid_bounds[9][1],
         },
         'synth5': {},
         'he2': {
@@ -383,6 +388,7 @@ version_definitions = {
                  'z': flat_prior},
              7: {'d_b': gaussian(mean=5.7, std=0.2)},
              8: {'d_b': gaussian(mean=5.7, std=0.2)},
+             10: {'d_b': gaussian(mean=5.7, std=0.2)},
          },
          'synth5': {},
          'he2': {
@@ -398,6 +404,7 @@ version_definitions = {
             6: 5,
             7: 3,
             8: initial_position[9][1],
+            10: initial_position[9][3],
         },
         'synth5': {},
         'he2': {},
