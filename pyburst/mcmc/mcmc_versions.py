@@ -279,6 +279,7 @@ source_defaults = {
 #   6  : priors: d_b  (up to z=0.015)
 #   7  : as 3, with tail_50
 #   8  : as 3, fitting epoch 1998
+#   10 : as 3, fitting epoch 2007
 
 version_definitions = {
     'interpolator': {

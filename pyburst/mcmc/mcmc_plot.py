@@ -306,7 +306,8 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
     if param_labels is None:
         if (source is None) or (version is None):
             raise ValueError('If param_labels not provided, must give source, version')
-        param_labels = mcmc_versions.get_parameter(source, version, 'param_keys')
+        param_keys = mcmc_versions.get_parameter(source, version, 'param_keys')
+        param_labels = plot_tools.convert_mcmc_labels(param_keys)
 
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_dimensions = chain.shape[2]
