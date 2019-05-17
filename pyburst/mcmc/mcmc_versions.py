@@ -165,6 +165,7 @@ initial_position = {
     },
     9: {
         1: (0.095, 0.72, 0.0035, 0.4, 2.6, 1.6, 5.7, 1.6),
+        2: (0.12, 0.72, 0.0035, 0.2, 2.6, 1.6, 5.7, 1.6),
         3: (0.14, 0.72, 0.0035, 0.2, 2.6, 1.6, 5.7, 1.6),
     },
 }
@@ -279,6 +280,7 @@ source_defaults = {
 #   6  : priors: d_b  (up to z=0.015)
 #   7  : as 3, with tail_50
 #   8  : as 3, fitting epoch 1998
+#   9  : as 3, fitting epoch 2000
 #   10 : as 3, fitting epoch 2007
 
 version_definitions = {
@@ -291,6 +293,7 @@ version_definitions = {
             6: 2,
             7: 4,
             8: 3,
+            9: 3,
             10: 3,
         },
         'synth5': {},
@@ -326,6 +329,7 @@ version_definitions = {
         'grid5': {
             -1: param_keys[7],  # dummy version for synth reference
             8: param_keys[9],
+            9: param_keys[9],
             10: param_keys[9],
         },
         'synth5': {},
@@ -347,6 +351,7 @@ version_definitions = {
     'epoch': {
         'grid5': {
             8: 1998,
+            9: 2000,
             10: 2007,
         },
         'synth5': {},
@@ -368,6 +373,7 @@ version_definitions = {
             5: 2,
             7: 2,
             8: grid_bounds[9][1],
+            9: grid_bounds[9][1],
             10: grid_bounds[9][1],
         },
         'synth5': {},
@@ -389,6 +395,7 @@ version_definitions = {
                  'z': flat_prior},
              7: {'d_b': gaussian(mean=5.7, std=0.2)},
              8: {'d_b': gaussian(mean=5.7, std=0.2)},
+             9: {'d_b': gaussian(mean=5.7, std=0.2)},
              10: {'d_b': gaussian(mean=5.7, std=0.2)},
          },
          'synth5': {},
@@ -405,6 +412,7 @@ version_definitions = {
             6: 5,
             7: 3,
             8: initial_position[9][1],
+            9: initial_position[9][2],
             10: initial_position[9][3],
         },
         'synth5': {},
