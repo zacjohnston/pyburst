@@ -285,6 +285,35 @@ def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
     plt.show(block=False)
 
 
+def setup_epochs_chainconsumer(chains, param_keys, discard, cap=None, sigmas=None,
+                              cloud=None):
+    """Setup multiple MCMC chains fit to individual epochs
+
+    chains : [n_epochs]
+        list of raw numpy chains
+    param_keys : [n_epochs]
+        list of parameters for each epoch chain
+    discard : int
+    cap : int (optional)
+    sigmas : [] (optional)
+    cloud : bool (optional)
+    """
+    chains_flat = []
+    for chain in chains:
+        sliced = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
+        _, _, n_dimensions = sliced.shape
+        chains_flat += [sliced.reshape((-1, n_dimensions))]
+
+    cc = chainconsumer.ChainConsumer()
+
+    for i, chain_flat in enumerate(chains_flat):
+        param_labels = plot_tools.convert_mcmc_labels(param_keys[i])
+        cc.add_chain(chain_flat, parameters=param_labels)
+
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
+    return cc
+
+
 def get_summary(chain, discard, source, version, cap=None):
     """Return summary values from MCMC chain (mean, uncertainties)
     """
