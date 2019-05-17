@@ -286,7 +286,7 @@ def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
 
 
 def setup_epochs_chainconsumer(chains, param_keys, discard, cap=None, sigmas=None,
-                              cloud=None):
+                               cloud=None):
     """Setup multiple MCMC chains fit to individual epochs
 
     chains : [n_epochs]
