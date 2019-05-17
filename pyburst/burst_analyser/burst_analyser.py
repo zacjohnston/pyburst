@@ -1483,8 +1483,8 @@ class BurstRun(object):
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
                            path=plot_path, extra='')
 
-    def add_lightcurve(self, burst, ax, zero_time=True, color='C0', alpha=1.0,
-                       linewidth=1):
+    def add_lightcurve(self, burst, ax, align='t_start', zero_time=True, color='C0',
+                       alpha=1.0, linewidth=1):
         """Add a lightcurve to the provided matplotlib axis
 
         parameters
@@ -1497,14 +1497,16 @@ class BurstRun(object):
         color : str
         alpha : flt
         linewidth : flt
+        align : str
+            burst time point to align LCs by (e.g., t_pre, t_start, t_peak)
         """
         yscale = 1e38
-        lc = self.extract_lightcurve(burst=burst, zero_time=zero_time)
+        lc = self.extract_lightcurve(burst=burst, zero_time=zero_time, align=align)
 
         ax.plot(lc[:, 0], lc[:, 1] / yscale,
                 label=f'{burst}', color=color, alpha=alpha, linewidth=linewidth)
 
-    def extract_lightcurve(self, burst, zero_time=True):
+    def extract_lightcurve(self, burst, align='t_start', zero_time=True):
         """Returns sliced out burst lightcurve
         """
         if burst > self.n_bursts - 1\
@@ -1517,8 +1519,7 @@ class BurstRun(object):
         lc = np.array(self.lum[i_start:i_end])
 
         if zero_time:
-            lc[:, 0] -= self.bursts['t_start'][burst]
-
+            lc[:, 0] -= self.bursts[align][burst]
         return lc
 
     def save_all_lightcurves(self, **kwargs):
