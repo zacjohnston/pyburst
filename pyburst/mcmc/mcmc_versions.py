@@ -156,9 +156,9 @@ priors = {
 
 initial_position = {
     7: {
-        1: (0.09, 0.12, 0.14, 0.72, 0.005, 0.4, 0.2, 0.2, 2.4, 2.0, 5.9, 0.9),
+        1: (0.09, 0.12, 0.14, 0.72, 0.005, 0.4, 0.2, 0.2, 2.4, 2.0, 5.9, 1.6),
         2: (0.09, 0.12, 0.14, 0.73, 0.005, 0.4, 0.3, 0.2, 2.5, 1.76, 5.7, 1.6),
-        3: (0.09, 0.12, 0.136, 0.73, 0.007, 0.4, 0.2, 0.2, 2.5, 1.9, 5.74, 0.94),
+        3: (0.09, 0.12, 0.136, 0.73, 0.007, 0.4, 0.2, 0.2, 2.5, 1.9, 5.74, 1.6),
     },
     8: {
         1: (0.21, 0.30, 0.02, 0.35, 0.15, 1.7, 1.9, 7.3, 0.93),
@@ -282,6 +282,7 @@ source_defaults = {
 #   8  : as 3, fitting epoch 1998
 #   9  : as 3, fitting epoch 2000
 #   10 : as 3, fitting epoch 2007
+#   11 : as 3, 15x weight on brate
 
 version_definitions = {
     'interpolator': {
@@ -295,6 +296,7 @@ version_definitions = {
             8: 3,
             9: 3,
             10: 3,
+            11: 3,
         },
         'synth5': {},
         'he2': {
@@ -318,7 +320,8 @@ version_definitions = {
 
     'weights': {
         'grid5': {
-            7: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'tail_50': 1.0}
+            7: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'tail_50': 1.0},
+            11: {'rate': 15.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0}
         },
         'synth5': {},
         'he2': {},
@@ -375,6 +378,7 @@ version_definitions = {
             8: grid_bounds[9][1],
             9: grid_bounds[9][1],
             10: grid_bounds[9][1],
+            11: 2,
         },
         'synth5': {},
         'he2': {
@@ -397,6 +401,7 @@ version_definitions = {
              8: {'d_b': gaussian(mean=5.7, std=0.2)},
              9: {'d_b': gaussian(mean=5.7, std=0.2)},
              10: {'d_b': gaussian(mean=5.7, std=0.2)},
+             11: {'d_b': gaussian(mean=5.7, std=0.2)},
          },
          'synth5': {},
          'he2': {
@@ -414,6 +419,7 @@ version_definitions = {
             8: initial_position[9][1],
             9: initial_position[9][2],
             10: initial_position[9][3],
+            11: 3,
         },
         'synth5': {},
         'he2': {},
