@@ -29,6 +29,7 @@ version_defaults = {
         },
         'alpha1': {},
         'alpha2': {},
+        'mesa': {},
     },
 
     'exclude_all': {
@@ -49,6 +50,7 @@ version_defaults = {
         'he2': {},
         'alpha1': [{}],
         'alpha2': [{}],
+        'mesa': {},
     },
 }
 
@@ -111,6 +113,7 @@ version_definitions = {
             },
             'alpha1': {},
             'alpha2': {},
+            'mesa': {},
         },
     'exclude_all':
         {
@@ -131,6 +134,7 @@ version_definitions = {
             'he2': {},
             'alpha1': {},
             'alpha2': {},
+            'mesa': {},
         }
 }
 
