@@ -43,19 +43,18 @@ def write_jobscripts(batch, source, walltime, path=None, run0=None, run1=None,
 
     # TODO: combine clusters into single 'slurm' script (how to handle constraints?)
     for cluster in ['monarch', 'icer']:
-        print('Writing submission script for cluster:', cluster)
-        script_str = get_submission_str(run0=run0, run1=run1, runs=runs, source=source,
-                                        batch=batch, basename=basename, time_str=time_str,
-                                        job_str=job_str, cluster=cluster, restart=restart,
-                                        adapnet_filename=adapnet_filename,
-                                        bdat_filename=bdat_filename)
-
         span = get_span_string(run0, run1)
         prepend_str = {True: 'restart_'}.get(restart, '')
 
         filename = f'{cluster}_{prepend_str}{source}_{batch}_{span}.sh'
         filepath = os.path.join(path, filename)
+        print(f'Writing: {filepath}')
 
+        script_str = get_submission_str(run0=run0, run1=run1, runs=runs, source=source,
+                                        batch=batch, basename=basename, time_str=time_str,
+                                        job_str=job_str, cluster=cluster, restart=restart,
+                                        adapnet_filename=adapnet_filename,
+                                        bdat_filename=bdat_filename)
         with open(filepath, 'w') as f:
             f.write(script_str)
 
