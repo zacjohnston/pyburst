@@ -572,7 +572,7 @@ def sync_model_restarts(source, target, basename='xrb', verbose=True,
         batches = np.unique(short_model_table['batch'])
 
     targets = {
-        'icer': 'isync:~/kepler/runs/',
+        'icer': f'isync:~/kepler/runs/',
         'oz': 'oz:/fred/oz011/zac/kepler/runs/',
         'monarch': 'm2:/home/zacpetej/id43/kepler/runs/',
         'carbon': f'zac@carbon.sci.monash.edu:/home/zac/{source}'}
@@ -581,15 +581,16 @@ def sync_model_restarts(source, target, basename='xrb', verbose=True,
 
     for batch in batches:
         batch_str = grid_strings.get_batch_string(batch, source)
-        batch_path = os.path.join(MODELS_PATH, '.', batch_str)
+        batch_path = os.path.join(MODELS_PATH, '.', source, batch_str)
 
         if short_model_table is not None:
             batch_table = grid_tools.reduce_table(short_model_table, params={'batch': batch})
             runs = np.array(batch_table['run'])
 
         if sync_jobscripts:
+            # TODO: make universal jobfile string function (for here and kepler_jobs.py)
             span_str = kepler_jobs.get_span_string(runs[0], runs[-1])
-            jobscript = f'icer_restart_{source}_{batch}_{span_str}.qsub'
+            jobscript = f'icer_restart_{source}_{batch}_{span_str}.sh'
             jobscript_path = os.path.join(batch_path, 'logs', jobscript)
             sync_paths += [jobscript_path]
 
