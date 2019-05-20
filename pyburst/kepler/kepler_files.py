@@ -5,7 +5,7 @@ import os
 # ========================================================
 # Functions for writing input files for kepler models
 # ========================================================
-
+# TODO: rename this kepler_setup.py
 
 def write_genfile(h1, he4, n14, qb, acc_mult, lburn,
                   geemult, path, header, lumdata=0, qnuc=5.,
