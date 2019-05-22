@@ -180,26 +180,32 @@ class BurstFit:
         if self.debug.debug:
             print_params(params, source=self.source, version=self.version)
 
+        zero_lhood = self.zero_lhood * self.lhood_factor
+
         # ===== check priors =====
-        lp = self.lnprior(params=params)
-        # TODO: move into self.lnprior(), and raise ZeroLhood
+        try:
+            lp = self.lnprior(params=params)
+        except ZeroLhood:
+            return zero_lhood
+
         if self.priors_only:
             self.debug.end_function()
             return lp * self.lhood_factor
 
-        if lp == self.zero_lhood:
-            self.debug.end_function()
-            return self.zero_lhood * self.lhood_factor
-
+        # ===== Interpolate and calculate local model burst properties =====
         try:
             interp_local, analytic_local = self.get_model_local(params=params)
         except ZeroLhood:
-            return self.zero_lhood * self.lhood_factor
+            self.debug.end_function()
+            return zero_lhood
 
+        # ===== Shift all burst properties to observable quantities =====
         interp_shifted, analytic_shifted = self.get_model_shifted(
                                                     interp_local=interp_local,
                                                     analytic_local=analytic_local,
                                                     params=params)
+
+        # ===== Setup plotting =====
         n_bprops = len(self.mcmc_version.weights)
         if plot:
             plot_width = 6
@@ -208,17 +214,18 @@ class BurstFit:
                                    figsize=(plot_width, plot_height * n_bprops))
         else:
             fig = ax = None
-
+        
+        # ===== Evaluate likelihoods against observed data =====
         lh = self.compare_all(interp_shifted, analytic_shifted, ax=ax, plot=plot)
         lhood = (lp + lh) * self.lhood_factor
 
+        # ===== Finalise plotting =====
         if plot:
             plt.show(block=False)
             self.debug.end_function()
             return lhood, fig
         else:
             self.debug.end_function()
-            # return lhood, bprop_values
             return lhood
 
     def get_model_local(self, params):
@@ -438,7 +445,7 @@ class BurstFit:
 
         if False in inside_bounds:
             self.debug.end_function()
-            return self.zero_lhood
+            raise ZeroLhood
 
         prior_lhood = 0.0
 
