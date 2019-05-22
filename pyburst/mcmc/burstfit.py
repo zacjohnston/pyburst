@@ -80,6 +80,7 @@ class BurstFit:
         self.n_bprops = len(self.mcmc_version.bprops)
         self.n_analytic_bprops = len(self.mcmc_version.analytic_bprops)
         self.n_interp_params = len(self.mcmc_version.interp_keys)
+        self.has_xedd_ratio = ('xedd_ratio' in self.mcmc_version.param_keys)
 
         self.kpc_to_cm = u.kpc.to(u.cm)
         self.zero_lhood = zero_lhood
@@ -214,7 +215,7 @@ class BurstFit:
                                    figsize=(plot_width, plot_height * n_bprops))
         else:
             fig = ax = None
-        
+
         # ===== Evaluate likelihoods against observed data =====
         lh = self.compare_all(interp_shifted, analytic_shifted, ax=ax, plot=plot)
         lhood = (lp + lh) * self.lhood_factor
@@ -248,8 +249,12 @@ class BurstFit:
                 Note: Actually the luminosity, because this is the local value
             """
             out = np.full([self.n_epochs, 2], np.nan, dtype=float)
-            l_edd = accretion.eddington_lum(mass=params[self.param_idxs['m_nw']],
-                                            x=params[self.param_idxs['x']])
+
+            x = params[self.param_idxs['x']]
+            if self.has_xedd_ratio:
+                x *= params[self.param_idxs['xedd_ratio']]
+
+            l_edd = accretion.eddington_lum(mass=params[self.param_idxs['m_nw']], x=x)
             out[:, 0] = l_edd
             out[:, 1] = l_edd * self.u_fedd_frac
             return out
