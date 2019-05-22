@@ -277,13 +277,22 @@ source_defaults = {
 #   3  : priors: z, d_b
 #   4  : priors: z, d_b, m_gr
 #   5  : priors: d_b
+
 #   6  : priors: d_b  (up to z=0.015)
 #   7  : as 3, with tail_50
+
 #   8  : as 3, fitting epoch 1998
 #   9  : as 3, fitting epoch 2000
 #   10 : as 3, fitting epoch 2007
+
 #   11 : as 3, 15x weight on brate
+
 #   12 : as 2, with bprop fedd
+#   13 : as 12, fitting epoch 1998
+#   14 : as 12, fitting epoch 2000
+#   15 : as 12, fitting epoch 2007
+
+#   16 : as 12, with no priors
 
 version_definitions = {
     'interpolator': {
@@ -302,6 +311,7 @@ version_definitions = {
             13: 3,
             14: 3,
             15: 3,
+            16: 3,
         },
         'synth5': {},
         'he2': {
@@ -331,6 +341,7 @@ version_definitions = {
             13: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             14: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             15: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
+            16: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
         },
         'synth5': {},
         'he2': {},
@@ -398,6 +409,7 @@ version_definitions = {
             13: 8,
             14: 8,
             15: 8,
+            16: 2,
         },
         'synth5': {},
         'he2': {
@@ -421,6 +433,7 @@ version_definitions = {
              9: {'d_b': gaussian(mean=5.7, std=0.2)},
              10: {'d_b': gaussian(mean=5.7, std=0.2)},
              11: {'d_b': gaussian(mean=5.7, std=0.2)},
+             16: {'z': flat_prior},
          },
          'synth5': {},
          'he2': {
