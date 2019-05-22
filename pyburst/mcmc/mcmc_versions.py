@@ -255,7 +255,7 @@ source_defaults = {
     'disc_model': {},
 
     'interpolator': {
-        'grid5': 1,
+        'grid5': 3,
         'synth5': 1,
         'he2': 0,
     },
@@ -328,21 +328,8 @@ source_defaults = {
 version_definitions = {
     'interpolator': {
         'grid5': {
-            2: 3,
-            3: 3,
-            4: 3,
-            5: 3,
             6: 2,
             7: 4,
-            8: 3,
-            9: 3,
-            10: 3,
-            11: 3,
-            12: 3,
-            13: 3,
-            14: 3,
-            15: 3,
-            16: 3,
         },
         'synth5': {},
         'he2': {
