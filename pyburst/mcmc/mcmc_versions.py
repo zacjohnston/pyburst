@@ -10,6 +10,8 @@ from pyburst.grids import grid_strings
 # '***' signifies values that changed over the previous version
 # First layer identifies param_keys
 # -----------------------------------
+# NOTE: in self.bprops, interp_bprops ALWAYS come before analytic_bprops
+# -----------------------------------
 
 # ===== Define order/number of params provided to BurstFit =====
 param_keys = {
@@ -209,11 +211,17 @@ source_defaults = {
         'synth5': param_aliases[1],
         'he2': param_aliases[1],
     },
-
-    'bprops': {
+    # TODO: rename interp_bprop_keys, etc.
+    'interp_bprops': {
         'grid5': ('rate', 'fluence', 'peak'),
         'synth5': ('rate', 'fluence', 'peak'),
         'he2': ('rate', 'fluence'),
+    },
+
+    'analytic_bprops': {
+        'grid5': ('fper',),
+        'synth5': ('fper',),
+        'he2': ('fper',),
     },
 
     'weights': {
@@ -322,7 +330,7 @@ version_definitions = {
         },
     },
 
-    'bprops': {
+    'interp_bprops': {
         'grid5': {
             7: ('rate', 'fluence', 'peak', 'tail_50'),
         },
@@ -331,6 +339,18 @@ version_definitions = {
             3: ('rate', 'fluence', 'peak'),
             4: ('rate', 'fluence', 'peak'),
         },
+    },
+
+    'analytic_bprops': {
+        'grid5': {
+            12: ('fper', 'fedd'),
+            13: ('fper', 'fedd'),
+            14: ('fper', 'fedd'),
+            15: ('fper', 'fedd'),
+            16: ('fper', 'fedd'),
+        },
+        'synth5': {},
+        'he2': {},
     },
 
     'weights': {
@@ -495,7 +515,9 @@ class McmcVersion:
         self.epoch_unique = self.get_parameter('epoch_unique')
         self.epoch = self.get_parameter('epoch')
         self.param_aliases = self.get_parameter('param_aliases')
-        self.bprops = self.get_parameter('bprops')
+        self.interp_bprops = self.get_parameter('interp_bprops')
+        self.analytic_bprops = self.get_parameter('analytic_bprops')
+        self.bprops = self.interp_bprops + self.analytic_bprops
         self.weights = self.get_parameter('weights')
         self.interpolator = self.get_parameter('interpolator')
         self.grid_bounds = np.array(self.get_parameter('grid_bounds'))
@@ -535,6 +557,8 @@ class McmcVersion:
                 + f'\nepoch unique     : {self.epoch_unique}'
                 + f'\nparam aliases    : {self.param_aliases}'
                 + f'\nbprops           : {self.bprops}'
+                + f'\ninterp_bprops    : {self.interp_bprops}'
+                + f'\nanalytic_bprops  : {self.analytic_bprops}'
                 + f'\nweights          : {self.weights}'
                 + f'\ninitial position : {self.initial_position}'
                 + f'\ndisc model       : {self.disc_model}'

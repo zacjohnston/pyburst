@@ -11,7 +11,7 @@ from .mcmc_versions import McmcVersion
 from pyburst.mcmc.mcmc_tools import print_params
 from pyburst.misc import pyprint
 from pyburst.synth import synth
-from pyburst.physics import gravity
+from pyburst.physics import gravity, accretion
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 PYBURST_PATH = os.environ['PYBURST']
@@ -43,7 +43,14 @@ def default_plt_options():
 default_plt_options()
 
 
-# TODO: Docstrings
+# TODO:
+#       - Docstrings
+#       - replace "debug" with "verbose"
+
+
+class ZeroLhood(Exception):
+    pass
+
 
 class BurstFit:
     """Class for comparing modelled bursts to observed bursts
@@ -51,7 +58,7 @@ class BurstFit:
 
     def __init__(self, source, version, verbose=True,
                  lhood_factor=1, debug=False, priors_only=False,
-                 re_interp=False, u_fper_frac=0.0, zero_lhood=-np.inf,
+                 re_interp=False, u_fper_frac=0.0, u_fedd_frac=0.0, zero_lhood=-np.inf,
                  reference_radius=10, **kwargs):
         """
         reference_radius : float
@@ -63,14 +70,21 @@ class BurstFit:
         self.verbose = verbose
         self.debug = pyprint.Debugger(debug=debug)
         self.mcmc_version = McmcVersion(source=source, version=version)
+
         self.param_idxs = {}
         self.interp_idxs = {}
-        self.get_param_indexes()
+        self.get_indexes()
+
         self.reference_radius = reference_radius
+
+        self.n_bprops = len(self.mcmc_version.bprops)
+        self.n_analytic_bprops = len(self.mcmc_version.analytic_bprops)
+        self.n_interp_params = len(self.mcmc_version.interp_keys)
 
         self.kpc_to_cm = u.kpc.to(u.cm)
         self.zero_lhood = zero_lhood
         self.u_fper_frac = u_fper_frac
+        self.u_fedd_frac = u_fedd_frac
         self.lhood_factor = lhood_factor
         self.priors_only = priors_only
 
@@ -94,18 +108,20 @@ class BurstFit:
         if self.verbose:
             print(string, **kwargs)
 
-    def get_param_indexes(self):
-        """Extracts indexes of parameters
+    def get_indexes(self):
+        """Extracts indexes of parameters and burst properties
 
         Expects params array to be in same order as param_keys
         """
+        def idx_dict(dict_in):
+            dict_out = {}
+            for i, key in enumerate(dict_in):
+                dict_out[key] = i
+            return dict_out
+
         self.debug.start_function('get_param_indexes')
-
-        for i, key in enumerate(self.mcmc_version.param_keys):
-            self.param_idxs[key] = i
-        for i, key in enumerate(self.mcmc_version.interp_keys):
-            self.interp_idxs[key] = i
-
+        self.param_idxs = idx_dict(self.mcmc_version.param_keys)
+        self.interp_idxs = idx_dict(self.mcmc_version.interp_keys)
         self.debug.end_function()
 
     def extract_obs_values(self):
@@ -166,6 +182,7 @@ class BurstFit:
 
         # ===== check priors =====
         lp = self.lnprior(params=params)
+        # TODO: move into self.lnprior(), and raise ZeroLhood
         if self.priors_only:
             self.debug.end_function()
             return lp * self.lhood_factor
@@ -174,17 +191,16 @@ class BurstFit:
             self.debug.end_function()
             return self.zero_lhood * self.lhood_factor
 
-        # ===== interpolate bursts from model params =====
-        bprop_values = np.zeros((len(self.mcmc_version.bprops) + 1, self.n_epochs))
-        epoch_params = self.get_epoch_params(params)
-        interp = self.interpolate(interp_params=epoch_params)
-
-        if True in np.isnan(interp):
-            self.debug.print_('Outside interpolator bounds')
-            self.debug.end_function()
+        try:
+            interp_local, analytic_local = self.get_model_local(params=params)
+        except ZeroLhood:
             return self.zero_lhood * self.lhood_factor
 
-        n_bprops = len(self.mcmc_version.bprops) + 1
+        interp_shifted, analytic_shifted = self.get_model_shifted(
+                                                    interp_local=interp_local,
+                                                    analytic_local=analytic_local,
+                                                    params=params)
+        n_bprops = len(self.mcmc_version.weights)
         if plot:
             plot_width = 6
             plot_height = 2.25
@@ -193,22 +209,105 @@ class BurstFit:
         else:
             fig = ax = None
 
-        # ===== compare model burst properties against observed =====
+        lh = self.compare_all(interp_shifted, analytic_shifted, ax=ax, plot=plot)
+        lhood = (lp + lh) * self.lhood_factor
+
+        if plot:
+            plt.show(block=False)
+            self.debug.end_function()
+            return lhood, fig
+        else:
+            self.debug.end_function()
+            # return lhood, bprop_values
+            return lhood
+
+    def get_model_local(self, params):
+        """Calculates predicted model values (bprops) for given params
+            Returns: interp_local, analytic_local
+        """
+        self.debug.start_function('predict_model_values')
+
+        epoch_params = self.get_epoch_params(params=params)
+        interp_local = self.get_interp_bprops(interp_params=epoch_params)
+        analytic_local = self.get_analytic_bprops(params=params, epoch_params=epoch_params)
+
+        return interp_local, analytic_local
+
+    def get_analytic_bprops(self, params, epoch_params):
+        """Returns calculated analytic burst properties for given params
+        """
+        def get_fedd():
+            """Returns Eddington flux array (n_epochs, 2)
+                Note: Actually the luminosity, because this is the local value
+            """
+            out = np.full([self.n_epochs, 2], np.nan, dtype=float)
+            l_edd = accretion.eddington_lum(mass=params[self.param_idxs['m_nw']],
+                                            x=params[self.param_idxs['x']])
+            out[:, 0] = l_edd
+            out[:, 1] = l_edd * self.u_fedd_frac
+            return out
+
+        def get_fper():
+            """Returns persistent accretion flux array (n_epochs, 2)
+                Note: Actually the luminosity, because this is the local value
+            """
+            out = np.full([self.n_epochs, 2], np.nan, dtype=float)
+            mass_ratio, redshift = self.get_gr_factors(params=params)
+
+            phi = (redshift - 1) * c.value ** 2 / redshift  # gravitational potential
+            mdot = epoch_params[:, self.interp_idxs['mdot']]
+            l_per = mdot * mdot_edd * phi
+
+            out[:, 0] = l_per
+            out[:, 1] = out[:, 0] * self.u_fper_frac
+            return out
+
+        function_map = {'fper': get_fper, 'fedd': get_fedd}
+        analytic = np.full([self.n_epochs, 2*self.n_analytic_bprops], np.nan, dtype=float)
+
+        for i, bprop in enumerate(self.mcmc_version.analytic_bprops):
+            analytic[:, 2*i: 2*(i+1)] = function_map[bprop]()
+
+        return analytic
+
+    def get_model_shifted(self, interp_local, analytic_local, params):
+        """Returns predicted model values (+ uncertainties) shifted to an observer frame
+        """
+        interp_shifted = np.full_like(interp_local, np.nan, dtype=float)
+        analytic_shifted = np.full_like(analytic_local, np.nan, dtype=float)
+
+        # ==== shift interpolated bprops ====
+        # TODO: concatenate bprop arrays and handle together
+        for i, bprop in enumerate(self.mcmc_version.interp_bprops):
+            i0 = 2 * i
+            i1 = 2 * (i + 1)
+            interp_shifted[:, i0:i1] = self.shift_to_observer(
+                                                    values=interp_local[:, i0:i1],
+                                                    bprop=bprop, params=params)
+
+        # ==== shift analytic bprops ====
+        for i, bprop in enumerate(self.mcmc_version.analytic_bprops):
+            i0 = 2 * i
+            i1 = 2 * (i + 1)
+            analytic_shifted[:, i0:i1] = self.shift_to_observer(
+                                                    values=analytic_local[:, i0:i1],
+                                                    bprop=bprop, params=params)
+        return interp_shifted, analytic_shifted
+
+    def compare_all(self, interp_shifted, analytic_shifted, ax, plot=False):
+        """Compares all bprops against observations and returns total likelihood
+        """
         lh = 0.0
+        all_shifted = np.concatenate([interp_shifted, analytic_shifted], axis=1)
+
         for i, bprop in enumerate(self.mcmc_version.bprops):
             u_bprop = f'u_{bprop}'
-            bprop_col = 2 * i
-            u_bprop_col = bprop_col + 1
+            bprop_idx = 2 * i
+            u_bprop_idx = bprop_idx + 1
 
-            # ===== shift values to observer frame and units =====
-            for j, key in enumerate([bprop, u_bprop]):
-                col = bprop_col + j
-                interp[:, col] = self.shift_to_observer(values=interp[:, col],
-                                                        bprop=key, params=params)
-            model = interp[:, bprop_col]
-            u_model = interp[:, u_bprop_col]
+            model = all_shifted[:, bprop_idx]
+            u_model = all_shifted[:, u_bprop_idx]
 
-            bprop_values[i, :] = model
             lh += self.compare(model=model, u_model=u_model,
                                obs=self.obs_data[bprop], bprop=bprop,
                                u_obs=self.obs_data[u_bprop], label=bprop)
@@ -216,32 +315,10 @@ class BurstFit:
                 self.plot_compare(model=model, u_model=u_model, obs=self.obs_data[bprop],
                                   u_obs=self.obs_data[u_bprop], bprop=bprop,
                                   ax=ax[i], display=False,
-                                  legend=True if i == 0 else False)
+                                  legend=True if i == 0 else False,
+                                  xlabel=True if i == self.n_bprops-1 else False)
 
-        # ===== compare predicted persistent flux with observed =====
-        # TODO: fold this into above loop?
-        fper = self.shift_to_observer(values=epoch_params[:, self.interp_idxs['mdot']],
-                                      bprop='fper', params=params)
-        u_fper = fper * self.u_fper_frac  # Assign uncertainty to model persistent flux
-
-        bprop_values[-1, :] = fper
-        lh += self.compare(model=fper, u_model=u_fper, label='fper',
-                           obs=self.obs_data['fper'], bprop='fper',
-                           u_obs=self.obs_data['u_fper'])
-
-        lhood = (lp + lh) * self.lhood_factor
-
-        if plot:
-            self.plot_compare(model=fper, u_model=u_fper, bprop='fper',
-                              obs=self.obs_data['fper'], u_obs=self.obs_data['u_fper'],
-                              ax=ax[n_bprops - 1], display=False,
-                              xlabel=True)
-            plt.show(block=False)
-            self.debug.end_function()
-            return lhood, fig
-        else:
-            self.debug.end_function()
-            return lhood#, bprop_values
+        return lh
 
     def shift_to_observer(self, values, bprop, params):
         """Returns burst property shifted to observer frame/units
@@ -261,39 +338,30 @@ class BurstFit:
         In special case bprop='fper', 'values' must be local accrate
                 as fraction of Eddington rate.
         """
-
-        def gr_factors():
-            mass_nw = params[self.param_idxs['m_nw']]
-            mass_gr = params[self.param_idxs['m_gr']]
-            m_ratio = mass_gr / mass_nw
-            red = gravity.gr_corrections(r=self.reference_radius, m=mass_nw,
-                                         phi=m_ratio)[1]
-            return m_ratio, red
-
-        # TODO: cache other reused values
+        # TODO:
+        #       - cache other reused values
+        #       - generalise to type of units (eg: lum --> flux)
         self.debug.start_function('shift_to_observer')
-        mass_ratio, redshift = gr_factors()
+        mass_ratio, redshift = self.get_gr_factors(params=params)
 
-        if bprop in ('dt', 'u_dt'):
+        if bprop == 'dt':
             shifted = values * redshift / 3600
-        elif bprop in ('rate', 'u_rate'):
+        elif bprop == 'rate':
             shifted = values / redshift
-        elif bprop in ('tail_50', 'u_tail_50'):
+        elif bprop == 'tail_50':
             shifted = values * redshift
         else:
             flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']]) ** 2
             flux_factor_p = flux_factor_b * params[self.param_idxs['xi_ratio']]
 
-            if bprop in ('fluence', 'u_fluence'):  # (erg) --> (erg / cm^2)
+            if bprop == 'fluence':  # (erg) --> (erg / cm^2)
                 shifted = (values * mass_ratio) / (4 * np.pi * flux_factor_b)
-
-            elif bprop in ('peak', 'u_peak'):  # (erg/s) --> (erg / cm^2 / s)
-                shifted = (values * mass_ratio) / (redshift * 4 * np.pi * flux_factor_b)
-
-            elif bprop in 'fper':  # mdot --> (erg / cm^2 / s)
-                phi = (redshift - 1) * c.value ** 2 / redshift  # gravitational potential
-                lum_acc = values * mdot_edd * phi
-                shifted = (lum_acc * mass_ratio) / (redshift * 4 * np.pi * flux_factor_p)
+            elif bprop in ('peak', 'fper', 'fedd'):  # (erg/s) --> (erg / cm^2 / s)
+                flux_factor = {'peak': flux_factor_b,
+                               'fedd': flux_factor_b,
+                               'fper': flux_factor_p,
+                               }.get(bprop)
+                shifted = (values * mass_ratio) / (redshift * 4 * np.pi * flux_factor)
             else:
                 raise ValueError('bprop must be one of (dt, u_dt, rate, u_rate, '
                                  + 'fluence, u_fluence, '
@@ -301,7 +369,7 @@ class BurstFit:
         self.debug.end_function()
         return shifted
 
-    def interpolate(self, interp_params):
+    def get_interp_bprops(self, interp_params):
         """Interpolates burst properties for N epochs
 
         Parameters
@@ -310,22 +378,26 @@ class BurstFit:
             parameters specific to the model (e.g. mdot1, x, z, qb, mass)
         """
         self.debug.start_function('interpolate')
-        # TODO: generalise to N-epochs
         self.debug.variable('interp_params', interp_params, formatter='')
+
         output = self.kemulator.emulate_burst(params=interp_params)
+
+        if True in np.isnan(output):
+            self.debug.print_('Outside interpolator bounds')
+            self.debug.end_function()
+            raise ZeroLhood
+
         self.debug.end_function()
         return output
 
     def get_epoch_params(self, params):
         """Extracts array of model parameters for each epoch
         """
-        self.debug.start_function('extract_epoch_params')
-        # TODO: use base set of interp params (without epoch duplicates)
-        n_interp = len(self.mcmc_version.interp_keys)
-        epoch_params = np.full((self.n_epochs, n_interp), np.nan, dtype=float)
+        self.debug.start_function('get_epoch_params')
+        epoch_params = np.full((self.n_epochs, self.n_interp_params), np.nan, dtype=float)
 
         for i in range(self.n_epochs):
-            for j in range(n_interp):
+            for j in range(self.n_interp_params):
                 key = self.mcmc_version.interp_keys[j]
                 epoch_params[i, j] = self.get_interp_param(key, params, epoch_idx=i)
 
@@ -346,6 +418,14 @@ class BurstFit:
         self.debug.variable('param key', key, formatter='')
         self.debug.end_function()
         return params[self.param_idxs[key]]
+
+    def get_gr_factors(self, params):
+        """Returns GR factors (m_ratio, redshift) given (m_nw, m_gr)"""
+        mass_nw = params[self.param_idxs['m_nw']]
+        mass_gr = params[self.param_idxs['m_gr']]
+        m_ratio = mass_gr / mass_nw
+        redshift = gravity.gr_corrections(r=self.reference_radius, m=mass_nw, phi=m_ratio)[1]
+        return m_ratio, redshift
 
     def lnprior(self, params):
         """Return logarithm prior lhood of params
@@ -425,20 +505,25 @@ class BurstFit:
         capsize = 3
         n_sigma = 3
         dx = 0.13  # horizontal offset of plot points
-        yscale = {'dt': 1.0, 'rate': 1.0, 'tail_50': 1.0,
+        yscale = {'dt': 1.0, 'rate': 1.0, 'tail_50': 1.0, 'fedd': 1e-8,
                   'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
         ylabel = {'dt': r'$\Delta t$',
                   'rate': 'Burst rate',
                   'fluence': r'$E_b$',
                   'peak': r'$F_{peak}$',
                   'fper': r'$F_p$',
-                  'tail_50': r'$t_{50}$'}.get(bprop, bprop)
+                  'tail_50': r'$t_{50}$',
+                  'fedd': r'$F_\mathrm{Edd}$',
+                  }.get(bprop, bprop)
+
         y_units = {'dt': 'hr',
                    'rate': 'day$^{-1}$',
                    'fluence': r'$10^{-6}$ erg cm$^{-2}$',
                    'peak': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
                    'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$',
-                   'tail_50': 's'}.get(bprop)
+                   'tail_50': 's',
+                   'fedd': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
+                   }.get(bprop)
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 
