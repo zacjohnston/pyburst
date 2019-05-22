@@ -14,10 +14,12 @@ from pyburst.grids import grid_strings
 # -----------------------------------
 
 # ===== Define order/number of params provided to BurstFit =====
+# TODO: reset indexes
 param_keys = {
     7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     8: ['mdot1', 'mdot2', 'x', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     9: ['mdot1', 'x', 'z', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
+    10: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -125,6 +127,23 @@ grid_bounds = {
             ),
     },
 
+    10: {
+        1: ((0.08, 0.18),  # mdot1
+            (0.08, 0.18),  # mdot2
+            (0.08, 0.18),  # mdot3
+            (0.67, 0.76),  # x
+            (0.001, 0.0125),  # z
+            (0.0, 0.8),  # qb1
+            (0.0, 0.8),  # qb2
+            (0.0, 0.8),  # qb3
+            (1.7, 2.9),  # m_nw
+            (1.0, 2.3),  # m_gr
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            (0.0, 1.0),  # xedd_ratio
+            ),
+    },
+
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -169,6 +188,9 @@ initial_position = {
         1: (0.095, 0.7, 0.0035, 0.4, 2.3, 2.0, 6.5, 1.7),
         2: (0.12,  0.7, 0.0035, 0.2, 2.3, 2.0, 6.5, 1.7),
         3: (0.14,  0.7, 0.0035, 0.2, 2.3, 2.0, 6.5, 1.7),
+    },
+    10: {
+        1: (0.09, 0.12, 0.14, 0.72, 0.005, 0.4, 0.2, 0.2, 2.4, 2.0, 6.0, 1.6, 0.5),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -301,6 +323,7 @@ source_defaults = {
 #   15 : as 12, fitting epoch 2007
 
 #   16 : as 12, with no priors
+#   17 : as 12, with param x_edd
 
 version_definitions = {
     'interpolator': {
@@ -348,6 +371,7 @@ version_definitions = {
             14: ('fper', 'fedd'),
             15: ('fper', 'fedd'),
             16: ('fper', 'fedd'),
+            17: ('fper', 'fedd'),
         },
         'synth5': {},
         'he2': {},
@@ -362,6 +386,7 @@ version_definitions = {
             14: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             15: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             16: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
+            17: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
         },
         'synth5': {},
         'he2': {},
@@ -377,6 +402,7 @@ version_definitions = {
             13: param_keys[9],
             14: param_keys[9],
             15: param_keys[9],
+            17: param_keys[10],
         },
         'synth5': {},
         'he2': {},
@@ -430,6 +456,7 @@ version_definitions = {
             14: 8,
             15: 8,
             16: 2,
+            17: grid_bounds[10][1],
         },
         'synth5': {},
         'he2': {
@@ -475,6 +502,7 @@ version_definitions = {
             13: initial_position[9][1],
             14: initial_position[9][2],
             15: initial_position[9][3],
+            17: initial_position[10][1],
         },
         'synth5': {},
         'he2': {},
