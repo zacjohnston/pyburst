@@ -167,25 +167,28 @@ class BurstFit:
 
             self.debug.end_function()
 
-    def lhood(self, params, plot=False):
+    def lhood(self, x, plot=False):
         """Return lhood for given params
 
         Parameters
         ----------
-        params : ndarray
-            set of parameters to try (see "param_keys" for labels)
+        x : 1D array
+            set of parameter values to try (must match order of mcmc_version.param_keys)
         plot : bool
             whether to plot the comparison
         """
         self.debug.start_function('lhood')
-        if self.debug.debug:
-            print_params(params, source=self.source, version=self.version)
 
+        params = self.get_params_dict(x=x)
         zero_lhood = self.zero_lhood * self.lhood_factor
+
+        if self.debug.debug:
+            for key, val in params.items():
+                print(f'{key:10}  {val:.4f}')
 
         # ===== check priors =====
         try:
-            lp = self.lnprior(params=params)
+            lp = self.lnprior(x=x, params=params)
         except ZeroLhood:
             return zero_lhood
 
@@ -229,14 +232,14 @@ class BurstFit:
             self.debug.end_function()
             return lhood
 
-    def get_params_dict(self, params):
+    def get_params_dict(self, x):
         """Returns params in form of dict
         """
         keys = self.mcmc_version.param_keys
         params_dict = dict.fromkeys(keys)
 
         for i, key in enumerate(keys):
-            params_dict[key] = params[i]
+            params_dict[key] = x[i]
 
         return params_dict
 
@@ -260,12 +263,12 @@ class BurstFit:
                 Note: Actually the luminosity, because this is the local value
             """
             out = np.full([self.n_epochs, 2], np.nan, dtype=float)
+            x_edd = params['x']
 
-            x = params[self.param_idxs['x']]
             if self.has_xedd_ratio:
-                x *= params[self.param_idxs['xedd_ratio']]
+                x_edd *= params['xedd_ratio']
 
-            l_edd = accretion.eddington_lum(mass=params[self.param_idxs['m_nw']], x=x)
+            l_edd = accretion.eddington_lum(mass=params['m_nw'], x=x_edd)
             out[:, 0] = l_edd
             out[:, 1] = l_edd * self.u_fedd_frac
             return out
@@ -374,8 +377,8 @@ class BurstFit:
         elif bprop == 'tail_50':
             shifted = values * redshift
         else:
-            flux_factor_b = (self.kpc_to_cm * params[self.param_idxs['d_b']]) ** 2
-            flux_factor_p = flux_factor_b * params[self.param_idxs['xi_ratio']]
+            flux_factor_b = (self.kpc_to_cm * params['d_b']) ** 2
+            flux_factor_p = flux_factor_b * params['xi_ratio']
 
             if bprop == 'fluence':  # (erg) --> (erg / cm^2)
                 shifted = (values * mass_ratio) / (4 * np.pi * flux_factor_b)
@@ -420,8 +423,7 @@ class BurstFit:
         epoch_params = np.full((self.n_epochs, self.n_interp_params), np.nan, dtype=float)
 
         for i in range(self.n_epochs):
-            for j in range(self.n_interp_params):
-                key = self.mcmc_version.interp_keys[j]
+            for j, key in enumerate(self.mcmc_version.interp_keys):
                 epoch_params[i, j] = self.get_interp_param(key, params, epoch_idx=i)
 
         self.debug.variable('epoch_params', epoch_params, formatter='')
@@ -440,34 +442,32 @@ class BurstFit:
 
         self.debug.variable('param key', key, formatter='')
         self.debug.end_function()
-        return params[self.param_idxs[key]]
+        return params[key]
 
     def get_gr_factors(self, params):
         """Returns GR factors (m_ratio, redshift) given (m_nw, m_gr)"""
-        mass_nw = params[self.param_idxs['m_nw']]
-        mass_gr = params[self.param_idxs['m_gr']]
+        mass_nw = params['m_nw']
+        mass_gr = params['m_gr']
         m_ratio = mass_gr / mass_nw
         redshift = gravity.gr_corrections(r=self.reference_radius, m=mass_nw, phi=m_ratio)[1]
         return m_ratio, redshift
 
-    def lnprior(self, params):
+    def lnprior(self, x, params):
         """Return logarithm prior lhood of params
         """
         self.debug.start_function('lnprior')
         lower_bounds = self.mcmc_version.grid_bounds[:, 0]
         upper_bounds = self.mcmc_version.grid_bounds[:, 1]
-        inside_bounds = np.logical_and(params > lower_bounds,
-                                       params < upper_bounds)
+        inside_bounds = np.logical_and(x > lower_bounds,
+                                       x < upper_bounds)
 
         if False in inside_bounds:
             self.debug.end_function()
             raise ZeroLhood
 
         prior_lhood = 0.0
-
-        for param, prior_pdf in self.priors.items():
-            idx = self.param_idxs[param]
-            prior_lhood += np.log(prior_pdf(params[idx]))
+        for key, val in params.items():
+            prior_lhood += np.log(self.priors[key](val))
 
         self.debug.variable('prior_lhood', prior_lhood, formatter='f')
         self.debug.end_function()
