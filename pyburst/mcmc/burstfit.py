@@ -229,6 +229,17 @@ class BurstFit:
             self.debug.end_function()
             return lhood
 
+    def get_params_dict(self, params):
+        """Returns params in form of dict
+        """
+        keys = self.mcmc_version.param_keys
+        params_dict = dict.fromkeys(keys)
+
+        for i, key in enumerate(keys):
+            params_dict[key] = params[i]
+
+        return params_dict
+
     def get_model_local(self, params):
         """Calculates predicted model values (bprops) for given params
             Returns: interp_local, analytic_local
