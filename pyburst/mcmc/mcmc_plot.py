@@ -302,8 +302,8 @@ def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
     ax.errorbar(x=x, y=y, xerr=xerr, yerr=yerr,
                 marker='o', capsize=3, color='C0', ls='none')
 
-    ax.set_ylabel('$Q_\mathrm{b}$ (MeV nucleon$^{-1}$)', fontsize=fontsize)
-    ax.set_xlabel('$\dot{M} / \dot{M}_\mathrm{Edd}$', fontsize=fontsize)
+    ax.set_ylabel(r'$Q_\mathrm{b}$ (MeV nucleon$^{-1}$)', fontsize=fontsize)
+    ax.set_xlabel(r'$\dot{M} / \dot{M}_\mathrm{Edd}$', fontsize=fontsize)
     plt.tight_layout()
     plt.show(block=False)
 
@@ -388,39 +388,3 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
     save_plot(fig, prefix='compare', n_dimensions=len(max_params),
               n_walkers=n_walkers, n_steps=n_steps, save=save, source=source,
               version=version, display=display)
-
-
-# TODO deprecate
-def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
-    """Saves frames of contour evolution, to make an animation
-    """
-    default_plt_options()
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-
-    n_walkers, n_steps, n_dimensions = chain.shape
-    mtarget = os.path.join(GRIDS_PATH, 'sources', source, 'mcmc', 'animation')
-    ftarget = os.path.join(mtarget, 'frames')
-
-    cc = chainconsumer.ChainConsumer()
-
-    for i in range(dt, n_steps, dt):
-        print('frame  ', i)
-        subchain = chain[:, :i, :].reshape((-1, n_dimensions))
-        cc.add_chain(subchain, parameters=pkeys)
-
-        fig = cc.plotter.plot()
-        fig.set_size_inches(6, 6)
-        cnt = round(i / dt)
-
-        filename = f'{cnt:04d}.png'
-        filepath = os.path.join(ftarget, filename)
-        fig.savefig(filepath)
-
-        plt.close(fig)
-        cc.remove_chain()
-
-    if ffmpeg:
-        print('Creating movie')
-        framefile = os.path.join(ftarget, f'%04d.png')
-        savefile = os.path.join(mtarget, f'chain.mp4')
-        subprocess.run(['ffmpeg', '-r', str(fps), '-i', framefile, savefile])
