@@ -151,6 +151,8 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
               version=version, display=display)
 
 
+# TODO: combine plot_mass_radius() and plot_xedd()
+
 def plot_mass_radius(chain, discard, source, version, cap=None,
                      display=True, save=False, max_lhood=False, verbose=True,
                      cloud=True, sigmas=np.linspace(0, 2, 10)):
@@ -187,6 +189,7 @@ def plot_xedd(chain, discard, source, version, cap=None,
     """Plots posterior for Eddington hydrogen composition (X_Edd)
     """
     default_plt_options()
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     xedd_chain = mcmc_params.get_xedd_chain(chain=chain, discard=discard, source=source,
                                             version=version, cap=cap)
 
@@ -195,8 +198,16 @@ def plot_xedd(chain, discard, source, version, cap=None,
     cc.add_chain(xedd_chain.reshape(-1), parameters=[label])
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
 
-    # TODO: plot max_lhood option
-    fig = cc.plotter.plot(display=True, figsize=[6, 6])
+    if max_lhood:
+        n_walkers, n_steps = chain[:, :, 0].shape
+        max_params = mcmc_tools.get_max_lhood_params(source, version=version,
+                                                     n_walkers=n_walkers, n_steps=n_steps,
+                                                     verbose=verbose)
+        xedd = (max_params[pkeys.index('xedd_ratio')]
+                * max_params[pkeys.index('xedd_ratio')])
+        fig = cc.plotter.plot(display=True, figsize=[6, 6], truth=[xedd])
+    else:
+        fig = cc.plotter.plot(display=True, figsize=[6, 6])
 
     save_plot(fig, prefix='xedd', chain=chain, save=save, source=source,
               version=version, display=display)
