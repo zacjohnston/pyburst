@@ -179,6 +179,27 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
               version=version, display=display)
 
 
+def plot_xedd(chain, discard, source, version, cap=None,
+              display=True, save=False, max_lhood=False, verbose=True,
+              cloud=True, sigmas=np.linspace(0, 2, 10)):
+    """Plots posterior for Eddington hydrogen composition (X_Edd)
+    """
+    default_plt_options()
+    xedd_chain = get_xedd_chain(chain=chain, discard=discard, source=source,
+                                version=version, cap=cap)
+
+    cc = chainconsumer.ChainConsumer()
+    label = plot_tools.mcmc_label('xedd')
+    cc.add_chain(xedd_chain.reshape(-1), parameters=[label])
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
+
+    # TODO: plot max_lhood option
+    fig = cc.plotter.plot(display=True, figsize=[6, 6])
+
+    save_plot(fig, prefix='xedd', chain=chain, save=save, source=source,
+              version=version, display=display)
+
+
 def plot_walkers(chain, source, version, params=None, n_lines=30, xlim=-1,
                  display=True, save=False, label=''):
     """Plots walkers vs steps (i.e. "time")
