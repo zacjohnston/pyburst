@@ -9,7 +9,7 @@ from math import ceil
 from . import mcmc_versions
 from . import mcmc_tools
 from . import burstfit
-from pyburst.physics import gravity
+from . import mcmc_params
 from pyburst.plotting import plot_tools
 from pyburst.grids.grid_strings import get_source_path, print_warning
 
@@ -154,14 +154,13 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
 def plot_mass_radius(chain, discard, source, version, cap=None,
                      display=True, save=False, max_lhood=False, verbose=True,
                      cloud=True, sigmas=np.linspace(0, 2, 10)):
-    """Plots contours of mass versus radius
-
-    See: get_mass_radius()
+    """Plots contours of mass versus radius from a given chain
     """
     default_plt_options()
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-    mass_radius_chain = get_mass_radius_chain(chain=chain, discard=discard,
-                                              source=source, version=version, cap=cap)
+    mass_radius_chain = mcmc_params.get_mass_radius_chain(chain=chain, discard=discard,
+                                                          source=source, version=version,
+                                                          cap=cap)
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['R', 'M'])
@@ -173,7 +172,7 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
                                                      n_steps=n_steps, verbose=verbose)
         mass_nw = max_params[pkeys.index('m_nw')]
         mass = max_params[pkeys.index('m_gr')]
-        radius = get_radius(mass_nw=mass_nw, mass_gr=mass)
+        radius = mcmc_params.get_radius(mass_nw=mass_nw, mass_gr=mass)
         fig = cc.plotter.plot(display=True, figsize=[6, 6], truth=[mass, radius])
     else:
         fig = cc.plotter.plot(display=True, figsize=[6, 6])
@@ -188,8 +187,8 @@ def plot_xedd(chain, discard, source, version, cap=None,
     """Plots posterior for Eddington hydrogen composition (X_Edd)
     """
     default_plt_options()
-    xedd_chain = get_xedd_chain(chain=chain, discard=discard, source=source,
-                                version=version, cap=cap)
+    xedd_chain = mcmc_params.get_xedd_chain(chain=chain, discard=discard, source=source,
+                                            version=version, cap=cap)
 
     cc = chainconsumer.ChainConsumer()
     label = plot_tools.mcmc_label('xedd')
@@ -371,55 +370,6 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
     return cc
 
 
-def get_mass_radius_chain(chain, discard, source, version, cap=None):
-    """Returns GR mass and radius given a chain containing gravity and redshift
-
-    Returns ndarray of equivalent form to input chain (after slicing discard/cap)
-    """
-    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
-    n_walkers, n_steps, n_dimensions = chain.shape
-    chain_flat = chain.reshape((-1, n_dimensions))
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-
-    mass_nw = chain_flat[:, pkeys.index('m_nw')]
-    mass_gr = chain_flat[:, pkeys.index('m_gr')]
-    radius_gr = get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
-
-    new_shape = (n_walkers, n_steps)
-    mass_reshape = mass_gr.reshape(new_shape)
-    radius_reshape = radius_gr.reshape(new_shape)
-
-    return np.dstack((radius_reshape, mass_reshape))
-
-
-def get_radius(mass_nw, mass_gr):
-    """Returns GR radius for the given Newtonian mass and GR mass
-    """
-    ref_radius = 10
-    m_ratio = mass_gr / mass_nw
-
-    xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
-    radius_gr = ref_radius * xi
-    return radius_gr
-
-
-def get_xedd_chain(chain, discard, source, version, cap=None):
-    """Returns chain of X_edd, from a given chain with parameters xedd_ratio and x
-    """
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-
-    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
-    n_walkers, n_steps, n_dimensions = chain.shape
-    chain_flat = chain.reshape((-1, n_dimensions))
-
-    xedd_flat = chain_flat[:, pkeys.index('xedd_ratio')] * chain_flat[:, pkeys.index('x')]
-
-    new_shape = (n_walkers, n_steps)
-    xedd_chain = xedd_flat.reshape(new_shape)
-
-    return xedd_chain
-
-
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=False,
                    display=True, save=False):
     default_plt_options()
@@ -440,6 +390,7 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
               version=version, display=display)
 
 
+# TODO deprecate
 def animate_contours(chain, source, version, dt=5, fps=20, ffmpeg=True):
     """Saves frames of contour evolution, to make an animation
     """
