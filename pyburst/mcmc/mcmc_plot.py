@@ -390,6 +390,23 @@ def get_mass_radius_point(params, source, version):
     return radius_gr, mass_gr
 
 
+def get_xedd_chain(chain, discard, source, version, cap=None):
+    """Returns chain of X_edd, from a given chain with parameters xedd_ratio and x
+    """
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+
+    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
+    n_walkers, n_steps, n_dimensions = chain.shape
+    chain_flat = chain.reshape((-1, n_dimensions))
+
+    xedd_flat = chain_flat[:, pkeys.index('xedd_ratio')] * chain_flat[:, pkeys.index('x')]
+
+    new_shape = (n_walkers, n_steps)
+    xedd_chain = xedd_flat.reshape(new_shape)
+
+    return xedd_chain
+
+
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=False,
                    display=True, save=False):
     default_plt_options()
