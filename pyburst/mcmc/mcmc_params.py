@@ -10,6 +10,8 @@ from pyburst.physics import gravity
 Module for manipulating and calculating parameters derived from MCMC chains
 """
 
+# TODO:
+#       - get_inclination(xi_ratio)
 
 def get_mass_radius_chain(chain, discard, source, version, cap=None):
     """Returns GR mass and radius given a chain containing gravity and redshift
