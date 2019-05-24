@@ -159,8 +159,9 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
     See: get_mass_radius()
     """
     default_plt_options()
-    mass_radius_chain = get_mass_radius(chain=chain, discard=discard,
-                                        source=source, version=version, cap=cap)
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+    mass_radius_chain = get_mass_radius_chain(chain=chain, discard=discard,
+                                              source=source, version=version, cap=cap)
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['R', 'M'])
@@ -170,7 +171,9 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
         n_walkers, n_steps = chain[:, :, 0].shape
         max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
                                                      n_steps=n_steps, verbose=verbose)
-        mass, radius = get_mass_radius_point(max_params, source=source, version=version)
+        mass_nw = max_params[pkeys.index('m_nw')]
+        mass = max_params[pkeys.index('m_gr')]
+        radius = get_radius(mass_nw=mass_nw, mass_gr=mass)
         fig = cc.plotter.plot(display=True, figsize=[6, 6], truth=[mass, radius])
     else:
         fig = cc.plotter.plot(display=True, figsize=[6, 6])
@@ -368,13 +371,11 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
     return cc
 
 
-def get_mass_radius(chain, discard, source, version, cap=None):
+def get_mass_radius_chain(chain, discard, source, version, cap=None):
     """Returns GR mass and radius given a chain containing gravity and redshift
 
     Returns ndarray of equivalent form to input chain (after slicing discard/cap)
     """
-    ref_radius = 10
-
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_walkers, n_steps, n_dimensions = chain.shape
     chain_flat = chain.reshape((-1, n_dimensions))
@@ -382,12 +383,8 @@ def get_mass_radius(chain, discard, source, version, cap=None):
 
     mass_nw = chain_flat[:, pkeys.index('m_nw')]
     mass_gr = chain_flat[:, pkeys.index('m_gr')]
-    m_ratio = mass_gr / mass_nw
+    radius_gr = get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
 
-    xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
-    radius_gr = ref_radius * xi
-
-    # reshape back into chain
     new_shape = (n_walkers, n_steps)
     mass_reshape = mass_gr.reshape(new_shape)
     radius_reshape = radius_gr.reshape(new_shape)
@@ -395,20 +392,15 @@ def get_mass_radius(chain, discard, source, version, cap=None):
     return np.dstack((radius_reshape, mass_reshape))
 
 
-def get_mass_radius_point(params, source, version):
-    """Returns the mass, radius for a single walker point
+def get_radius(mass_nw, mass_gr):
+    """Returns GR radius for the given Newtonian mass and GR mass
     """
     ref_radius = 10
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-
-    mass_nw = params[pkeys.index('m_nw')]
-    mass_gr = params[pkeys.index('m_gr')]
     m_ratio = mass_gr / mass_nw
 
     xi = gravity.gr_corrections(r=ref_radius, m=mass_nw, phi=m_ratio)[0]
     radius_gr = ref_radius * xi
-
-    return radius_gr, mass_gr
+    return radius_gr
 
 
 def get_xedd_chain(chain, discard, source, version, cap=None):
