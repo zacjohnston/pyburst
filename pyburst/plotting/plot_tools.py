@@ -53,6 +53,7 @@ def mcmc_label(quantity):
         'm_gr': r'$M_\mathrm{GR}$',
         'm_nw': r'$M_\mathrm{NW}$',
         'xedd_ratio': r'$X_\mathrm{Edd} / X_0$',
+        'xedd': r'$X_\mathrm{Edd}$',
     }
 
     # assumes last character is a single integer specifying epoch
