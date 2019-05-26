@@ -342,8 +342,8 @@ def expand_params(dv={'x': 0.05},
     """Expand variable parameters to fill their ranges, given specified stepsizes
     """
     params_full = dict(params)
-    nv = len(dv.keys())  # number of variables
-    var = find_varying(params, nv)
+    n_var = len(dv.keys())  # number of variables
+    var = find_varying(params, n_var)
 
     # ===== Create full lists of model parameters =====
     for key in var:
