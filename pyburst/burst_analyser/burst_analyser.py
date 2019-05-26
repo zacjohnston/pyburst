@@ -207,13 +207,13 @@ class BurstRun(object):
         """Loads config parameters from file
         """
         # TODO: Load defaults also
-        config_filepath = grid_strings.config_filepath(self.source)
+        config_filepath = grid_strings.config_filepath(self.source,
+                                                       module_dir='burst_analyser')
         self.printv(f'Loading config: {config_filepath}')
 
         if not os.path.exists(config_filepath):
             raise FileNotFoundError(f'Config file not found: {config_filepath}'
                                     '\nEither create one or set load_config=False')
-
         ini = configparser.ConfigParser()
         ini.read(config_filepath)
 

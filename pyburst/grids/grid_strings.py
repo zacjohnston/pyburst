@@ -106,12 +106,20 @@ def burst_analyser_path(source):
     return get_source_subdir(source, 'burst_analysis')
 
 
-def config_path():
-    return os.path.join(pyburst_path, 'pyburst', 'burst_analyser', 'config')
+def config_path(module_dir):
+    """Returns string of path to config directory
+
+    parameters
+    ----------
+    module_dir : str
+        module directory that the config belongs to (e.g. 'burst_analyser', or 'grids')
+
+    """
+    return os.path.join(pyburst_path, 'pyburst', module_dir, 'config')
 
 
-def config_filepath(source):
-    path = config_path()
+def config_filepath(source, module_dir):
+    path = config_path(module_dir=module_dir)
     return os.path.join(path, f'{source}.ini')
 
 
