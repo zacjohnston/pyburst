@@ -15,18 +15,21 @@ from pyburst.misc.pyprint import print_title, print_dashes
 from pyburst.qnuc import qnuc_tools
 from pyburst.physics import gravity
 
-# ====================================
-# Kepler model grid generator
-# --------------------
-# Generates kepler model generator files, in addition to setting up model grids
-# and jobscripts
-# --------------------
-# Note: This module is a bit of a patchwork and not so nice to look at. Things might
-#           not work elegently or as expected
-# --------------------
-# Author: Zac Johnston
-# Email: zac.johnston@monash.edu
-# ====================================
+"""
+======================================
+Grid Setup
+--------------------
+Tools for creating kepler model grids
+  including: jobscripts, model files, parameter tables, etc.
+--------------------
+NOTE: This module is pretty spaghettified.
+      Things might not work elegently or as expected.
+      USE WITH CAUTION!
+--------------------
+Author: Zac Johnston
+Email: zac.johnston@monash.edu
+======================================
+"""
 
 flt2 = '{:.2f}'.format
 flt4 = '{:.4f}'.format
