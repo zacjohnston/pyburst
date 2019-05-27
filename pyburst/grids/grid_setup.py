@@ -52,7 +52,7 @@ def create_batch(batch, source, params, dv,
                  t_end=1.3e5, exclude=None, basename='xrb', walltime=96,
                  auto_t_end=True, notes='No notes given', nbursts=20, kgrid=None,
                  nuc_heat=True, setup_test=False,
-                 predict_qnuc=False, grid_version=None, qnuc_source='heat',
+                 auto_qnuc=False, grid_version=None, qnuc_source='heat',
                  substrate='fe54', substrate_off=True, adapnet_filename=None,
                  bdat_filename=None, params_full=None,
                  numerical_params=None):
@@ -79,9 +79,9 @@ def create_batch(batch, source, params, dv,
     walltime : int (optional)
     notes : str (optional)
     nbursts : int (optional)
+    auto_qnuc : bool (optional)
     nuc_heat : bool (optional)
     setup_test : bool (optional)
-    predict_qnuc : bool (optional)
     grid_version : int (optional)
     qnuc_source : str (optional)
     substrate : str (optional)
@@ -128,19 +128,9 @@ def create_batch(batch, source, params, dv,
     params_full['radius'] = np.full(n_models, radius_ref)
     params_full['gravity'] = gravities
 
-    # TODO: rewrite properly (use tables)
-    if predict_qnuc:
-        if len(params['qnuc']) > 1:
-            raise ValueError('Cannot provide multiple "qnuc" in params if predict_qnuc=True')
-
-        linr_qnuc = qnuc_tools.linregress_qnuc(qnuc_source, grid_version=grid_version)
-        for i in range(n_models):
-            params_qnuc = {}
-            for param in param_list:
-                params_qnuc[param] = params_full[param][i]
-            params_full['qnuc'][i] = qnuc_tools.predict_qnuc(params=params_qnuc,
-                                                             source=qnuc_source,
-                                                             linr_table=linr_qnuc)
+    if auto_qnuc:
+        predict_qnuc(params_full=params_full, qnuc_source=qnuc_source,
+                     grid_version=grid_version)
 
     # ===== Create top grid folder =====
     batch_model_path = grid_strings.get_batch_models_path(batch, source)
@@ -274,6 +264,19 @@ def exclude_params(params_expanded, exclude):
     return params_full
 
 
+def predict_qnuc(params_full, qnuc_source, grid_version):
+    linr_qnuc = qnuc_tools.linregress_qnuc(qnuc_source, grid_version=grid_version)
+    n_models = len(params_full['x'])
+
+    for i in range(n_models):
+        params_qnuc = {}
+        for param in param_list:
+            params_qnuc[param] = params_full[param][i]
+        params_full['qnuc'][i] = qnuc_tools.predict_qnuc(params=params_qnuc,
+                                                         source=qnuc_source,
+                                                         linr_table=linr_qnuc)
+
+
 def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcmc_version,
                   constant=None, epoch_independent=('x', 'z', 'mass'),
                   epoch_dependent=('accrate', 'qb'), epoch_chosen=None):
@@ -311,7 +314,7 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
 
         create_batch(batch0+i, dv={}, params={}, source=source, nbursts=30, kgrid=kgrid,
                      walltime=96, setup_test=False, nuc_heat=True,
-                     predict_qnuc=False, grid_version=0, substrate_off=True,
+                     auto_qnuc=False, grid_version=0, substrate_off=True,
                      params_full=params_full)
 
 
@@ -351,7 +354,7 @@ def setup_mcmc_sample(batch0, sample_source, chain, n_models_epoch, n_epochs, re
 
         create_batch(batch0+i, dv={}, params={}, source=sample_source, nbursts=35,
                      kgrid=kgrid, walltime=96, setup_test=False,
-                     nuc_heat=True, predict_qnuc=False, substrate_off=True,
+                     nuc_heat=True, auto_qnuc=False, substrate_off=True,
                      params_full=params_full, notes=idx_string)
 
 
