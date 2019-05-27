@@ -40,13 +40,12 @@ GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
 
 # TODO: This whole module is a mess. Needs lots of tidying up
-# TODO: Rewrite docstrings
 # TODO: Allow enumerating over multiple parameters, create_batches()
 
 param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
 
 
-def create_batch(batch, dv, source, params,
+def create_batch(batch, source, params, dv,
                  lburn=1, t_end=1.3e5, exclude=None, basename='xrb', walltime=96,
                  nstop=10000000, nsdump=500, auto_t_end=True, notes='No notes given',
                  nbursts=20, kgrid=None, nuc_heat=True, setup_test=False,
@@ -59,6 +58,7 @@ def create_batch(batch, dv, source, params,
     Parameters
     ---------
     batch : int
+    source : str
     params : {}
         specifiy model parameters. If variable: give range
     dv : {}
@@ -71,11 +71,36 @@ def create_batch(batch, dv, source, params,
         auto-choose t_end based on predicted recurrence time
     kgrid : Kgrid
         pre-loaded Kgrid object, optional (avoids reloading)
+    lburn : bool (optional)
+    t_end : float (optional)
+    basename : str (optional)
+    walltime : int (optional)
+    nstop : int (optional)
+    nsdump : int (optional)
+    notes : str (optional)
+    nbursts : int (optional)
+    nuc_heat : bool (optional)
+    setup_test : bool (optional)
+    predict_qnuc : bool (optional)
+    grid_version : int (optional)
+    qnuc_source : str (optional)
+    minzone : int (optional)
+    zonermax : int (optional)
+    zonermin : int (optional)
+    thickfac : float (optional)
+    substrate : str (optional)
+    substrate_off : bool (optional)
+    adapnet_filename : str (optional)
+    bdat_filename : str (optional)
+    ibdatov : int (optional)
+    params_full : {} (optional)
     """
-    # TODO: WRITE ALL PARAM DESCRIPTIONS
-    # TODO: set default values for params
-    # TODO: Overhaul/tidy up
-    # TODO: use pd table instead of dicts of arrays
+    # TODO:
+    #   - WRITE ALL PARAM DESCRIPTIONS
+    #   - Overhaul/tidy up
+    #   - use pd table instead of dicts of arrays
+    #   - fold arguments into default config files (e.g. zoning options/params)
+
     print_batch(batch=batch)
     source = grid_strings.source_shorthand(source=source)
     mass_ref = 1.4  # reference NS mass (Msun)
