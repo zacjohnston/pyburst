@@ -108,6 +108,7 @@ def create_batch(batch, source, params, dv,
                        'numerical_params': numerical_params}
 
     config = setup_config(supplied_config=supplied_config, source=source)
+    # TODO: print numerical_params being used
 
     if params_full is None:
         params_expanded, var = expand_params(params=config['params'], dv=config['dv'])

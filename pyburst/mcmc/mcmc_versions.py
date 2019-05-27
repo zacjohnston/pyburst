@@ -90,28 +90,8 @@ grid_bounds = {
             (0.001, 0.05),  # x
             (0.05, 0.4),  # qb1
             (0.05, 0.4),  # qb2
-            (1.1, 2.6),  # m_nw
-            (0.9, 2.3),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        2: ((0.15, 0.4),  # mdot1
-            (0.15, 0.4),  # mdot2
-            (0.001, 0.05),  # x
-            (0.1, 0.4),  # qb1
-            (0.1, 0.4),  # qb2
-            (1.4, 2.6),  # m_nw
-            (1.0, 2.3),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        3: ((0.15, 0.4),  # mdot1
-            (0.15, 0.4),  # mdot2
-            (0.001, 0.05),  # x
-            (0.05, 0.4),  # qb1
-            (0.05, 0.4),  # qb2
             (1.1, 2.0),  # m_nw
-            (1.0, 2.3),  # m_gr
+            (0.9, 2.2),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
@@ -262,13 +242,13 @@ source_defaults = {
     'analytic_bprops': {
         'grid5': ('fper',),
         'synth5': ('fper',),
-        'he2': ('fper',),
+        'he2': ('fper', 'fedd'),
     },
 
     'weights': {
         'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         'synth5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
-        'he2': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+        'he2': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
     },
 
     'disc_model': {},
@@ -320,7 +300,7 @@ source_defaults = {
 }
 
 # Summary
-# -------
+# ------------------------------
 # grid5:
 #   2  : priors: z
 #   3  : priors: z, d_b
@@ -346,7 +326,9 @@ source_defaults = {
 #   18 : as 17, epoch 1998
 #   19 : as 17, epoch 2000
 #   20 : as 17, epoch 2007
-
+# ------------------------------
+# he2
+#
 version_definitions = {
     'interpolator': {
         'grid5': {
@@ -355,8 +337,6 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            1: 1,
-            2: 2,
             3: 3,
             4: 3,
         },
@@ -368,8 +348,6 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            3: ('rate', 'fluence', 'peak'),
-            4: ('rate', 'fluence', 'peak'),
         },
     },
 
@@ -484,9 +462,6 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            2: grid_bounds[8][2],
-            3: grid_bounds[8][3],
-            4: grid_bounds[8][3],
         },
     },
 
@@ -508,7 +483,6 @@ version_definitions = {
          },
          'synth5': {},
          'he2': {
-             3: {'d_b': gaussian(mean=7.6, std=0.4)}
          },
     },
 
