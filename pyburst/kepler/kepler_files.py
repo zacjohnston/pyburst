@@ -1,4 +1,3 @@
-import numpy as np
 import os
 
 
@@ -7,28 +6,25 @@ import os
 # ========================================================
 # TODO: rename this kepler_setup.py
 
-def write_genfile(h1, he4, n14, qb, acc_mult, lburn,
-                  geemult, path, header, lumdata=0, qnuc=5.,
-                  t_end=1.3e5, accdepth=1.0e19, accrate0=5.7E-04,
-                  accmass=1.0e18, zonermax=10, zonermin=-1, nstop=10000000,
-                  accrate1_str='', nsdump=500, nuc_heat=False, cnv=0,
-                  minzone=51, thickfac=0.001, setup_test=False, substrate_off=True,
-                  ibdatov=0):
+def write_genfile(h1, he4, n14, qb, acc_mult, numerical_params,
+                  geemult, path, header, qnuc,
+                  t_end, accdepth, accrate0, accmass,
+                  lumdata=0, accrate1_str='', nuc_heat=False,
+                  setup_test=False, substrate_off=True):
     """========================================================
     Creates a model generator file with the given params inserted
     ========================================================
+    numerical_params : {}
+        dict specifying misc. kepler params (see grids/config/default.ini)
     h1       = flt   : hydrogen mass fraction
     he4      = flt   : helium    "    "
     z        = flt   : metals    "    "
     qb       = flt   : base heating (MeV/nucleon)
-    nstop    = int   : max number of timesteps (cycles)
     qnuc     = flt   : nuclear heating (MeV/nucleon, for thermal setup)
-    lburn    = int   : switch for full network energy generation (0/1  = off/on)
     lumdata  = int   : switch for time-dependent base-flux (0/1 = off/on)
     accrate0 = flt   : accretion rate at model start (as fraction of Eddington),
                           for getting profile into equilibrium (essentially setting base flux)
     accrate1_str = str   : optional string to redefine accrate  (-1 = time-dependent)
-    nsdump   = int   : keep every 'nsdump' savefiles
     path     = str   : target directory for generator file
     ========================================================"""
     genpath = os.path.join(path, 'xrb_g')
@@ -95,7 +91,7 @@ p 46 .15
 p 47 3.e-3
 p 48 1.
 p 49 1.e+50
-p thickfac {thickfac:.2f}
+p thickfac {numerical_params['thickfac']:.2f}
 p 53 .1
 p 54  2.
 p 55  10.
@@ -156,7 +152,7 @@ p 65 1.d7
 
 p 211 1.75d-9
 
-p minzone {minzone:.0f}
+p minzone {numerical_params['minzone']:.0f}
 p 119 40
 p 132 4
 p 336 1.5d19
@@ -174,7 +170,7 @@ p 454 -1.
 p 456 -1.
 
 # Overwrite hard-coded rates with bdat
-p ibdatov {ibdatov:.0f}
+p ibdatov {numerical_params['ibdatov']:.0f}
 
 c=======================================================================
 c Now follows the command file
@@ -236,7 +232,7 @@ c .........................
 c =================================
 @time>1.d17
 {qnuc_str2}
-p ncnvout {cnv}
+p ncnvout {numerical_params['cnv']}
 
 c overwrites accreted composition (if need to change)
 compsurb {n14:.6f} n14 {he4:.6f} he4 {h1:.6f} h1
@@ -264,7 +260,7 @@ cutbin
 resetacc
 d #
 
-p lburn {lburn}
+p lburn {numerical_params['lburn']}
 p 1 1.
 p 521 1
 p tnucmin 1.d7
@@ -272,8 +268,8 @@ p tnucmin 1.d7
 p 86 1
 p 87 1
 p 452 0
-p zonermin {zonermin:.4f}
-p zonermax {zonermax:.4f}
+p zonermin {numerical_params['zonermin']:.4f}
+p zonermax {numerical_params['zonermax']:.4f}
 p zonemmax 1.d99
 p ddmin 1.d4
 c decretion
@@ -287,9 +283,9 @@ c p 69 5.d18
 p pbound {{6.67259e-8 * zm(0) * xm(0) / (4. * 3.14159 * rn(0) ^ 4 ) * 0.5}}
 
 p 132 11
-p nsdump {nsdump:.0f}
+p nsdump {numerical_params['nsdump']:.0f}
 
-p nstop {nstop:.0f}
+p nstop {numerical_params['nstop']:.0f}
 p abunlim 0.01
 {kill_setup}
 

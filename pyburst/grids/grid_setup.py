@@ -49,13 +49,13 @@ param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
 
 
 def create_batch(batch, source, params, dv,
-                 lburn=1, t_end=1.3e5, exclude=None, basename='xrb', walltime=96,
-                 nstop=10000000, nsdump=500, auto_t_end=True, notes='No notes given',
-                 nbursts=20, kgrid=None, nuc_heat=True, setup_test=False,
-                 predict_qnuc=False, grid_version=None, qnuc_source='heat', minzone=51,
-                 zonermax=10, zonermin=-1, thickfac=0.001, substrate='fe54',
-                 substrate_off=True, adapnet_filename=None, bdat_filename=None,
-                 ibdatov=1, params_full=None):
+                 t_end=1.3e5, exclude=None, basename='xrb', walltime=96,
+                 auto_t_end=True, notes='No notes given', nbursts=20, kgrid=None,
+                 nuc_heat=True, setup_test=False,
+                 predict_qnuc=False, grid_version=None, qnuc_source='heat',
+                 substrate='fe54', substrate_off=True, adapnet_filename=None,
+                 bdat_filename=None, params_full=None,
+                 numerical_params=None):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -74,12 +74,9 @@ def create_batch(batch, source, params, dv,
         auto-choose t_end based on predicted recurrence time
     kgrid : Kgrid
         pre-loaded Kgrid object, optional (avoids reloading)
-    lburn : bool (optional)
     t_end : float (optional)
     basename : str (optional)
     walltime : int (optional)
-    nstop : int (optional)
-    nsdump : int (optional)
     notes : str (optional)
     nbursts : int (optional)
     nuc_heat : bool (optional)
@@ -87,46 +84,41 @@ def create_batch(batch, source, params, dv,
     predict_qnuc : bool (optional)
     grid_version : int (optional)
     qnuc_source : str (optional)
-    minzone : int (optional)
-    zonermax : int (optional)
-    zonermin : int (optional)
-    thickfac : float (optional)
     substrate : str (optional)
     substrate_off : bool (optional)
     adapnet_filename : str (optional)
     bdat_filename : str (optional)
-    ibdatov : int (optional)
     params_full : {} (optional)
+    numerical_params : {} (optional)
+        Overwrite default numerical kepler parameters (e.g. nsdump, zonermax, lburn,
+        For all parameters: see 'numerical_params' in config/default.ini
     """
     # TODO:
     #   - WRITE ALL PARAM DESCRIPTIONS
     #   - Overhaul/tidy up
     #   - use pd table instead of dicts of arrays
-    #   - fold arguments into default config files (e.g. zoning options/params)
 
     print_batch(batch=batch)
     source = grid_strings.source_shorthand(source=source)
     mass_ref = 1.4  # reference NS mass (Msun)
     radius_ref = 10  # default NS radius (km)
 
-    params = setup_config(params=params, source=source)
+    supplied_config = {'params': params,
+                       'dv': dv,
+                       'numerical_params': numerical_params}
+
+    config = setup_config(supplied_config=supplied_config, source=source)
 
     if params_full is None:
-        params_expanded, var = expand_params(params=params, dv=dv)
-
-        # ===== Cut out any excluded values =====
-        if exclude is None:
-            exclude = {}
-        cut_params(params=params_expanded, exclude=exclude)
-        print_grid_params(params_expanded)
-
-        params_full = grid_tools.enumerate_params(params_expanded)
+        params_expanded, var = expand_params(params=config['params'], dv=config['dv'])
+        params_full = exclude_params(params_expanded=params_expanded, exclude=exclude)
 
     n_models = len(params_full['x'])
 
     if kgrid is None:
-        print('No kgrid provided. Loading:')
-        kgrid = grid_analyser.Kgrid(load_lc=False, source=source)
+        print('No kgrid provided. Loading default:')
+        kgrid = grid_analyser.Kgrid(load_lc=False, linregress_burst_rate=True,
+                                    source=source)
 
     params_full['y'] = 1 - params_full['x'] - params_full['z']  # helium-4 values
     params_full['geemult'] = params_full['mass'] / mass_ref  # Gravity multiplier
@@ -159,11 +151,12 @@ def create_batch(batch, source, params, dv,
     grid_tools.try_mkdir(logpath)
 
     # ===== Write parameter table MODELS.txt and NOTES.txt=====
-    write_model_table(n=n_models, params=params_full, lburn=lburn, path=batch_model_path)
+    write_model_table(n=n_models, params=params_full, path=batch_model_path)
     filepath = os.path.join(batch_model_path, 'NOTES.txt')
     with open(filepath, 'w') as f:
         f.write(notes)
 
+    # ===== Write jobscripts for submission on clusters =====
     print_dashes()
     kepler_jobs.write_both_jobscripts(run0=1, run1=n_models, batch=batch,
                                       source=source, basename=basename,
@@ -187,8 +180,6 @@ def create_batch(batch, source, params, dv,
         kepler_files.write_rpabg(x0, z0, run_path, substrate=substrate)
 
         # ==== Create model generator file ====
-        accrate0 = params_full['accrate'][i]
-
         if auto_t_end:
             mdot = params_full['accrate'][i] * params_full['acc_mult'][i]
             rate_params = {}
@@ -214,34 +205,39 @@ def create_batch(batch, source, params, dv,
 
         kepler_files.write_genfile(h1=params_full['x'][i], he4=params_full['y'][i],
                                    n14=params_full['z'][i], qb=params_full['qb'][i],
-                                   acc_mult=params_full['acc_mult'][i], qnuc=params_full['qnuc'][i],
-                                   lburn=lburn, geemult=params_full['geemult'][i],
-                                   path=run_path, t_end=t_end, header=header,
-                                   accrate0=accrate0, accdepth=accdepth,
+                                   acc_mult=params_full['acc_mult'][i],
+                                   qnuc=params_full['qnuc'][i],
+                                   geemult=params_full['geemult'][i],
+                                   accrate0=params_full['accrate'][i],
                                    accmass=params_full['accmass'][i],
-                                   nsdump=nsdump, nstop=nstop,
-                                   nuc_heat=nuc_heat, setup_test=setup_test, cnv=0,
-                                   minzone=minzone, zonermax=zonermax, zonermin=zonermin,
-                                   thickfac=thickfac, substrate_off=substrate_off,
-                                   ibdatov=ibdatov)
+                                   accdepth=params_full['accdepth'][i],
+                                   path=run_path, t_end=t_end, header=header,
+                                   nuc_heat=nuc_heat, setup_test=setup_test,
+                                   substrate_off=substrate_off,
+                                   numerical_params=config['numerical_params'])
 
 
-def setup_config(params, source):
+def setup_config(supplied_config, source):
     """Returns combined dict of params from default, source, and supplied
     """
     def overwrite(old_dict, new_dict):
         for key, val in new_dict.items():
             old_dict[key] = val
 
-    params_out = load_config(config_source='default')
-    source_params = load_config(config_source=source)
+    if supplied_config['numerical_params'] is None:
+        supplied_config['numerical_params'] = {}
 
-    print('Overwriting default params with source params')
-    overwrite(old_dict=params_out, new_dict=source_params)
-    print('Overwriting with supplied params')
-    overwrite(old_dict=params_out, new_dict=params)
+    default_config = load_config(config_source='default')
+    source_config = load_config(config_source=source)
+    combined_config = dict(default_config)
 
-    return params_out
+    for category, contents in combined_config.items():
+        print(f'Overwriting default {category} with source-specific and '
+              f'user-supplied {category}')
+        overwrite(old_dict=contents, new_dict=source_config[category])
+        overwrite(old_dict=contents, new_dict=supplied_config[category])
+
+    return combined_config
 
 
 def load_config(config_source):
@@ -263,7 +259,19 @@ def load_config(config_source):
         for option in ini.options(section):
             config[section][option] = ast.literal_eval(ini.get(section, option))
 
-    return config['params']
+    return config
+
+
+def exclude_params(params_expanded, exclude):
+    """Cut out specified params from expanded_params
+    """
+    if exclude is None:
+        exclude = {}
+    cut_params(params=params_expanded, exclude=exclude)
+    print_grid_params(params_expanded)
+
+    params_full = grid_tools.enumerate_params(params_expanded)
+    return params_full
 
 
 def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcmc_version,
@@ -302,8 +310,8 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
                                                                 n_models=n_models, mv=mv)
 
         create_batch(batch0+i, dv={}, params={}, source=source, nbursts=30, kgrid=kgrid,
-                     walltime=96, setup_test=False, nsdump=500, nuc_heat=True,
-                     predict_qnuc=False, grid_version=0, substrate_off=True, ibdatov=1,
+                     walltime=96, setup_test=False, nuc_heat=True,
+                     predict_qnuc=False, grid_version=0, substrate_off=True,
                      params_full=params_full)
 
 
@@ -342,8 +350,8 @@ def setup_mcmc_sample(batch0, sample_source, chain, n_models_epoch, n_epochs, re
             params_full[key] = get_mcmc_params(mv_key, param_sample=param_sample, mv=mv)
 
         create_batch(batch0+i, dv={}, params={}, source=sample_source, nbursts=35,
-                     kgrid=kgrid, walltime=96, setup_test=False, nsdump=500,
-                     nuc_heat=True, predict_qnuc=False, substrate_off=True, ibdatov=1,
+                     kgrid=kgrid, walltime=96, setup_test=False,
+                     nuc_heat=True, predict_qnuc=False, substrate_off=True,
                      params_full=params_full, notes=idx_string)
 
 
@@ -481,7 +489,7 @@ def check_grid_params(params_full, source, precision=6, kgrid=None):
     return any_matches
 
 
-def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
+def write_model_table(n, params, path, filename='MODELS.txt'):
     """Writes table of model parameters to file
 
     Parameters
@@ -490,22 +498,18 @@ def write_model_table(n, params, lburn, path, filename='MODELS.txt'):
         number of models
     params : {}
         dictionary of parameters
-    lburn : int
-        lburn switch (0,1)
     path : str
     filename : str
     """
     print('Writing MODEL.txt table')
     runlist = np.arange(1, n + 1, dtype='int')
-    lburn_list = np.full(n, lburn, dtype='int')
 
     p = dict(params)
     p['run'] = runlist
-    p['lburn'] = lburn_list
 
     cols = ['run', 'z', 'y', 'x', 'accrate', 'qb', 'qnuc',
             'tshift', 'acc_mult', 'qb_delay', 'mass', 'radius', 'gravity',
-            'lburn', 'accmass', 'accdepth']
+            'accmass', 'accdepth']
     ptable = pd.DataFrame(p)
     ptable = ptable[cols]  # Fix column order
 
