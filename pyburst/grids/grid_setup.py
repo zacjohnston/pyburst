@@ -2,6 +2,8 @@ import os
 import numpy as np
 import pandas as pd
 import subprocess
+import configparser
+import ast
 
 # pyburst
 from . import grid_analyser
@@ -44,12 +46,7 @@ MODELS_PATH = os.environ['KEPLER_MODELS']
 param_list = ['x', 'z', 'qb', 'accrate', 'accdepth', 'accmass', 'mass']
 
 
-def create_batch(batch, dv, source,
-                 params={'x': [0.6, 0.8], 'z': [0.01, 0.02],
-                         'tshift': [0.0], 'accrate': [0.05],
-                         'qb': [0.125], 'acc_mult': [1.0], 'qnuc': [5.0],
-                         'qb_delay': [0.0], 'mass': [1.4],
-                         'accmass': [1e16], 'accdepth': [1e20]},
+def create_batch(batch, dv, source, params,
                  lburn=1, t_end=1.3e5, exclude=None, basename='xrb', walltime=96,
                  nstop=10000000, nsdump=500, auto_t_end=True, notes='No notes given',
                  nbursts=20, kgrid=None, nuc_heat=True, setup_test=False,
@@ -79,14 +76,15 @@ def create_batch(batch, dv, source,
     # TODO: set default values for params
     # TODO: Overhaul/tidy up
     # TODO: use pd table instead of dicts of arrays
+    print_batch(batch=batch)
     source = grid_strings.source_shorthand(source=source)
     mass_ref = 1.4  # reference NS mass (Msun)
     radius_ref = 10  # default NS radius (km)
 
-    print_batch(batch=batch)
+    params = setup_config(params=params, source=source)
 
     if params_full is None:
-        params_expanded, var = expand_params(dv, params)
+        params_expanded, var = expand_params(params=params, dv=dv)
 
         # ===== Cut out any excluded values =====
         if exclude is None:
@@ -198,6 +196,46 @@ def create_batch(batch, dv, source,
                                    minzone=minzone, zonermax=zonermax, zonermin=zonermin,
                                    thickfac=thickfac, substrate_off=substrate_off,
                                    ibdatov=ibdatov)
+
+
+def setup_config(params, source):
+    """Returns combined dict of params from default, source, and supplied
+    """
+    def overwrite(old_dict, new_dict):
+        for key, val in new_dict.items():
+            old_dict[key] = val
+
+    params_out = load_config(config_source='default')
+    source_params = load_config(config_source=source)
+
+    print('Overwriting default params with source params')
+    overwrite(old_dict=params_out, new_dict=source_params)
+    print('Overwriting with supplied params')
+    overwrite(old_dict=params_out, new_dict=params)
+
+    return params_out
+
+
+def load_config(config_source):
+    """Loads config parameters from file
+    """
+    config_filepath = grid_strings.config_filepath(source=config_source,
+                                                   module_dir='grids')
+    print(f'Loading config: {config_filepath}')
+
+    if not os.path.exists(config_filepath):
+        raise FileNotFoundError(f'Config file not found: {config_filepath}')
+
+    ini = configparser.ConfigParser()
+    ini.read(config_filepath)
+
+    config = {}
+    for section in ini.sections():
+        config[section] = {}
+        for option in ini.options(section):
+            config[section][option] = ast.literal_eval(ini.get(section, option))
+
+    return config['params']
 
 
 def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcmc_version,
@@ -334,11 +372,7 @@ def cut_params(params, exclude):
                 params[ex_var] = np.delete(params[ex_var], [ex_idx])
 
 
-def expand_params(dv={'x': 0.05},
-                  params={'x': [0.4, 0.5], 'z': [0.02],
-                          'tshift': [20.0], 'accrate': [-1],
-                          'qb': [0.3], 'acc_mult': [1.05],
-                          'qb_delay': [0.0], 'mass': [1.4]}):
+def expand_params(params, dv):
     """Expand variable parameters to fill their ranges, given specified stepsizes
     """
     params_full = dict(params)
