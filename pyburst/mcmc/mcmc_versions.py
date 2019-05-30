@@ -95,6 +95,16 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
+        2: ((0.15, 0.35),  # mdot1
+            (0.15, 0.35),  # mdot2
+            (0.0, 0.1),  # x
+            (0.05, 0.4),  # qb1
+            (0.05, 0.4),  # qb2
+            (1.1, 2.0),  # m_nw
+            (1.0, 2.2),  # m_gr
+            (1., 20.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
     },
     9: {
         1: ((0.08, 0.18),  # mdot1
@@ -176,7 +186,8 @@ initial_position = {
         3: (0.09, 0.12, 0.136, 0.73, 0.007, 0.4, 0.2, 0.2, 2.5, 1.9, 5.74, 1.6),
     },
     8: {
-        1: (0.2, 0.27, 0.02, 0.35, 0.25, 1.3, 1.5, 5.7, 1.0),
+        1: (0.2, 0.27, 0.02, 0.35, 0.25, 1.3, 1.5, 7.5, 1.4),
+        2: (0.21, 0.29, 0.02, 0.35, 0.16, 1.35, 2.1, 7.4, 1.4),
     },
     9: {
         1: (0.095, 0.7, 0.0035, 0.4, 2.3, 2.0, 6.5, 1.7),
@@ -328,7 +339,12 @@ source_defaults = {
 #   20 : as 17, epoch 2007
 # ------------------------------
 # he2
-#
+#   1 : flat priors
+#   2 : single d_b prior (7.6)
+#   3 : using combined d_b prior
+#   4 : as 3, x=0.10 (upper accrate = 0.35)
+#   5 : as 4, excluding mass=1.4
+
 version_definitions = {
     'interpolator': {
         'grid5': {
@@ -337,6 +353,8 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
+            4: 1,
+            5: 2,
         },
     },
 
@@ -460,6 +478,8 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
+            4: grid_bounds[8][2],
+            5: 4,
         },
     },
 
@@ -483,6 +503,8 @@ version_definitions = {
          'he2': {
              2: {'d_b': gaussian(mean=7.6, std=0.4)},
              3: {'d_b': gaussian(mean=7.846, std=0.333)},
+             4: {'d_b': gaussian(mean=7.846, std=0.333)},
+             5: {'d_b': gaussian(mean=7.846, std=0.333)},
          },
     },
 
@@ -506,7 +528,10 @@ version_definitions = {
             20: initial_position[11][3],
         },
         'synth5': {},
-        'he2': {},
+        'he2': {
+            4: initial_position[8][2],
+            5: 4,
+        },
     },
 
     'disc_model': {},
