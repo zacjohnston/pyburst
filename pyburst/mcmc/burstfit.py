@@ -210,7 +210,7 @@ class BurstFit:
                                                     params=params)
 
         # ===== Setup plotting =====
-        n_bprops = len(self.mcmc_version.weights)
+        n_bprops = len(self.mcmc_version.bprops)
         if plot:
             plot_width = 6
             plot_height = 2.25
