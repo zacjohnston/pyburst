@@ -38,7 +38,7 @@ class BurstRun(object):
                  get_slopes=False, load_model_params=True, truncate_edd=True,
                  check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True, remove_shocks=False,
-                 remove_zero_lum=True, subtract_background_lum=True, load_config=False,
+                 remove_zero_lum=True, subtract_background_lum=True, load_config=True,
                  get_tail_timescales=True):
         # TODO: move these into default config file
         self.flags = {'lum_loaded': False,
