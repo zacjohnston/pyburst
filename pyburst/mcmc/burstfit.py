@@ -263,10 +263,11 @@ class BurstFit:
                 Note: Actually the luminosity, because this is the local value
             """
             out = np.full([self.n_epochs, 2], np.nan, dtype=float)
-            x_edd = params['x']
 
             if self.has_xedd_ratio:
-                x_edd *= params['xedd_ratio']
+                x_edd = params['x'] * params['xedd_ratio']
+            else:
+                x_edd = 0.0
 
             l_edd = accretion.eddington_lum(mass=params['m_nw'], x=x_edd)
             out[:, 0] = l_edd
