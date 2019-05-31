@@ -76,6 +76,9 @@ class Kgrid:
         for v in self.params.columns[2:]:
             self.unique_params[v] = np.unique(self.params[v])
 
+        if self.verbose:
+            grid_tools.check_complete(param_table=self.params, raise_error=False)
+
         self.n_models = len(self.params)
         self.printv('=' * 40)
         self.printv('Loaded')
