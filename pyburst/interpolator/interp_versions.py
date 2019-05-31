@@ -21,7 +21,9 @@ version_definitions = {
         'grid5': {},
         'grid6': {},
         'he1': {},
-        'he2': {},
+        'he2': {
+            5: ['accrate', 'qb', 'mass'],
+        },
     },
 
     # The burst properties being interpolated
