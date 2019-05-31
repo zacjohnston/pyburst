@@ -1,6 +1,7 @@
 import numpy as np
 
 # Defines various versions/subsets of model grids
+# TODO: change format to specify *included* instead of excluded
 
 version_defaults = {
     'exclude_any': {
@@ -25,7 +26,7 @@ version_defaults = {
             'qb': [0.0, 0.4],
         },
         'he2': {
-            'qnuc': [3.0], 'qb': [0.5, 0.8], 'mass': [2.6], 'x': [0.001], 'z': [0.005],
+            'qnuc': [3.0], 'qb': [0.3, 0.5, 0.8], 'mass': [2.6], 'x': [0.001], 'z': [0.005],
         },
         'alpha1': {},
         'alpha2': {},
@@ -105,16 +106,20 @@ version_definitions = {
             'he1': {},
             'he2': {
                 1: {
-                    'qnuc': [3.0], 'qb': [0.5, 0.8], 'mass': [2.6], 'x': [0.001],
+                    'qnuc': [3.0], 'qb': [0.3, 0.5, 0.8], 'mass': [2.6], 'x': [0.001],
                     'accrate': [0.4], 'z': [0.005],
                 },
                 2: {
-                    'qnuc': [3.0], 'qb': [0.5, 0.8], 'mass': [1.4, 2.6], 'x': [0.001],
+                    'qnuc': [3.0], 'qb': [0.3, 0.5, 0.8], 'mass': [1.4, 2.6], 'x': [0.001],
                     'accrate': [0.4], 'z': [0.005],
                 },
                 3: {
-                    'qnuc': [3.0], 'qb': [0.4, 0.5, 0.8], 'mass': [1.4, 2.6],
+                    'qnuc': [3.0], 'qb': [0.3, 0.4, 0.5, 0.8], 'mass': [1.4, 2.6],
                     'x': [0.001, 0.1],  'z': [0.005],
+                },
+                4: {
+                    'qnuc': [3.0], 'qb': [0.3, 0.5, 0.8], 'mass': [1.4, 2.6], 'x': [0.001],
+                    'accrate': [0.4], 'z': [],
                 },
             },
             'alpha1': {},
