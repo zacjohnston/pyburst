@@ -7,7 +7,7 @@ import subprocess
 from astropy.io import ascii
 
 # kepler_grids
-from pyburst.misc.pyprint import print_dashes, printv
+from pyburst.misc.pyprint import print_dashes, printv, print_warning
 from pyburst.physics import gravity
 from . import grid_strings
 
@@ -542,7 +542,7 @@ def check_complete(param_table, raise_error=True,
         if raise_error:
             raise RuntimeError(out_str)
         else:
-            print(out_str)
+            print_warning(out_str)
 
 
 def print_params_summary(table, show=None):
