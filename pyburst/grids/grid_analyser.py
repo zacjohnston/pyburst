@@ -396,6 +396,7 @@ class Kgrid:
                    'alpha': r'$\alpha$',
                    'length': 'Burst length (min)'
                    }.get(bprop, bprop)
+        # TODO: Move these into config file
         ylims = {'rate': {
                     'grid5': [0.0, 24],
                     'he2': [0.0, 50],
@@ -406,7 +407,7 @@ class Kgrid:
                  },
                  'fluence': {
                      'grid5': [0.0, 21],
-                     'he2': [0.0, 12.5],
+                     'he2': [0.0, 6],
                  },
                  'peak': {
                      'grid5': [0.0, 7.0],
