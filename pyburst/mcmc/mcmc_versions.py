@@ -375,6 +375,7 @@ source_defaults = {
 #   5 : as 4, excluding mass=1.4
 #   6 : sparse grid
 #   7 : fixed x=0.0
+#   8 : as 7, m_gr prior (1.85 +/- 0.15)
 
 version_definitions = {
     'interpolator': {
@@ -388,6 +389,7 @@ version_definitions = {
             5: 2,
             6: 3,
             7: 5,
+            8: 5,
         },
     },
 
@@ -451,6 +453,7 @@ version_definitions = {
         'synth5': {},
         'he2': {
             7: param_keys[12],
+            8: 7,
         },
     },
 
@@ -459,6 +462,7 @@ version_definitions = {
         'synth5': {},
         'he2': {
             7: interp_keys[4],
+            8: 7,
         },
     },
 
@@ -518,6 +522,7 @@ version_definitions = {
             5: 4,
             6: grid_bounds[8][3],
             7: grid_bounds[12][1],
+            8: 7,
         },
     },
 
@@ -541,6 +546,7 @@ version_definitions = {
          'he2': {
              1: {'d_b': flat_prior},
              2: {'d_b': gaussian(mean=7.6, std=0.4)},
+             8: {'m_gr': gaussian(mean=1.85, std=0.15)},
          },
     },
 
@@ -569,6 +575,7 @@ version_definitions = {
             5: 4,
             6: initial_position[8][3],
             7: initial_position[12][1],
+            8: 7,
         },
     },
 
