@@ -21,6 +21,7 @@ param_keys = {
     9: ['mdot1', 'x', 'z', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     10: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
     11: ['mdot1', 'x', 'z', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
+    12: ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -28,6 +29,7 @@ interp_keys = {
     1: ['mdot', 'x', 'z', 'qb', 'mass'],
     2: ['mdot', 'x', 'z', 'mass'],
     3: ['mdot', 'x', 'qb', 'mass'],
+    4: ['mdot', 'qb', 'mass'],
 }
 
 # ===== Define params that are unique for each epoch =====
@@ -105,11 +107,11 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
-        3: ((0.15, 0.4),  # mdot1
-            (0.15, 0.4),  # mdot2
+        3: ((0.2, 0.4),  # mdot1
+            (0.2, 0.4),  # mdot2
             (0.0, 0.05),  # x
-            (0.05, 0.2),  # qb1
-            (0.05, 0.2),  # qb2
+            (0.05, 0.3),  # qb1
+            (0.05, 0.3),  # qb2
             (1.1, 2.0),  # m_nw
             (1.0, 2.2),  # m_gr
             (1., 20.),  # d_b
@@ -158,6 +160,17 @@ grid_bounds = {
             ),
     },
 
+    12: {
+        1: ((0.175, 0.4),  # mdot1
+            (0.175, 0.4),  # mdot2
+            (0.05, 0.5),  # qb1
+            (0.05, 0.5),  # qb2
+            (1.1, 2.0),  # m_nw
+            (1.0, 2.2),  # m_gr
+            (1., 20.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+    },
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -198,7 +211,7 @@ initial_position = {
     8: {
         1: (0.2, 0.27, 0.02, 0.35, 0.25, 1.3, 1.5, 7.5, 1.4),
         2: (0.21, 0.29, 0.02, 0.35, 0.16, 1.35, 2.1, 7.4, 1.4),
-        3: (0.26, 0.34, 0.02, 0.18, 0.1, 1.8, 2.1, 7.4, 1.45),
+        3: (0.26, 0.36, 0.02, 0.18, 0.1, 1.8, 2.1, 7.4, 1.5),
     },
     9: {
         1: (0.095, 0.7, 0.0035, 0.4, 2.3, 2.0, 6.5, 1.7),
@@ -212,6 +225,9 @@ initial_position = {
         1: (0.09, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
         2: (0.13, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
         3: (0.15, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
+    },
+    12: {
+        1: (0.26, 0.36, 0.18, 0.1, 1.8, 2.1, 7.4, 1.5),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -292,7 +308,9 @@ source_defaults = {
           'z': priors['z'][1],
         },
         'synth5': {},
-        'he2': {},
+        'he2': {
+            'd_b': gaussian(mean=7.846, std=0.333),
+        },
     },
 
     'initial_position': {
@@ -356,6 +374,7 @@ source_defaults = {
 #   4 : as 3, x=0.10 (upper accrate = 0.35)
 #   5 : as 4, excluding mass=1.4
 #   6 : sparse grid
+#   7 : fixed x=0.0
 
 version_definitions = {
     'interpolator': {
@@ -368,6 +387,7 @@ version_definitions = {
             4: 1,
             5: 2,
             6: 3,
+            7: 5,
         },
     },
 
@@ -376,8 +396,7 @@ version_definitions = {
             7: ('rate', 'fluence', 'peak', 'tail_50'),
         },
         'synth5': {},
-        'he2': {
-        },
+        'he2': {},
     },
 
     'analytic_bprops': {
@@ -430,13 +449,17 @@ version_definitions = {
             20: param_keys[11],
         },
         'synth5': {},
-        'he2': {},
+        'he2': {
+            7: param_keys[12],
+        },
     },
 
     'interp_keys': {
         'grid5': {},
         'synth5': {},
-        'he2': {},
+        'he2': {
+            7: interp_keys[4],
+        },
     },
 
     'epoch_unique': {
@@ -494,6 +517,7 @@ version_definitions = {
             4: grid_bounds[8][2],
             5: 4,
             6: grid_bounds[8][3],
+            7: grid_bounds[12][1],
         },
     },
 
@@ -515,11 +539,8 @@ version_definitions = {
          },
          'synth5': {},
          'he2': {
+             1: {'d_b': flat_prior},
              2: {'d_b': gaussian(mean=7.6, std=0.4)},
-             3: {'d_b': gaussian(mean=7.846, std=0.333)},
-             4: {'d_b': gaussian(mean=7.846, std=0.333)},
-             5: {'d_b': gaussian(mean=7.846, std=0.333)},
-             6: {'d_b': gaussian(mean=7.846, std=0.333)},
          },
     },
 
@@ -547,6 +568,7 @@ version_definitions = {
             4: initial_position[8][2],
             5: 4,
             6: initial_position[8][3],
+            7: initial_position[12][1],
         },
     },
 
