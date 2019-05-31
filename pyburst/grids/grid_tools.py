@@ -524,6 +524,27 @@ def check_finished(batches, source, efficiency=True, show='all',
             print(string)
 
 
+def check_complete(param_table, raise_error=True,
+                   param_list=('accrate', 'x', 'z', 'qb', 'mass')):
+    """Checks for completeness of model grid, and raises an warning or error if incomplete
+    """
+    print('Checking model grid completeness')
+    product = 1
+    n_models = len(param_table)
+
+    for param in param_list:
+        product *= len(np.unique(param_table[param]))
+
+    if product != n_models:
+        out_str = (f'Model grid is not complete! Expected {product} models, '
+                   f'but have {n_models}. '
+                   'Some parameter combinations are missing!')
+        if raise_error:
+            raise RuntimeError(out_str)
+        else:
+            print(out_str)
+
+
 def print_params_summary(table, show=None):
     """Print summary of unique params in a given table
 
