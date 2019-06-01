@@ -531,7 +531,7 @@ version_definitions = {
             19: grid_bounds[11][1],
             20: grid_bounds[11][1],
             21: 17,
-            22: 12,
+            22: 2,
         },
         'synth5': {},
         'he2': {
