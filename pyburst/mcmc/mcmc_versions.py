@@ -374,6 +374,7 @@ source_defaults = {
 #   20 : as 17, epoch 2007
 
 #   21 : as 17, z-prior (0.0 +/- 0.1)
+#   22 : as 12, z-prior (0.0 +/- 0.1)
 
 # ------------------------------
 # he2
@@ -422,6 +423,7 @@ version_definitions = {
             19: ('fper', 'fedd'),
             20: ('fper', 'fedd'),
             21: ('fper', 'fedd'),
+            22: ('fper', 'fedd'),
         },
         'synth5': {},
         'he2': {},
@@ -441,6 +443,7 @@ version_definitions = {
             19: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             20: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             21: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
+            22: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
         },
         'synth5': {},
         'he2': {},
@@ -528,6 +531,7 @@ version_definitions = {
             19: grid_bounds[11][1],
             20: grid_bounds[11][1],
             21: 17,
+            22: 12,
         },
         'synth5': {},
         'he2': {
@@ -555,6 +559,7 @@ version_definitions = {
              11: {'d_b': gaussian(mean=5.7, std=0.2)},
              16: {'z': flat_prior},
              21: {'z': log_z2},
+             22: {'z': log_z2},
          },
          'synth5': {},
          'he2': {
