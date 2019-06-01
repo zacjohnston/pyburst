@@ -179,11 +179,17 @@ def flat_prior(x):
 
 
 log_norm = norm(loc=-0.5, scale=0.25).pdf
+log_norm2 = norm(loc=0.0, scale=0.25).pdf
+
 def log_z(z, z_sun=0.01):
     """PDF of log10(z/z_solar)"""
     logz = np.log10(z / z_sun)
     return log_norm(logz)
 
+def log_z2(z, z_sun=0.01):
+    """PDF of log10(z/z_solar)"""
+    logz = np.log10(z / z_sun)
+    return log_norm2(logz)
 
 def gaussian(mean, std):
     """Returns function for Gaussian distribution
@@ -366,6 +372,9 @@ source_defaults = {
 #   18 : as 17, epoch 1998
 #   19 : as 17, epoch 2000
 #   20 : as 17, epoch 2007
+
+#   21 : as 17, z-prior (0.0 +/- 0.1)
+
 # ------------------------------
 # he2
 #   1 : flat priors
@@ -412,6 +421,7 @@ version_definitions = {
             18: ('fper', 'fedd'),
             19: ('fper', 'fedd'),
             20: ('fper', 'fedd'),
+            21: ('fper', 'fedd'),
         },
         'synth5': {},
         'he2': {},
@@ -430,6 +440,7 @@ version_definitions = {
             18: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             19: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             20: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
+            21: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
         },
         'synth5': {},
         'he2': {},
@@ -449,6 +460,7 @@ version_definitions = {
             18: param_keys[11],
             19: param_keys[11],
             20: param_keys[11],
+            21: 17,
         },
         'synth5': {},
         'he2': {
@@ -515,6 +527,7 @@ version_definitions = {
             18: grid_bounds[11][1],
             19: grid_bounds[11][1],
             20: grid_bounds[11][1],
+            21: 17,
         },
         'synth5': {},
         'he2': {
@@ -541,6 +554,7 @@ version_definitions = {
              10: {'d_b': gaussian(mean=5.7, std=0.2)},
              11: {'d_b': gaussian(mean=5.7, std=0.2)},
              16: {'z': flat_prior},
+             21: {'z': log_z2},
          },
          'synth5': {},
          'he2': {
@@ -568,6 +582,7 @@ version_definitions = {
             18: initial_position[11][1],
             19: initial_position[11][2],
             20: initial_position[11][3],
+            21: 17,
         },
         'synth5': {},
         'he2': {
