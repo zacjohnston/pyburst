@@ -325,6 +325,12 @@ source_defaults = {
         'he2': initial_position[8][1],
     },
 
+    'x_edd_option': {
+      'grid5': 'x_0',
+      'synth5': None,
+      'he2': 0.0,
+    },
+
     'synthetic': {  # whether the data being matches is synthetic
         'grid5': False,
         'synth5': True,
@@ -599,6 +605,12 @@ version_definitions = {
         },
     },
 
+    'x_edd_option': {
+        'grid5': {},
+        'synth5': {},
+        'he2': {},
+    },
+
     'disc_model': {},
 
     # ===== Special definitions for synthetic data sources =====
@@ -641,6 +653,7 @@ class McmcVersion:
         self.interpolator = self.get_parameter('interpolator')
         self.grid_bounds = np.array(self.get_parameter('grid_bounds'))
         self.initial_position = self.get_parameter('initial_position')
+        self.x_edd_option = self.get_parameter('x_edd_option')
         self.priors = self.get_priors()
         self.synthetic = source_defaults['synthetic'][source]
         self.disc_model = None
@@ -682,6 +695,7 @@ class McmcVersion:
                 + f'\ninitial position : {self.initial_position}'
                 + f'\ndisc model       : {self.disc_model}'
                 + f'\ninterpolator     : {self.interpolator}'
+                + f'\nx_edd option     : {self.x_edd_option}'
                 + f'{grid_bound_str}'
                 + f'{priors_str}'
                 + f'\nsynthetic        : {self.synthetic}'
