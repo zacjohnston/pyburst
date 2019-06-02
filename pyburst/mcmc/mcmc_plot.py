@@ -393,8 +393,8 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
     lhood, fig = bfit.lhood(max_params, plot=True)
 
     if lhood != max_lhood:
-        print_warning(f'lhoods do not match ({max_lhood:.2f}, {lhood:.2f}). '
-                      + 'BurstFit (lhood, lnhood) or interpolator may have changed')
+        print_warning(f'lhoods do not match (original={max_lhood:.2f}, current={lhood:.2f}). '
+                      + 'BurstFit (e.g. lhood, lnhood) or interpolator may have changed')
 
     save_plot(fig, prefix='compare', n_dimensions=len(max_params),
               n_walkers=n_walkers, n_steps=n_steps, save=save, source=source,
