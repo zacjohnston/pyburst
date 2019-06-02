@@ -239,7 +239,8 @@ def load_config(config_source):
     print(f'Loading config: {config_filepath}')
 
     if not os.path.exists(config_filepath):
-        raise FileNotFoundError(f'Config file not found: {config_filepath}')
+        raise FileNotFoundError(f'Config file not found: {config_filepath}.'
+                                "\nTry making one from the template 'default.ini'")
 
     ini = configparser.ConfigParser()
     ini.read(config_filepath)
