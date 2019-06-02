@@ -260,14 +260,16 @@ class BurstFit:
         """
         def get_fedd():
             """Returns Eddington flux array (n_epochs, 2)
-                Note: Actually the luminosity, because this is the local value
+                Note: Actually the luminosity at this stage, as this is the local value
             """
             out = np.full([self.n_epochs, 2], np.nan, dtype=float)
 
             if self.has_xedd_ratio:
                 x_edd = params['x'] * params['xedd_ratio']
+            elif self.mcmc_version.x_edd_option == 'x_0':
+                x_edd = params['x']
             else:
-                x_edd = 0.0
+                x_edd = self.mcmc_version.x_edd_option
 
             l_edd = accretion.eddington_lum(mass=params['m_nw'], x=x_edd)
             out[:, 0] = l_edd
