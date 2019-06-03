@@ -545,7 +545,7 @@ class Kgrid:
         ax.set_title(title)
         plt.show(block=False)
 
-    def save_all_plots(self, fixed=('x', 'mass', 'qb'), var='z', x_var='accrate',
+    def save_all_plots(self, fixed=('x', 'mass', 'qb'), var='z', xaxis='accrate',
                        bprops=('rate', 'fluence', 'peak'), **kwargs):
         """Saves burst_property plots for various iterations of parameters
         """
@@ -562,7 +562,7 @@ class Kgrid:
             fixed_input = {x: full_fixed[x][i] for x in full_fixed}
 
             for bprop in bprops:
-                self.plot_burst_property(bprop=bprop, var=var, xaxis=x_var, save=True,
+                self.plot_burst_property(bprop=bprop, var=var, xaxis=xaxis, save=True,
                                          fixed=fixed_input, show=False, **kwargs)
             plt.close('all')
 
