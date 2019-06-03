@@ -166,7 +166,16 @@ grid_bounds = {
             (0.05, 0.5),  # qb1
             (0.05, 0.5),  # qb2
             (1.1, 2.0),  # m_nw
-            (1.0, 2.2),  # m_gr
+            (1.0, 2.1),  # m_gr
+            (1., 20.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+        2: ((0.175, 0.35),  # mdot1
+            (0.175, 0.35),  # mdot2
+            (0.05, 0.5),  # qb1
+            (0.05, 0.5),  # qb2
+            (1.1, 2.0),  # m_nw
+            (1.0, 2.1),  # m_gr
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
@@ -233,7 +242,7 @@ initial_position = {
         3: (0.15, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
     },
     12: {
-        1: (0.21, 0.3, 0.33, 0.2, 1.4, 2.0, 7.45, 1.4),
+        1: (0.20, 0.28, 0.35, 0.25, 1.2, 2.0, 7.5, 1.4),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -392,6 +401,8 @@ source_defaults = {
 #   6 : sparse grid
 #   7 : fixed x=0.0
 #   8 : as 7, m_gr prior (1.85 +/- 0.15)
+#   9 : as 7, upper accrate = 0.35
+#   10 : as 8, upper accrate = 0.35
 
 version_definitions = {
     'interpolator': {
@@ -406,6 +417,8 @@ version_definitions = {
             6: 3,
             7: 5,
             8: 5,
+            9: 5,
+            10: 5,
         },
     },
 
@@ -475,6 +488,8 @@ version_definitions = {
         'he2': {
             7: param_keys[12],
             8: 7,
+            9: 7,
+            10: 7,
         },
     },
 
@@ -484,6 +499,8 @@ version_definitions = {
         'he2': {
             7: interp_keys[4],
             8: 7,
+            9: 7,
+            10: 7,
         },
     },
 
@@ -546,6 +563,8 @@ version_definitions = {
             6: grid_bounds[8][3],
             7: grid_bounds[12][1],
             8: 7,
+            9: grid_bounds[12][2],
+            10: 9,
         },
     },
 
@@ -572,6 +591,7 @@ version_definitions = {
              1: {'d_b': flat_prior},
              2: {'d_b': gaussian(mean=7.6, std=0.4)},
              8: {'m_gr': gaussian(mean=1.85, std=0.15)},
+             10: {'m_gr': gaussian(mean=1.85, std=0.15)},
          },
     },
 
@@ -602,6 +622,8 @@ version_definitions = {
             6: initial_position[8][3],
             7: initial_position[12][1],
             8: 7,
+            9: 7,
+            10: 7,
         },
     },
 
