@@ -480,7 +480,8 @@ class Kgrid:
                 ax.plot(xlims, rate)
 
         if legend:
-            ax.legend(fontsize=fontsize-2, loc='upper right')
+            loc = {'rate': 'upper left'}.get(bprop, 'upper right')
+            ax.legend(fontsize=fontsize-2, loc=loc)
 
         bprop_ylims = ylims.get(bprop)
         if fix_ylims and (bprop_ylims is not None):
