@@ -94,10 +94,10 @@ class Kemulator:
     def load_interpolator(self):
         """Loads previously-saved (pickled) interpolators from file
         """
-        self.printv(f'Loading interpolator')
         filename = f'interpolator_{self.source}_V{self.version}'
         filepath = os.path.join(GRIDS_PATH, 'sources', self.source,
                                 'interpolator', filename)
+        self.printv(f'Loading interpolator: {filepath}')
         self.interpolator = pickle.load(open(filepath, 'rb'))
 
     def setup_interpolator(self, bprops):
