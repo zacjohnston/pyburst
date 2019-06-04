@@ -1439,7 +1439,7 @@ class BurstRun(object):
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
                          zero_time=True, fontsize=14, ylims=None, title=True,
-                         color=None, **kwargs):
+                         color=None, legend=False, **kwargs):
         """Plot individual burst lightcurve
 
         parameters
@@ -1482,6 +1482,8 @@ class BurstRun(object):
 
         ax.set_xlim(xlims)
         ax.set_ylim(ylims)
+        if legend:
+            ax.legend()
         plot_path = os.path.join(self.paths['plots'], 'lightcurves')
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
