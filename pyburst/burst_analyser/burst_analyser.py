@@ -1462,6 +1462,11 @@ class BurstRun(object):
         if bursts is None:
             bursts = np.arange(self.n_bursts)
 
+        xlims = {'grid5': [-2, 60], 'he2': [-2, 10], 'ks1': [-2, 60]}.get(self.source)
+        if ylims is None:
+            ylims = {'grid5': [-0.1, 4], 'he2': [-0.1, 5.5],
+                     'ks1': [-0.1, 7]}.get(self.source)
+
         fig, ax = plt.subplots(figsize=(8, 5))
         ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
         ax.set_xlabel('Time (s)', fontsize=fontsize)
@@ -1475,9 +1480,8 @@ class BurstRun(object):
         for burst in bursts:
             self.add_lightcurve(burst, ax, zero_time=zero_time, color=color, **kwargs)
 
-        ax.set_xlim(left=-2, right=10)
-        if ylims is not None:
-            ax.set_ylim(ylims[0], ylims[1])
+        ax.set_xlim(xlims)
+        ax.set_ylim(ylims)
         plot_path = os.path.join(self.paths['plots'], 'lightcurves')
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
