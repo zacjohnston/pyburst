@@ -5,19 +5,28 @@ if [ "$1" == "-h" ]; then
 where:
 1. grid/batch basename (e.g. 'grid', 'gs1826')
 2. first grid
-3. last grid"
+3. last grid
+(4. scratch)"
   exit 0
 fi
 
 if [ $# -ne 3 ]; then
-  echo "Error: must supply 3 arguments (use option -h for help):
-1. grid/batch basename (e.g. 'grid', 'gs1826')
-2. first grid
-3. last grid"
-  exit 1
+    if [ $# -ne 4 ]; then
+      echo "Error: must supply 3 arguments (use option -h for help):
+    1. grid/batch basename (e.g. 'grid', 'gs1826')
+    2. first grid
+    3. last grid
+    (4. scratch)"
+    exit 1
+    fi
 fi
 
-GRID_DIR=${SCRATCH}
+if [[ $# == 4 ]]; then
+    GRID_DIR=${SCRATCH}
+else
+    GRID_DIR=${KEPLER_MODELS}
+fi
+
 GRID_NAME=$1
 GRID_FIRST=$2
 GRID_LAST=$3
