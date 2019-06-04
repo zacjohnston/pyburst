@@ -17,7 +17,7 @@ if [ $# -ne 3 ]; then
   exit 1
 fi
 
-GRID_DIR=$KEPLER_MODELS
+GRID_DIR=${SCRATCH}
 GRID_NAME=$1
 GRID_FIRST=$2
 GRID_LAST=$3
