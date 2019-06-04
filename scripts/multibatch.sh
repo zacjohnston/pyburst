@@ -17,12 +17,13 @@ if [ $# -ne 6 ]; then
 fi
 #============================================
 # Environment variables:
-LOC_DIR=${KEPLER_PATH}/runs
+LOC_DIR=${SCRATCH}
 CLUSTER=${CLUSTER}
 
 source=$1
 batch1=$2
 batch2=$3
+
 
 if [ $# == 6 ]; then
   run0=$4
