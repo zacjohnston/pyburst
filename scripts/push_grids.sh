@@ -30,8 +30,11 @@ if [[ "${cluster}" == "monarch" ]]; then
   SERVER='m2'
   KPATH='/home/zacpetej/id43/kepler/runs'
 elif [[ "${cluster}" == "icer" ]]; then
-  SERVER='icer'
+  SERVER='isync'
   KPATH='/mnt/home/f0003004/kepler/runs'
+elif [[ "${cluster}" == "iscratch" ]]; then
+  SERVER='isync'
+  KPATH='/mnt/gs18/scratch/users/f0003004'
 elif [[ "${cluster}" == "oz" ]]; then
   SERVER='oz'
   KPATH='/fred/oz011/zac/kepler/runs'
