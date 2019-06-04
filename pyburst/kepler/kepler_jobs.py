@@ -98,7 +98,7 @@ for FILE in ${{ADAPNET_PATH}} ${{BDAT_PATH}}; do
     fi
 done
 
-cd $KEPLER_MODELS/{source}/{source}_{batch}/{basename}$N/
+cd $SCRATCH/{source}/{source}_{batch}/{basename}$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
 ln -sf $BDAT_PATH ./bdat
 $EXE_PATH {basename}$N {cmd_str}
