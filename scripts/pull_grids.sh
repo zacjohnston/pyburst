@@ -36,7 +36,7 @@ if [[ "${cluster}" == "monarch" ]]; then
   SERVER='m2'
   KPATH='/home/zacpetej/id43/kepler/runs'
 elif [[ "${cluster}" == "icer" ]]; then
-  SERVER='icer'
+  SERVER='isync'
   KPATH='/mnt/home/f0003004/kepler/runs'
 elif [[ "${cluster}" == "oz" ]]; then
   SERVER='oz'
@@ -59,4 +59,4 @@ else
     PULL_DIR="${MODELS_DIR}/*"
 fi
 
-rsync -av ${PULL_DIR} ${TARGET_DIR}
+rsync -av --info=progress2 ${PULL_DIR} ${TARGET_DIR}
