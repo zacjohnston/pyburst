@@ -322,7 +322,7 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
 
 def setup_mcmc_sample(batch0, sample_source, chain, discard, n_models_epoch, n_epochs,
                       ref_source, ref_mcmc_version, kgrid, nbursts, constant=None,
-                      epoch_independent=('x', 'z', 'mass'),
+                      epoch_independent=('x', 'z', 'mass'), walltime=96,
                       epoch_dependent=('accrate', 'qb'), cap=None):
     """Creates batches of models, with random sample of params drawn from MCMC chain
     """
@@ -356,7 +356,7 @@ def setup_mcmc_sample(batch0, sample_source, chain, discard, n_models_epoch, n_e
             params_full[key] = get_mcmc_params(mv_key, param_sample=param_sample, mv=mv)
 
         create_batch(batch0+i, dv={}, params={}, source=sample_source, nbursts=nbursts,
-                     kgrid=kgrid, walltime=96, setup_test=False,
+                     kgrid=kgrid, walltime=walltime, setup_test=False,
                      nuc_heat=True, auto_qnuc=False, substrate_off=True,
                      params_full=params_full, notes=idx_string)
 
