@@ -4,21 +4,31 @@
 # input : first grid ID, last grid ID, restart(y/n)
 #========================================================
 if [ $# -ne 6 ]; then
-  if [ $# -ne 4 ]; then
-    echo "Error: must supply 4 or 6 arguments:
-    1. source
-    2. batch1
-    3. batch2
-    (4. run0)
-    (5. run1)
-    6. restart"
-    exit 1
+  if [ $# -ne 5 ]; then
+    if [ $# -ne 4 ]; then
+        echo "Error: must supply 4 or 6 arguments:
+        1. source
+        2. batch1
+        3. batch2
+        (4. run0)
+        (5. run1)
+        6. restart
+        (7. scratch)"
+        exit 1
+    fi
   fi
 fi
 #============================================
 # Environment variables:
-LOC_DIR=${SCRATCH}
 CLUSTER=${CLUSTER}
+LOC_DIR=${KEPLER_MODELS}
+
+if [ $# == 5 ]; then
+    if [ "$5" == 'y' ]; then
+        echo 'Using SCRATCH file system'
+        LOC_DIR=${SCRATCH}
+    fi
+fi
 
 source=$1
 batch1=$2
