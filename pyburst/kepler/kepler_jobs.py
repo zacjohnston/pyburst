@@ -9,19 +9,21 @@ from pyburst.grids import grid_strings
 
 def write_both_jobscripts(batch, source, walltime, path=None, run0=None,
                           run1=None, runs=None, basename='xrb',
-                          adapnet_filename=None, bdat_filename=None):
+                          adapnet_filename=None, bdat_filename=None,
+                          scratch_file_sys=False):
     """Iterates write_jobscripts() for both restart=True/False
     """
     for restart in [True, False]:
         write_jobscripts(run0=run0, run1=run1, runs=runs, restart=restart,
                          batch=batch, source=source, basename=basename, path=path,
                          walltime=walltime, adapnet_filename=adapnet_filename,
-                         bdat_filename=bdat_filename)
+                         bdat_filename=bdat_filename, scratch_file_sys=scratch_file_sys)
 
 
 def write_jobscripts(batch, source, walltime, path=None, run0=None, run1=None,
                      runs=None, basename='xrb', restart=False,
-                     adapnet_filename=None, bdat_filename=None):
+                     adapnet_filename=None, bdat_filename=None,
+                     scratch_file_sys=False):
     """Writes jobscripts to execute on cluster (eg, Monarch, ICER...)
 
     Parameter:
@@ -54,13 +56,15 @@ def write_jobscripts(batch, source, walltime, path=None, run0=None, run1=None,
                                         batch=batch, basename=basename, time_str=time_str,
                                         job_str=job_str, cluster=cluster, restart=restart,
                                         adapnet_filename=adapnet_filename,
-                                        bdat_filename=bdat_filename)
+                                        bdat_filename=bdat_filename,
+                                        scratch_file_sys=scratch_file_sys)
         with open(filepath, 'w') as f:
             f.write(script_str)
 
 
 def get_submission_str(run0, run1, source, runs, batch, basename, cluster, time_str,
-                       job_str, restart, adapnet_filename=None, bdat_filename=None):
+                       job_str, restart, adapnet_filename=None, bdat_filename=None,
+                       scratch_file_sys=False):
     """Returns string of submission script contents
     """
     source = grid_strings.source_shorthand(source=source)
@@ -70,6 +74,11 @@ def get_submission_str(run0, run1, source, runs, batch, basename, cluster, time_
         adapnet_filename = 'adapnet_alex_email_dec.5.2016.cfg'
     if bdat_filename is None:
         bdat_filename = '20161114Reaclib.bdat5.fixed'
+
+    if scratch_file_sys:
+        model_dir = 'SCRATCH'
+    else:
+        model_dir = 'KEPLER_MODELS'
 
     cmd_str = {True: 'z1', False: 'xrb_g'}[restart]
     constraint_str = {'icer': 'SBATCH --constraint=intel18'}.get(cluster, '')
@@ -98,7 +107,7 @@ for FILE in ${{ADAPNET_PATH}} ${{BDAT_PATH}}; do
     fi
 done
 
-cd $SCRATCH/{source}/{source}_{batch}/{basename}$N/
+cd ${model_dir}/{source}/{source}_{batch}/{basename}$N/
 ln -sf $ADAPNET_PATH ./adapnet.cfg
 ln -sf $BDAT_PATH ./bdat
 $EXE_PATH {basename}$N {cmd_str}
