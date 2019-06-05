@@ -55,7 +55,7 @@ def create_batch(batch, source, params, dv,
                  auto_qnuc=False, grid_version=None, qnuc_source='heat',
                  substrate='fe54', substrate_off=True, adapnet_filename=None,
                  bdat_filename=None, params_full=None,
-                 numerical_params=None):
+                 numerical_params=None, scratch_file_sys=False):
     """Generates a grid of Kepler models, containing n models over the range x
 
     Parameters
@@ -92,6 +92,8 @@ def create_batch(batch, source, params, dv,
     numerical_params : {} (optional)
         Overwrite default numerical kepler parameters (e.g. nsdump, zonermax, lburn,
         For all parameters: see 'numerical_params' in config/default.ini
+    scratch_file_sys : bool (optional)
+        whether to use the scratch file system on ICER cluster
     """
     # TODO:
     #   - WRITE ALL PARAM DESCRIPTIONS
@@ -153,7 +155,8 @@ def create_batch(batch, source, params, dv,
                                       source=source, basename=basename,
                                       path=logpath, walltime=walltime,
                                       adapnet_filename=adapnet_filename,
-                                      bdat_filename=bdat_filename)
+                                      bdat_filename=bdat_filename,
+                                      scratch_file_sys=scratch_file_sys)
 
     # ===== Directories and templates for each model =====
     for i in range(n_models):
@@ -281,7 +284,8 @@ def predict_qnuc(params_full, qnuc_source, grid_version):
 
 def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcmc_version,
                   constant=None, epoch_independent=('x', 'z', 'mass'),
-                  epoch_dependent=('accrate', 'qb'), epoch_chosen=None):
+                  epoch_dependent=('accrate', 'qb'), epoch_chosen=None,
+                  scratch_file_sys=False):
     """Creates random sample of model parameters
     """
     aliases = {'mass': 'm_nw', 'accrate': 'mdot'}
@@ -317,13 +321,14 @@ def random_models(batch0, source, n_models, n_epochs, ref_source, kgrid, ref_mcm
         create_batch(batch0+i, dv={}, params={}, source=source, nbursts=30, kgrid=kgrid,
                      walltime=96, setup_test=False, nuc_heat=True,
                      auto_qnuc=False, grid_version=0, substrate_off=True,
-                     params_full=params_full)
+                     params_full=params_full, scratch_file_sys=scratch_file_sys)
 
 
 def setup_mcmc_sample(batch0, sample_source, chain, discard, n_models_epoch, n_epochs,
                       ref_source, ref_mcmc_version, kgrid, nbursts, constant=None,
                       epoch_independent=('x', 'z', 'mass'), walltime=96,
-                      epoch_dependent=('accrate', 'qb'), cap=None):
+                      epoch_dependent=('accrate', 'qb'), cap=None,
+                      scratch_file_sys=False):
     """Creates batches of models, with random sample of params drawn from MCMC chain
     """
     aliases = {'mass': 'm_nw', 'accrate': 'mdot'}
@@ -358,7 +363,8 @@ def setup_mcmc_sample(batch0, sample_source, chain, discard, n_models_epoch, n_e
         create_batch(batch0+i, dv={}, params={}, source=sample_source, nbursts=nbursts,
                      kgrid=kgrid, walltime=walltime, setup_test=False,
                      nuc_heat=True, auto_qnuc=False, substrate_off=True,
-                     params_full=params_full, notes=idx_string)
+                     params_full=params_full, notes=idx_string,
+                     scratch_file_sys=scratch_file_sys)
 
 
 def save_sample_array(param_sample, source, batch0, batch1):
@@ -528,7 +534,8 @@ def write_model_table(n, params, path, filename='MODELS.txt'):
 
 def extend_runs(summ_table, source, nbursts=None, t_end=None,
                 basename='xrb', nstop=9999999, nsdump=500, walltime=96,
-                do_cmd_files=True, do_jobscripts=True, adapnet_filename=None):
+                do_cmd_files=True, do_jobscripts=True, adapnet_filename=None,
+                scratch_file_sys=False):
     """Modifies existing models (in summ_table) for resuming, to simulate more bursts
     """
     source = grid_strings.source_shorthand(source)
@@ -557,7 +564,8 @@ def extend_runs(summ_table, source, nbursts=None, t_end=None,
             kepler_jobs.write_jobscripts(batch, run0=runs[0], run1=runs[-1],
                                          runs=runs, source=source,
                                          walltime=walltime, restart=True,
-                                         adapnet_filename=adapnet_filename)
+                                         adapnet_filename=adapnet_filename,
+                                         scratch_file_sys=scratch_file_sys)
 
     return short_table
 
