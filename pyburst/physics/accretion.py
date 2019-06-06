@@ -13,6 +13,7 @@ def eddington_lum(mass, x):
     x : flt
         hydrogen composition (mass fraction)
     """
+    # TODO: This is Newtonian. Need GR version
     l_edd = 4*np.pi * const.G * (mass*units.M_sun) * const.m_p * const.c / const.sigma_T
     l_edd = l_edd.to(units.erg / units.s).value   # cgs units
     l_edd = l_edd * 2 / (x + 1)  # correct for hydrogen/helium ratio
