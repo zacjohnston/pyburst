@@ -1,6 +1,8 @@
 import numpy as np
 import os
 import pickle
+import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 # kepler_grids
 from pyburst.misc import pyprint
@@ -158,6 +160,27 @@ def get_sampler_state(sampler):
     del sampler_dict['pool']
     return sampler_dict
 
+
+def fit_z_prior(table, plot=False, xlims=(-3, 3)):
+    """Returns Gaussian fit (mean, std) to a given [Fe/H] distribution
+
+    table : pd.DataFrame
+        table containing a column of 'feh'
+    plot : bool
+        show Gaussian fit against distribution histogram
+    """
+    mean, std = norm.fit(table['feh'])
+
+    if plot:
+        x = np.linspace(xlims[0], xlims[1], 200)
+        y = norm.pdf(x, mean, std)
+
+        fig, ax = plt.subplots()
+        ax.hist(table['feh'], bins=100, density=1.0)
+        ax.plot(x, y)
+        plt.show(block=False)
+
+    return mean, std
 
 def get_mcmc_path(source):
     source = grid_strings.check_synth_source(source)
