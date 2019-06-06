@@ -182,6 +182,7 @@ def fit_z_prior(table, plot=False, xlims=(-3, 3)):
 
     return mean, std
 
+
 def get_mcmc_path(source):
     source = grid_strings.check_synth_source(source)
     return os.path.join(GRIDS_PATH, 'sources', source, 'mcmc')

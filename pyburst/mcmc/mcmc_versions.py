@@ -174,7 +174,7 @@ grid_bounds = {
             (0.175, 0.325),  # mdot2
             (0.1, 0.55),  # qb1
             (0.1, 0.55),  # qb2
-            (1.1, 2.0),  # m_nw
+            (1.1, 1.7),  # m_nw
             (1.0, 2.1),  # m_gr
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -188,7 +188,7 @@ def flat_prior(x):
 
 
 log_norm = norm(loc=-0.5, scale=0.25).pdf
-log_norm2 = norm(loc=0.0, scale=0.25).pdf
+log_norm2 = norm(loc=-0.1, scale=0.5).pdf
 
 def log_z(z, z_sun=0.01):
     """PDF of log10(z/z_solar)"""
