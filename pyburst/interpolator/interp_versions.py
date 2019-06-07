@@ -28,10 +28,7 @@ version_definitions = {
 
     # The burst properties being interpolated
     'bprops': {
-        'grid5': {
-            4: ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak', 'tail_50',
-                'u_tail_50'),
-        },
+        'grid5': {},
         'grid6': {},
         'he1': {},
         'he2': {},
@@ -40,9 +37,7 @@ version_definitions = {
     # The base grid to interpolate over (see: grids/grid_versions.py)
     #       Note: if not defined, defaults to: grid_version = interp_version
     'grid_version': {
-        'grid5': {
-            4: 3,
-        },
+        'grid5': {},
         'grid6': {},
         'he1': {},
         'he2': {},
