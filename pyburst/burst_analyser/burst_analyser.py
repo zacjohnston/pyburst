@@ -99,7 +99,7 @@ class BurstRun(object):
                            'dump_time_offset': 0.0,  # time offset (s) from burst start
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
                            'min_rise_steps': 5,  # min time steps between t_pre and t_peak
-                           'stable_dt_frac': 10,  # no. of dt's from last burst to end of model to flag stable burning
+                           'stable_dt': 5,  # no. of dt's from last burst to end of model to flag stable burning
                            'short_wait_dt': 45,  # threshold for short-wait bursts (minutes)
                            'shock_radius_t': 0.1,  # radius in s around maxima to check for shock conditions
                            't_buffer': 300,  # time buffer (s) from start/end of model to ignore
@@ -1141,7 +1141,7 @@ class BurstRun(object):
         last_timestep = self.lum[-1, 0]
         n_dt = (last_timestep - last_burst) / self.summary['dt']
 
-        if n_dt > self.parameters['stable_dt_frac']:
+        if n_dt > self.parameters['stable_dt']:
             self.flags['stable_burning'] = True
             self.summary['stable_burning'] = True
             self.print_warn('Stable burning regime detected. Consider verifying')
