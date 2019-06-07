@@ -22,6 +22,7 @@ param_keys = {
     10: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
     11: ['mdot1', 'x', 'z', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
     12: ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
+    13: ['mdot1', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -172,9 +173,19 @@ grid_bounds = {
             ),
         2: ((0.175, 0.35),  # mdot1
             (0.175, 0.35),  # mdot2
-            (0.1, 0.55),  # qb1
-            (0.1, 0.55),  # qb2
-            (1.1, 2.0),  # m_nw
+            (0.1, 0.45),  # qb1
+            (0.1, 0.45),  # qb2
+            (1.1, 1.7),  # m_nw
+            (1.0, 2.1),  # m_gr
+            (1., 20.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+    },
+
+    13: {
+        1: ((0.175, 0.35),  # mdot1
+            (0.1, 0.45),  # qb1
+            (1.1, 1.7),  # m_nw
             (1.0, 2.1),  # m_gr
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -243,7 +254,10 @@ initial_position = {
     },
     12: {
         1: (0.195, 0.27, 0.47, 0.25, 1.2, 2.0, 7.5, 1.38),
-        2: (0.22, 0.31, 0.3, 0.19, 1.45, 2.0, 7.3, 1.4),
+        2: (0.23, 0.33, 0.25, 0.16, 1.5, 2.0, 7.4, 1.4),
+    },
+    13: {
+        1: (0.23, 0.25, 1.5, 2.0, 7.4, 1.4),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -404,6 +418,8 @@ source_defaults = {
 #   8 : as 7, m_gr prior (1.85 +/- 0.15)
 #   9 : as 7, upper accrate = 0.35
 #   10 : as 8, upper accrate = 0.35
+#   11 : as 9, epoch 1997
+#   12 : as 9, epoch 2009
 
 version_definitions = {
     'interpolator': {
@@ -420,6 +436,8 @@ version_definitions = {
             8: 5,
             9: 5,
             10: 5,
+            11: 5,
+            12: 5,
         },
     },
 
@@ -491,6 +509,8 @@ version_definitions = {
             8: 7,
             9: 7,
             10: 7,
+            11: param_keys[13],
+            12: param_keys[13],
         },
     },
 
@@ -502,6 +522,8 @@ version_definitions = {
             8: 7,
             9: 7,
             10: 7,
+            11: 7,
+            12: 7,
         },
     },
 
@@ -524,7 +546,10 @@ version_definitions = {
             20: 2007,
         },
         'synth5': {},
-        'he2': {},
+        'he2': {
+            11: 1997,
+            12: 2009,
+        },
     },
 
     'param_aliases': {
@@ -566,6 +591,8 @@ version_definitions = {
             8: 7,
             9: grid_bounds[12][2],
             10: 9,
+            11: grid_bounds[13][1],
+            12: grid_bounds[13][1],
         },
     },
 
@@ -625,6 +652,8 @@ version_definitions = {
             8: 7,
             9: 7,
             10: 7,
+            11: initial_position[13][1],
+            12: initial_position[13][1],
         },
     },
 
