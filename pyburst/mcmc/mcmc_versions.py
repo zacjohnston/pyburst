@@ -170,11 +170,11 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
-        2: ((0.175, 0.325),  # mdot1
-            (0.175, 0.325),  # mdot2
+        2: ((0.175, 0.35),  # mdot1
+            (0.175, 0.35),  # mdot2
             (0.1, 0.55),  # qb1
             (0.1, 0.55),  # qb2
-            (1.1, 1.7),  # m_nw
+            (1.1, 2.0),  # m_nw
             (1.0, 2.1),  # m_gr
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -243,6 +243,7 @@ initial_position = {
     },
     12: {
         1: (0.195, 0.27, 0.47, 0.25, 1.2, 2.0, 7.5, 1.38),
+        2: (0.22, 0.31, 0.3, 0.19, 1.45, 2.0, 7.3, 1.4),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -620,7 +621,7 @@ version_definitions = {
             4: initial_position[8][2],
             5: 4,
             6: initial_position[8][3],
-            7: initial_position[12][1],
+            7: initial_position[12][2],
             8: 7,
             9: 7,
             10: 7,
