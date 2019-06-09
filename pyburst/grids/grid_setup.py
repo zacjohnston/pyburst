@@ -651,12 +651,15 @@ def sync_model_restarts(source, target, basename='xrb', verbose=True,
     else:
         batches = np.unique(short_model_table['batch'])
 
+    jobscript_aliases = {'oz': 'monarch'}
     targets = {
         'icer': f'isync:~/kepler/runs/',
         'oz': 'oz:/fred/oz011/zac/kepler/runs/',
         'monarch': 'm2:/home/zacpetej/id43/kepler/runs/',
         'carbon': f'zac@carbon.sci.monash.edu:/home/zac/{source}'}
+
     target_path = targets[target]
+    jobscript_prefix = jobscript_aliases.get(target, target)
     sync_paths = []
 
     for batch in batches:
@@ -670,7 +673,7 @@ def sync_model_restarts(source, target, basename='xrb', verbose=True,
         if sync_jobscripts:
             # TODO: make universal jobfile string function (for here and kepler_jobs.py)
             span_str = kepler_jobs.get_span_string(runs[0], runs[-1])
-            jobscript = f'icer_restart_{source}_{batch}_{span_str}.sh'
+            jobscript = f'{jobscript_prefix}_restart_{source}_{batch}_{span_str}.sh'
             jobscript_path = os.path.join(batch_path, 'logs', jobscript)
             sync_paths += [jobscript_path]
 
