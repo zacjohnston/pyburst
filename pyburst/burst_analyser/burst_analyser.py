@@ -39,7 +39,7 @@ class BurstRun(object):
                  check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True, remove_shocks=False,
                  remove_zero_lum=True, subtract_background_lum=True, load_config=True,
-                 get_tail_timescales=True):
+                 get_tail_timescales=False):
         # TODO: move these into default config file
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
