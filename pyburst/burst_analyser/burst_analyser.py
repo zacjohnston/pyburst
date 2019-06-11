@@ -1281,9 +1281,6 @@ class BurstRun(object):
 
         if discard is None:
             discard = self.discard
-        else:
-            self.discard = discard
-
         if self.n_bursts < discard+2:
             print('Too few bursts to plot convergence')
             return
