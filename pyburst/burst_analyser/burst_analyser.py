@@ -19,8 +19,10 @@ from pyburst.physics import accretion
 plt.rc('text', usetex=False)
 plt.rc('font', family='serif')
 
-# TODO: Generalise to non-batch organised models
-# TODO: param description docstring
+# TODO:
+#   - Generalise to non-batch organised models
+#   - param description docstring
+#   - Add print statements to functions
 
 class NoBursts(Exception):
     pass
@@ -123,7 +125,7 @@ class BurstRun(object):
                      'tail_10',
                      'slope_dt', 'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
                      'slope_peak', 'slope_peak_err', 'short_wait', 'outlier',
-                     'dump_start', 'acc_mass']
+                     'dump_start', 'acc_mass', 'qnuc']
 
         self.paths = {'batch_models': grid_strings.get_batch_models_path(batch, source),
                       'source': grid_strings.get_source_path(source),
@@ -158,7 +160,7 @@ class BurstRun(object):
         self.candidates = None
 
         # Burst properties which will be averaged and added to summary
-        self.bprops = ['dt', 'fluence', 'peak', 'length', 'acc_mass']
+        self.bprops = ['dt', 'fluence', 'peak', 'length', 'acc_mass', 'qnuc']
         self.shocks = []
         self.n_shocks = None
         self.shock_maxima = []
@@ -608,6 +610,7 @@ class BurstRun(object):
 
         if self.options['load_model_params']:
             self.get_acc_mass()
+            self.get_qnuc()
 
         try:
             self.check_n_bursts()
@@ -950,6 +953,16 @@ class BurstRun(object):
         mdot = self.model_params['accrate'] * mdot_edd
 
         self.bursts['acc_mass'] = self.bursts['dt'] * mdot
+
+    def get_qnuc(self):
+        """Calculates effective nuclear energy rate released from surface (MeV/nucleon)
+        """
+        self.printv('Calculating Q_nuc')
+
+        mass = self.bursts['acc_mass'] * units.g.to(units.M_p)  # Accreted mass (protons)
+        energy = self.bursts['fluence'] * units.erg.to(units.MeV)  # burst energy (MeV)
+
+        self.bursts['qnuc'] = energy / mass
 
     def identify_outliers(self):
         """Identify outlier bursts
