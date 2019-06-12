@@ -949,7 +949,7 @@ class BurstRun(object):
         mdot_edd = self.parameters['mdot_edd'] * msun_to_grams
         mdot = self.model_params['accrate'] * mdot_edd
 
-        self.bursts['ign_mass'] = self.bursts['dt'] * mdot
+        self.bursts['acc_mass'] = self.bursts['dt'] * mdot
 
     def identify_outliers(self):
         """Identify outlier bursts
