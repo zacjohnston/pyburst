@@ -8,7 +8,7 @@ import configparser
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
 from scipy.stats import linregress
-
+from astropy import units, constants
 # kepler_grids
 from pyburst.burst_analyser import burst_tools
 from pyburst.grids import grid_tools, grid_strings
@@ -103,6 +103,7 @@ class BurstRun(object):
                            'short_wait_dt': 45,  # threshold for short-wait bursts (minutes)
                            'shock_radius_t': 0.1,  # radius in s around maxima to check for shock conditions
                            't_buffer': 300,  # time buffer (s) from start/end of model to ignore
+                           'mdot_edd': 1.75e-8,  # reference Eddington accretion rate (Msun/yr)
                            }
         self.overwrite_parameters(set_paramaters)
 
@@ -122,7 +123,7 @@ class BurstRun(object):
                      'tail_10',
                      'slope_dt', 'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
                      'slope_peak', 'slope_peak_err', 'short_wait', 'outlier',
-                     'dump_start']
+                     'dump_start', 'acc_mass']
 
         self.paths = {'batch_models': grid_strings.get_batch_models_path(batch, source),
                       'source': grid_strings.get_source_path(source),
@@ -155,7 +156,9 @@ class BurstRun(object):
 
         self.summary = {}
         self.candidates = None
-        self.bprops = ['dt', 'fluence', 'peak', 'length', 'tail_50', 'tail_25', 'tail_10']
+
+        # Burst properties which will be averaged and added to summary
+        self.bprops = ['dt', 'fluence', 'peak', 'length', 'acc_mass']
         self.shocks = []
         self.n_shocks = None
         self.shock_maxima = []
@@ -932,6 +935,17 @@ class BurstRun(object):
 
             fluence = integrate.trapz(y=lum_slice[:, 1] - subtract, x=lum_slice[:, 0])
             self.bursts.loc[burst.Index, 'fluence'] = fluence
+
+    def get_acc_mass(self):
+        """Calculates mass of accreted column for each burst
+        """
+        self.printv('Calculating accreted masses')
+
+        msun_to_grams = (units.M_sun / units.year).to(units.g / units.s)
+        mdot_edd = self.parameters['mdot_edd'] * msun_to_grams
+        mdot = self.model_params['accrate'] * mdot_edd
+
+        self.bursts['ign_mass'] = self.bursts['dt'] * mdot
 
     def identify_outliers(self):
         """Identify outlier bursts
