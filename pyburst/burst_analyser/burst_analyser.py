@@ -606,16 +606,20 @@ class BurstRun(object):
         self.get_recurrence_times()
         self.get_burst_rates()
 
+        if self.options['load_model_params']:
+            self.get_acc_mass()
+
         try:
             self.check_n_bursts()
         except NoBursts:
             return
 
         self.identify_short_wait_bursts()
+
         if self.options['get_tail_timescales']:
             self.get_tail_timescales()
-        self.bursts.reset_index(inplace=True, drop=True)
 
+        self.bursts.reset_index(inplace=True, drop=True)
         self.bursts['length'] = self.bursts['t_end'] - self.bursts['t_start']
         self.bursts['n'] = np.arange(self.n_bursts) + 1  # burst ID (starting from 1)
 
