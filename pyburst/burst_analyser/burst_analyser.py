@@ -556,6 +556,11 @@ class BurstRun(object):
                 self.truncate_eddington()
 
             self.get_fluences()
+
+            if self.options['load_model_params']:
+                self.get_acc_mass()
+                self.get_qnuc()
+                
             self.identify_outliers()
 
             if self.options['get_slopes']:
@@ -593,7 +598,6 @@ class BurstRun(object):
            4. Identify short-wait bursts (below some fraction of mean dt)
            5. Get start/end times (discard final burst if cut off)
         """
-        # TODO: add "mass accreted" column to bursts (dt * mdot)
         self.printv('Identifying bursts')
         self.check_lum_loaded()
         self.get_burst_candidates()
@@ -603,14 +607,11 @@ class BurstRun(object):
         except NoBursts:
             return
 
+        self.printv('Extracting burst properties')
         self.get_burst_starts()
         self.get_burst_ends()
         self.get_recurrence_times()
         self.get_burst_rates()
-
-        if self.options['load_model_params']:
-            self.get_acc_mass()
-            self.get_qnuc()
 
         try:
             self.check_n_bursts()
@@ -959,8 +960,8 @@ class BurstRun(object):
         """
         self.printv('Calculating Q_nuc')
 
-        mass = self.bursts['acc_mass'] * units.g.to(units.M_p)  # Accreted mass (protons)
         energy = self.bursts['fluence'] * units.erg.to(units.MeV)  # burst energy (MeV)
+        mass = self.bursts['acc_mass'] * units.g.to(units.M_p)  # Accreted mass (protons)
 
         self.bursts['qnuc'] = energy / mass
 
