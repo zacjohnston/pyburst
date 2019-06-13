@@ -184,17 +184,8 @@ grid_bounds = {
     },
 
     12: {
-        1: ((0.175, 0.4),  # mdot1
-            (0.175, 0.4),  # mdot2
-            (0.05, 0.5),  # qb1
-            (0.05, 0.5),  # qb2
-            (1.1, 2.0),  # m_nw
-            (1.0, 2.1),  # m_gr
-            (1., 20.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        2: ((0.175, 0.4),  # mdot1
-            (0.175, 0.4),  # mdot2
+        1: ((0.175, 0.475),  # mdot1
+            (0.175, 0.475),  # mdot2
             (0.05, 0.4),  # qb1
             (0.05, 0.4),  # qb2
             (1.2, 2.0),  # m_nw
@@ -205,7 +196,7 @@ grid_bounds = {
     },
 
     13: {
-        1: ((0.175, 0.4),  # mdot1
+        1: ((0.175, 0.475),  # mdot1
             (0.05, 0.4),  # qb1
             (1.2, 2.0),  # m_nw
             (1.0, 2.1),  # m_gr
@@ -276,8 +267,7 @@ initial_position = {
         3: (0.15, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
     },
     12: {
-        1: (0.195, 0.27, 0.47, 0.25, 1.2, 2.0, 7.5, 1.38),
-        2: (0.23, 0.33, 0.22, 0.16, 1.5, 2.0, 7.4, 1.4),
+        1: (0.23, 0.33, 0.22, 0.16, 1.5, 2.0, 7.4, 1.4),
     },
     13: {
         1: (0.23, 0.25, 1.5, 2.0, 7.4, 1.4),
@@ -297,13 +287,13 @@ source_defaults = {
     'param_keys': {
         'grid5': param_keys[7],
         'synth5': param_keys[7],
-        'he2': param_keys[8],
+        'he2': param_keys[12],
     },
 
     'interp_keys': {
         'grid5': interp_keys[1],
         'synth5': interp_keys[1],
-        'he2': interp_keys[3],
+        'he2': interp_keys[4],
     },
 
     'epoch_unique': {
@@ -353,7 +343,7 @@ source_defaults = {
     'grid_bounds': {
         'grid5': grid_bounds[7][1],
         'synth5': grid_bounds[7][1],
-        'he2': grid_bounds[8][1],
+        'he2': grid_bounds[12][1],
     },
 
     'priors': {  # if not defined here, the default/fallback will be flat_prior()
@@ -369,7 +359,7 @@ source_defaults = {
     'initial_position': {
         'grid5': initial_position[7][1],
         'synth5': initial_position[7][1],
-        'he2': initial_position[8][1],
+        'he2': initial_position[12][1],
     },
 
     'x_edd_option': {
@@ -460,17 +450,7 @@ version_definitions = {
             26: 4,
         },
         'synth5': {},
-        'he2': {
-            4: 1,
-            5: 2,
-            6: 3,
-            7: 5,
-            8: 5,
-            9: 5,
-            10: 5,
-            11: 5,
-            12: 5,
-        },
+        'he2': {},
     },
 
     'interp_bprops': {
@@ -548,10 +528,6 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            7: param_keys[12],
-            8: 7,
-            9: 7,
-            10: 7,
             11: param_keys[13],
             12: param_keys[13],
         },
@@ -560,14 +536,7 @@ version_definitions = {
     'interp_keys': {
         'grid5': {},
         'synth5': {},
-        'he2': {
-            7: interp_keys[4],
-            8: 7,
-            9: 7,
-            10: 7,
-            11: 7,
-            12: 7,
-        },
+        'he2': {},
     },
 
     'epoch_unique': {
@@ -634,13 +603,6 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            4: grid_bounds[8][2],
-            5: 4,
-            6: grid_bounds[8][3],
-            7: grid_bounds[12][1],
-            8: 7,
-            9: grid_bounds[12][2],
-            10: 9,
             11: grid_bounds[13][1],
             12: 11,
         },
@@ -669,12 +631,7 @@ version_definitions = {
              26: {'z': log_z2},
          },
          'synth5': {},
-         'he2': {
-             1: {'d_b': flat_prior},
-             2: {'d_b': gaussian(mean=7.6, std=0.4)},
-             8: {'m_gr': gaussian(mean=1.85, std=0.15)},
-             10: {'m_gr': gaussian(mean=1.85, std=0.15)},
-         },
+         'he2': {},
     },
 
     'initial_position': {
@@ -703,15 +660,8 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            4: initial_position[8][2],
-            5: 4,
-            6: initial_position[8][3],
-            7: initial_position[12][2],
-            8: 7,
-            9: 7,
-            10: 7,
             11: initial_position[13][1],
-            12: initial_position[13][1],
+            12: 11,
         },
     },
 
