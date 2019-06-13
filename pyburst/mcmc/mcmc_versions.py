@@ -203,6 +203,13 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
+        2: ((0.175, 0.4),  # mdot1
+            (0.05, 0.4),  # qb1
+            (1.2, 2.0),  # m_nw
+            (1.0, 2.1),  # m_gr
+            (1., 20.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
     },
 }
 
@@ -426,18 +433,15 @@ source_defaults = {
 
 # ------------------------------
 # he2
-#   1 : flat priors
-#   2 : single d_b prior (7.6)
-#   3 : using combined d_b prior
-#   4 : as 3, x=0.10 (upper accrate = 0.35)
-#   5 : as 4, excluding mass=1.4
-#   6 : sparse grid
-#   7 : fixed x=0.0
-#   8 : as 7, m_gr prior (1.85 +/- 0.15)
-#   9 : as 7, upper accrate = 0.35
-#   10 : as 8, upper accrate = 0.35
-#   11 : as 9, epoch 1997
-#   12 : as 9, epoch 2009
+#   1 : default grid
+#   2 : as 1, epoch 1997
+#   3 : as 1, epoch 2009
+
+#   4 : as 1, qnuc=1.0
+#   5 : as 4, epoch 1997
+#   6 : as 4, epoch 2009
+
+# TODO: delete he2 v11,12 (once new v2,3 exist)
 
 version_definitions = {
     'interpolator': {
@@ -450,7 +454,11 @@ version_definitions = {
             26: 4,
         },
         'synth5': {},
-        'he2': {},
+        'he2': {
+            4: 1,
+            5: 1,
+            6: 1,
+        },
     },
 
     'interp_bprops': {
@@ -528,8 +536,12 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            11: param_keys[13],
-            12: param_keys[13],
+            2: param_keys[13],
+            3: 2,
+            5: 2,
+            6: 2,
+            11: 2,
+            12: 2,
         },
     },
 
@@ -562,6 +574,10 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
+            2: 1997,
+            3: 2009,
+            5: 1997,
+            6: 2009,
             11: 1997,
             12: 2009,
         },
@@ -603,8 +619,12 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            11: grid_bounds[13][1],
-            12: 11,
+            2: grid_bounds[13][1],
+            3: 2,
+            5: grid_bounds[13][2],
+            6: 5,
+            11: 2,
+            12: 2,
         },
     },
 
@@ -660,8 +680,12 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            11: initial_position[13][1],
-            12: 11,
+            2: initial_position[13][1],
+            3: 2,
+            5: 2,
+            6: 2,
+            11: 2,
+            12: 2,
         },
     },
 
