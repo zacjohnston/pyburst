@@ -5,7 +5,7 @@ version_defaults = {
         'grid5': ['accrate', 'x', 'z', 'qb', 'mass'],
         'grid6': ['accrate', 'x', 'z', 'qb', 'mass'],
         'he1': ['accrate', 'x', 'z', 'qb', 'mass'],
-        'he2': ['accrate', 'x', 'qb', 'mass'],
+        'he2': ['accrate', 'qb', 'mass'],
     },
     'bprops': {
         'grid5': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
@@ -21,9 +21,7 @@ version_definitions = {
         'grid5': {},
         'grid6': {},
         'he1': {},
-        'he2': {
-            5: ['accrate', 'qb', 'mass'],
-        },
+        'he2': {},
     },
 
     # The burst properties being interpolated
