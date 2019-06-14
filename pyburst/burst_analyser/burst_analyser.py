@@ -780,8 +780,9 @@ class BurstRun(object):
 
             if self.n_bursts == 0:
                 raise NoBursts
-        elif (self.n_bursts - self.parameters['min_discard']) < 1:
-            self.print_warn('n_bursts < min_discard, most analysis will be skipped')
+        elif (self.n_bursts - self.parameters['min_discard']) \
+                < self.parameters['min_bursts']:
+            self.print_warn('n_bursts < min_bursts, most analysis will be skipped')
             self.flags['too_few_bursts'] = True
             self.flags['regress_too_few_bursts'] = True
 
@@ -1050,20 +1051,21 @@ class BurstRun(object):
 
         ideal_discard = self.parameters['ideal_discard']
         min_discard = self.parameters['min_discard']
+        min_bursts = self.parameters['min_bursts']
         too_few_str = f'Too few bursts for ideal_discard, using min_discard={min_discard}'
 
-        if self.flags['too_few_bursts']:
-            self.printv(too_few_str)
-            return min_discard
+        ideal_remaining = self.n_bursts - ideal_discard
+        min_remaining = self.n_bursts - min_discard
 
-        n_remaining = self.n_bursts - ideal_discard
-
-        if n_remaining < self.parameters['min_bursts']:
-            self.printv(too_few_str)
-            return min_discard
-        else:
+        if ideal_remaining >= min_bursts:
             self.printv(f"Using ideal_discard={ideal_discard}")
             return ideal_discard
+        elif min_remaining >= min_bursts:
+            self.printv(f"Keeping min_bursts={min_bursts}")
+            return self.n_bursts - min_bursts
+        else:
+            self.printv(too_few_str)
+            return min_discard
 
     def get_auto_discard(self):
         """Returns min no. of bursts to discard to achieve zero slope in bprops
