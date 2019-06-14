@@ -39,10 +39,9 @@ class BurstRun(object):
                  load_dumps=False, set_paramaters=None, auto_discard=False,
                  get_slopes=False, load_model_params=True, truncate_edd=True,
                  check_stable_burning=True, quick_discard=True,
-                 check_lumfile_monotonic=True, remove_shocks=False,
-                 remove_zero_lum=True, subtract_background_lum=True, load_config=True,
+                 check_lumfile_monotonic=True,  remove_zero_lum=True,
+                 subtract_background_lum=True, load_config=True,
                  get_tail_timescales=False):
-        # TODO: move these into default config file
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -59,6 +58,7 @@ class BurstRun(object):
                       'stable_burning': False,
                       }
 
+        # TODO: move these into default config file
         self.options = {'verbose': verbose,
                         'reload': reload,
                         'save_lum': save_lum,
@@ -72,7 +72,6 @@ class BurstRun(object):
                         'check_stable_burning': check_stable_burning,
                         'quick_discard': quick_discard,
                         'check_lumfile_monotonic': check_lumfile_monotonic,
-                        'remove_shocks': remove_shocks,
                         'subtract_background_lum': subtract_background_lum,
                         'get_tail_timescales': get_tail_timescales,
                         }
@@ -161,7 +160,6 @@ class BurstRun(object):
 
         # Burst properties which will be averaged and added to summary
         self.bprops = ['dt', 'fluence', 'peak', 'length', 'acc_mass', 'qnuc']
-        self.shocks = []
         self.n_shocks = None
         self.shock_maxima = []
         self.dumpfiles = None
@@ -628,30 +626,10 @@ class BurstRun(object):
         self.bursts['n'] = np.arange(self.n_bursts) + 1  # burst ID (starting from 1)
 
     def get_burst_candidates(self):
-        """Identify potential bursts, while removing shocks in lightcurve
+        """Identify potential bursts, while discarding shocks in lightcurve
         """
-        candidates = self.get_lum_maxima()
-
-        if self.options['remove_shocks']:
-            old_candidates = [0]
-            count = 0
-            while not np.array_equal(old_candidates, candidates):
-                old_candidates = candidates
-                self.remove_shocks(candidates)
-                candidates = self.get_lum_maxima()
-
-                count += 1
-                if count == self.parameters['max_shock_iterations']:
-                    self.print_warn('Reached maximum iterations of shock-removal, '
-                                    + 'lightcurve should be verified')
-                    break
-
-            print(f'Shock removal iterations: {count}')
-        else:
-            candidates = self.discard_shock_maxima(candidates)
-
-        self.candidates = candidates
-        self.shocks = np.array(self.shocks)
+        maxima = self.get_lum_maxima()
+        self.candidates = self.discard_shock_maxima(maxima)
 
     def truncate_eddington(self):
         """Truncates all super-Eddington luminosities from model lightcurve
@@ -683,36 +661,6 @@ class BurstRun(object):
 
         maxima_i = argrelextrema(lum_cut[:, 1], np.greater)[0]
         return lum_cut[maxima_i]
-
-    def remove_shocks(self, maxima):
-        """Cut out convective shocks (extreme spikes in luminosity).
-        Identifies spikes, and replaces them with interpolation from neighbours.
-
-        parameters
-        ----------
-        maxima : nparray(n,2)
-            local maxima to check (t, lum)
-        """
-        radius = self.parameters['shock_radius']
-        # ----- Discard if maxima more than [tolerance] larger than all neighbours -----
-        for max_i in maxima:
-            t, lum = max_i
-            idx = np.searchsorted(self.lum[:, 0], t)
-
-            left = self.lum[idx - radius: idx, 1]  # left neighbours
-            right = self.lum[idx + 1: idx + radius + 1, 1]  # right neighbours
-            neighbours = np.concatenate([left, right])
-
-            if True in (lum > self.parameters['shock_frac'] * neighbours):
-                if not self.flags['shocks']:
-                    self.printv('Shocks detected and removed: consider verifying'
-                                ' with self.plot(shocks=True)')
-                    self.flags['shocks'] = True
-
-                new_lum = 0.5 * (left[-1] + right[0])  # mean of two neighbours
-                max_i[1] = new_lum
-                self.lum[idx, 1] = new_lum
-                self.shocks.append([idx, t, lum])
 
     def discard_shock_maxima(self, maxima):
         """Check for and discard maxima that are just spikes in luminosity
@@ -1187,7 +1135,7 @@ class BurstRun(object):
     # ===========================================================
     def plot(self, peaks=True, display=True, save=False, log=False,
              burst_stages=False, candidates=False, legend=False, time_unit='h',
-             short_wait=True, shocks=False, fontsize=14, title=True,
+             short_wait=True, fontsize=14, title=True,
              outliers=True, show_all=False, dumps=False, dump_start=False,
              shock_maxima=False, fix_ylim=True):
         """Plots overall model lightcurve, with detected bursts
@@ -1208,7 +1156,6 @@ class BurstRun(object):
             burst_stages = True
             candidates = True
             short_wait = True
-            shocks = True
             outliers = True
 
         if title:
@@ -1271,17 +1218,6 @@ class BurstRun(object):
                 label = {'pre': 'Burst stages'}.get(stage, None)
                 ax.plot(x, y, marker='o', c=self.colours['burst_stages'], ls='none',
                         markersize=markersize, markeredgecolor=markeredgecolor, label=label)
-
-        if shocks:  # plot shocks that were removed
-            for i, shock in enumerate(self.shocks):
-                idx = int(shock[0])
-                shock_lum = shock[2]
-
-                shock_slice = self.lum[idx-1:idx+2, :]
-                shock_slice[1, 1] = shock_lum
-                ax.plot(shock_slice[:, 0]/timescale, shock_slice[:, 1]/yscale,
-                        c=self.colours['shocks'],
-                        label='shocks' if (i == 0) else '_nolegend_')
 
         if shock_maxima:
             ax.plot(self.shock_maxima[:, 0]/timescale, self.shock_maxima[:, 1]/yscale,
