@@ -34,7 +34,7 @@ for file_ in file_list:
 
     elif (source in file_
             and keep_step in file_
-            and f'V{version}' in file_):
+            and f'_V{version}_' in file_):
         keep += [file_]
 
 if len(keep) == 0:
