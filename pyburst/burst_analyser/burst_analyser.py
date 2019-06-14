@@ -51,7 +51,7 @@ class BurstRun(object):
                       'outliers': False,
                       'regress_too_few_bursts': False,
                       'converged': False,
-                      'shocks': False,
+                      'spikes': False,
                       'zeros': False,
                       'calculated_slopes': False,
                       'super_eddington': False,
@@ -78,8 +78,7 @@ class BurstRun(object):
         self.check_options()
 
         self.parameters = {'lum_cutoff': 1e37,  # luminosity cutoff for burst detection
-                           'shock_radius': 2,  # neighbour zones to compare for shocks
-                           'shock_frac': 2.0,  # lum factor that shocks exceed neighbours by
+                           'spike_frac': 2.0,  # lum factor that spikes exceed neighbours by
                            'zero_replacement': 1e35,  # zero lums set to this
                            'maxima_radius': 60,  # bursts are largest maxima within (sec)
                            'pre_time': 60,  # look for burst rise within sec before peak
@@ -96,13 +95,12 @@ class BurstRun(object):
                            'bimodal_sigma': 3,  # number of std's modes are separated by
                            'outlier_bprops': ('dt', 'fluence', 'peak'),  # bprops to check
                            'outlier_distance': 3.,  # fraction of IQR above Q3
-                           'max_shock_iterations': 100,  # max cycles in get_burst_candidates()
                            'dump_time_offset': 0.0,  # time offset (s) from burst start
                            'dump_time_min': 1,  # min time (s) between t_start and dump time
                            'min_rise_steps': 5,  # min time steps between t_pre and t_peak
                            'stable_dt': 5,  # no. of dt's from last burst to end of model to flag stable burning
                            'short_wait_dt': 45,  # threshold for short-wait bursts (minutes)
-                           'shock_radius_t': 0.1,  # radius in s around maxima to check for shock conditions
+                           'spike_radius_t': 0.1,  # radius in s around maxima to check for spike conditions
                            't_buffer': 300,  # time buffer (s) from start/end of model to ignore
                            'mdot_edd': 1.75e-8,  # reference Eddington accretion rate (Msun/yr)
                            }
@@ -113,9 +111,8 @@ class BurstRun(object):
                         'outliers': 'C9',
                         'short_waits': 'C4',
                         'burst_stages': 'C2',
-                        'shocks': 'C3',
+                        'spikes': 'C3',
                         'dumps': 'C3',
-                        'shock_maxima': 'C3',
                         }
 
         self.cols = ['n', 'dt', 'rate', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
@@ -160,8 +157,8 @@ class BurstRun(object):
 
         # Burst properties which will be averaged and added to summary
         self.bprops = ['dt', 'fluence', 'peak', 'length', 'acc_mass', 'qnuc']
-        self.n_shocks = None
-        self.shock_maxima = []
+        self.n_spikes = None
+        self.spikes = []
         self.dumpfiles = None
         self.dump_table = None
 
@@ -591,7 +588,7 @@ class BurstRun(object):
          Pipeline:
          ---------
            1. Get maxima above minimum threshold
-           2. Discard shock peaks
+           2. Discard spike peaks
            3. Get largest peaks in some radius
            4. Identify short-wait bursts (below some fraction of mean dt)
            5. Get start/end times (discard final burst if cut off)
@@ -626,10 +623,10 @@ class BurstRun(object):
         self.bursts['n'] = np.arange(self.n_bursts) + 1  # burst ID (starting from 1)
 
     def get_burst_candidates(self):
-        """Identify potential bursts, while discarding shocks in lightcurve
+        """Identify potential bursts, while discarding spikes in lightcurve
         """
         maxima = self.get_lum_maxima()
-        self.candidates = self.discard_shock_maxima(maxima)
+        self.candidates = self.discard_spikes(maxima)
 
     def truncate_eddington(self):
         """Truncates all super-Eddington luminosities from model lightcurve
@@ -662,7 +659,7 @@ class BurstRun(object):
         maxima_i = argrelextrema(lum_cut[:, 1], np.greater)[0]
         return lum_cut[maxima_i]
 
-    def discard_shock_maxima(self, maxima):
+    def discard_spikes(self, maxima):
         """Check for and discard maxima that are just spikes in luminosity
 
             returns array of maxima with spikes excluded
@@ -672,7 +669,7 @@ class BurstRun(object):
         maxima : nparray(n,2)
             local maxima to check (t, lum)
         """
-        t_radius = self.parameters['shock_radius_t']
+        t_radius = self.parameters['spike_radius_t']
 
         # ignore maxima too close to start/end
         buffer_idxs = np.searchsorted(maxima[:, 0], [self.lum[0, 0] + t_radius,
@@ -682,16 +679,16 @@ class BurstRun(object):
 
         left_lum = self.lumf(maxima[:, 0] - t_radius)
         right_lum = self.lumf(maxima[:, 0] + t_radius)
-        frac = self.parameters['shock_frac']
+        frac = self.parameters['spike_frac']
 
         # find maxima that are more than [frac] larger than neighbour points
         spike_mask = np.logical_or(maxima[:, 1] > frac * left_lum,
                                    maxima[:, 1] > frac * right_lum)
 
-        self.shock_maxima = maxima[spike_mask]
-        self.n_shocks = len(self.shock_maxima)
-        self.printv(f'{self.n_shocks} shock maxima detected and ignored from analysis')
-        self.flags['shocks'] = True
+        self.spikes = maxima[spike_mask]
+        self.n_spikes = len(self.spikes)
+        self.printv(f'{self.n_spikes} spike maxima detected and ignored from analysis')
+        self.flags['spikes'] = True
         return maxima[np.logical_not(spike_mask)]
 
     def get_burst_peaks(self):
@@ -1137,7 +1134,7 @@ class BurstRun(object):
              burst_stages=False, candidates=False, legend=False, time_unit='h',
              short_wait=True, fontsize=14, title=True,
              outliers=True, show_all=False, dumps=False, dump_start=False,
-             shock_maxima=False, fix_ylim=True):
+             spikes=False, fix_ylim=True):
         """Plots overall model lightcurve, with detected bursts
         """
         if not self.flags['lum_loaded']:
@@ -1185,7 +1182,7 @@ class BurstRun(object):
             self.show_save_fig(fig, display=display, save=save, plot_name='model')
             return
 
-        if candidates:  # NOTE: candidates may be modified if a shock was removed
+        if candidates:  # NOTE: candidates may be modified if a spike was removed
             x = self.candidates[:, 0] / timescale
             y = self.candidates[:, 1] / yscale
             ax.plot(x, y, marker='o', c=self.colours['candidates'], ls='none',
@@ -1219,10 +1216,10 @@ class BurstRun(object):
                 ax.plot(x, y, marker='o', c=self.colours['burst_stages'], ls='none',
                         markersize=markersize, markeredgecolor=markeredgecolor, label=label)
 
-        if shock_maxima:
-            ax.plot(self.shock_maxima[:, 0]/timescale, self.shock_maxima[:, 1]/yscale,
+        if spikes:
+            ax.plot(self.spikes[:, 0]/timescale, self.spikes[:, 1]/yscale,
                     marker='o', markersize=markersize, markeredgecolor=markeredgecolor,
-                    label='shock_maxima', ls='none', color=self.colours['shock_maxima'])
+                    label='spikes', ls='none', color=self.colours['spikes'])
 
         if dumps or dump_start:
             self.check_dumpfiles()
