@@ -14,7 +14,6 @@ from pyburst.grids import grid_strings
 # -----------------------------------
 
 # ===== Define order/number of params provided to BurstFit =====
-# TODO: reset indexes (grid5)
 param_keys = {
     7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     8: ['mdot1', 'mdot2', 'x', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
@@ -204,8 +203,8 @@ grid_bounds = {
             ),
         3: ((0.2, 0.5),  # mdot1
             (0.2, 0.5),  # mdot2
-            (0.0, 0.35),  # qb1
-            (0.0, 0.35),  # qb2
+            (0.0, 0.4),  # qb1
+            (0.0, 0.4),  # qb2
             (1.2, 2.0),  # m_nw
             (1.0, 3.0),  # m_gr
             (1., 20.),  # d_b
@@ -559,8 +558,6 @@ version_definitions = {
             3: 2,
             5: 2,
             6: 2,
-            11: 2,
-            12: 2,
         },
     },
 
@@ -597,8 +594,6 @@ version_definitions = {
             3: 2009,
             5: 1997,
             6: 2009,
-            11: 1997,
-            12: 2009,
         },
     },
 
@@ -644,8 +639,6 @@ version_definitions = {
             5: grid_bounds[13][2],
             6: 5,
             7: grid_bounds[12][3],
-            11: 2,
-            12: 2,
         },
     },
 
@@ -705,8 +698,6 @@ version_definitions = {
             3: initial_position[13][2],
             5: 2,
             6: 3,
-            11: 2,
-            12: 3,
         },
     },
 
