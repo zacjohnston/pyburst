@@ -45,46 +45,7 @@ param_aliases = {
 
 grid_bounds = {
     7: {
-        1: ((0.08, 0.18),  # mdot1
-            (0.08, 0.18),  # mdot2
-            (0.08, 0.18),  # mdot3
-            (0.67, 0.76),  # x
-            (0.001, 0.0125),  # z
-            (0.0, 0.8),  # qb1
-            (0.0, 0.8),  # qb2
-            (0.0, 0.8),  # qb3
-            (1.7, 2.9),  # m_nw
-            (1.0, 2.3),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        2: ((0.08, 0.18),  # mdot1
-            (0.08, 0.18),  # mdot2
-            (0.08, 0.18),  # mdot3
-            (0.67, 0.76),  # x
-            (0.0025, 0.0125),  # z
-            (0.0, 0.8),  # qb1
-            (0.0, 0.8),  # qb2
-            (0.0, 0.8),  # qb3
-            (1.7, 2.9),  # m_nw
-            (1.0, 2.3),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        3: ((0.08, 0.18),  # mdot1
-            (0.08, 0.18),  # mdot2
-            (0.08, 0.18),  # mdot3
-            (0.67, 0.76),  # x
-            (0.001, 0.0125),  # z
-            (0.0, 0.8),  # qb1
-            (0.0, 0.8),  # qb2
-            (0.0, 0.8),  # qb3
-            (1.7, 2.9),  # m_nw
-            (1.0, 2.3),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        4: ((0.07, 0.18),  # mdot1
+        1: ((0.07, 0.18),  # mdot1
             (0.07, 0.18),  # mdot2
             (0.07, 0.18),  # mdot3
             (0.64, 0.73),  # x
@@ -100,27 +61,7 @@ grid_bounds = {
     },
 
     8: {
-        1: ((0.15, 0.4),  # mdot1
-            (0.15, 0.4),  # mdot2
-            (0.0, 0.05),  # x
-            (0.05, 0.4),  # qb1
-            (0.05, 0.4),  # qb2
-            (1.1, 2.0),  # m_nw
-            (1.0, 2.2),  # m_gr
-            (1., 20.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        2: ((0.15, 0.35),  # mdot1
-            (0.15, 0.35),  # mdot2
-            (0.0, 0.1),  # x
-            (0.05, 0.4),  # qb1
-            (0.05, 0.4),  # qb2
-            (1.1, 2.0),  # m_nw
-            (1.0, 2.2),  # m_gr
-            (1., 20.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        3: ((0.2, 0.4),  # mdot1
+        1: ((0.2, 0.4),  # mdot1
             (0.2, 0.4),  # mdot2
             (0.0, 0.05),  # x
             (0.05, 0.3),  # qb1
@@ -131,17 +72,9 @@ grid_bounds = {
             (0.1, 10.),  # xi_ratio
             ),
     },
+
     9: {
-        1: ((0.08, 0.18),  # mdot1
-            (0.67, 0.76),  # x
-            (0.001, 0.0125),  # z
-            (0.0, 0.8),  # qb1
-            (1.7, 2.9),  # m_nw
-            (1.0, 2.3),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        2: ((0.07, 0.18),  # mdot1
+        1: ((0.07, 0.18),  # mdot1
             (0.64, 0.73),  # x
             (0.001, 0.015),  # z
             (0.0, 0.6),  # qb1
@@ -267,15 +200,10 @@ priors = {
 
 initial_position = {
     7: {
-        1: (0.09, 0.12, 0.14, 0.72, 0.005, 0.4, 0.2, 0.2, 2.4, 2.0, 6.0, 1.6),
-        2: (0.09, 0.12, 0.14, 0.73, 0.005, 0.4, 0.3, 0.2, 2.5, 1.76, 5.7, 1.6),
-        3: (0.09, 0.12, 0.136, 0.73, 0.007, 0.4, 0.2, 0.2, 2.5, 1.9, 5.74, 1.6),
-        4: (0.082, 0.11, 0.13, 0.69, 0.007, 0.15, 0.05, 0.05, 1.7, 2.1, 7.2, 1.6),
+        1: (0.082, 0.11, 0.13, 0.69, 0.007, 0.15, 0.05, 0.05, 1.7, 2.1, 7.2, 1.6),
     },
     8: {
-        1: (0.2, 0.27, 0.02, 0.35, 0.25, 1.3, 1.5, 7.5, 1.4),
-        2: (0.21, 0.29, 0.02, 0.35, 0.16, 1.35, 2.1, 7.4, 1.4),
-        3: (0.26, 0.36, 0.02, 0.18, 0.1, 1.8, 2.1, 7.4, 1.5),
+        1: (0.26, 0.36, 0.02, 0.18, 0.1, 1.8, 2.1, 7.4, 1.5),
     },
     9: {
         1: (0.085, 0.69, 0.006, 0.15, 1.7, 2.0, 7.3, 1.6),
@@ -286,9 +214,7 @@ initial_position = {
         1: (0.10, 0.13, 0.15, 0.7, 0.004, 0.2, 0.15, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
     },
     11: {
-        1: (0.09, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
-        2: (0.13, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
-        3: (0.15, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
+        1: (0.15, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
     },
     12: {
         1: (0.3, 0.42, 0.11, 0.06, 1.6, 2.0, 7.7, 1.4),
@@ -309,6 +235,12 @@ initial_position = {
 
 # TODO: reform into tables (saved as files), and a function to add versions (rows)
 source_defaults = {
+    'interpolator': {
+        'grid5': 0,
+        'synth5': 1,
+        'he2': 0,
+    },
+
     'param_keys': {
         'grid5': param_keys[7],
         'synth5': param_keys[7],
@@ -346,24 +278,18 @@ source_defaults = {
     },
 
     'analytic_bprops': {
-        'grid5': ('fper',),
+        'grid5': ('fper', 'fedd'),
         'synth5': ('fper',),
         'he2': ('fper', 'fedd'),
     },
 
     'weights': {
-        'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
+        'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
         'synth5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
         'he2': {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0},
     },
 
     'disc_model': {},
-
-    'interpolator': {
-        'grid5': 3,
-        'synth5': 1,
-        'he2': 0,
-    },
 
     'grid_bounds': {
         'grid5': grid_bounds[7][1],
@@ -373,7 +299,7 @@ source_defaults = {
 
     'priors': {  # if not defined here, the default/fallback will be flat_prior()
         'grid5': {
-          'z': priors['z'][1],
+            'z': log_z2,
         },
         'synth5': {},
         'he2': {
@@ -441,14 +367,7 @@ source_defaults = {
 
 version_definitions = {
     'interpolator': {
-        'grid5': {
-            6: 2,
-            # 7: 4,
-            23: 4,
-            24: 4,
-            25: 4,
-            26: 4,
-        },
+        'grid5': {},
         'synth5': {},
         'he2': {
             4: 1,
@@ -458,46 +377,19 @@ version_definitions = {
     },
 
     'interp_bprops': {
-        'grid5': {
-            7: ('rate', 'fluence', 'peak', 'tail_50'),
-        },
+        'grid5': {},
         'synth5': {},
         'he2': {},
     },
 
     'analytic_bprops': {
-        'grid5': {
-            12: ('fper', 'fedd'),
-            13: ('fper', 'fedd'),
-            14: ('fper', 'fedd'),
-            15: ('fper', 'fedd'),
-            16: ('fper', 'fedd'),
-            17: ('fper', 'fedd'),
-            18: ('fper', 'fedd'),
-            19: ('fper', 'fedd'),
-            20: ('fper', 'fedd'),
-            21: ('fper', 'fedd'),
-            22: ('fper', 'fedd'),
-            23: ('fper', 'fedd'),
-            24: ('fper', 'fedd'),
-            25: ('fper', 'fedd'),
-            26: ('fper', 'fedd'),
-        },
+        'grid5': {},
         'synth5': {},
         'he2': {},
     },
 
     'weights': {
-        'grid5': {
-            12: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            13: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            14: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            15: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            23: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            24: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            25: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            26: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-        },
+        'grid5': {},
         'synth5': {},
         'he2': {},
 
@@ -505,13 +397,9 @@ version_definitions = {
 
     'param_keys': {
         'grid5': {
-            -1: param_keys[7],  # dummy version for synth reference
-            13: param_keys[9],
-            14: param_keys[9],
-            15: param_keys[9],
-            24: 13,
-            25: 13,
-            26: 13,
+            24: param_keys[9],
+            25: 24,
+            26: 24,
         },
         'synth5': {},
         'he2': {
@@ -536,9 +424,6 @@ version_definitions = {
 
     'epoch': {
         'grid5': {
-            13: 1998,
-            14: 2000,
-            15: 2007,
             24: 1998,
             25: 2000,
             26: 2007,
@@ -560,13 +445,7 @@ version_definitions = {
 
     'grid_bounds': {
         'grid5': {
-            -1: 2,
-            12: 2,
-            13: 8,
-            14: 8,
-            15: 8,
-            23: grid_bounds[7][4],
-            24: grid_bounds[9][2],
+            24: grid_bounds[9][1],
             25: 24,
             26: 24,
         },
@@ -582,25 +461,16 @@ version_definitions = {
     },
 
     'priors': {
-         'grid5': {
-             23: {'z': log_z2},
-             24: {'z': log_z2},
-             25: {'z': log_z2},
-             26: {'z': log_z2},
-         },
+         'grid5': {},
          'synth5': {},
          'he2': {},
     },
 
     'initial_position': {
         'grid5': {
-            13: initial_position[9][1],
-            14: initial_position[9][2],
-            15: initial_position[9][3],
-            23: initial_position[7][4],
-            24: 13,
-            25: 14,
-            26: 15,
+            24: initial_position[9][1],
+            25: initial_position[9][2],
+            26: initial_position[9][3],
         },
         'synth5': {},
         'he2': {
