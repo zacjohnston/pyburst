@@ -342,9 +342,12 @@ version_definitions = {
 
     'param_keys': {
         'grid5': {
-            24: param_keys[2],
-            25: 24,
-            26: 24,
+            2: param_keys[2],
+            3: 2,
+            4: 2,
+            24: 2,
+            25: 2,
+            26: 2,
         },
         'synth5': {},
         'he2': {
@@ -369,6 +372,9 @@ version_definitions = {
 
     'epoch': {
         'grid5': {
+            2: 1998,
+            3: 2000,
+            4: 2007,
             24: 1998,
             25: 2000,
             26: 2007,
@@ -390,9 +396,12 @@ version_definitions = {
 
     'grid_bounds': {
         'grid5': {
-            24: grid_bounds[2][1],
-            25: 24,
-            26: 24,
+            2: grid_bounds[2][1],
+            3: 2,
+            4: 2,
+            24: 2,
+            25: 2,
+            26: 2,
         },
         'synth5': {},
         'he2': {
@@ -413,9 +422,12 @@ version_definitions = {
 
     'initial_position': {
         'grid5': {
-            24: initial_position[2][1],
-            25: initial_position[2][2],
-            26: initial_position[2][3],
+            2: initial_position[2][1],
+            3: initial_position[2][2],
+            4: initial_position[2][3],
+            24: 2,
+            25: 3,
+            26: 4,
         },
         'synth5': {},
         'he2': {
