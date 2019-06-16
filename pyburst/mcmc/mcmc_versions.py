@@ -416,33 +416,10 @@ source_defaults = {
 # Summary
 # ------------------------------
 # grid5:
-#   2  : priors: z
-#   3  : priors: z, d_b
-#   4  : priors: z, d_b, m_gr
-#   5  : priors: d_b
-
-#   6  : priors: d_b  (up to z=0.015)
-#   7  : as 3, with tail_50
-
-#   8  : as 3, epoch 1998
-#   9  : as 3, epoch 2000
-#   10 : as 3, epoch 2007
-
-#   11 : as 3, 15x weight on brate
-
 #   12 : as 2, with bprop fedd
 #   13 : as 12, epoch 1998
 #   14 : as 12, epoch 2000
 #   15 : as 12, epoch 2007
-
-#   16 : as 12, with no priors
-#   17 : as 12, with param x_edd
-#   18 : as 17, epoch 1998
-#   19 : as 17, epoch 2000
-#   20 : as 17, epoch 2007
-
-#   21 : as 17, z-prior (0.0 +/- 0.1)
-#   22 : as 12, z-prior (0.0 +/- 0.1)
 
 #   23 : as 12, z-prior (-0.1 +/- 0.5)
 #   24 : as 23, epoch 1998
@@ -459,7 +436,8 @@ source_defaults = {
 #   5 : as 4, epoch 1997
 #   6 : as 4, epoch 2009
 
-# TODO: delete he2 v11,12 (once new v2,3 exist)
+#   7 : as 1, m_gr=3.0
+
 
 version_definitions = {
     'interpolator': {
@@ -511,19 +489,10 @@ version_definitions = {
 
     'weights': {
         'grid5': {
-            7: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'tail_50': 1.0},
-            11: {'rate': 15.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0},
             12: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             13: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             14: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             15: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            16: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            17: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            18: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            19: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            20: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            21: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
-            22: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             23: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             24: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
             25: {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
@@ -537,17 +506,9 @@ version_definitions = {
     'param_keys': {
         'grid5': {
             -1: param_keys[7],  # dummy version for synth reference
-            8: param_keys[9],
-            9: param_keys[9],
-            10: param_keys[9],
             13: param_keys[9],
             14: param_keys[9],
             15: param_keys[9],
-            17: param_keys[10],
-            18: param_keys[11],
-            19: param_keys[11],
-            20: param_keys[11],
-            21: 17,
             24: 13,
             25: 13,
             26: 13,
@@ -575,15 +536,9 @@ version_definitions = {
 
     'epoch': {
         'grid5': {
-            8: 1998,
-            9: 2000,
-            10: 2007,
             13: 1998,
             14: 2000,
             15: 2007,
-            18: 1998,
-            19: 2000,
-            20: 2007,
             24: 1998,
             25: 2000,
             26: 2007,
@@ -606,26 +561,10 @@ version_definitions = {
     'grid_bounds': {
         'grid5': {
             -1: 2,
-            2: grid_bounds[7][3],
-            3: 2,
-            4: 2,
-            5: 2,
-            7: 2,
-            8: grid_bounds[9][1],
-            9: grid_bounds[9][1],
-            10: grid_bounds[9][1],
-            11: 2,
             12: 2,
             13: 8,
             14: 8,
             15: 8,
-            16: 2,
-            17: grid_bounds[10][1],
-            18: grid_bounds[11][1],
-            19: grid_bounds[11][1],
-            20: grid_bounds[11][1],
-            21: 17,
-            22: 2,
             23: grid_bounds[7][4],
             24: grid_bounds[9][2],
             25: 24,
@@ -644,21 +583,6 @@ version_definitions = {
 
     'priors': {
          'grid5': {
-             3: {'d_b': gaussian(mean=5.7, std=0.2)},
-             4: {'d_b': gaussian(mean=5.7, std=0.2),
-                 'm_gr': gaussian(mean=1.0, std=0.5)},
-             5: {'d_b': gaussian(mean=5.7, std=0.2),
-                 'z': flat_prior},
-             6: {'d_b': gaussian(mean=5.7, std=0.2),
-                 'z': flat_prior},
-             7: {'d_b': gaussian(mean=5.7, std=0.2)},
-             8: {'d_b': gaussian(mean=5.7, std=0.2)},
-             9: {'d_b': gaussian(mean=5.7, std=0.2)},
-             10: {'d_b': gaussian(mean=5.7, std=0.2)},
-             11: {'d_b': gaussian(mean=5.7, std=0.2)},
-             16: {'z': flat_prior},
-             21: {'z': log_z2},
-             22: {'z': log_z2},
              23: {'z': log_z2},
              24: {'z': log_z2},
              25: {'z': log_z2},
@@ -670,23 +594,9 @@ version_definitions = {
 
     'initial_position': {
         'grid5': {
-            3: initial_position[7][2],
-            4: 3,
-            5: initial_position[7][3],
-            6: 5,
-            7: 3,
-            8: initial_position[9][1],
-            9: initial_position[9][2],
-            10: initial_position[9][3],
-            11: 3,
             13: initial_position[9][1],
             14: initial_position[9][2],
             15: initial_position[9][3],
-            17: initial_position[10][1],
-            18: initial_position[11][1],
-            19: initial_position[11][2],
-            20: initial_position[11][3],
-            21: 17,
             23: initial_position[7][4],
             24: 13,
             25: 14,
