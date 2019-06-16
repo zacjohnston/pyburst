@@ -15,13 +15,10 @@ from pyburst.grids import grid_strings
 
 # ===== Define order/number of params provided to BurstFit =====
 param_keys = {
-    7: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
-    8: ['mdot1', 'mdot2', 'x', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
-    9: ['mdot1', 'x', 'z', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
-    10: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
-    11: ['mdot1', 'x', 'z', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
-    12: ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
-    13: ['mdot1', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
+    1: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
+    2: ['mdot1', 'x', 'z', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
+    3: ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
+    4: ['mdot1', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -44,7 +41,7 @@ param_aliases = {
 }
 
 grid_bounds = {
-    7: {
+    1: {
         1: ((0.07, 0.18),  # mdot1
             (0.07, 0.18),  # mdot2
             (0.07, 0.18),  # mdot3
@@ -60,20 +57,7 @@ grid_bounds = {
             ),
     },
 
-    8: {
-        1: ((0.2, 0.4),  # mdot1
-            (0.2, 0.4),  # mdot2
-            (0.0, 0.05),  # x
-            (0.05, 0.3),  # qb1
-            (0.05, 0.3),  # qb2
-            (1.1, 2.0),  # m_nw
-            (1.0, 2.2),  # m_gr
-            (1., 20.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-    },
-
-    9: {
+    2: {
         1: ((0.07, 0.18),  # mdot1
             (0.64, 0.73),  # x
             (0.001, 0.015),  # z
@@ -85,37 +69,7 @@ grid_bounds = {
             ),
     },
 
-    10: {
-        1: ((0.08, 0.18),  # mdot1
-            (0.08, 0.18),  # mdot2
-            (0.08, 0.18),  # mdot3
-            (0.67, 0.76),  # x
-            (0.001, 0.0125),  # z
-            (0.0, 0.8),  # qb1
-            (0.0, 0.8),  # qb2
-            (0.0, 0.8),  # qb3
-            (1.7, 2.9),  # m_nw
-            (1.0, 2.2),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            (0.0, 1.0),  # xedd_ratio
-            ),
-    },
-
-    11: {
-        1: ((0.08, 0.18),  # mdot1
-            (0.67, 0.76),  # x
-            (0.001, 0.0125),  # z
-            (0.0, 0.8),  # qb1
-            (1.7, 2.9),  # m_nw
-            (1.0, 2.2),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            (0.0, 1.0),  # xedd_ratio
-            ),
-    },
-
-    12: {
+    3: {
         1: ((0.2, 0.5),  # mdot1
             (0.2, 0.5),  # mdot2
             (0.0, 0.35),  # qb1
@@ -145,7 +99,7 @@ grid_bounds = {
             ),
     },
 
-    13: {
+    4: {
         1: ((0.2, 0.5),  # mdot1
             (0.0, 0.35),  # qb1
             (1.2, 2.0),  # m_nw
@@ -199,22 +153,13 @@ priors = {
 # ===== initial position of walkers =====
 
 initial_position = {
-    7: {
+    1: {
         1: (0.082, 0.11, 0.13, 0.69, 0.007, 0.15, 0.05, 0.05, 1.7, 2.1, 7.2, 1.6),
-    },
-    8: {
-        1: (0.26, 0.36, 0.02, 0.18, 0.1, 1.8, 2.1, 7.4, 1.5),
     },
     9: {
         1: (0.085, 0.69, 0.006, 0.15, 1.7, 2.0, 7.3, 1.6),
         2: (0.11,  0.69, 0.006, 0.05, 1.7, 2.0, 7.3, 1.6),
         3: (0.13,  0.69, 0.006, 0.05, 1.7, 2.0, 7.3, 1.6),
-    },
-    10: {
-        1: (0.10, 0.13, 0.15, 0.7, 0.004, 0.2, 0.15, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
-    },
-    11: {
-        1: (0.15, 0.7, 0.004, 0.15, 2.1, 2.0, 6.7, 1.6, 0.9),
     },
     12: {
         1: (0.3, 0.42, 0.11, 0.06, 1.6, 2.0, 7.7, 1.4),
@@ -242,9 +187,9 @@ source_defaults = {
     },
 
     'param_keys': {
-        'grid5': param_keys[7],
-        'synth5': param_keys[7],
-        'he2': param_keys[12],
+        'grid5': param_keys[1],
+        'synth5': param_keys[1],
+        'he2': param_keys[3],
     },
 
     'interp_keys': {
@@ -292,9 +237,9 @@ source_defaults = {
     'disc_model': {},
 
     'grid_bounds': {
-        'grid5': grid_bounds[7][1],
-        'synth5': grid_bounds[7][1],
-        'he2': grid_bounds[12][1],
+        'grid5': grid_bounds[1][1],
+        'synth5': grid_bounds[1][1],
+        'he2': grid_bounds[3][1],
     },
 
     'priors': {  # if not defined here, the default/fallback will be flat_prior()
@@ -308,9 +253,9 @@ source_defaults = {
     },
 
     'initial_position': {
-        'grid5': initial_position[7][1],
-        'synth5': initial_position[7][1],
-        'he2': initial_position[12][1],
+        'grid5': initial_position[1][1],
+        'synth5': initial_position[1][1],
+        'he2': initial_position[3][1],
     },
 
     'x_edd_option': {
@@ -397,13 +342,13 @@ version_definitions = {
 
     'param_keys': {
         'grid5': {
-            24: param_keys[9],
+            24: param_keys[2],
             25: 24,
             26: 24,
         },
         'synth5': {},
         'he2': {
-            2: param_keys[13],
+            2: param_keys[4],
             3: 2,
             5: 2,
             6: 2,
@@ -445,18 +390,18 @@ version_definitions = {
 
     'grid_bounds': {
         'grid5': {
-            24: grid_bounds[9][1],
+            24: grid_bounds[2][1],
             25: 24,
             26: 24,
         },
         'synth5': {},
         'he2': {
-            2: grid_bounds[13][1],
+            2: grid_bounds[4][1],
             3: 2,
-            4: grid_bounds[12][2],
-            5: grid_bounds[13][2],
+            4: grid_bounds[3][2],
+            5: grid_bounds[4][2],
             6: 5,
-            7: grid_bounds[12][3],
+            7: grid_bounds[3][3],
         },
     },
 
@@ -468,14 +413,14 @@ version_definitions = {
 
     'initial_position': {
         'grid5': {
-            24: initial_position[9][1],
-            25: initial_position[9][2],
-            26: initial_position[9][3],
+            24: initial_position[2][1],
+            25: initial_position[2][2],
+            26: initial_position[2][3],
         },
         'synth5': {},
         'he2': {
-            2: initial_position[13][1],
-            3: initial_position[13][2],
+            2: initial_position[4][1],
+            3: initial_position[4][2],
             5: 2,
             6: 3,
         },
