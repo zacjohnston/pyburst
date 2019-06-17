@@ -415,7 +415,9 @@ version_definitions = {
     },
 
     'priors': {
-         'grid5': {},
+         'grid5': {
+             5: {'m_gr': gaussian(mean=1.6, std=0.1)}
+         },
          'synth5': {},
          'he2': {},
     },
