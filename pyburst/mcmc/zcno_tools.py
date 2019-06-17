@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 
 
-def fit_z_prior(table, plot=False, xlims=(-3, 3)):
+def fit_z_gaussian(table, plot=False, xlims=(-3, 3)):
     """Returns Gaussian fit (mean, std) to a given [Fe/H] distribution
 
     table : pd.DataFrame
