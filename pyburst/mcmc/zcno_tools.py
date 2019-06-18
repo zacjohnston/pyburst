@@ -1,7 +1,23 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import norm
+from scipy.stats import norm, beta
+
+# TODO:p1.5/3.75hhh
+#   - plot_distribution(var='feh')
+
+def plot_hist(table, var='feh', bins=100, histtype='step'):
+    """Plots histogram of the given table variable
+    """
+    xlabels = {'feh': '[Fe/H]'}
+
+    fig, ax = plt.subplots()
+    ax.hist(table[var], bins=bins, density=1, histtype=histtype)
+
+    xlabel = xlabels.get(var, var)
+    ax.set_xlabel(xlabel)
+
+    plt.show(block=False)
 
 
 def fit_z_gaussian(table, plot=False, xlims=(-3, 3)):
