@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import norm
+from scipy.stats import norm, beta
 
 # kepler_grids
 from pyburst.grids import grid_strings
@@ -124,6 +124,7 @@ def flat_prior(x):
 
 log_norm = norm(loc=-0.5, scale=0.25).pdf
 log_norm2 = norm(loc=-0.1, scale=0.5).pdf
+log_beta = beta(a=14.922, b=7.9, loc=-3.565, scale=5.2).pdf
 
 def log_z(z, z_sun=0.01):
     """PDF of log10(z/z_solar)"""
@@ -134,6 +135,11 @@ def log_z2(z, z_sun=0.01):
     """PDF of log10(z/z_solar)"""
     logz = np.log10(z / z_sun)
     return log_norm2(logz)
+
+def log_z_beta(z, z_sun=0.01):
+    logz = np.log10(z / z_sun)
+    return log_beta(logz)
+
 
 def gaussian(mean, std):
     """Returns function for Gaussian distribution
@@ -244,7 +250,7 @@ source_defaults = {
 
     'priors': {  # if not defined here, the default/fallback will be flat_prior()
         'grid5': {
-            'z': log_z2,
+            'z': log_z_beta,
         },
         'synth5': {},
         'he2': {
