@@ -3,10 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import norm, beta
 
-# TODO:p1.5/3.75hhh
-#   - plot_distribution(var='feh')
+# TODO:
 
-def plot_hist(table, var='feh', bins=100, histtype='step'):
+def plot_hist(table, var='feh', bins=100, histtype='step', display=True):
     """Plots histogram of the given table variable
     """
     xlabels = {'feh': '[Fe/H]'}
@@ -17,7 +16,8 @@ def plot_hist(table, var='feh', bins=100, histtype='step'):
     xlabel = xlabels.get(var, var)
     ax.set_xlabel(xlabel)
 
-    plt.show(block=False)
+    if display:
+        plt.show(block=False)
     return fig, ax
 
 
@@ -35,8 +35,7 @@ def fit_z_gaussian(table, plot=False, xlims=(-3, 3)):
         x = np.linspace(xlims[0], xlims[1], 200)
         y = norm.pdf(x, mean, std)
 
-        fig, ax = plt.subplots()
-        ax.hist(table['feh'], bins=100, density=1.0)
+        fig, ax = plot_hist(table=table, var='feh')
         ax.plot(x, y)
         plt.show(block=False)
 
