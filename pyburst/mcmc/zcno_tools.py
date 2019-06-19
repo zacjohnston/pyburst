@@ -21,7 +21,7 @@ def plot_hist(table, var='feh', bins=100, histtype='step', display=True):
     return fig, ax
 
 
-def fit_z_gaussian(table, plot=False, xlims=(-3, 3)):
+def fit_gaussian(table, plot=False, xlims=(-3, 3)):
     """Returns Gaussian fit (mean, std) to a given [Fe/H] distribution
 
     table : pd.DataFrame
