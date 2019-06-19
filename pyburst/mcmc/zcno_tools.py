@@ -40,3 +40,19 @@ def fit_gaussian(table, plot=False, xlims=(-3, 3)):
         plt.show(block=False)
 
     return mean, std
+
+
+def fit_beta(table, plot=False, xlims=(-2, 0.5)):
+    """Returns fit of Beta Distribution to a given [Fe/H] table
+    See: fit_gaussian()
+    """
+    z_sort = np.sort(table['feh'])
+    i_0 = np.searchsorted(z_sort, xlims[0])
+    i_1 = np.searchsorted(z_sort, xlims[1])
+
+    loc = xlims[0]
+    scale = xlims[1] - xlims[0]
+
+    a, b, loc, scale = beta.fit(z_sort[i_0:i_1], floc=loc, fscale=scale)
+
+    return a, b, loc, scale
