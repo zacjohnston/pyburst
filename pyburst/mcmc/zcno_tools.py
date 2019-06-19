@@ -18,6 +18,7 @@ def plot_hist(table, var='feh', bins=100, histtype='step'):
     ax.set_xlabel(xlabel)
 
     plt.show(block=False)
+    return fig, ax
 
 
 def fit_z_gaussian(table, plot=False, xlims=(-3, 3)):
