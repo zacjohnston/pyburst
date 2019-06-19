@@ -5,13 +5,17 @@ from scipy.stats import norm, beta
 
 # TODO:
 
-def plot_hist(table, var='feh', bins=100, histtype='step', display=True):
+def plot_hist(table, var='feh', bins=100, histtype='step', display=True,
+              values=None):
     """Plots histogram of the given table variable
     """
     xlabels = {'feh': '[Fe/H]'}
 
+    if values is None:
+        values = table[var]
+
     fig, ax = plt.subplots()
-    ax.hist(table[var], bins=bins, density=1, histtype=histtype)
+    ax.hist(values, bins=bins, density=1, histtype=histtype)
 
     xlabel = xlabels.get(var, var)
     ax.set_xlabel(xlabel)
@@ -54,5 +58,13 @@ def fit_beta(table, plot=False, xlims=(-2, 0.5)):
     scale = xlims[1] - xlims[0]
 
     a, b, loc, scale = beta.fit(z_sort[i_0:i_1], floc=loc, fscale=scale)
+
+    if plot:
+        x = np.linspace(xlims[0], xlims[1], 100)
+        y = beta.pdf(x, a, b, loc=loc, scale=scale)
+
+        fig, ax = plot_hist(table=table, var='feh', values=z_sort)
+        ax.plot(x, y)
+        plt.show(block=False)
 
     return a, b, loc, scale
