@@ -88,7 +88,7 @@ class BurstRun(object):
                            'min_length': 5,  # min time between burst peak and end (sec)
                            'short_wait_frac': 0.5,  # short_waits below frac of following dt
                            'min_discard': 2,  # min num of bursts to discard
-                           'ideal_discard': 10,  # no. bursts to attempt to discard, but fall back on min_discard
+                           'target_discard': 10,  # no. bursts to attempt to discard, but fall back on min_discard
                            'min_bursts': 10,  # min no. bursts (after discards) to calculate mean properties
                            'min_regress': 20,  # min num of bursts to do linear regression
                            'n_bimodal': 20,  # n_bursts to check for bimodality
@@ -994,17 +994,17 @@ class BurstRun(object):
         """
         self.printv('Finding quick number of bursts to discard')
 
-        ideal_discard = self.parameters['ideal_discard']
+        target_discard = self.parameters['target_discard']
         min_discard = self.parameters['min_discard']
         min_bursts = self.parameters['min_bursts']
-        too_few_str = f'Too few bursts for ideal_discard, using min_discard={min_discard}'
+        too_few_str = f'Too few bursts for target_discard, using min_discard={min_discard}'
 
-        ideal_remaining = self.n_bursts - ideal_discard
+        ideal_remaining = self.n_bursts - target_discard
         min_remaining = self.n_bursts - min_discard
 
         if ideal_remaining >= min_bursts:
-            self.printv(f"Using ideal_discard={ideal_discard}")
-            return ideal_discard
+            self.printv(f"Using target_discard={target_discard}")
+            return target_discard
         elif min_remaining >= min_bursts:
             self.printv(f"Keeping min_bursts={min_bursts}")
             return self.n_bursts - min_bursts
