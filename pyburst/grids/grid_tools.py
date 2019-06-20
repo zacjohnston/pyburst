@@ -572,11 +572,11 @@ def printv(string, verbose):
         print(string)
 
 
-def try_mkdir(path, skip=False):
-    print(f'Creating directory  {path}')
+def try_mkdir(path, skip=False, verbose=True):
+    printv(f'Creating directory  {path}', verbose)
     if os.path.exists(path):
         if skip:
-            print('Directory already exists - skipping')
+            printv('Directory already exists - skipping', verbose)
         else:
             print('Directory exists')
             cont = input('Overwrite? (DESTROY) [y/n]: ')
