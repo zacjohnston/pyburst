@@ -25,7 +25,7 @@ class Ksample:
     against observed LC
     """
     def __init__(self, source, mcmc_source, mcmc_version, batches, runs=None,
-                 verbose=True):
+                 verbose=True, single_burst_lc=False, burst_i=None):
         self.source = source
         self.obs_source = obs_sources[source]
         self.grid = grid_analyser.Kgrid(self.source)
@@ -34,6 +34,8 @@ class Ksample:
         self.batches = batches
         self.params = load_param_sample(self.source, self.batches)
         self.verbose = verbose
+        self.single_burst_lc = single_burst_lc
+        self.burst_i = burst_i
 
         if runs is None:
             sub_batch = self.grid.get_params(self.batches[0])
@@ -42,10 +44,12 @@ class Ksample:
             self.runs = runs
 
         self.n_epochs = len(batches)
+        self.loaded_lc = {}
         self.shifted_lc = {}
         self.interp_lc = {}
         self.t_shifts = None
 
+        self.load_model_lc()
         self.extract_lc()
         self.interp_obs_lc()
         self.get_all_tshifts()
@@ -78,6 +82,32 @@ class Ksample:
         if self.verbose:
             sys.stdout.write('\n')
 
+    def load_model_lc(self):
+        """Loads model burst lightcurves
+        """
+        self.printv('Loading model lightcurves')
+
+        if self.single_burst_lc:
+            if self.burst_i is None:
+                raise ValueError('Must supply burst_i if single_burst_lc=True')
+
+            for batch in self.batches:
+                self.loaded_lc[batch] = {}
+                self.grid.load_burst_lightcurves(batch, burst=self.burst_i)
+                lc_batch = self.grid.burst_lc[batch]
+
+                for run in lc_batch:
+                    burst_lc = lc_batch[run][self.burst_i]
+
+                    padded_lc = np.zeros([len(burst_lc), 3])
+                    padded_lc[:, :2] = burst_lc
+
+                    self.loaded_lc[batch][run] = padded_lc
+        else:
+            for batch in self.batches:
+                self.grid.load_mean_lightcurves(batch)
+                self.loaded_lc[batch] = self.grid.mean_lc[batch]
+
     def extract_lc(self):
         """Extracts mean lightcurves from models and shifts to observer according to
             sample parameters
@@ -85,23 +115,24 @@ class Ksample:
         for batch in self.batches:
             self.shifted_lc[batch] = {}
             self.interp_lc[batch] = {}
-            self.grid.load_mean_lightcurves(batch)
 
             for i, run in enumerate(self.runs):
                 if self.verbose:
                     sys.stdout.write('\rExtracting and shifting model lightcurves: '
                                      f'Batch {batch} : run {run}/{len(self.runs)}')
-                params = self.params[i]
-                self.shifted_lc[batch][run] = np.array(self.grid.mean_lc[batch][run])
+                self.shifted_lc[batch][run] = np.array(self.loaded_lc[batch][run])
 
                 lc = self.shifted_lc[batch][run]
                 t = lc[:, 0]
                 lum = lc[:, 1:3]
 
+                params = self.params[i]
+                params_dict = self.bfit.get_params_dict(params)
+
                 lc[:, 0] = 3600 * self.bfit.shift_to_observer(values=t, bprop='dt',
-                                                              params=params)
+                                                              params=params_dict)
                 lc[:, 1:3] = self.bfit.shift_to_observer(values=lum, bprop='peak',
-                                                         params=params)
+                                                         params=params_dict)
 
                 flux = lum[:, 0]
                 flux_err = lum[:, 1]
