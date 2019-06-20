@@ -236,6 +236,14 @@ def load_batch_table(batch, source, table_name):
     return pd.read_csv(filepath, delim_whitespace=True)
 
 
+def load_burst_lightcurve(burst_i, run, batch, source):
+    """Loads individual burst lightcurves
+    """
+    filepath = grid_strings.burst_lightcurve_filepath(burst_i, run=run,
+                                                      batch=batch, source=source)
+    return np.loadtxt(filepath)
+
+
 def get_burst_cycles(run, batch, source):
     """Returns dump cycles that correspond to burst start times
     """
