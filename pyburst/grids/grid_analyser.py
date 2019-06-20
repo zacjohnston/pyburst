@@ -340,7 +340,7 @@ class Kgrid:
         ax.plot(x, y, label=label)
         return ax
 
-    def load_burst_lightcurves(self, batch):
+    def load_burst_lightcurves(self, batch, burst=None):
         """Loads individual burst lightcurves for given batch
 
         Note: save LCs with burst_analyser.BurstRun.save_burst_lightcurves()
@@ -354,7 +354,12 @@ class Kgrid:
             n_bursts = model.num
             self.burst_lc[batch][run] = {}
 
-            for burst_i in range(n_bursts):
+            if burst is None:
+                bursts = range(n_bursts)
+            else:
+                bursts = [burst]
+
+            for burst_i in bursts:
                 sys.stdout.write(f'\rLoading burst lc: run {run}, burst {burst_i+1}')
                 lc = burst_tools.load_burst_lightcurve(burst_i, run=run, batch=batch,
                                                        source=self.source)
