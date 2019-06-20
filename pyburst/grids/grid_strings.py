@@ -92,6 +92,16 @@ def batch_analysis_path(batch, source):
     return os.path.join(analysis_path, batch_str)
 
 
+def batch_lightcurves_path(batch, source):
+    analysis_path = batch_analysis_path(batch, source=source)
+    return os.path.join(analysis_path, 'output', 'lightcurves')
+
+
+def model_lightcurves_path(run, batch, source):
+    batch_lc_path = batch_lightcurves_path(batch=batch, source=source)
+    return os.path.join(batch_lc_path, f'run_{run}')
+
+
 def plots_path(source):
     return get_source_subdir(source, 'plots')
 
