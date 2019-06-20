@@ -1492,7 +1492,7 @@ class BurstRun(object):
             lc[:, 0] -= self.bursts[align][burst]
         return lc
 
-    def save_all_lightcurves(self, **kwargs):
+    def save_all_lightcurve_plots(self, **kwargs):
         for burst in range(self.n_bursts):
             self.plot_lightcurves(burst, save=True, display=False, **kwargs)
 
