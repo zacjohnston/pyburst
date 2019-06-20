@@ -13,7 +13,7 @@ import sys
 
 # kepler_grids
 from . import grid_tools, grid_strings, grid_versions
-
+from pyburst.burst_analyser import burst_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -91,6 +91,7 @@ class Kgrid:
 
         # ===== Load mean lightcurve data =====
         self.mean_lc = {'columns': ['Time', 'L', 'u(L)', 'R', 'u(R)']}
+        self.burst_lc = {'columns': ['Time', 'L']}
         if load_lc:
             self.load_all_mean_lightcurves()
 
@@ -254,7 +255,7 @@ class Kgrid:
             plt.show(block=False)
         return ax
 
-    def save_mean_lc(self, params, error=True, show=False):
+    def save_mean_lc(self, params, show=False):
         """Save a series of mean lightcurve plots for given params
         """
         models = self.get_params(params=params)
@@ -339,6 +340,26 @@ class Kgrid:
         ax.plot(x, y, label=label)
         return ax
 
+    def load_burst_lightcurves(self, batch):
+        """Loads individual burst lightcurves for given batch
+
+        Note: save LCs with burst_analyser.BurstRun.save_burst_lightcurves()
+        """
+        self.burst_lc[batch] = {}
+        batch_table = self.get_summ(batch=batch)
+        self.printv(f'Loading burst lightcurves for batch: {batch}')
+
+        for model in batch_table.itertuples():
+            run = model.run
+            n_bursts = model.num
+            self.burst_lc[batch][run] = {}
+
+            for burst_i in range(n_bursts):
+                sys.stdout.write(f'\rLoading burst lc: run {run}, burst {burst_i+1}')
+                lc = burst_tools.load_burst_lightcurve(burst_i, run=run, batch=batch,
+                                                       source=self.source)
+                self.burst_lc[batch][run][burst_i] = lc
+
     def load_mean_lightcurves(self, batch):
         """
         Loads mean lightcurve files for given batch
@@ -347,7 +368,6 @@ class Kgrid:
                   0         1          2       3            4
         """
         batch_str = f'{self.source}_{batch}'
-        analyser_path = grid_strings.get_analyser_path(self.source)
         path = os.path.join(self.source_path, 'mean_lightcurves', batch_str)
         batch_table = self.get_params(batch=batch)
         self.mean_lc[batch] = {}
