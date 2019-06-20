@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import linregress
 import os
-
+import sys
 
 # kepler_grids
 from . import grid_tools, grid_strings, grid_versions
@@ -190,6 +190,8 @@ class Kgrid:
 
         for row in linear_rate.itertuples():
             i = row.Index
+            sys.stdout.write(f'\rCalculating linear fits to burst rates: {i+1}/{n}')
+
             sub_params = {'qb': row.qb, 'z': row.z, 'x': row.x, 'mass': row.mass}
             table_params = self.get_params(params=sub_params)
             table_summ = self.get_summ(params=sub_params)
@@ -207,6 +209,7 @@ class Kgrid:
                 linear_rate.loc[i, 'm'] = m
                 linear_rate.loc[i, 'y0'] = y0
 
+        sys.stdout.write('\n')
         nan_mask = np.array(np.isnan(linear_rate['m']))  # Remove nans
         self.linear_rates = linear_rate.iloc[~nan_mask]
 
@@ -412,7 +415,7 @@ class Kgrid:
                  },
                  'fluence': {
                      'grid5': [0.0, 21],
-                     'he2': [0.0, 15],
+                     'he2': [0.5, 9],
                      'ks1': [2.0, 10],
                  },
                  'peak': {
