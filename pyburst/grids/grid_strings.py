@@ -192,6 +192,10 @@ def cmd_filepath(run, batch, source, basename='xrb'):
     filename = get_run_string(run, basename, extension='.cmd')
     return os.path.join(path, filename)
 
+def burst_lightcurve_filepath(burst_i, run, batch, source):
+    path = model_lightcurves_path(run, batch=batch, source=source)
+    filename = f'lc_{burst_i}.txt'
+    return os.path.join(path, filename)
 
 # ======================================================
 # Misc. prints
