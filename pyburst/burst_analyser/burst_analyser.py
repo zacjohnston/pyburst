@@ -552,10 +552,10 @@ class BurstRun(object):
         for burst_idx in range(self.n_bursts):
             lightcurve = self.extract_lightcurve(burst_idx, align=align)
             header = 'time (s), luminosity (erg/s)'
-            filename = f'lc_{burst_idx}.txt'
-
             sys.stdout.write(f'\rSaving burst lightcurve: {burst_idx+1}/{self.n_bursts}')
-            filepath = os.path.join(path, filename)
+            filepath = grid_strings.burst_lightcurve_filepath(burst_idx, run=self.run,
+                                                              batch=self.batch,
+                                                              source=self.source)
             np.savetxt(filepath, lightcurve, header=header)
 
         sys.stdout.write('\n')
