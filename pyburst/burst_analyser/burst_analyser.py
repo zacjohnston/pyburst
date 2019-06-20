@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import sys
 import ast
 import configparser
 
@@ -127,6 +128,7 @@ class BurstRun(object):
                       'source': grid_strings.get_source_path(source),
                       'analysis': grid_strings.batch_analysis_path(batch, source),
                       'plots': grid_strings.get_source_subdir(source, 'plots'),
+                      'lightcurves': grid_strings.model_lightcurves_path(run, batch, source)
                       }
 
         self.config = None
@@ -398,7 +400,7 @@ class BurstRun(object):
         self.test_bimodal()
 
     # ===========================================================
-    # Accessing data
+    # Saving/Loading/Accessing data
     # ===========================================================
     def printv(self, string):
         if self.options['verbose']:
@@ -536,6 +538,27 @@ class BurstRun(object):
         cycles = self.bursts['dump_start'][mask].astype(int)
         table = self.dump_table.set_index('cycle')
         return table.loc[cycles]
+
+    def save_burst_lightcurves(self, path=None, align='t_start'):
+        """Saves individual burst lightcurves to txt files
+        """
+        self.ensure_analysed_is(True)
+        if path is None:  # default to model directory
+            path = self.paths['lightcurves']
+
+        self.printv(f'Saving burst lightcurves to: {path}')
+        grid_tools.try_mkdir(path, skip=True, verbose=False)
+
+        for burst_idx in range(self.n_bursts):
+            lightcurve = self.extract_lightcurve(burst_idx, align=align)
+            header = 'time (s), luminosity (erg/s)'
+            filename = f'lc_{burst_idx}.txt'
+
+            sys.stdout.write(f'\rSaving burst lightcurve: {burst_idx+1}/{self.n_bursts}')
+            filepath = os.path.join(path, filename)
+            np.savetxt(filepath, lightcurve, header=header)
+
+        sys.stdout.write('\n')
 
     # ===========================================================
     # Analysis
@@ -1373,33 +1396,6 @@ class BurstRun(object):
             ax[0].legend()
         plt.tight_layout()
         self.show_save_fig(fig, display=display, save=save, plot_name='linregress')
-
-    def save_burst_lightcurves(self, path=None):
-        """Saves burst lightcurves to txt files. Excludes 'pre' bursts
-        """
-        # TODO: obsolete?
-        self.ensure_analysed_is(True)
-        if path is None:  # default to model directory
-            path = self.paths['batch_models']
-
-        for i in range(self.n_bursts):
-            bnum = i + 1
-
-            i_start = self.bursts['t_pre_i'][i]
-            i_zero = self.bursts['t_start_i'][i]
-            i_end = self.bursts['t_end_i'][i]
-
-            t = self.lum[i_start:i_end, 0] - self.lum[i_zero, 0]
-            lum = self.lum[i_start:i_end, 1]
-            uncertainty = 0.02
-            u_lum = lum * uncertainty
-
-            lightcurve = np.array([t, lum, u_lum]).transpose()
-            header = 'time luminosity u_luminosity'
-            b_file = f'b{bnum}.txt'
-            filepath = os.path.join(path, b_file)
-
-            np.savetxt(filepath, lightcurve, header=header)
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
                          zero_time=True, fontsize=14, ylims=None, title=True,
