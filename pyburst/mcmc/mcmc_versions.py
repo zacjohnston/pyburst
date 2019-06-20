@@ -124,7 +124,7 @@ def flat_prior(x):
 
 log_norm = norm(loc=-0.5, scale=0.25).pdf
 log_norm2 = norm(loc=-0.1, scale=0.5).pdf
-log_beta = beta(a=14.922, b=7.9, loc=-3.565, scale=5.2).pdf
+log_beta = beta(a=10.1, b=3.5, loc=-3.5, scale=4.5).pdf
 
 def log_z(z, z_sun=0.01):
     """PDF of log10(z/z_solar)"""
