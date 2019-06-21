@@ -46,7 +46,20 @@ grid_bounds = {
             (0.07, 0.18),  # mdot2
             (0.07, 0.18),  # mdot3
             (0.64, 0.73),  # x
-            (0.001, 0.015),  # z
+            (0.001, 0.02),  # z
+            (0.0, 0.6),  # qb1
+            (0.0, 0.6),  # qb2
+            (0.0, 0.6),  # qb3
+            (1.4, 2.3),  # m_nw
+            (1.0, 3.0),  # m_gr
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+        2: ((0.07, 0.18),  # mdot1
+            (0.07, 0.18),  # mdot2
+            (0.07, 0.18),  # mdot3
+            (0.64, 0.73),  # x
+            (0.0025, 0.02),  # z
             (0.0, 0.6),  # qb1
             (0.0, 0.6),  # qb2
             (0.0, 0.6),  # qb3
@@ -293,15 +306,14 @@ source_defaults = {
 # Summary
 # ------------------------------
 # grid5:
-#   12 : as 2, with bprop fedd
-#   13 : as 12, epoch 1998
-#   14 : as 12, epoch 2000
-#   15 : as 12, epoch 2007
+#   1  : base grid
+#   2 : as 1, epoch 1998
+#   3 : as 1, epoch 2000
+#   4 : as 1, epoch 2007
 
-#   23 : as 12, z-prior (-0.1 +/- 0.5)
-#   24 : as 23, epoch 1998
-#   25 : as 23, epoch 2000
-#   26 : as 23, epoch 2007
+#   5 : as 1, prior on m_gr 1.6 +/- 0.1
+
+#   6 : as 1, sparse grid (interpolator 1)
 
 # ------------------------------
 # he2
@@ -318,12 +330,85 @@ source_defaults = {
 
 version_definitions = {
     'interpolator': {
-        'grid5': {},
+        'grid5': {
+            6: 1,
+        },
         'synth5': {},
         'he2': {
             4: 1,
             5: 1,
             6: 1,
+        },
+    },
+
+    'grid_bounds': {
+        'grid5': {
+            2: grid_bounds[2][1],
+            3: 2,
+            4: 2,
+            6: grid_bounds[1][2],
+        },
+        'synth5': {},
+        'he2': {
+            2: grid_bounds[4][1],
+            3: 2,
+            4: grid_bounds[3][2],
+            5: grid_bounds[4][2],
+            6: 5,
+            7: grid_bounds[3][3],
+        },
+    },
+
+    'initial_position': {
+        'grid5': {
+            2: initial_position[2][1],
+            3: initial_position[2][2],
+            4: initial_position[2][3],
+        },
+        'synth5': {},
+        'he2': {
+            2: initial_position[4][1],
+            3: initial_position[4][2],
+            5: 2,
+            6: 3,
+        },
+    },
+
+    'priors': {
+        'grid5': {
+            5: {'m_gr': gaussian(mean=1.6, std=0.1)}
+        },
+        'synth5': {},
+        'he2': {},
+    },
+
+    'param_keys': {
+        'grid5': {
+            2: param_keys[2],
+            3: 2,
+            4: 2,
+        },
+        'synth5': {},
+        'he2': {
+            2: param_keys[4],
+            3: 2,
+            5: 2,
+            6: 2,
+        },
+    },
+
+    'epoch': {
+        'grid5': {
+            2: 1998,
+            3: 2000,
+            4: 2007,
+        },
+        'synth5': {},
+        'he2': {
+            2: 1997,
+            3: 2009,
+            5: 1997,
+            6: 2009,
         },
     },
 
@@ -346,24 +431,6 @@ version_definitions = {
 
     },
 
-    'param_keys': {
-        'grid5': {
-            2: param_keys[2],
-            3: 2,
-            4: 2,
-            24: 2,
-            25: 2,
-            26: 2,
-        },
-        'synth5': {},
-        'he2': {
-            2: param_keys[4],
-            3: 2,
-            5: 2,
-            6: 2,
-        },
-    },
-
     'interp_keys': {
         'grid5': {},
         'synth5': {},
@@ -376,74 +443,10 @@ version_definitions = {
         'he2': {},
     },
 
-    'epoch': {
-        'grid5': {
-            2: 1998,
-            3: 2000,
-            4: 2007,
-            24: 1998,
-            25: 2000,
-            26: 2007,
-        },
-        'synth5': {},
-        'he2': {
-            2: 1997,
-            3: 2009,
-            5: 1997,
-            6: 2009,
-        },
-    },
-
     'param_aliases': {
         'grid5': {},
         'synth5': {},
         'he2': {},
-    },
-
-    'grid_bounds': {
-        'grid5': {
-            2: grid_bounds[2][1],
-            3: 2,
-            4: 2,
-            24: 2,
-            25: 2,
-            26: 2,
-        },
-        'synth5': {},
-        'he2': {
-            2: grid_bounds[4][1],
-            3: 2,
-            4: grid_bounds[3][2],
-            5: grid_bounds[4][2],
-            6: 5,
-            7: grid_bounds[3][3],
-        },
-    },
-
-    'priors': {
-         'grid5': {
-             5: {'m_gr': gaussian(mean=1.6, std=0.1)}
-         },
-         'synth5': {},
-         'he2': {},
-    },
-
-    'initial_position': {
-        'grid5': {
-            2: initial_position[2][1],
-            3: initial_position[2][2],
-            4: initial_position[2][3],
-            24: 2,
-            25: 3,
-            26: 4,
-        },
-        'synth5': {},
-        'he2': {
-            2: initial_position[4][1],
-            3: initial_position[4][2],
-            5: 2,
-            6: 3,
-        },
     },
 
     'x_edd_option': {
