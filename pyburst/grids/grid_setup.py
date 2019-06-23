@@ -621,7 +621,8 @@ def get_table_subset(table, batches):
 def sync_model_restarts(source, target, basename='xrb', verbose=True,
                         batches=None, runs=None, short_model_table=None,
                         sync_model_files=True, sync_jobscripts=True, sync_model_tables=True,
-                        dry_run=False, modelfiles=('.cmd', '.lc', 'z1')):
+                        dry_run=False, modelfiles=('.cmd', '.lc', 'z1'),
+                        jobscript_labels=('restart_',)):
     """Sync kepler models to cluster for resuming extended runs
 
     Parameters
@@ -673,9 +674,10 @@ def sync_model_restarts(source, target, basename='xrb', verbose=True,
         if sync_jobscripts:
             # TODO: make universal jobfile string function (for here and kepler_jobs.py)
             span_str = kepler_jobs.get_span_string(runs[0], runs[-1])
-            jobscript = f'{jobscript_prefix}_restart_{source}_{batch}_{span_str}.sh'
-            jobscript_path = os.path.join(batch_path, 'logs', jobscript)
-            sync_paths += [jobscript_path]
+            for label in jobscript_labels:
+                jobscript = f'{jobscript_prefix}_{label}{source}_{batch}_{span_str}.sh'
+                jobscript_path = os.path.join(batch_path, 'logs', jobscript)
+                sync_paths += [jobscript_path]
 
         if sync_model_tables:
             model_table = os.path.join(batch_path, 'MODELS.txt')
@@ -687,8 +689,8 @@ def sync_model_restarts(source, target, basename='xrb', verbose=True,
                 run_path = os.path.join(batch_path, run_str)
 
                 for filetype in modelfiles:
-                    if filetype == 'rpabg':
-                        filename = 'rpabg'
+                    if filetype in ('rpabg', 'xrb_g'):
+                        filename = filetype
                     else:
                         filename = f'{run_str}{filetype}'
 
