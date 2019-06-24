@@ -26,10 +26,8 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     def load_save(load_filepath, save_filepath):
         lum_loaded = extract_lcdata(filepath=load_filepath, silent=silent)
         if save:
-            try:
-                save_ascii(lum=lum_loaded, filepath=save_filepath)
-            except FileNotFoundError:
-                print("Can't save preloaded luminosity file, path not found")
+            grid_tools.try_mkdir(input_path, skip=True, verbose=False)
+            save_ascii(lum=lum_loaded, filepath=save_filepath)
         return lum_loaded
 
     batch_str = grid_strings.get_batch_string(batch, source)
