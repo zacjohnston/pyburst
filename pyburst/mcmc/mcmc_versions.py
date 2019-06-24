@@ -196,6 +196,7 @@ initial_position = {
     },
     3: {
         1: (0.28, 0.36, 0.11, 0.05, 1.6, 2.0, 7.8, 1.5),
+        2: (0.3, 0.4, 0.1, 0.05, 1.6, 1.8, 7.7, 1.3),
     },
     4: {
         1: (0.32, 0.07, 1.76, 2.0, 7.7, 1.6),
@@ -398,6 +399,7 @@ version_definitions = {
             3: initial_position[4][2],
             5: initial_position[4][3],
             6: initial_position[4][4],
+            7: initial_position[3][2],
         },
     },
 
