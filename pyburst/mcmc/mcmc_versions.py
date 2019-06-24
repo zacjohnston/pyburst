@@ -200,6 +200,8 @@ initial_position = {
     4: {
         1: (0.32, 0.07, 1.76, 2.0, 7.7, 1.6),
         2: (0.42, 0.055, 1.6, 2.0, 7.7, 1.4),
+        3: (0.22, 0.4, 1.76, 2.5, 8.0, 1.8),
+        4: (0.32, 0.3, 1.76, 2.5, 8.0, 1.8),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -343,6 +345,8 @@ source_defaults = {
 #   5 : as 4, epoch 1997
 #   6 : as 4, epoch 2009
 
+#   7 : as 1, m_gr prior (1.6 +/- 0.1)
+
 
 version_definitions = {
     'interpolator': {
@@ -392,8 +396,8 @@ version_definitions = {
         'he2': {
             2: initial_position[4][1],
             3: initial_position[4][2],
-            5: 2,
-            6: 3,
+            5: initial_position[4][3],
+            6: initial_position[4][4],
         },
     },
 
@@ -402,7 +406,9 @@ version_definitions = {
             5: {'m_gr': gaussian(mean=1.6, std=0.1)}
         },
         'synth5': {},
-        'he2': {},
+        'he2': {
+            7: {'m_gr': gaussian(mean=1.8, std=0.1)}
+        },
     },
 
     'param_keys': {
