@@ -114,21 +114,12 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
-        2: ((0.175, 0.4),  # mdot1
-            (0.175, 0.4),  # mdot2
-            (0.05, 0.4),  # qb1
-            (0.05, 0.4),  # qb2
-            (1.2, 2.0),  # m_nw
-            (1.0, 2.1),  # m_gr
-            (1., 20.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            ),
-        3: ((0.2, 0.5),  # mdot1
+        2: ((0.2, 0.5),  # mdot1
             (0.2, 0.5),  # mdot2
-            (0.0, 0.4),  # qb1
-            (0.0, 0.4),  # qb2
+            (0.01, 0.45),  # qb1
+            (0.01, 0.45),  # qb2
             (1.2, 2.0),  # m_nw
-            (1.0, 3.0),  # m_gr
+            (1.0, 10.0),  # m_gr
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
@@ -142,10 +133,10 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
-        2: ((0.175, 0.4),  # mdot1
-            (0.05, 0.4),  # qb1
+        2: ((0.2, 0.5),  # mdot1
+            (0.01, 0.45),  # qb1
             (1.2, 2.0),  # m_nw
-            (1.0, 2.1),  # m_gr
+            (1.0, 10.0),  # m_gr
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
@@ -228,6 +219,28 @@ source_defaults = {
         'he2': 0,
     },
 
+    'grid_bounds': {
+        'grid5': grid_bounds[1][1],
+        'synth5': grid_bounds[1][1],
+        'he2': grid_bounds[3][1],
+    },
+
+    'initial_position': {
+        'grid5': initial_position[1][1],
+        'synth5': initial_position[1][1],
+        'he2': initial_position[3][1],
+    },
+
+    'priors': {  # if not defined here, the default/fallback will be flat_prior()
+        'grid5': {
+            'z': log_z_beta,
+        },
+        'synth5': {},
+        'he2': {
+            'd_b': gaussian(mean=7.846, std=0.333),
+        },
+    },
+
     'param_keys': {
         'grid5': param_keys[1],
         'synth5': param_keys[1],
@@ -278,28 +291,6 @@ source_defaults = {
 
     'disc_model': {},
 
-    'grid_bounds': {
-        'grid5': grid_bounds[1][1],
-        'synth5': grid_bounds[1][1],
-        'he2': grid_bounds[3][1],
-    },
-
-    'priors': {  # if not defined here, the default/fallback will be flat_prior()
-        'grid5': {
-            'z': log_z_beta,
-        },
-        'synth5': {},
-        'he2': {
-            'd_b': gaussian(mean=7.846, std=0.333),
-        },
-    },
-
-    'initial_position': {
-        'grid5': initial_position[1][1],
-        'synth5': initial_position[1][1],
-        'he2': initial_position[3][1],
-    },
-
     'x_edd_option': {
       'grid5': 'x_0',
       'synth5': None,
@@ -348,11 +339,9 @@ source_defaults = {
 #   2 : as 1, epoch 1997
 #   3 : as 1, epoch 2009
 
-#   4 : as 1, qnuc=1.0
+#   4 : as 1, m_gr=10
 #   5 : as 4, epoch 1997
 #   6 : as 4, epoch 2009
-
-#   7 : as 1, m_gr=3.0
 
 
 version_definitions = {
@@ -365,11 +354,7 @@ version_definitions = {
             10: 1,
         },
         'synth5': {},
-        'he2': {
-            4: 1,
-            5: 1,
-            6: 1,
-        },
+        'he2': {},
     },
 
     'grid_bounds': {
@@ -390,7 +375,6 @@ version_definitions = {
             4: grid_bounds[3][2],
             5: grid_bounds[4][2],
             6: 5,
-            7: grid_bounds[3][3],
         },
     },
 
