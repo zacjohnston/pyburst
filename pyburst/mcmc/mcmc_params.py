@@ -60,3 +60,23 @@ def get_xedd_chain(chain, discard, source, version, cap=None):
     xedd_chain = xedd_flat.reshape(new_shape)
 
     return xedd_chain
+
+
+def get_redshift(chain, discard, source, version, cap=None, r_nw=10):
+    """Returns chain of redshift samples for given MCMC chain
+    """
+    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
+    n_walkers, n_steps, n_dimensions = chain.shape
+    chain_flat = chain.reshape((-1, n_dimensions))
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+
+    mass_nw = chain_flat[:, pkeys.index('m_nw')]
+    mass_gr = chain_flat[:, pkeys.index('m_gr')]
+    mass_ratio = mass_gr / mass_nw
+
+    _, redshift = gravity.gr_corrections(r=r_nw, m=mass_nw, phi=mass_ratio)
+
+    new_shape = (n_walkers, n_steps)
+    redshift_reshape = redshift.reshape(new_shape)
+
+    return redshift_reshape
