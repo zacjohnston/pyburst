@@ -183,6 +183,24 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
               version=version, display=display)
 
 
+def plot_redshift(chain, discard, source, version, cap=None, display=True, save=False):
+    """Plots posterior distribution of redshift given a chain
+    """
+    redshift_chain = mcmc_params.get_redshift(chain=chain, discard=discard,
+                                              source=source, version=version,
+                                              cap=cap)
+
+    cc = chainconsumer.ChainConsumer()
+    cc.add_chain(redshift_chain.reshape(-1), parameters=['(1+z)'])
+    cc.configure(kde=False, smooth=0)
+
+    fig = cc.plotter.plot_distributions(display=display, figsize=[5, 5])
+    plt.tight_layout()
+
+    save_plot(fig, prefix='redshift', chain=chain, save=save, source=source,
+              version=version, display=display)
+
+
 def plot_xedd(chain, discard, source, version, cap=None,
               display=True, save=False, max_lhood=False, verbose=True,
               cloud=True, sigmas=np.linspace(0, 2, 10)):
