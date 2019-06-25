@@ -158,11 +158,11 @@ def gr_corrections(r, m, phi=1.0, verbose=False):
     """
     zeta = get_zeta(r=r, m=m)
 
-    b = (9*zeta**2*phi**4 + np.sqrt(3)*phi**3 * np.sqrt(16 + 27*zeta**4 * phi**2))**(1/3)
-    a = (2/9)**(1/3) * (b**2 / phi**2 - 2 * 6**(1/3)) / (b * zeta**2)
-    xi = (zeta * phi/2) * (1 + np.sqrt(1 - a) + np.sqrt(2 + a + 2 / np.sqrt(1 - a)))
+    b = (9 * zeta**2 * phi**4 + np.sqrt(3) * phi**3 * np.sqrt(16 + 27 * zeta**4 * phi**2))**(1/3)
+    a = (2 / 9)**(1 / 3) * (b**2 / phi**2 - 2 * 6**(1 / 3)) / (b * zeta**2)
+    xi = (zeta * phi / 2) * (1 + np.sqrt(1 - a) + np.sqrt(2 + a + 2 / np.sqrt(1 - a)))
 
-    redshift = xi**2/phi    # NOTE: xi is unrelated to anisotropy factors xi_b, xi_p
+    redshift = xi**2 / phi    # NOTE: xi is unrelated to anisotropy factors xi_b, xi_p
 
     if verbose:
         print_title(f'Using R={r:.3f}, M={m}, M_GR={m*phi}:')
