@@ -394,9 +394,8 @@ class BurstFit:
             elif bprop == 'fedd':
                 shifted = values / flux_factor_b
             else:
-                raise ValueError('bprop must be one of (dt, u_dt, rate, u_rate, '
-                                 + 'fluence, u_fluence, '
-                                 + 'peak, u_peak, fper)')
+                raise ValueError('bprop must be one of (dt, rate, fluence, peak, '
+                                 'fper, f_edd)')
         self.debug.end_function()
         return shifted
 
