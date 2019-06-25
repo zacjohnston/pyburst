@@ -10,18 +10,18 @@ from pyburst.misc.pyprint import print_title, print_dashes
 # Constants in cgs units
 G = const.G.to(u.cm**3/(u.g*u.s**2))
 c = const.c.to(u.cm/u.s)
-Msun = const.M_sun.to(u.g)
+Msun_in_g = const.M_sun.to(u.g)
 
 # TODO: allow flexibility with parsing units, e.g. check_units()
 # TODO: inverse redshift
 
 
 def apply_units(r, m):
-    """Return radius and mass with applied units
+    """Return radius and mass with units (cm, g)
 
-    Assumes radius in km, mass in Msun
+    Assumes radius given in km, mass given in Msun
     """
-    return r*1e5*u.cm, m*Msun
+    return (r * u.km).to(u.cm), m * Msun_in_g
 
 
 def get_redshift(r, m):
