@@ -369,37 +369,37 @@ class BurstFit:
         """
         # TODO:
         #       - cache other reused values
-        #       - generalise to type of units (eg: lum --> flux)
-        #       - add "GR factor" along with flux_factor"
+
         self.debug.start_function('shift_to_observer')
+
         mass_ratio, redshift = self.get_gr_factors(params=params)
+        flux_factor_b = 4 * np.pi * (self.kpc_to_cm * params['d_b']) ** 2
+        flux_factor_p = flux_factor_b * params['xi_ratio']
 
-        if bprop == 'dt':
-            shifted = values * redshift / 3600
-        elif bprop == 'rate':
-            shifted = values / redshift
-        else:
-            #  ---- convert (erg) ==> (erg / cm ^ 2) ----
-            flux_factor_b = 4 * np.pi * (self.kpc_to_cm * params['d_b']) ** 2
-            flux_factor_p = flux_factor_b * params['xi_ratio']
+        flux_factors = {'dt': 1,
+                        'rate': 1,
+                        'fluence': flux_factor_b,
+                        'peak': flux_factor_b,
+                        'fedd': flux_factor_b,
+                        'fper': flux_factor_p,
+                        }
 
-            flux_factor = {'fluence': flux_factor_b,
-                           'peak': flux_factor_b,
-                           'fedd': flux_factor_b,
-                           'fper': flux_factor_p,
-                           }.get(bprop)
+        gr_corrections = {'dt': redshift / 3600,  # include hr to sec
+                          'rate': 1/redshift,
+                          'fluence': mass_ratio,
+                          'peak': mass_ratio / redshift,
+                          'fedd': 1,
+                          'fper': mass_ratio / redshift,
+                          }
 
-            gr_correction = {'fluence': mass_ratio,
-                             'peak': mass_ratio / redshift,
-                             'fedd': 1,
-                             'fper': mass_ratio / redshift,
-                             }.get(bprop)
+        flux_factor = flux_factors.get(bprop)
+        gr_correction = gr_corrections.get(bprop)
 
-            if flux_factor is None:
-                raise ValueError('bprop must be one of (dt, rate, fluence, peak, '
-                                 'fper, f_edd)')
+        if flux_factor is None:
+            raise ValueError('bprop must be one of (dt, rate, fluence, peak, '
+                             'fper, f_edd)')
 
-            shifted = (values * gr_correction) / flux_factor
+        shifted = (values * gr_correction) / flux_factor
 
         self.debug.end_function()
         return shifted
