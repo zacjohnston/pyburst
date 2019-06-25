@@ -370,6 +370,7 @@ class BurstFit:
         # TODO:
         #       - cache other reused values
         #       - generalise to type of units (eg: lum --> flux)
+        #       - add "GR factor" along with flux_factor"
         self.debug.start_function('shift_to_observer')
         mass_ratio, redshift = self.get_gr_factors(params=params)
 
@@ -377,20 +378,21 @@ class BurstFit:
             shifted = values * redshift / 3600
         elif bprop == 'rate':
             shifted = values / redshift
-        elif bprop == 'tail_50':
-            shifted = values * redshift
         else:
-            flux_factor_b = (self.kpc_to_cm * params['d_b']) ** 2
+            flux_factor_b = 4 * np.pi * (self.kpc_to_cm * params['d_b']) ** 2
             flux_factor_p = flux_factor_b * params['xi_ratio']
 
             if bprop == 'fluence':  # (erg) --> (erg / cm^2)
-                shifted = (values * mass_ratio) / (4 * np.pi * flux_factor_b)
-            elif bprop in ('peak', 'fper', 'fedd'):  # (erg/s) --> (erg / cm^2 / s)
+                shifted = (values * mass_ratio) / flux_factor_b
+            # elif bprop in ('peak', 'fper', 'fedd'):  # (erg/s) --> (erg / cm^2 / s)
+            elif bprop in ('peak', 'fper'):  # (erg/s) --> (erg / cm^2 / s)
                 flux_factor = {'peak': flux_factor_b,
                                'fedd': flux_factor_b,
                                'fper': flux_factor_p,
                                }.get(bprop)
-                shifted = (values * mass_ratio) / (redshift * 4 * np.pi * flux_factor)
+                shifted = (values * mass_ratio) / (redshift * flux_factor)
+            elif bprop == 'fedd':
+                shifted = values / flux_factor_b
             else:
                 raise ValueError('bprop must be one of (dt, u_dt, rate, u_rate, '
                                  + 'fluence, u_fluence, '
