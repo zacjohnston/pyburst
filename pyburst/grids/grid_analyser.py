@@ -430,7 +430,7 @@ class Kgrid:
         # TODO: Move these into config file
         ylims = {'rate': {
                     'grid5': [0.0, 24],
-                    'he2': [0.0, 50],
+                    'he2': [0.0, 55],
                     'ks1': [2.0, 20],
                   },
                  'dt': {
@@ -440,7 +440,7 @@ class Kgrid:
                  },
                  'fluence': {
                      # 'grid5': [0.0, 21],
-                    'grid5': [3.0, 12],
+                     'grid5': [3.0, 12],
                      'he2': [0.5, 9],
                      'ks1': [2.0, 10],
                  },
