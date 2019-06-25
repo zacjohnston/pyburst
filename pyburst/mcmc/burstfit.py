@@ -383,19 +383,23 @@ class BurstFit:
             flux_factor_p = flux_factor_b * params['xi_ratio']
 
             if bprop == 'fluence':  # (erg) --> (erg / cm^2)
-                shifted = (values * mass_ratio) / flux_factor_b
-            # elif bprop in ('peak', 'fper', 'fedd'):  # (erg/s) --> (erg / cm^2 / s)
+                gr_correction = mass_ratio
+                flux_factor = flux_factor_b
             elif bprop in ('peak', 'fper'):  # (erg/s) --> (erg / cm^2 / s)
                 flux_factor = {'peak': flux_factor_b,
                                'fedd': flux_factor_b,
                                'fper': flux_factor_p,
                                }.get(bprop)
-                shifted = (values * mass_ratio) / (redshift * flux_factor)
+                gr_correction = mass_ratio / redshift
             elif bprop == 'fedd':
-                shifted = values / flux_factor_b
+                gr_correction = 1
+                flux_factor = flux_factor_b
             else:
                 raise ValueError('bprop must be one of (dt, rate, fluence, peak, '
                                  'fper, f_edd)')
+
+            shifted = (values * gr_correction) / flux_factor
+
         self.debug.end_function()
         return shifted
 
