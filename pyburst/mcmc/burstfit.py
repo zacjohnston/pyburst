@@ -382,6 +382,7 @@ class BurstFit:
                         'peak': flux_factor_b,
                         'fedd': flux_factor_b,
                         'fper': flux_factor_p,
+                        'tail_index': 1,
                         }
 
         gr_corrections = {'dt': redshift / 3600,  # include hr to sec
@@ -390,6 +391,7 @@ class BurstFit:
                           'peak': mass_ratio / redshift,
                           'fedd': 1,
                           'fper': mass_ratio / redshift,
+                          'tail_index': 1,
                           }
 
         flux_factor = flux_factors.get(bprop)
@@ -397,7 +399,7 @@ class BurstFit:
 
         if flux_factor is None:
             raise ValueError('bprop must be one of (dt, rate, fluence, peak, '
-                             'fper, f_edd)')
+                             'fper, f_edd, tail_index)')
 
         shifted = (values * gr_correction) / flux_factor
 
@@ -538,7 +540,8 @@ class BurstFit:
         n_sigma = 3
         dx = 0.13  # horizontal offset of plot points
         yscale = {'dt': 1.0, 'rate': 1.0, 'tail_50': 1.0, 'fedd': 1e-8,
-                  'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9}.get(bprop)
+                  'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9,
+                  'tail_index': 1.0}.get(bprop)
         ylabel = {'dt': r'$\Delta t$',
                   'rate': 'Burst rate',
                   'fluence': r'$E_b$',
@@ -546,6 +549,7 @@ class BurstFit:
                   'fper': r'$F_p$',
                   'tail_50': r'$t_{50}$',
                   'fedd': r'$F_\mathrm{Edd}$',
+                  'tail_index': 'Power index',
                   }.get(bprop, bprop)
 
         y_units = {'dt': 'hr',
@@ -555,6 +559,7 @@ class BurstFit:
                    'fper': r'$10^{-9}$ erg cm$^{-2}$ s$^{-1}$',
                    'tail_50': 's',
                    'fedd': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
+                   'tail_index': '',
                    }.get(bprop)
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
