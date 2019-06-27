@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
-import os
+from scipy.optimize import curve_fit
 
 
 # pyburst
@@ -104,6 +104,27 @@ def get_tail_timescale(lc_table, epoch_row, frac=0.5):
     u_time_diff = (time_since_peak[mask_right][0] - time_since_peak[mask_left][0])/2
 
     return time_diff, u_time_diff
+
+
+def fit_power_law(lc_table, x_idx, yscale=1e-8, p0=(-1, 5, 0)):
+    """Fits power law to lightcurve tail
+
+    x_idx : int
+        index of lightcurve point to begin fitting from
+    """
+
+    time = lc_table.time + 0.5 * lc_table.dt
+    flux = lc_table.flux / yscale
+    u_flux = lc_table.u_flux / yscale
+
+    pfit, pcov = curve_fit(func_powerlaw, time[x_idx:], flux[x_idx:],
+                           p0=p0, sigma=u_flux[x_idx:])
+    u_pfit = np.sqrt(np.diag(pcov))
+    return pfit, u_pfit
+
+
+def func_powerlaw(x, a, b, c):
+    return c + b * x ** a
 
 
 def get_peak_length(lc_table, peak_frac=0.75):
