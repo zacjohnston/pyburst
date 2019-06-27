@@ -42,7 +42,7 @@ class BurstRun(object):
                  check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True,  remove_zero_lum=True,
                  subtract_background_lum=True, load_config=True,
-                 get_tail_timescales=False):
+                 get_tail_timescales=False, get_tail_start_times=False):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -75,6 +75,7 @@ class BurstRun(object):
                         'check_lumfile_monotonic': check_lumfile_monotonic,
                         'subtract_background_lum': subtract_background_lum,
                         'get_tail_timescales': get_tail_timescales,
+                        'get_tail_start_times': get_tail_start_times,
                         }
         self.check_options()
 
@@ -118,8 +119,8 @@ class BurstRun(object):
 
         self.cols = ['n', 'dt', 'rate', 'fluence', 'peak', 'length', 't_peak', 't_peak_i',
                      't_pre', 't_pre_i', 'lum_pre', 't_start', 't_start_i',
-                     'lum_start', 't_end', 't_end_i', 'lum_end', 'tail_50', 'tail_25',
-                     'tail_10',
+                     'lum_start', 't_end', 't_end_i', 'lum_end',
+                     't_tail_start', 't_tail_start_i', 'tail_50', 'tail_25', 'tail_10',
                      'slope_dt', 'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
                      'slope_peak', 'slope_peak_err', 'short_wait', 'outlier',
                      'dump_start', 'acc_mass', 'qnuc']
@@ -573,6 +574,9 @@ class BurstRun(object):
             if self.options['truncate_edd']:
                 self.truncate_eddington()
 
+            if self.options['get_tail_start_times']:
+                self.get_tail_start_times()
+
             self.get_fluences()
 
             if self.options['load_model_params']:
@@ -864,6 +868,20 @@ class BurstRun(object):
                 idx = len(lum_tail) - np.searchsorted(lum_tail[::-1, 1],
                                                       frac * lum_height, side='right')
                 self.bursts.loc[burst.Index, f'tail_{percent}'] = time_from_peak[idx]
+
+    def get_tail_start_times(self):
+        """Locates time that burst tail begins
+            NOTES:  - Intended for PRE bursts with Eddington truncation enabled
+                    - May not work if there's a sudden spike in the tail
+        """
+        for burst in self.bursts.itertuples():
+            lum_slice = self.lum[burst.t_peak_i:burst.t_end_i]
+            dlum_dt = np.diff(lum_slice[:, 1]) / np.diff(lum_slice[:, 0])
+            start_idx = np.argmin(dlum_dt)
+
+            self.bursts.loc[burst.Index, 't_tail_start'] = lum_slice[start_idx, 0]
+            self.bursts.loc[burst.Index, 't_tail_start_i'] = burst.t_peak_i + start_idx
+            self.bursts.loc[burst.Index, 'lum_tail_start'] = lum_slice[start_idx, 1]
 
     def delete_burst(self, burst_i):
         """Removes burst from self.bursts table
@@ -1232,7 +1250,7 @@ class BurstRun(object):
                         markersize=markersize, markeredgecolor=markeredgecolor, label='Short-wait')
 
         if burst_stages:
-            for stage in ('pre', 'start', 'end'):
+            for stage in ('pre', 'start', 'tail_start', 'end'):
                 x = self.bursts[f't_{stage}'] / timescale
                 y = self.bursts[f'lum_{stage}'] / yscale
                 label = {'pre': 'Burst stages'}.get(stage, None)
@@ -1415,6 +1433,7 @@ class BurstRun(object):
         title : bool (optional)
         color : str (optional)
             colour of all curves. If None, use default pyplot color cycle
+        legend : bool
         """
         self.ensure_analysed_is(True)
         if not self.flags['lum_loaded']:
