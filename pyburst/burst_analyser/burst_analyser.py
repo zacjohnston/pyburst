@@ -9,7 +9,9 @@ import configparser
 from scipy import interpolate, integrate
 from scipy.signal import argrelextrema
 from scipy.stats import linregress
+from scipy.optimize import curve_fit
 from astropy import units, constants
+
 # kepler_grids
 from pyburst.burst_analyser import burst_tools
 from pyburst.grids import grid_tools, grid_strings
@@ -42,7 +44,7 @@ class BurstRun(object):
                  check_stable_burning=True, quick_discard=True,
                  check_lumfile_monotonic=True,  remove_zero_lum=True,
                  subtract_background_lum=True, load_config=True,
-                 get_tail_timescales=False, get_tail_start_times=False):
+                 get_tail_timescales=False, fit_tail_power_law=False):
         self.flags = {'lum_loaded': False,
                       'lum_does_not_exist': False,
                       'dumps_loaded': False,
@@ -75,7 +77,7 @@ class BurstRun(object):
                         'check_lumfile_monotonic': check_lumfile_monotonic,
                         'subtract_background_lum': subtract_background_lum,
                         'get_tail_timescales': get_tail_timescales,
-                        'get_tail_start_times': get_tail_start_times,
+                        'fit_tail_power_law': fit_tail_power_law,
                         }
         self.check_options()
 
@@ -105,6 +107,8 @@ class BurstRun(object):
                            'spike_radius_t': 0.1,  # radius in s around maxima to check for spike conditions
                            't_buffer': 300,  # time buffer (s) from start/end of model to ignore
                            'mdot_edd': 1.75e-8,  # reference Eddington accretion rate (Msun/yr)
+                           'tail_fit_start': 2,  # time (s) after t_tail_start to begin fitting power law
+                           'tail_fit_stop': 60,  # time (s) after tail_fit_start to fit power law for
                            }
         self.overwrite_parameters(set_paramaters)
 
@@ -123,7 +127,8 @@ class BurstRun(object):
                      't_tail_start', 't_tail_start_i', 'tail_50', 'tail_25', 'tail_10',
                      'slope_dt', 'slope_dt_err', 'slope_fluence', 'slope_fluence_err',
                      'slope_peak', 'slope_peak_err', 'short_wait', 'outlier',
-                     'dump_start', 'acc_mass', 'qnuc']
+                     'dump_start', 'acc_mass', 'qnuc',
+                     'tail_index', 'tail_b', 'tail_c']
 
         self.paths = {'batch_models': grid_strings.get_batch_models_path(batch, source),
                       'source': grid_strings.get_source_path(source),
@@ -159,7 +164,8 @@ class BurstRun(object):
         self.candidates = None
 
         # Burst properties which will be averaged and added to summary
-        self.bprops = ['dt', 'fluence', 'peak', 'length', 'acc_mass', 'qnuc']
+        self.bprops = ['dt', 'fluence', 'peak', 'length', 'acc_mass', 'qnuc',
+                       'tail_index']
         self.n_spikes = None
         self.spikes = []
         self.dumpfiles = None
@@ -574,8 +580,9 @@ class BurstRun(object):
             if self.options['truncate_edd']:
                 self.truncate_eddington()
 
-            if self.options['get_tail_start_times']:
+            if self.options['fit_tail_power_law']:
                 self.get_tail_start_times()
+                self.fit_tail_power_law()
 
             self.get_fluences()
 
@@ -882,6 +889,33 @@ class BurstRun(object):
             self.bursts.loc[burst.Index, 't_tail_start'] = lum_slice[start_idx, 0]
             self.bursts.loc[burst.Index, 't_tail_start_i'] = burst.t_peak_i + start_idx
             self.bursts.loc[burst.Index, 'lum_tail_start'] = lum_slice[start_idx, 1]
+
+    def fit_tail_power_law(self):
+        """Fits a power law to burst tail
+        """
+        self.printv('Fitting power law to burst tails')
+        y_scale = 1e38
+
+        for burst in self.bursts.itertuples():
+            if burst.short_wait:
+                continue
+            tail_slice = self.lum[burst.t_tail_start_i:burst.t_end_i]
+            start_i = np.searchsorted(tail_slice[:, 0],
+                                      burst.t_tail_start + self.parameters['tail_fit_start'])
+            stop_i = np.searchsorted(tail_slice[:, 0],
+                                     burst.t_tail_start + self.parameters['tail_fit_stop'])
+
+            power_fit, pcov = curve_fit(self.func_powerlaw,
+                                        tail_slice[start_i:stop_i, 0] - burst.t_peak,
+                                        tail_slice[start_i:stop_i, 1] / y_scale,
+                                        p0=[-2, 5, 0], maxfev=2000)
+
+            self.bursts.loc[burst.Index, 'tail_index'] = power_fit[0]
+            self.bursts.loc[burst.Index, 'tail_b'] = power_fit[1]
+            self.bursts.loc[burst.Index, 'tail_c'] = power_fit[2]
+
+    def func_powerlaw(self, x, a, b, c):
+        return c + b * x ** a
 
     def delete_burst(self, burst_i):
         """Removes burst from self.bursts table
@@ -1417,7 +1451,7 @@ class BurstRun(object):
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
                          zero_time=True, fontsize=14, ylims=None, title=True,
-                         color=None, legend=False, **kwargs):
+                         color=None, legend=False, power_fits=False, **kwargs):
         """Plot individual burst lightcurve
 
         parameters
@@ -1434,6 +1468,7 @@ class BurstRun(object):
         color : str (optional)
             colour of all curves. If None, use default pyplot color cycle
         legend : bool
+        power_fits : bool
         """
         self.ensure_analysed_is(True)
         if not self.flags['lum_loaded']:
@@ -1456,7 +1491,14 @@ class BurstRun(object):
             ax.set_yscale('log')
             ax.set_ylim([1e34, 1e39])
 
+        x = np.linspace(1, 1000, 10000)
+
         for burst in bursts:
+            # TODO: kinda hacky. Need to account for align
+            if power_fits:
+                b_row = self.bursts.loc[burst]
+                y = self.func_powerlaw(x, b_row.tail_index, b_row.tail_b, b_row.tail_c)
+                ax.plot(x, y)
             self.add_lightcurve(burst, ax, zero_time=zero_time, color=color, **kwargs)
 
         ax.set_xlim(xlims)
@@ -1469,7 +1511,7 @@ class BurstRun(object):
                            path=plot_path, extra='')
 
     def add_lightcurve(self, burst, ax, align='t_start', zero_time=True, color='C0',
-                       alpha=1.0, linewidth=1):
+                       alpha=1.0, linewidth=1, yscale=1e38):
         """Add a lightcurve to the provided matplotlib axis
 
         parameters
@@ -1484,8 +1526,8 @@ class BurstRun(object):
         linewidth : flt
         align : str
             burst time point to align LCs by (e.g., t_pre, t_start, t_peak)
+        yscale : flt
         """
-        yscale = 1e38
         lc = self.extract_lightcurve(burst=burst, zero_time=zero_time, align=align)
 
         ax.plot(lc[:, 0], lc[:, 1] / yscale,
@@ -1564,3 +1606,4 @@ class BurstRun(object):
             plt.show(block=False)
         else:
             plt.close(fig)
+
