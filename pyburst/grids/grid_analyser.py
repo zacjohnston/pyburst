@@ -425,7 +425,8 @@ class Kgrid:
                    'peak': r'$L_{peak}$ ($10^{38}$ erg s$^{-1}$)',
                    'rate': 'Burst rate (day$^{-1}$)',
                    'alpha': r'$\alpha$',
-                   'length': 'Burst length (min)'
+                   'length': 'Burst length (min)',
+                   'tail_index': 'Power Index',
                    }.get(bprop, bprop)
         # TODO: Move these into config file
         ylims = {'rate': {
