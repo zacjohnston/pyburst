@@ -56,18 +56,6 @@ def load_epoch_lightcurve(epoch, source):
     return table
 
 
-def add_peak_length(source):
-    """Calculcates peak length from lightcurve and adds to summary file
-    """
-    # TODO: finish
-    # table = load_summary(source)
-    #
-    # for epoch in table['epoch']:
-    #     lcurve = load_epoch_lightcurve(epoch=epoch, source=source)
-    #     x = np.linspace()
-    pass
-
-
 def add_tail_timescales(source, percent=50):
     """Calculates decay tail timescales from observed lightcurves, and adds to summary
     """
@@ -105,6 +93,26 @@ def get_tail_timescale(lc_table, epoch_row, frac=0.5):
 
     return time_diff, u_time_diff
 
+
+def add_power_laws(source):
+    """Calculates power law fits to lightcurve tails, and saves to summary table
+    """
+    x_idxs = {
+        '4u1820': {1997: 17, 2009: 9},   # lightcurve point to start fitting from
+        'gs1826': {1998: 60, 2000: 32, 2007: 33}
+    }.get(source)
+    summ_table = load_summary(source)
+
+    for epoch in summ_table.itertuples():
+        lc_table = load_epoch_lightcurve(epoch=epoch.epoch, source=source)
+        x_idx = x_idxs.get(epoch.epoch)
+        power_fit, u_power_fit = fit_power_law(lc_table, x_idx=x_idx)
+        print(power_fit, u_power_fit)
+        summ_table.loc[epoch.Index, 'tail_index'] = power_fit[0]
+        summ_table.loc[epoch.Index, f'u_tail_index'] = u_power_fit[0]
+
+    save_summary(summ_table, source=source)
+    return summ_table
 
 def fit_power_law(lc_table, x_idx, yscale=1e-8, p0=(-1, 5, 0)):
     """Fits power law to lightcurve tail
