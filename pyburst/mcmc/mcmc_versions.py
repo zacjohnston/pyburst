@@ -352,6 +352,13 @@ source_defaults = {
 
 #   7 : as 1, m_gr prior (1.8 +/- 0.1)
 
+#   8 : using bprop tail_index
+#   9 : as 8, epoch 1997
+#   10 : as 8, epoch 2009
+
+#   11 : interpolating only rate (not fluence)
+#   12 : as 11, epoch 1997
+#   13 : as 11, epoch 2009
 
 version_definitions = {
     'interpolator': {
@@ -367,6 +374,9 @@ version_definitions = {
             8: 1,
             9: 1,
             10: 1,
+            11: 2,
+            12: 2,
+            13: 2,
         },
     },
 
@@ -390,6 +400,8 @@ version_definitions = {
             6: 5,
             9: 2,
             10: 2,
+            12: 2,
+            13: 2,
         },
     },
 
@@ -413,6 +425,8 @@ version_definitions = {
             8: initial_position[3][3],
             9: initial_position[4][5],
             10: initial_position[4][6],
+            12: 2,
+            13: 3,
         },
     },
 
@@ -443,6 +457,8 @@ version_definitions = {
             6: 2,
             9: 2,
             10: 2,
+            12: 2,
+            13: 2,
         },
     },
 
@@ -463,6 +479,8 @@ version_definitions = {
             6: 2009,
             9: 1997,
             10: 2009,
+            12: 1997,
+            13: 2009,
         },
     },
 
@@ -473,6 +491,9 @@ version_definitions = {
             8: ('rate', 'fluence', 'tail_index'),
             9: ('rate', 'fluence', 'tail_index'),
             10: ('rate', 'fluence', 'tail_index'),
+            11: ('rate',),
+            12: ('rate',),
+            13: ('rate',),
         },
     },
 
@@ -489,6 +510,7 @@ version_definitions = {
             8: {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0, 'tail_index': 1.0},
             9: {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0, 'tail_index': 1.0},
             10: {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0, 'tail_index': 1.0},
+            11: {'rate': 1.0, 'fper': 1.0, 'fedd': 1.0},
         },
     },
 
