@@ -30,7 +30,8 @@ version_definitions = {
         'grid6': {},
         'he1': {},
         'he2': {
-            1: ('rate', 'u_rate', 'fluence', 'u_fluence', 'tail_index', 'u_tail_index')
+            1: ('rate', 'u_rate', 'fluence', 'u_fluence', 'tail_index', 'u_tail_index'),
+            2: ('rate', 'u_rate'),
         },
     },
 
@@ -42,6 +43,7 @@ version_definitions = {
         'he1': {},
         'he2': {
             1: 0,
+            2: 0,
         },
     },
 }
