@@ -271,7 +271,7 @@ class BurstFit:
             else:
                 x_edd = self.mcmc_version.x_edd_option
 
-            l_edd = accretion.eddington_lum(mass=params['m_nw'], x=x_edd)
+            l_edd = accretion.eddington_lum_newtonian(mass=params['m_nw'], x=x_edd)
             out[:, 0] = l_edd
             out[:, 1] = l_edd * self.u_fedd_frac
             return out

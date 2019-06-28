@@ -202,7 +202,9 @@ class BurstRun(object):
             self.load_summary_table()
 
         if truncate_edd:
-            self.l_edd = accretion.eddington_lum(mass=self.model_params['mass'], x=0.0)
+            # assumes Eddington limit for pure helium
+            self.l_edd = accretion.eddington_lum_newtonian(mass=self.model_params['mass'],
+                                                           x=0.0)
 
         if analyse:
             self.analyse()
