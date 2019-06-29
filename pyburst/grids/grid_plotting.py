@@ -19,6 +19,30 @@ def show_plot(fig, save, savepath, savename):
         plt.show(block=False)
 
 
+def plot_grid(kgrid, fixed_vals=(2.0, 1.1), fixed_param='mass',
+              x_param='accrate', y_param='qb'):
+    """Plot grid points for which a model exists
+        Useful for diagnosing missing parts of grid.
+
+    fixed : {}
+    """
+    fig, ax = plt.subplots()
+    ax.set_xlabel(x_param)
+    ax.set_ylabel(y_param)
+    ax.set_title(f'{fixed_param}={fixed_vals}')
+
+    for i, fixed_val in enumerate(fixed_vals):
+        for x_val in kgrid.unique_params[x_param]:
+            params = {fixed_param: fixed_val, x_param: x_val}
+            y = np.unique(kgrid.get_params(params=params)[y_param])
+            x = np.full_like(y, x_val)
+
+            color = {0: 'C3', 1: 'black'}.get(i)
+            ax.plot(x, y, marker='o', ls='none', color=color)
+
+    plt.show(block=False)
+
+
 def plot_flags(kgrid, fixed=None, flag='short_waits'):
     """Map out parameters where short-wait bursts occur
     """
