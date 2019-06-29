@@ -10,10 +10,8 @@ if [ $# -ne 6 ]; then
         1. source
         2. batch1
         3. batch2
-        (4. run0)
-        (5. run1)
-        6. restart
-        (7. scratch)"
+        4. restart
+        (5. scratch)"
         exit 1
     fi
   fi
@@ -23,28 +21,16 @@ fi
 CLUSTER=${CLUSTER}
 LOC_DIR=${KEPLER_MODELS}
 
+source=$1
+batch1=$2
+batch2=$3
+restart=$4
+
 if [ $# == 5 ]; then
     if [ "$5" == 'y' ]; then
         echo 'Using SCRATCH file system'
         LOC_DIR=${SCRATCH}
     fi
-fi
-
-source=$1
-batch1=$2
-batch2=$3
-
-
-if [ $# == 6 ]; then
-  run0=$4
-  run1=$5
-  restart=$6
-  filestring=${run0}-${run1}.qsub
-fi
-
-if [ $# == 4 ]; then
-   restart=$4
-   filestring=*
 fi
 
 if [ "${restart}" == 'y' ]
@@ -59,7 +45,7 @@ fi
 for i in $(seq ${batch1} ${batch2})
 do
   cd ${LOC_DIR}/${source}/${source}_${i}/logs
-  sbatch ${CLUSTER}_${prefix}_${i}_${filestring}
+  sbatch ${CLUSTER}_${prefix}_${i}_*
 done
 
 exit 0
