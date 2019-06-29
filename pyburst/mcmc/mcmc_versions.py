@@ -114,10 +114,10 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
-        2: ((0.2, 0.5),  # mdot1
-            (0.2, 0.5),  # mdot2
-            (0.01, 0.45),  # qb1
-            (0.01, 0.45),  # qb2
+        2: ((0.2, 0.55),  # mdot1
+            (0.2, 0.55),  # mdot2
+            (0.01, 0.4),  # qb1
+            (0.01, 0.4),  # qb2
             (1.2, 2.0),  # m_nw
             (1.0, 10.0),  # m_gr
             (1., 20.),  # d_b
@@ -125,8 +125,8 @@ grid_bounds = {
             ),
         3: ((0.2, 0.55),  # mdot1
             (0.2, 0.55),  # mdot2
-            (0.01, 0.3),  # qb1
-            (0.01, 0.3),  # qb2
+            (0.01, 0.4),  # qb1
+            (0.01, 0.4),  # qb2
             (1.2, 2.0),  # m_nw
             (1.0, 2.2),  # m_gr
             (1., 20.),  # d_b
@@ -143,15 +143,15 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
-        2: ((0.2, 0.5),  # mdot1
-            (0.01, 0.45),  # qb1
+        2: ((0.2, 0.55),  # mdot1
+            (0.01, 0.4),  # qb1
             (1.2, 2.0),  # m_nw
             (1.0, 10.0),  # m_gr
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
         3: ((0.2, 0.55),  # mdot1
-            (0.01, 0.3),  # qb1
+            (0.01, 0.4),  # qb1
             (1.2, 2.0),  # m_nw
             (1.0, 2.2),  # m_gr
             (1., 20.),  # d_b
@@ -379,6 +379,11 @@ source_defaults = {
 #   12 : as 11, epoch 1997
 #   13 : as 11, epoch 2009
 
+#   14 : as 11, m_gr=10
+#   15 : as 14, epoch 1997
+#   16 : as 14, epoch 2009
+
+
 version_definitions = {
     'interpolator': {
         'grid5': {
@@ -396,6 +401,9 @@ version_definitions = {
             11: 2,
             12: 2,
             13: 2,
+            14: 2,
+            15: 2,
+            16: 2,
         },
     },
 
@@ -421,7 +429,10 @@ version_definitions = {
             10: 2,
             11: grid_bounds[3][3],
             12: grid_bounds[4][3],
-            13: 2,
+            13: grid_bounds[4][3],
+            14: 4,
+            15: 5,
+            16: 5,
         },
     },
 
@@ -448,6 +459,9 @@ version_definitions = {
             11: initial_position[3][4],
             12: initial_position[4][7],
             13: initial_position[4][8],
+            14: initial_position[3][4],
+            15: 12,
+            16: 13,
         },
     },
 
@@ -480,6 +494,8 @@ version_definitions = {
             10: 2,
             12: 2,
             13: 2,
+            15: 2,
+            16: 2,
         },
     },
 
@@ -502,6 +518,8 @@ version_definitions = {
             10: 2009,
             12: 1997,
             13: 2009,
+            15: 1997,
+            16: 2009,
         },
     },
 
@@ -515,6 +533,9 @@ version_definitions = {
             11: ('rate',),
             12: ('rate',),
             13: ('rate',),
+            14: ('rate',),
+            15: ('rate',),
+            16: ('rate',),
         },
     },
 
@@ -531,7 +552,6 @@ version_definitions = {
             8: {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0, 'tail_index': 1.0},
             9: {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0, 'tail_index': 1.0},
             10: {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0, 'tail_index': 1.0},
-            11: {'rate': 1.0, 'fper': 1.0, 'fedd': 1.0},
         },
     },
 
