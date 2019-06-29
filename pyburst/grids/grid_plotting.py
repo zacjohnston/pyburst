@@ -19,25 +19,28 @@ def show_plot(fig, save, savepath, savename):
         plt.show(block=False)
 
 
-def plot_grid(kgrid, fixed_vals=(2.0, 1.1), fixed_param='mass',
-              x_param='accrate', y_param='qb'):
+def plot_grid(kgrid, iter_vals=(2.0, 1.1), iter_param='mass',
+              x_param='accrate', y_param='qb', fixed=None):
     """Plot grid points for which a model exists
         Useful for diagnosing missing parts of grid.
 
     fixed : {}
     """
+    if fixed is None:
+        fixed = {}
+        
     fig, ax = plt.subplots()
     ax.set_xlabel(x_param)
     ax.set_ylabel(y_param)
-    ax.set_title(f'{fixed_param}={fixed_vals}')
+    ax.set_title(f'{iter_param}={iter_vals}')
 
-    for i, fixed_val in enumerate(fixed_vals):
+    for i, iter_val in enumerate(iter_vals):
         for x_val in kgrid.unique_params[x_param]:
-            params = {fixed_param: fixed_val, x_param: x_val}
+            params = {iter_param: iter_val, x_param: x_val, **fixed}
             y = np.unique(kgrid.get_params(params=params)[y_param])
             x = np.full_like(y, x_val)
 
-            color = {0: 'black', 1: 'C3'}.get(i)
+            color = {0: 'C3', 1: 'black'}.get(i)
             ax.plot(x, y, marker='o', ls='none', color=color, markersize=i*2+5)
 
     plt.show(block=False)
