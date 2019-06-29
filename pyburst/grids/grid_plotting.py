@@ -31,6 +31,14 @@ def plot_grid(kgrid, fixed_vals=(2.0, 1.1), fixed_param='mass',
     ax.set_ylabel(y_param)
     ax.set_title(f'{fixed_param}={fixed_vals}')
 
+    xmin = np.min(kgrid.unique_params[x_param])
+    xmax = np.max(kgrid.unique_params[x_param])
+    ymin = np.min(kgrid.unique_params[y_param])
+    ymax = np.max(kgrid.unique_params[y_param])
+
+    for y_val in kgrid.unique_params[y_param]:
+        ax.plot([xmin, xmax], [y_val, y_val], color='black')
+
     for i, fixed_val in enumerate(fixed_vals):
         for x_val in kgrid.unique_params[x_param]:
             params = {fixed_param: fixed_val, x_param: x_val}
@@ -38,6 +46,8 @@ def plot_grid(kgrid, fixed_vals=(2.0, 1.1), fixed_param='mass',
             x = np.full_like(y, x_val)
 
             color = {0: 'C3', 1: 'black'}.get(i)
+            if i == 0:
+                ax.plot([x_val, x_val], [ymin, ymax], color='black')
             ax.plot(x, y, marker='o', ls='none', color=color)
 
     plt.show(block=False)
