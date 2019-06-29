@@ -404,6 +404,9 @@ version_definitions = {
             14: 2,
             15: 2,
             16: 2,
+            17: 2,
+            18: 2,
+            19: 2,
         },
     },
 
@@ -433,6 +436,9 @@ version_definitions = {
             14: 4,
             15: 5,
             16: 5,
+            17: 4,
+            18: 5,
+            19: 5,
         },
     },
 
@@ -462,6 +468,9 @@ version_definitions = {
             14: initial_position[3][4],
             15: 12,
             16: 13,
+            17: 14,
+            18: 12,
+            19: 13,
         },
     },
 
@@ -471,7 +480,10 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            7: {'m_gr': gaussian(mean=1.8, std=0.1)}
+            7: {'m_gr': gaussian(mean=1.8, std=0.1)},
+            17: {'m_gr': gaussian(mean=1.8, std=0.1)},
+            18: {'m_gr': gaussian(mean=1.8, std=0.1)},
+            19: {'m_gr': gaussian(mean=1.8, std=0.1)},
         },
     },
 
@@ -496,6 +508,8 @@ version_definitions = {
             13: 2,
             15: 2,
             16: 2,
+            18: 2,
+            19: 2,
         },
     },
 
@@ -520,6 +534,8 @@ version_definitions = {
             13: 2009,
             15: 1997,
             16: 2009,
+            18: 1997,
+            19: 2009,
         },
     },
 
@@ -536,6 +552,9 @@ version_definitions = {
             14: ('rate',),
             15: ('rate',),
             16: ('rate',),
+            17: ('rate',),
+            18: ('rate',),
+            19: ('rate',),
         },
     },
 
