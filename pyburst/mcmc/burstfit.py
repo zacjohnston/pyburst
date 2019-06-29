@@ -389,7 +389,7 @@ class BurstFit:
                           'rate': 1/redshift,
                           'fluence': mass_ratio,
                           'peak': mass_ratio / redshift,
-                          'fedd': 1,
+                          'fedd': mass_ratio / redshift,
                           'fper': mass_ratio / redshift,
                           'tail_index': 1,
                           }
