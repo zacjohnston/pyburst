@@ -19,7 +19,7 @@ from pyburst.grids import grid_strings, grid_tools
 
 # TODO: Move to kepler_tools.py?
 def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
-             silent=True, check_monotonic=True):
+             silent=True, check_monotonic=True, verbose=True):
     """Attempts to load pre-extracted luminosity data, or load raw binary.
     Returns [time (s), luminosity (erg/s)]
     """
@@ -27,7 +27,7 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
         lum_loaded = extract_lcdata(filepath=load_filepath, silent=silent)
         if save:
             grid_tools.try_mkdir(input_path, skip=True, verbose=False)
-            save_ascii(lum=lum_loaded, filepath=save_filepath)
+            save_ascii(lum=lum_loaded, filepath=save_filepath, verbose=verbose)
         return lum_loaded
 
     batch_str = grid_strings.get_batch_string(batch, source)
@@ -38,24 +38,24 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     run_str = grid_strings.get_run_string(run, basename)
     model_path = grid_strings.get_model_path(run, batch, source, basename)
     binary_filepath = os.path.join(model_path, f'{run_str}.lc')
-    print(binary_filepath)
+
     if reload:
-        print('Deleting preloaded file, reloading binary file')
+        pyprint.printv('Deleting preloaded file, reloading binary file', verbose=verbose)
         subprocess.run(['rm', '-f', presaved_filepath])
         try:
             lum = load_save(binary_filepath, presaved_filepath)
         except FileNotFoundError:
-            print('XXXXXXX lumfile not found. Skipping XXXXXXXX')
+            pyprint.printv('XXXXXXX lumfile not found. Skipping XXXXXXXX', verbose=verbose)
             return
     else:
         try:
-            lum = load_ascii(presaved_filepath)
+            lum = load_ascii(presaved_filepath, verbose=verbose)
         except (FileNotFoundError, OSError):
-            print('No preloaded file found. Reloading binary')
+            pyprint.printv('No preloaded file found. Reloading binary', verbose=verbose)
             try:
                 lum = load_save(binary_filepath, presaved_filepath)
             except FileNotFoundError:
-                print('XXXXXXX lumfile not found. Skipping XXXXXXX')
+                pyprint.printv('XXXXXXX lumfile not found. Skipping XXXXXXX', verbose=verbose)
                 return
 
     if check_monotonic:
@@ -67,17 +67,17 @@ def load_lum(run, batch, source, basename='xrb', reload=False, save=True,
     return lum
 
 
-def load_ascii(filepath):
+def load_ascii(filepath, verbose=True):
     """Loads pre-extracted .txt file of [time, lum]
     """
-    print(f'Loading preloaded luminosity file: {filepath}')
+    pyprint.printv(f'Loading preloaded luminosity file: {filepath}', verbose=verbose)
     return np.loadtxt(filepath, skiprows=1)
 
 
-def save_ascii(lum, filepath):
+def save_ascii(lum, filepath, verbose=True):
     """Saves extracted [time, lum]
     """
-    print(f'Saving data for faster loading in: {filepath}')
+    pyprint.printv(f'Saving data for faster loading in: {filepath}', verbose=verbose)
     header = 'time (s),             luminosity (erg/s)'
     np.savetxt(filepath, lum, header=header)
 
