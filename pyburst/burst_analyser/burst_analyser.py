@@ -258,7 +258,8 @@ class BurstRun(object):
         """Load model parameters from grid table
         """
         try:
-            batch_table = grid_tools.load_model_table(self.batch, source=self.source)
+            batch_table = grid_tools.load_model_table(self.batch, source=self.source,
+                                                      verbose=self.options['verbose'])
         except FileNotFoundError:
             try:
                 grid_table = grid_tools.load_grid_table('params', source=self.source)
@@ -293,7 +294,8 @@ class BurstRun(object):
                                         source=self.source, basename=self.basename,
                                         save=self.options['save_lum'],
                                         reload=self.options['reload'],
-                                        check_monotonic=self.options['check_lumfile_monotonic'])
+                                        check_monotonic=self.options['check_lumfile_monotonic'],
+                                        verbose=self.options['verbose'])
 
         if self.lum is None:
             self.flags['lum_does_not_exist'] = True
