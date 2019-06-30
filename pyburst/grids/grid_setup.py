@@ -332,10 +332,11 @@ def setup_mcmc_sample(batch0, sample_source, chain, discard, n_models_epoch, n_e
     """Creates batches of models, with random sample of params drawn from MCMC chain
     """
     aliases = {'mass': 'm_nw', 'accrate': 'mdot'}
-    # TODO: use config defaults for constants
+    # TODO: - use config defaults for constants
+    #       - account for different variable params (he2, grid5 with x,z)
     if constant is None:
         constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
-                    'accmass': 1e16, 'accdepth': 1e20}#, 'x':0.0, 'z':0.015}
+                    'accmass': 1e16, 'accdepth': 1e20, 'x': 0.0, 'z': 0.015}
 
     mv = mcmc_versions.McmcVersion(source=ref_source, version=ref_mcmc_version)
     params_full = {}
