@@ -41,7 +41,8 @@ class Kgrid:
 
     def __init__(self, source, basename='xrb', grid_version=0,
                  load_lc=False, verbose=True, linregress_burst_rate=False,
-                 lampe_analyser=False, load_bursts=False, **kwargs):
+                 lampe_analyser=False, load_bursts=False, use_sub_cols=False,
+                 **kwargs):
         """
         source   =  str  : source object being modelled (e.g. gs1826)
         basename =  str  : basename of individual models (e.g. xrb)
@@ -61,6 +62,8 @@ class Kgrid:
         self.printv(self.grid_version)
 
         # ==== Load tables of models attributes ====
+        self.use_sub_cols = use_sub_cols
+        self.sub_cols = ['batch', 'run', 'accrate', 'qb', 'x', 'z', 'mass', 'qnuc']
         self.params = None
         self.summ = None
         self.bursts = None
@@ -94,6 +97,11 @@ class Kgrid:
         self.burst_lc = {'columns': ['Time', 'L']}
         if load_lc:
             self.load_all_mean_lightcurves()
+
+        # ==== Keep only important columns (may break other things...) =====
+        if self.use_sub_cols:
+            self.printv('NOTE: Cutting out columns according to sub_cols.')
+            self.params = self.params[self.sub_cols]
 
     def printv(self, string, **kwargs):
         """Prints string if self.verbose == True
