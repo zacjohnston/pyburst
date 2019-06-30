@@ -86,7 +86,7 @@ class Ksample:
         """Loads model burst lightcurves
         """
         self.printv('Loading model lightcurves')
-
+        # TODO: Use multiple burst LCs from each model (with discard)
         if self.single_burst_lc:
             if self.burst_i is None:
                 raise ValueError('Must supply burst_i if single_burst_lc=True')
