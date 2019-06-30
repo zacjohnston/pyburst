@@ -383,6 +383,9 @@ source_defaults = {
 #   15 : as 14, epoch 1997
 #   16 : as 14, epoch 2009
 
+#   17 : as 14, (m_gr = 1.8 +/- 0.1)
+#   18 : as 17, epoch 1997
+#   19 : as 17, epoch 2009
 
 version_definitions = {
     'interpolator': {
