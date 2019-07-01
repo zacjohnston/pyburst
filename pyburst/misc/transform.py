@@ -61,6 +61,18 @@ def plot_model():
     return fig, ax
 
 
+def plot_comparison():
+    model = load_lc('model')
+    fig, ax = plot_sim()
+    model_shifted = shift_model(model)
+    ax.plot(model_shifted[:, 0], model_shifted[:, 1], label='model')
+
+    ax.set_ylabel('Flux (1e-9 erg/cm^2/s)')
+    ax.set_xlabel('Time (s)')
+    ax.legend()
+    plt.show(block=False)
+
+
 def shift_model(model, params=duncan_params, source='grid5', version=1):
     """Returns model lightcurve shifted into observer frame (s, 1e-9 erg/cm^2/s)
     """
@@ -70,7 +82,7 @@ def shift_model(model, params=duncan_params, source='grid5', version=1):
 
     lc[:, 0] = bfit.shift_to_observer(model[:, 0], bprop='dt', params=bfit_params)
     lc[:, 0] *= 3600  # bfit outputs in hrs
-    lc[:, 0] -= params['t_offset']
+    lc[:, 0] -= params['t_offset'] * params['redshift']
 
     lc[:, 1] = bfit.shift_to_observer(model[:, 1], bprop='peak', params=bfit_params)
     lc[:, 1] *= 1e9  # flux units
