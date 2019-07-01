@@ -100,7 +100,8 @@ class Kgrid:
 
         # ==== Keep only important columns (may break other things...) =====
         if self.use_sub_cols:
-            self.printv('NOTE: Cutting out columns according to sub_cols.')
+            self.printv('NOTE: Cutting out param columns according to sub_cols. '
+                        'May break functions which rely on secondary parameters')
             self.params = self.params[self.sub_cols]
 
     def printv(self, string, **kwargs):
