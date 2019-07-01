@@ -18,6 +18,14 @@ filepaths = {
 }
 delims = {'sim': ','}
 
+duncan_params = {
+    'd': 6.1,  # kpc
+    'inclination': 60,  # deg
+    'redshift': 1.26,
+    't_offset': -10,  # sec
+}
+
+
 def load_lc(label):
     """Loads and returns lightcurve data from Duncan
     """
@@ -47,3 +55,22 @@ def plot_model():
     ax.legend()
     plt.show(block=False)
     return fig, ax
+
+
+def shift_model(model, params):
+    """Shifts given model lightcurve to observer frame
+    """
+    pass
+
+
+def get_burstfit_params(params):
+    """Converts Duncan's params to those for input to BurstFit
+    """
+    out_params = dict()
+
+    out_params['d_b'] = params['d']
+    out_params['m_nw'] = 1.4
+    out_params['m_gr'] = 1.4
+    out_params['xi_ratio'] = 1.0
+
+    return out_params
