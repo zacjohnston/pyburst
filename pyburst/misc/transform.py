@@ -39,3 +39,11 @@ def plot_sim():
     plt.show(block=False)
     return fig, ax
 
+
+def plot_model():
+    model = load_lc('model')
+    fig, ax = plt.subplots()
+    ax.plot(model[:, 0], model[:, 1]/1e38, label='model')
+    ax.legend()
+    plt.show(block=False)
+    return fig, ax
