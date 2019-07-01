@@ -401,7 +401,7 @@ source_defaults = {
 #   15 : as 14, epoch 1997
 #   16 : as 14, epoch 2009
 
-#   17 : as 14, (m_gr = 1.8 +/- 0.1)
+#   17 : as 14, (m_gr = 1.6 +/- 0.1)
 #   18 : as 17, epoch 1997
 #   19 : as 17, epoch 2009
 
@@ -504,7 +504,7 @@ version_definitions = {
     'priors': {
         'grid5': {
             5: {'m_gr': gaussian(mean=1.6, std=0.1)},
-            12: {'m_gr': gaussian(mean=1.8, std=0.1)},
+            12: {'m_gr': gaussian(mean=1.6, std=0.1)},
         },
         'synth5': {},
         'he2': {
