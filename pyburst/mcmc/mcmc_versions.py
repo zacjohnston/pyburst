@@ -19,6 +19,7 @@ param_keys = {
     2: ['mdot1', 'x', 'z', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     3: ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     4: ['mdot1', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
+    5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_gr', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -27,6 +28,7 @@ interp_keys = {
     2: ['mdot', 'x', 'z', 'mass'],
     3: ['mdot', 'x', 'qb', 'mass'],
     4: ['mdot', 'qb', 'mass'],
+    5: ['mdot', 'x', 'z', 'qb'],
 }
 
 # ===== Define params that are unique for each epoch =====
@@ -45,7 +47,7 @@ grid_bounds = {
         1: ((0.07, 0.18),  # mdot1
             (0.07, 0.18),  # mdot2
             (0.07, 0.18),  # mdot3
-            (0.64, 0.73),  # x
+            (0.64, 0.76),  # x
             (0.0025, 0.02),  # z
             (0.0, 0.6),  # qb1
             (0.0, 0.6),  # qb2
@@ -171,6 +173,21 @@ grid_bounds = {
             (0.1, 10.),  # xi_ratio
             ),
     },
+
+    5: {
+        1: ((0.07, 0.18),  # mdot1
+            (0.07, 0.18),  # mdot2
+            (0.07, 0.18),  # mdot3
+            (0.64, 0.73),  # x
+            (0.0025, 0.02),  # z
+            (0.0, 0.6),  # qb1
+            (0.0, 0.6),  # qb2
+            (0.0, 0.6),  # qb3
+            (1.0, 2.2),  # m_gr
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+    },
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -241,6 +258,9 @@ initial_position = {
         6: (0.48, 0.03, 1.9, 2.0, 8.3, 1.5),
         7: (0.23, 0.05, 1.3, 2.1, 7.4, 2.0),
         8: (0.40, 0.04, 1.3, 2.1, 7.6, 1.9),
+    },
+    5: {
+        1: (0.085, 0.115, 0.135, 0.71, 0.009, 0.41, 0.24, 0.22, 2.0, 6.5, 1.5),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -381,6 +401,7 @@ source_defaults = {
 #   11 : as 10, (m_gr < 2.2)
 #   12 : as 10, (m_gr = 1.6 +/- 0.1)
 
+#   13 : as 1, constant m_nw=2.0
 # ------------------------------
 # he2
 #   1 : default grid
@@ -419,6 +440,7 @@ version_definitions = {
             10: 2,
             11: 2,
             12: 2,
+            13: 3,
         },
         'synth5': {},
         'he2': {
@@ -449,6 +471,7 @@ version_definitions = {
             10: grid_bounds[1][3],
             11: grid_bounds[1][4],
             12: 10,
+            13: grid_bounds[5][1],
         },
         'synth5': {},
         'he2': {
@@ -482,6 +505,7 @@ version_definitions = {
             10: initial_position[1][2],
             11: initial_position[1][3],
             12: initial_position[1][4],
+            13: initial_position[5][1],
         },
         'synth5': {},
         'he2': {
@@ -526,6 +550,7 @@ version_definitions = {
             7: 2,
             8: 2,
             9: 2,
+            13: param_keys[5],
         },
         'synth5': {},
         'he2': {
@@ -600,7 +625,9 @@ version_definitions = {
     },
 
     'constants': {
-        'grid5': {},
+        'grid5': {
+            13: {'m_nw': 2.0}
+        },
         'synth5': {},
         'he2': {},
     },
@@ -612,7 +639,9 @@ version_definitions = {
     },
 
     'interp_keys': {
-        'grid5': {},
+        'grid5': {
+            13: interp_keys[5],
+        },
         'synth5': {},
         'he2': {},
     },
