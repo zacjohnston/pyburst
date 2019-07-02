@@ -197,9 +197,13 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
 def plot_redshift(chain, discard, source, version, cap=None, display=True, save=False):
     """Plots posterior distribution of redshift given a chain
     """
+    constants = mcmc_versions.get_parameter_dict(source, version, 'constants')
+    mass_nw = constants.get('m_nw', None)
+    mass_gr = constants.get('m_gr', None)
+
     redshift_chain = mcmc_params.get_redshift(chain=chain, discard=discard,
                                               source=source, version=version,
-                                              cap=cap)
+                                              cap=cap, mass_nw=mass_nw, mass_gr=mass_gr)
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(redshift_chain.reshape(-1), parameters=['(1+z)'])
