@@ -20,6 +20,7 @@ param_keys = {
     3: ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     4: ['mdot1', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_gr', 'd_b', 'xi_ratio'],
+    6: ['mdot1', 'x', 'z', 'qb1', 'm_gr', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -174,15 +175,28 @@ grid_bounds = {
             ),
     },
 
+    # Fixed mass (grid5)
     5: {
         1: ((0.07, 0.18),  # mdot1
             (0.07, 0.18),  # mdot2
             (0.07, 0.18),  # mdot3
-            (0.64, 0.73),  # x
+            (0.64, 0.76),  # x
             (0.0025, 0.02),  # z
             (0.0, 0.6),  # qb1
             (0.0, 0.6),  # qb2
             (0.0, 0.6),  # qb3
+            (1.0, 2.2),  # m_gr
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+    },
+
+    # Epoch fixed mass (grid5)
+    6: {
+        1: ((0.07, 0.18),  # mdot1
+            (0.64, 0.76),  # x
+            (0.0025, 0.02),  # z
+            (0.0, 0.6),  # qb1
             (1.0, 2.2),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -260,7 +274,12 @@ initial_position = {
         8: (0.40, 0.04, 1.3, 2.1, 7.6, 1.9),
     },
     5: {
-        1: (0.085, 0.115, 0.135, 0.71, 0.009, 0.41, 0.24, 0.22, 2.0, 6.5, 1.5),
+        1: (0.088, 0.11, 0.13, 0.71, 0.01, 0.5, 0.3, 0.27, 2.0, 6.7, 1.4),
+    },
+    6: {
+        1: (0.08, 0.71, 0.01, 0.5, 2.0, 6.7, 1.4),
+        2: (0.11, 0.71, 0.01, 0.3, 2.0, 6.7, 1.4),
+        3: (0.13, 0.71, 0.01, 0.3, 2.0, 6.7, 1.4),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -402,6 +421,10 @@ source_defaults = {
 #   12 : as 10, (m_gr = 1.6 +/- 0.1)
 
 #   13 : as 1, constant m_nw=2.0
+#   14 : as 13, epoch 1998
+#   15 : as 13, epoch 2000
+#   16 : as 13, epoch 2007
+
 # ------------------------------
 # he2
 #   1 : default grid
@@ -441,6 +464,9 @@ version_definitions = {
             11: 2,
             12: 2,
             13: 3,
+            14: 3,
+            15: 3,
+            16: 3,
         },
         'synth5': {},
         'he2': {
@@ -472,6 +498,9 @@ version_definitions = {
             11: grid_bounds[1][4],
             12: 10,
             13: grid_bounds[5][1],
+            14: grid_bounds[6][1],
+            15: 14,
+            16: 14,
         },
         'synth5': {},
         'he2': {
@@ -506,6 +535,9 @@ version_definitions = {
             11: initial_position[1][3],
             12: initial_position[1][4],
             13: initial_position[5][1],
+            14: initial_position[6][1],
+            15: initial_position[6][2],
+            16: initial_position[6][3],
         },
         'synth5': {},
         'he2': {
@@ -551,6 +583,9 @@ version_definitions = {
             8: 2,
             9: 2,
             13: param_keys[5],
+            14: param_keys[6],
+            15: 14,
+            16: 14,
         },
         'synth5': {},
         'he2': {
@@ -577,6 +612,9 @@ version_definitions = {
             7: 1998,
             8: 2000,
             9: 2007,
+            14: 1998,
+            15: 2000,
+            16: 2007,
         },
         'synth5': {},
         'he2': {
@@ -626,7 +664,10 @@ version_definitions = {
 
     'constants': {
         'grid5': {
-            13: {'m_nw': 2.0}
+            13: {'m_nw': 2.0},
+            14: {'m_nw': 2.0},
+            15: {'m_nw': 2.0},
+            16: {'m_nw': 2.0},
         },
         'synth5': {},
         'he2': {},
@@ -641,6 +682,9 @@ version_definitions = {
     'interp_keys': {
         'grid5': {
             13: interp_keys[5],
+            14: 13,
+            15: 13,
+            16: 13,
         },
         'synth5': {},
         'he2': {},
