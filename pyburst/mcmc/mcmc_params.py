@@ -22,6 +22,17 @@ def get_constant_masses(source, version):
     return mass_nw, mass_gr
 
 
+def get_mass_from_chain(chain_flat, mass_nw, mass_gr, source, version):
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+
+    if mass_nw is None:
+        mass_nw = chain_flat[:, pkeys.index('m_nw')]
+    if mass_gr is None:
+        mass_gr = chain_flat[:, pkeys.index('m_gr')]
+
+    return mass_nw, mass_gr
+
+
 def get_mass_radius_chain(chain, discard, source, version, cap=None,
                           mass_nw=None, mass_gr=None):
     """Returns GR mass and radius given a chain containing gravity and redshift
@@ -43,12 +54,9 @@ def get_mass_radius_chain(chain, discard, source, version, cap=None,
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_walkers, n_steps, n_dimensions = chain.shape
     chain_flat = chain.reshape((-1, n_dimensions))
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
-    if mass_nw is None:
-        mass_nw = chain_flat[:, pkeys.index('m_nw')]
-    if mass_gr is None:
-        mass_gr = chain_flat[:, pkeys.index('m_gr')]
+    mass_nw, mass_gr = get_mass_from_chain(chain_flat, mass_nw=mass_nw, mass_gr=mass_gr,
+                                           source=source, version=version)
     radius_gr = get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
 
     new_shape = (n_walkers, n_steps)
@@ -93,15 +101,11 @@ def get_redshift(chain, discard, source, version, cap=None, r_nw=10,
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_walkers, n_steps, n_dimensions = chain.shape
     chain_flat = chain.reshape((-1, n_dimensions))
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
-    if mass_nw is None:
-        mass_nw = chain_flat[:, pkeys.index('m_nw')]
-    if mass_gr is None:
-        mass_gr = chain_flat[:, pkeys.index('m_gr')]
+    mass_nw, mass_gr = get_mass_from_chain(chain_flat, mass_nw=mass_nw, mass_gr=mass_gr,
+                                           source=source, version=version)
 
     mass_ratio = mass_gr / mass_nw
-
     _, redshift = gravity.gr_corrections(r=r_nw, m=mass_nw, phi=mass_ratio)
 
     new_shape = (n_walkers, n_steps)
