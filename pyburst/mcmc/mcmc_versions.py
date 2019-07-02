@@ -306,6 +306,12 @@ source_defaults = {
         'he2': None,
     },
 
+    'constants': {
+        'grid5': {},
+        'synth5': {},
+        'he2': {},
+    },
+
     'param_aliases': {
         'grid5': param_aliases[1],
         'synth5': param_aliases[1],
@@ -599,6 +605,12 @@ version_definitions = {
         },
     },
 
+    'constants': {
+        'grid5': {},
+        'synth5': {},
+        'he2': {},
+    },
+
     'interp_keys': {
         'grid5': {},
         'synth5': {},
@@ -666,6 +678,7 @@ class McmcVersion:
         self.grid_bounds = np.array(self.get_parameter('grid_bounds'))
         self.initial_position = self.get_parameter('initial_position')
         self.x_edd_option = self.get_parameter('x_edd_option')
+        self.constants = self.get_parameter('constants')
         self.priors = self.get_priors()
         self.synthetic = source_defaults['synthetic'][source]
         self.disc_model = None
@@ -708,6 +721,7 @@ class McmcVersion:
                 + f'\ndisc model       : {self.disc_model}'
                 + f'\ninterpolator     : {self.interpolator}'
                 + f'\nx_edd option     : {self.x_edd_option}'
+                + f'\nconstants        : {self.constants}'
                 + f'{grid_bound_str}'
                 + f'{priors_str}'
                 + f'\nsynthetic        : {self.synthetic}'
