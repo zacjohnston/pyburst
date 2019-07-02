@@ -589,12 +589,6 @@ version_definitions = {
         },
     },
 
-    'analytic_bprops': {
-        'grid5': {},
-        'synth5': {},
-        'he2': {},
-    },
-
     'weights': {
         'grid5': {},
         'synth5': {},
@@ -606,6 +600,12 @@ version_definitions = {
     },
 
     'constants': {
+        'grid5': {},
+        'synth5': {},
+        'he2': {},
+    },
+
+    'analytic_bprops': {
         'grid5': {},
         'synth5': {},
         'he2': {},
@@ -678,8 +678,8 @@ class McmcVersion:
         self.grid_bounds = np.array(self.get_parameter('grid_bounds'))
         self.initial_position = self.get_parameter('initial_position')
         self.x_edd_option = self.get_parameter('x_edd_option')
-        self.constants = self.get_parameter('constants')
-        self.priors = self.get_priors()
+        self.constants = self.get_parameter_dict('constants')
+        self.priors = self.get_parameter_dict('priors')
         self.synthetic = source_defaults['synthetic'][source]
         self.disc_model = None
 
@@ -759,8 +759,8 @@ class McmcVersion:
     def get_parameter(self, parameter):
         return get_parameter(self.source, self.version, parameter, verbose=self.verbose)
 
-    def get_priors(self):
-        return get_priors(self.source, self.version)
+    def get_parameter_dict(self, parameter):
+        return get_parameter_dict(self.source, self.version, parameter=parameter)
 
 
 def get_parameter(source, version, parameter, verbose=False):
@@ -778,20 +778,31 @@ def get_parameter(source, version, parameter, verbose=False):
         return output
 
 
-def get_priors(source, version):
+def get_parameter_dict(source, version, parameter):
+    """Retrieve parameter that's defined on an item-by-item basis
+    """
+    valid_parameters = ['priors', 'constants']
+    if parameter not in valid_parameters:
+        raise ValueError(f'parameter={parameter}, must be one of {valid_parameters}')
+
+    fall_back = {'priors': flat_prior,
+                 'constants': None,
+                 }.get(parameter)
     params = get_parameter(source=source, version=version, parameter='param_keys')
     pdfs = {}
     for param in params:
-        default = source_defaults['priors'][source].get(param, flat_prior)
-        v_definition = version_definitions['priors'][source].get(version)
+        default = source_defaults[parameter][source].get(param, fall_back)
+        v_definition = version_definitions[parameter][source].get(version)
 
         if v_definition is None:
             value = default
         else:
             value = v_definition.get(param, default)
 
-        if type(value) is int:  # allow pointing to previous versions
-            pdfs[param] = version_definitions['priors'][source].get(value, default)
+        if value is None:
+            continue
+        elif type(value) is int:  # allow pointing to previous versions
+            pdfs[param] = version_definitions[parameter][source].get(value, default)
         else:
             pdfs[param] = value
 
