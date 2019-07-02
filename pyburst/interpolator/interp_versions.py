@@ -18,7 +18,9 @@ version_defaults = {
 
 version_definitions = {
     'param_keys': {  # The input params (and their order) when calling interpolator
-        'grid5': {},
+        'grid5': {
+            3: ['accrate', 'x', 'z', 'qb'],
+        },
         'grid6': {},
         'he1': {},
         'he2': {},
