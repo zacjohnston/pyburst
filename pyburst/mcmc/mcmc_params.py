@@ -13,18 +13,33 @@ Module for manipulating and calculating parameters derived from MCMC chains
 # TODO:
 #       - get_inclination(xi_ratio)
 
-def get_mass_radius_chain(chain, discard, source, version, cap=None):
+def get_mass_radius_chain(chain, discard, source, version, cap=None,
+                          mass_nw=None, mass_gr=None):
     """Returns GR mass and radius given a chain containing gravity and redshift
 
     Returns ndarray of equivalent form to input chain (after slicing discard/cap)
+
+    parameters
+    ----------
+    chain : np.array
+    discard : int
+    source : str
+    version : int
+    cap : int
+    mass_nw : flt (optional)
+        specify a constant mass_nw. If None, assume it is in chain
+    mass_gr : flt (optional)
+        specify a constant mass_gr. If None, assume it is in chain
     """
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
     n_walkers, n_steps, n_dimensions = chain.shape
     chain_flat = chain.reshape((-1, n_dimensions))
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
-    mass_nw = chain_flat[:, pkeys.index('m_nw')]
-    mass_gr = chain_flat[:, pkeys.index('m_gr')]
+    if mass_nw is None:
+        mass_nw = chain_flat[:, pkeys.index('m_nw')]
+    if mass_gr is None:
+        mass_gr = chain_flat[:, pkeys.index('m_gr')]
     radius_gr = get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
 
     new_shape = (n_walkers, n_steps)
