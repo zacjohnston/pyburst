@@ -242,6 +242,9 @@ class BurstFit:
         for i, key in enumerate(keys):
             params_dict[key] = x[i]
 
+        for key, val in self.constants.items():
+            params_dict[key] = val
+
         return params_dict
 
     def get_model_local(self, params):
@@ -479,7 +482,8 @@ class BurstFit:
 
         prior_lhood = 0.0
         for key, val in params.items():
-            prior_lhood += np.log(self.priors[key](val))
+            if key not in self.constants:
+                prior_lhood += np.log(self.priors[key](val))
 
         self.debug.variable('prior_lhood', prior_lhood, formatter='f')
         self.debug.end_function()
