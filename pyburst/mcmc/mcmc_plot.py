@@ -160,9 +160,16 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
     """
     default_plt_options()
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+
+    constants = mcmc_versions.get_parameter_dict(source, version, 'constants')
+    mass_nw = constants.get('m_nw', None)
+    mass_gr = constants.get('m_gr', None)
+
     mass_radius_chain = mcmc_params.get_mass_radius_chain(chain=chain, discard=discard,
                                                           source=source, version=version,
-                                                          cap=cap)
+                                                          cap=cap,
+                                                          mass_nw=mass_nw,
+                                                          mass_gr=mass_gr)
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['R', 'M'])
@@ -172,10 +179,14 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
         n_walkers, n_steps = chain[:, :, 0].shape
         max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
                                                      n_steps=n_steps, verbose=verbose)
-        mass_nw = max_params[pkeys.index('m_nw')]
-        mass = max_params[pkeys.index('m_gr')]
-        radius = mcmc_params.get_radius(mass_nw=mass_nw, mass_gr=mass)
-        fig = cc.plotter.plot(display=True, figsize=[6, 6], truth=[mass, radius])
+        if mass_nw is None:
+            mass_nw = max_params[pkeys.index('m_nw')]
+        if mass_gr is None:
+            mass_gr = max_params[pkeys.index('m_gr')]
+
+        radius = mcmc_params.get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
+        fig = cc.plotter.plot(display=True, figsize=[6, 6], truth=[mass_gr, radius])
+
     else:
         fig = cc.plotter.plot(display=True, figsize=[6, 6])
 
