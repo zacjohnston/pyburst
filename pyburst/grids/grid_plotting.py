@@ -32,7 +32,7 @@ def plot_grid(kgrid, iter_vals=(2.0, 1.1), iter_param='mass',
     fig, ax = plt.subplots()
     ax.set_xlabel(x_param)
     ax.set_ylabel(y_param)
-    ax.set_title(f'{iter_param}={iter_vals}')
+    ax.set_title(f'{iter_param}={iter_vals}, {fixed}')
 
     for i, iter_val in enumerate(iter_vals):
         for x_val in kgrid.unique_params[x_param]:
