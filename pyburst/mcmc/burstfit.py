@@ -81,6 +81,7 @@ class BurstFit:
         self.n_analytic_bprops = len(self.mcmc_version.analytic_bprops)
         self.n_interp_params = len(self.mcmc_version.interp_keys)
         self.has_xedd_ratio = ('xedd_ratio' in self.mcmc_version.param_keys)
+        self.constants = self.mcmc_version.constants
 
         self.kpc_to_cm = u.kpc.to(u.cm)
         self.zero_lhood = zero_lhood
