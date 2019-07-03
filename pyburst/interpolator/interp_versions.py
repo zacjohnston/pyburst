@@ -23,7 +23,9 @@ version_definitions = {
         },
         'grid6': {},
         'he1': {},
-        'he2': {},
+        'he2': {
+            3: ['accrate', 'qb'],
+        },
     },
 
     # The burst properties being interpolated
@@ -34,6 +36,7 @@ version_definitions = {
         'he2': {
             1: ('rate', 'u_rate', 'fluence', 'u_fluence', 'tail_index', 'u_tail_index'),
             2: ('rate', 'u_rate'),
+            3: ('rate', 'u_rate'),
         },
     },
 
@@ -46,6 +49,7 @@ version_definitions = {
         'he2': {
             1: 0,
             2: 0,
+            3: 3,
         },
     },
 }
