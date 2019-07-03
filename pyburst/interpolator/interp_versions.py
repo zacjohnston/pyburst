@@ -25,6 +25,8 @@ version_definitions = {
         'he1': {},
         'he2': {
             3: ['accrate', 'qb'],
+            4: ['accrate', 'qb'],
+            5: ['accrate', 'qb'],
         },
     },
 
@@ -37,6 +39,8 @@ version_definitions = {
             1: ('rate', 'u_rate', 'fluence', 'u_fluence', 'tail_index', 'u_tail_index'),
             2: ('rate', 'u_rate'),
             3: ('rate', 'u_rate'),
+            4: ('rate', 'u_rate'),
+            5: ('rate', 'u_rate'),
         },
     },
 
@@ -49,7 +53,6 @@ version_definitions = {
         'he2': {
             1: 0,
             2: 0,
-            3: 3,
         },
     },
 }
