@@ -21,6 +21,8 @@ param_keys = {
     4: ['mdot1', 'qb1', 'm_nw', 'm_gr', 'd_b', 'xi_ratio'],
     5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_gr', 'd_b', 'xi_ratio'],
     6: ['mdot1', 'x', 'z', 'qb1', 'm_gr', 'd_b', 'xi_ratio'],
+    7: ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_gr', 'd_b', 'xi_ratio'],
+    8: ['mdot1', 'qb1', 'm_gr', 'd_b', 'xi_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -30,6 +32,7 @@ interp_keys = {
     3: ['mdot', 'x', 'qb', 'mass'],
     4: ['mdot', 'qb', 'mass'],
     5: ['mdot', 'x', 'z', 'qb'],
+    6: ['mdot', 'qb'],
 }
 
 # ===== Define params that are unique for each epoch =====
@@ -202,6 +205,28 @@ grid_bounds = {
             (0.1, 10.),  # xi_ratio
             ),
     },
+
+    # fixed mass (he2)
+    7: {
+        1: ((0.2, 0.55),  # mdot1
+            (0.2, 0.55),  # mdot2
+            (0.01, 0.4),  # qb1
+            (0.01, 0.4),  # qb2
+            (1.0, 2.2),  # m_gr
+            (1., 20.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+    },
+
+    # [epochs] fixed mass (he2)
+    8: {
+        1: ((0.2, 0.55),  # mdot1
+            (0.01, 0.4),  # qb1
+            (1.0, 2.2),  # m_gr
+            (1., 20.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
+    },
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -280,6 +305,13 @@ initial_position = {
         1: (0.08, 0.71, 0.01, 0.5, 2.0, 6.7, 1.4),
         2: (0.11, 0.71, 0.01, 0.3, 2.0, 6.7, 1.4),
         3: (0.13, 0.71, 0.01, 0.3, 2.0, 6.7, 1.4),
+    },
+    7: {
+        1: (0.28, 0.36, 0.11, 0.07, 2.0, 7.8, 1.5),
+    },
+    8: {
+        1: (0.32, 0.07, 2.0, 7.7, 1.6),
+        2: (0.42, 0.06, 2.0, 7.7, 1.4),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -437,9 +469,9 @@ source_defaults = {
 
 #   7 : as 1, m_gr prior (1.8 +/- 0.1)
 
-#   8 : using bprop tail_index
-#   9 : as 8, epoch 1997
-#   10 : as 8, epoch 2009
+#   8  :
+#   9  :
+#   10 :
 
 #   11 : interpolating only rate (not fluence)
 #   12 : as 11, epoch 1997
@@ -470,9 +502,9 @@ version_definitions = {
         },
         'synth5': {},
         'he2': {
-            8: 1,
-            9: 1,
-            10: 1,
+            8: 3,
+            9: 3,
+            10: 3,
             11: 2,
             12: 2,
             13: 2,
@@ -509,11 +541,12 @@ version_definitions = {
             4: grid_bounds[3][2],
             5: grid_bounds[4][2],
             6: 5,
-            9: 2,
-            10: 2,
+            8: grid_bounds[7][1],
+            9: grid_bounds[8][1],
+            10: 9,
             11: grid_bounds[3][3],
             12: grid_bounds[4][3],
-            13: grid_bounds[4][3],
+            13: 12,
             14: 4,
             15: 5,
             16: 5,
@@ -546,9 +579,9 @@ version_definitions = {
             5: initial_position[4][3],
             6: initial_position[4][4],
             7: initial_position[3][2],
-            8: initial_position[3][3],
-            9: initial_position[4][5],
-            10: initial_position[4][6],
+            8: initial_position[7][1],
+            9: initial_position[8][1],
+            10: initial_position[8][2],
             11: initial_position[3][4],
             12: initial_position[4][7],
             13: initial_position[4][8],
@@ -593,8 +626,9 @@ version_definitions = {
             3: 2,
             5: 2,
             6: 2,
-            9: 2,
-            10: 2,
+            8: param_keys[7],
+            9: param_keys[8],
+            10: 9,
             12: 2,
             13: 2,
             15: 2,
@@ -637,9 +671,9 @@ version_definitions = {
         'grid5': {},
         'synth5': {},
         'he2': {
-            8: ('rate', 'fluence', 'tail_index'),
-            9: ('rate', 'fluence', 'tail_index'),
-            10: ('rate', 'fluence', 'tail_index'),
+            8: ('rate',),
+            9: ('rate',),
+            10: ('rate',),
             11: ('rate',),
             12: ('rate',),
             13: ('rate',),
@@ -655,11 +689,7 @@ version_definitions = {
     'weights': {
         'grid5': {},
         'synth5': {},
-        'he2': {
-            8: {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0, 'tail_index': 1.0},
-            9: {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0, 'tail_index': 1.0},
-            10: {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0, 'tail_index': 1.0},
-        },
+        'he2': {},
     },
 
     'constants': {
@@ -670,7 +700,11 @@ version_definitions = {
             16: {'m_nw': 2.0},
         },
         'synth5': {},
-        'he2': {},
+        'he2': {
+            8: {'m_nw': 1.2},
+            9: {'m_nw': 1.2},
+            10: {'m_nw': 1.2},
+        },
     },
 
     'analytic_bprops': {
@@ -687,7 +721,11 @@ version_definitions = {
             16: 13,
         },
         'synth5': {},
-        'he2': {},
+        'he2': {
+            8: interp_keys[6],
+            9: 8,
+            10: 8,
+        },
     },
 
     'epoch_unique': {
