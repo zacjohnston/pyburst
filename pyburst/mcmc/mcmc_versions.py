@@ -234,8 +234,8 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
-        2: ((0.2, 0.5),  # mdot1
-            (0.01, 0.45),  # qb1
+        2: ((0.175, 0.5),  # mdot1
+            (0.05, 0.45),  # qb1
             (1.0, 10.0),  # m_gr
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -327,6 +327,8 @@ initial_position = {
     8: {
         1: (0.21, 0.05, 2.1, 7.5, 2.1),
         2: (0.26, 0.05, 2.1, 7.7, 1.3),
+        3: (0.21, 0.15, 2.3, 7.9, 1.8),
+        4: (0.26, 0.08, 2.3, 7.9, 1.8),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -484,9 +486,9 @@ source_defaults = {
 
 #   7 : as 1, m_gr prior (1.8 +/- 0.1)
 
-#   8  :
-#   9  :
-#   10 :
+#   8  : as 1, (fixed mass=1.2)
+#   9  : as 8, epoch 1997
+#   10 : as 8, epoch 2009
 
 #   11 : interpolating only rate (not fluence)
 #   12 : as 11, epoch 1997
@@ -624,8 +626,8 @@ version_definitions = {
             18: 12,
             19: 13,
             20: initial_position[7][2],
-            21: 9,
-            22: 10,
+            21: initial_position[8][3],
+            22: initial_position[8][4],
             23: 20,
             24: 20,
         },
