@@ -564,6 +564,7 @@ source_defaults = {
 
 #   23 : as 20, (fixed mass=2.0)
 #   24 : as 23, (fixed mass=1.4)
+#   25 : as 23, (fixed mass=1.7)
 
 version_definitions = {
     'interpolator': {
@@ -608,6 +609,7 @@ version_definitions = {
             22: 4,
             23: 5,
             24: 6,
+            25: 7,
         },
     },
 
@@ -661,6 +663,7 @@ version_definitions = {
             22: 21,
             23: 20,
             24: grid_bounds[7][3],
+            25: 24,
         },
     },
 
@@ -713,6 +716,7 @@ version_definitions = {
             22: initial_position[8][4],
             23: 20,
             24: 20,
+            25: 20,
         },
     },
 
@@ -771,6 +775,7 @@ version_definitions = {
             22: 9,
             23: 8,
             24: 8,
+            25: 8,
         },
     },
 
@@ -865,6 +870,7 @@ version_definitions = {
             22: {'m_nw': 1.2},
             23: {'m_nw': 2.0},
             24: {'m_nw': 1.4},
+            25: {'m_nw': 1.7},
         },
     },
 
@@ -900,6 +906,7 @@ version_definitions = {
             22: 8,
             23: 8,
             24: 8,
+            25: 8,
         },
     },
 
