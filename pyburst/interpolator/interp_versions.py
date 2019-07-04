@@ -29,6 +29,8 @@ version_definitions = {
             3: ['accrate', 'qb'],
             4: ['accrate', 'qb'],
             5: ['accrate', 'qb'],
+            6: ['accrate', 'qb'],
+            7: ['accrate', 'qb'],
         },
     },
 
@@ -43,6 +45,8 @@ version_definitions = {
             3: ('rate', 'u_rate'),
             4: ('rate', 'u_rate'),
             5: ('rate', 'u_rate'),
+            6: ('rate', 'u_rate'),
+            7: ('rate', 'u_rate'),
         },
     },
 
