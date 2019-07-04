@@ -57,7 +57,7 @@ grid_bounds = {
             (0.0, 0.6),  # qb1
             (0.0, 0.6),  # qb2
             (0.0, 0.6),  # qb3
-            (1.7, 2.3),  # m_nw
+            (1.4, 2.6),  # m_nw
             (1.0, 2.2),  # m_gr
             (1., 15.),  # d_b
             (0.1, 10.),  # xi_ratio
@@ -513,20 +513,20 @@ source_defaults = {
 #   11 : as 10, (m_gr < 2.2)
 #   12 : as 10, (m_gr = 1.6 +/- 0.1)
 
-#   13 : as 1, constant m_nw=2.0
+#   13 : as 1, (m_nw=2.0)
 #   14 : as 13, epoch 1998
 #   15 : as 13, epoch 2000
 #   16 : as 13, epoch 2007
 
-#   17 : as 13, constant m_nw=1.4
+#   17 : as 13, (m_nw=1.4)
 #   18 : as 17, epoch 1998
 #   19 : as 17, epoch 2000
 #   20 : as 17, epoch 2007
 
-#   21 : as 17, (m_gr < 10)
-#   22 : as 21, (constant m_nw=1.7)
+#   21 : as 17, (m_nw=1.4, m_gr < 10)
+#   22 : as 21, (m_nw=1.7)
 
-#   23 : as 17, (with x_edd)
+#   23 : as 17, (m_nw=1.4, with x_edd)
 #   24 : as 23, (m_nw=1.7)
 #   25 : as 23, (m_nw=2.0)
 
