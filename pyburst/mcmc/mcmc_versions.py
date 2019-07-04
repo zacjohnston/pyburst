@@ -23,6 +23,7 @@ param_keys = {
     6: ['mdot1', 'x', 'z', 'qb1', 'm_gr', 'd_b', 'xi_ratio'],
     7: ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_gr', 'd_b', 'xi_ratio'],
     8: ['mdot1', 'qb1', 'm_gr', 'd_b', 'xi_ratio'],
+    9: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -184,7 +185,7 @@ grid_bounds = {
             (0.07, 0.18),  # mdot2
             (0.07, 0.18),  # mdot3
             (0.64, 0.76),  # x
-            (0.0025, 0.02),  # z
+            (0.0025, 0.03),  # z
             (0.0, 0.6),  # qb1
             (0.0, 0.6),  # qb2
             (0.0, 0.6),  # qb3
@@ -196,7 +197,7 @@ grid_bounds = {
             (0.07, 0.18),  # mdot2
             (0.07, 0.18),  # mdot3
             (0.64, 0.76),  # x
-            (0.0025, 0.02),  # z
+            (0.0025, 0.03),  # z
             (0.0, 0.6),  # qb1
             (0.0, 0.6),  # qb2
             (0.0, 0.6),  # qb3
@@ -210,7 +211,7 @@ grid_bounds = {
     6: {
         1: ((0.07, 0.18),  # mdot1
             (0.64, 0.76),  # x
-            (0.0025, 0.02),  # z
+            (0.0025, 0.03),  # z
             (0.0, 0.6),  # qb1
             (1.0, 2.2),  # m_gr
             (1., 15.),  # d_b
@@ -251,6 +252,23 @@ grid_bounds = {
             (1.0, 10.0),  # m_gr
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
+            ),
+    },
+
+    # xedd_ratio (Fixed mass, grid5)
+    9: {
+        1: ((0.07, 0.18),  # mdot1
+            (0.07, 0.18),  # mdot2
+            (0.07, 0.18),  # mdot3
+            (0.64, 0.76),  # x
+            (0.0025, 0.03),  # z
+            (0.0, 0.6),  # qb1
+            (0.0, 0.6),  # qb2
+            (0.0, 0.6),  # qb3
+            (1.0, 2.2),  # m_gr
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            (0.0, 1.0),  # xedd_ratio
             ),
     },
 }
@@ -342,6 +360,9 @@ initial_position = {
         2: (0.26, 0.05, 2.1, 7.7, 1.3),
         3: (0.21, 0.15, 2.3, 7.9, 1.8),
         4: (0.26, 0.08, 2.3, 7.9, 1.8),
+    },
+    9: {
+        1: (0.072, 0.095, 0.11, 0.68, 0.013, 0.42, 0.3, 0.3, 2.1, 7.5, 1.4, 0.8),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -495,6 +516,9 @@ source_defaults = {
 #   21 : as 17, (m_gr < 10)
 #   22 : as 21, (constant m_nw=1.7)
 
+#   23 : as 17, (with x_edd)
+#   24 : as 23, (m_nw=1.7)
+
 # ------------------------------
 # he2
 #   1 : default grid
@@ -550,6 +574,8 @@ version_definitions = {
             20: 4,
             21: 4,
             22: 5,
+            23: 4,
+            24: 5,
         },
         'synth5': {},
         'he2': {
@@ -595,6 +621,8 @@ version_definitions = {
             20: 14,
             21: grid_bounds[5][2],
             22: 21,
+            23: grid_bounds[9][1],
+            24: 23,
         },
         'synth5': {},
         'he2': {
@@ -644,6 +672,8 @@ version_definitions = {
             20: 16,
             21: 17,
             22: 17,
+            23: initial_position[9][1],
+            24: 23,
         },
         'synth5': {},
         'he2': {
@@ -703,6 +733,8 @@ version_definitions = {
             20: 14,
             21: 13,
             22: 13,
+            23: param_keys[9],
+            24: 23,
         },
         'synth5': {},
         'he2': {
@@ -803,6 +835,8 @@ version_definitions = {
             20: {'m_nw': 1.4},
             21: {'m_nw': 1.4},
             22: {'m_nw': 1.7},
+            23: {'m_nw': 1.4},
+            24: {'m_nw': 1.7},
         },
         'synth5': {},
         'he2': {
@@ -835,6 +869,8 @@ version_definitions = {
             20: 13,
             21: 13,
             22: 13,
+            23: 13,
+            24: 13,
         },
         'synth5': {},
         'he2': {
@@ -862,7 +898,10 @@ version_definitions = {
     },
 
     'x_edd_option': {
-        'grid5': {},
+        'grid5': {
+            23: None,
+            24: None,
+        },
         'synth5': {},
         'he2': {},
     },
