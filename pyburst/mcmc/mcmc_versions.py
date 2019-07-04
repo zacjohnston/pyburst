@@ -237,6 +237,14 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
+        3: ((0.175, 0.5),  # mdot1
+            (0.175, 0.5),  # mdot2
+            (0.01, 0.5),  # qb1
+            (0.01, 0.5),  # qb2
+            (1.0, 10.0),  # m_gr
+            (1., 20.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
     },
 
     # [epochs] fixed mass (he2)
@@ -555,7 +563,7 @@ source_defaults = {
 #   22 : as 20, epoch 2009
 
 #   23 : as 20, (fixed mass=2.0)
-#   24 : as 23, (fixed mass=1.4: currently dummy using 1.2 grid)
+#   24 : as 23, (fixed mass=1.4)
 
 version_definitions = {
     'interpolator': {
@@ -599,7 +607,7 @@ version_definitions = {
             21: 4,
             22: 4,
             23: 5,
-            24: 4,
+            24: 6,
         },
     },
 
@@ -652,7 +660,7 @@ version_definitions = {
             21: grid_bounds[8][2],
             22: 21,
             23: 20,
-            24: 20,
+            24: grid_bounds[7][3],
         },
     },
 
