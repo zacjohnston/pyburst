@@ -493,6 +493,7 @@ source_defaults = {
 #   20 : as 17, epoch 2007
 
 #   21 : as 17, (m_gr < 10)
+#   22 : as 21, (constant m_nw=1.7)
 
 # ------------------------------
 # he2
@@ -548,6 +549,7 @@ version_definitions = {
             19: 4,
             20: 4,
             21: 4,
+            22: 5,
         },
         'synth5': {},
         'he2': {
@@ -592,6 +594,7 @@ version_definitions = {
             19: 14,
             20: 14,
             21: grid_bounds[5][2],
+            22: 21,
         },
         'synth5': {},
         'he2': {
@@ -640,6 +643,7 @@ version_definitions = {
             19: 15,
             20: 16,
             21: 17,
+            22: 17,
         },
         'synth5': {},
         'he2': {
@@ -698,6 +702,7 @@ version_definitions = {
             19: 14,
             20: 14,
             21: 13,
+            22: 13,
         },
         'synth5': {},
         'he2': {
@@ -797,6 +802,7 @@ version_definitions = {
             19: {'m_nw': 1.4},
             20: {'m_nw': 1.4},
             21: {'m_nw': 1.4},
+            22: {'m_nw': 1.7},
         },
         'synth5': {},
         'he2': {
@@ -828,6 +834,7 @@ version_definitions = {
             19: 13,
             20: 13,
             21: 13,
+            22: 13,
         },
         'synth5': {},
         'he2': {
