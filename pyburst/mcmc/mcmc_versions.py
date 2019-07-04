@@ -24,6 +24,7 @@ param_keys = {
     7: ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_gr', 'd_b', 'xi_ratio'],
     8: ['mdot1', 'qb1', 'm_gr', 'd_b', 'xi_ratio'],
     9: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
+    10: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -279,6 +280,24 @@ grid_bounds = {
             (0.0, 1.0),  # xedd_ratio
             ),
     },
+
+    # xedd_ratio (varying mass, grid5)
+    10: {
+        1: ((0.07, 0.18),  # mdot1
+            (0.07, 0.18),  # mdot2
+            (0.07, 0.18),  # mdot3
+            (0.64, 0.76),  # x
+            (0.0025, 0.02),  # z
+            (0.0, 0.6),  # qb1
+            (0.0, 0.6),  # qb2
+            (0.0, 0.6),  # qb3
+            (1.4, 2.6),  # m_nw
+            (1.0, 2.2),  # m_gr
+            (1., 15.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            (0.0, 1.0),  # xedd_ratio
+            ),
+    },
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -373,6 +392,9 @@ initial_position = {
         1: (0.072, 0.095, 0.11, 0.66, 0.012, 0.15, 0.08, 0.12, 2.1, 7.6, 1.3, 0.5),
         2: (0.073, 0.10, 0.114, 0.67, 0.011, 0.13, 0.1, 0.13, 2.1, 7.1, 1.35, 0.78),
         3: (0.077, 0.104, 0.12, 0.72, 0.014, 0.5, 0.2, 0.2, 2.1, 6.6, 1.4, 0.8),
+    },
+    10: {
+        1: (0.072, 0.095, 0.11, 0.66, 0.012, 0.15, 0.08, 0.12, 2.0, 2.1, 7.6, 1.3, 0.5),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -504,7 +526,7 @@ source_defaults = {
 #   3 : as 1, epoch 2000
 #   4 : as 1, epoch 2007
 
-#   6 : as 1, sparse grid (m_gr=10)
+#   6 : as 1, (with x_edd)
 #   7 : as 6, epoch 1998
 #   8 : as 6, epoch 2000
 #   9 : as 6, epoch 2007
@@ -529,6 +551,7 @@ source_defaults = {
 #   23 : as 17, (m_nw=1.4, with x_edd)
 #   24 : as 23, (m_nw=1.7)
 #   25 : as 23, (m_nw=2.0)
+
 
 # ------------------------------
 # he2
@@ -569,7 +592,6 @@ source_defaults = {
 version_definitions = {
     'interpolator': {
         'grid5': {
-            6: 1,
             7: 1,
             8: 1,
             9: 1,
@@ -618,7 +640,7 @@ version_definitions = {
             2: grid_bounds[2][1],
             3: 2,
             4: 2,
-            6: grid_bounds[1][2],
+            6: grid_bounds[10][1],
             7: grid_bounds[2][2],
             8: 7,
             9: 7,
@@ -672,6 +694,7 @@ version_definitions = {
             2: initial_position[2][1],
             3: initial_position[2][2],
             4: initial_position[2][3],
+            6: initial_position[10][1],
             7: 2,
             8: 3,
             9: 4,
@@ -738,6 +761,7 @@ version_definitions = {
             2: param_keys[2],
             3: 2,
             4: 2,
+            6: param_keys[10],
             7: 2,
             8: 2,
             9: 2,
@@ -924,6 +948,7 @@ version_definitions = {
 
     'x_edd_option': {
         'grid5': {
+            6: None,
             23: None,
             24: None,
             25: None,
