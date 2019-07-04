@@ -364,6 +364,7 @@ initial_position = {
     9: {
         1: (0.072, 0.095, 0.11, 0.66, 0.012, 0.15, 0.08, 0.12, 2.1, 7.6, 1.3, 0.5),
         2: (0.074, 0.10, 0.115, 0.66, 0.02, 0.5, 0.4, 0.4, 2.1, 8.3, 1.7, 0.5),
+        3: (0.077, 0.104, 0.12, 0.72, 0.014, 0.5, 0.2, 0.2, 2.1, 6.6, 1.4, 0.8),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -519,6 +520,7 @@ source_defaults = {
 
 #   23 : as 17, (with x_edd)
 #   24 : as 23, (m_nw=1.7)
+#   25 : as 23, (m_nw=2.0)
 
 # ------------------------------
 # he2
@@ -577,6 +579,7 @@ version_definitions = {
             22: 5,
             23: 4,
             24: 5,
+            25: 3,
         },
         'synth5': {},
         'he2': {
@@ -624,6 +627,7 @@ version_definitions = {
             22: 21,
             23: grid_bounds[9][1],
             24: 23,
+            25: 23,
         },
         'synth5': {},
         'he2': {
@@ -675,6 +679,7 @@ version_definitions = {
             22: 17,
             23: initial_position[9][1],
             24: initial_position[9][2],
+            25: initial_position[9][3],
         },
         'synth5': {},
         'he2': {
@@ -736,6 +741,7 @@ version_definitions = {
             22: 13,
             23: param_keys[9],
             24: 23,
+            25: 23,
         },
         'synth5': {},
         'he2': {
@@ -815,6 +821,7 @@ version_definitions = {
             22: ('rate',),
             23: ('rate',),
             24: ('rate',),
+            25: ('rate',),
         },
     },
 
@@ -838,6 +845,7 @@ version_definitions = {
             22: {'m_nw': 1.7},
             23: {'m_nw': 1.4},
             24: {'m_nw': 1.7},
+            25: {'m_nw': 2.0},
         },
         'synth5': {},
         'he2': {
@@ -872,6 +880,7 @@ version_definitions = {
             22: 13,
             23: 13,
             24: 13,
+            25: 13,
         },
         'synth5': {},
         'he2': {
@@ -902,6 +911,7 @@ version_definitions = {
         'grid5': {
             23: None,
             24: None,
+            25: None,
         },
         'synth5': {},
         'he2': {},
