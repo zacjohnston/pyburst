@@ -474,6 +474,11 @@ source_defaults = {
 #   15 : as 13, epoch 2000
 #   16 : as 13, epoch 2007
 
+#   17 : as 13, constant m_nw=1.4
+#   18 : as 17, epoch 1998
+#   19 : as 17, epoch 2000
+#   20 : as 17, epoch 2007
+
 # ------------------------------
 # he2
 #   1 : default grid
@@ -502,7 +507,7 @@ source_defaults = {
 #   18 : as 17, epoch 1997
 #   19 : as 17, epoch 2009
 
-#   20 : as 8, m_gr=10
+#   20 : as 8, m_gr=10 (fixed mass=1.2)
 #   21 : as 20, epoch 1997
 #   22 : as 20, epoch 2009
 
@@ -523,6 +528,10 @@ version_definitions = {
             14: 3,
             15: 3,
             16: 3,
+            17: 4,
+            18: 4,
+            19: 4,
+            20: 4,
         },
         'synth5': {},
         'he2': {
@@ -562,6 +571,10 @@ version_definitions = {
             14: grid_bounds[6][1],
             15: 14,
             16: 14,
+            17: 13,
+            18: 14,
+            19: 14,
+            20: 14,
         },
         'synth5': {},
         'he2': {
@@ -605,6 +618,10 @@ version_definitions = {
             14: initial_position[6][1],
             15: initial_position[6][2],
             16: initial_position[6][3],
+            17: 13,
+            18: 14,
+            19: 15,
+            20: 16,
         },
         'synth5': {},
         'he2': {
@@ -658,6 +675,10 @@ version_definitions = {
             14: param_keys[6],
             15: 14,
             16: 14,
+            17: 13,
+            18: 14,
+            19: 14,
+            20: 14,
         },
         'synth5': {},
         'he2': {
@@ -693,6 +714,9 @@ version_definitions = {
             14: 1998,
             15: 2000,
             16: 2007,
+            18: 1998,
+            19: 2000,
+            20: 2007,
         },
         'synth5': {},
         'he2': {
@@ -749,6 +773,10 @@ version_definitions = {
             14: {'m_nw': 2.0},
             15: {'m_nw': 2.0},
             16: {'m_nw': 2.0},
+            17: {'m_nw': 1.4},
+            18: {'m_nw': 1.4},
+            19: {'m_nw': 1.4},
+            20: {'m_nw': 1.4},
         },
         'synth5': {},
         'he2': {
@@ -775,6 +803,10 @@ version_definitions = {
             14: 13,
             15: 13,
             16: 13,
+            17: 13,
+            18: 13,
+            19: 13,
+            20: 13,
         },
         'synth5': {},
         'he2': {
