@@ -21,6 +21,7 @@ version_definitions = {
         'grid5': {
             3: ['accrate', 'x', 'z', 'qb'],
             4: ['accrate', 'x', 'z', 'qb'],
+            5: ['accrate', 'x', 'z', 'qb'],
         },
         'grid6': {},
         'he1': {},
