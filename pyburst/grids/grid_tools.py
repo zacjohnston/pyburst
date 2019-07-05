@@ -31,16 +31,16 @@ FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
 # TODO: rewrite docstrings
 
 
-def setup_config(source, specified=None, select=None, verbose=True):
+def setup_config(source, select=None, specified=None, verbose=True):
     """Returns combined dict of params from default, source, and supplied
 
     parameters
     ----------
     source : str
-    specified : {}
-        Overwrite default/source config with user-specified values
     select : str (optional)
         select and return only a single section of the config
+    specified : {}
+        Overwrite default/source config with user-specified values
     verbose : bool
     """
     def overwrite_option(old_dict, new_dict):
@@ -57,7 +57,9 @@ def setup_config(source, specified=None, select=None, verbose=True):
     for category, contents in combined_config.items():
         printv(f'Overwriting default {category} with source-specific and '
                f'user-supplied {category}', verbose=verbose)
-        overwrite_option(old_dict=contents, new_dict=source_config[category])
+
+        if source_config.get(category) is not None:
+            overwrite_option(old_dict=contents, new_dict=source_config[category])
 
         if specified.get(category) is not None:
             overwrite_option(old_dict=contents, new_dict=specified[category])
