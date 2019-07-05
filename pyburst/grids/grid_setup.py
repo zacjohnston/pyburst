@@ -103,11 +103,14 @@ def create_batch(batch, source, params, dv,
     mass_ref = 1.4  # reference NS mass (Msun)
     radius_ref = 10  # default NS radius (km)
 
-    supplied_config = {'params': params,
-                       'dv': dv,
-                       'numerical_params': numerical_params}
+    specified = {'params': params,
+                 'dv': dv,
+                 'numerical_params': numerical_params}
 
-    config = setup_config(supplied_config=supplied_config, source=source)
+    if specified['numerical_params'] is None:
+        specified['numerical_params'] = {}
+
+    config = grid_tools.setup_config(specified=specified, source=source)
     # TODO: print numerical_params being used
 
     if params_full is None:
@@ -207,30 +210,6 @@ def create_batch(batch, source, params, dv,
                                    nuc_heat=nuc_heat, setup_test=setup_test,
                                    substrate_off=substrate_off,
                                    numerical_params=config['numerical_params'])
-
-
-def setup_config(supplied_config, source):
-    """Returns combined dict of params from default, source, and supplied
-    """
-    def overwrite(old_dict, new_dict):
-        for key, val in new_dict.items():
-            old_dict[key] = val
-
-    if supplied_config['numerical_params'] is None:
-        supplied_config['numerical_params'] = {}
-
-    default_config = grid_tools.load_config(config_source='default')
-    source_config = grid_tools.load_config(config_source=source)
-    combined_config = dict(default_config)
-
-    for category, contents in combined_config.items():
-        print(f'Overwriting default {category} with source-specific and '
-              f'user-supplied {category}')
-        overwrite(old_dict=contents, new_dict=source_config[category])
-        overwrite(old_dict=contents, new_dict=supplied_config[category])
-
-    return combined_config
-
 
 def exclude_params(params_expanded, exclude):
     """Cut out specified params from expanded_params

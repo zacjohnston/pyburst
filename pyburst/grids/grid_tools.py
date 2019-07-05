@@ -12,6 +12,7 @@ import ast
 from pyburst.misc.pyprint import print_dashes, printv, print_warning
 from pyburst.physics import gravity
 from . import grid_strings
+from pyburst.misc.pyprint import printv
 
 
 # kepler
@@ -30,7 +31,41 @@ FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
 # TODO: rewrite docstrings
 
 
-def load_config(config_source, select=None):
+def setup_config(source, specified=None, select=None, verbose=True):
+    """Returns combined dict of params from default, source, and supplied
+
+    parameters
+    ----------
+    source : str
+    specified : {}
+        Overwrite default/source config with user-specified values
+    select : str (optional)
+        select and return only a single section of the config
+    verbose : bool
+    """
+    def overwrite_option(old_dict, new_dict):
+        for key, val in new_dict.items():
+            old_dict[key] = val
+
+    if specified is None:
+        specified = {}
+
+    default_config = load_config(config_source='default', select=select, verbose=verbose)
+    source_config = load_config(config_source=source, select=select, verbose=verbose)
+    combined_config = dict(default_config)
+
+    for category, contents in combined_config.items():
+        printv(f'Overwriting default {category} with source-specific and '
+               f'user-supplied {category}', verbose=verbose)
+        overwrite_option(old_dict=contents, new_dict=source_config[category])
+
+        if specified.get(category) is not None:
+            overwrite_option(old_dict=contents, new_dict=specified[category])
+
+    return combined_config
+
+
+def load_config(config_source, select=None, verbose=True):
     """Loads config parameters from file and returns as dict
 
     parameters
@@ -39,10 +74,11 @@ def load_config(config_source, select=None):
         soure to load
     select : str (optional)
         select and return only a single section of the config
+    verbose : bool
     """
     config_filepath = grid_strings.config_filepath(source=config_source,
                                                    module_dir='grids')
-    print(f'Loading config: {config_filepath}')
+    printv(f'Loading config: {config_filepath}', verbose=verbose)
 
     if not os.path.exists(config_filepath):
         raise FileNotFoundError(f'Config file not found: {config_filepath}.'
@@ -614,7 +650,7 @@ def try_mkdir(path, skip=False, verbose=True):
             printv('Directory already exists - skipping', verbose)
         else:
             print('Directory exists')
-            cont = input('Overwrite? (DESTROY) [y/n]: ')
+            cont = input('specified? (DESTROY) [y/n]: ')
 
             if cont == 'y' or cont == 'Y':
                 subprocess.run(['rm', '-r', path])
