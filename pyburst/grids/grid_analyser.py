@@ -516,7 +516,7 @@ class Kgrid:
 
             self.printv(f'Saving {filepath}')
             plt.savefig(filepath)
-        return ax
+        return fig, ax
 
     def plot_summ(self, var='num', batch=None, vlines=True, hline=None):
         """Plot any column from summ stable, versus batch/run
@@ -573,10 +573,10 @@ class Kgrid:
         for i in range(n_fixed):
             fixed_input = {x: full_fixed[x][i] for x in full_fixed}
 
-            self.plot_burst_property(bprops=bprops, var=var, xaxis=xaxis, save=True,
-                                     fixed=fixed_input, show=False, **kwargs)
-            # TODO: grab fig from plot_burst_property and close explicitly
-            plt.close('all')
+            fig, ax = self.plot_burst_property(bprops=bprops, var=var, xaxis=xaxis,
+                                               save=True, fixed=fixed_input, show=False,
+                                               **kwargs)
+            plt.close(fig)
 
     def print_params(self, batch, run):
         """Prints essential params for given batch-run
