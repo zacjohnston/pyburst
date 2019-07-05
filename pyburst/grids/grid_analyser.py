@@ -125,8 +125,7 @@ class Kgrid:
         for tablename in self.tablenames:
             tables[tablename] = grid_tools.load_grid_table(tablename=tablename,
                                                            source=self.source,
-                                                           verbose=self.verbose,
-                                                           lampe_analyser=self.lampe_analyser)
+                                                           verbose=self.verbose)
 
         self.params = grid_tools.reduce_table(table=tables['params'], params={},
                                               exclude_any=self.grid_version.exclude_any,
@@ -425,13 +424,9 @@ class Kgrid:
 
         var_unique = self.unique_params[var]
         params = dict(fixed)
-        # TODO: deprecate lampe handling
-        uncertainty_keys = {True: {'tDel': 'uTDel', 'fluence': 'uFluence',
-                                   'peakLum': 'uPeakLum'},
-                            False: {'dt': 'u_dt', 'fluence': 'u_fluence',
-                                    'peak': 'u_peak', 'rate': 'u_rate',
-                                    'alpha': 'u_alpha'},
-                            }.get(self.lampe_analyser)
+        uncertainty_keys = {'dt': 'u_dt', 'fluence': 'u_fluence',
+                            'peak': 'u_peak', 'rate': 'u_rate',
+                            'alpha': 'u_alpha'}
 
         y_labels = {'dt': r'$\Delta t$ (hr)',
                     'fluence': r'$E_b$ ($10^{39}$ erg)',
