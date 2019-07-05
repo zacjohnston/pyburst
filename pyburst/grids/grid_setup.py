@@ -2,8 +2,6 @@ import os
 import numpy as np
 import pandas as pd
 import subprocess
-import configparser
-import ast
 
 # pyburst
 from . import grid_analyser
@@ -221,8 +219,8 @@ def setup_config(supplied_config, source):
     if supplied_config['numerical_params'] is None:
         supplied_config['numerical_params'] = {}
 
-    default_config = load_config(config_source='default')
-    source_config = load_config(config_source=source)
+    default_config = grid_tools.load_config(config_source='default')
+    source_config = grid_tools.load_config(config_source=source)
     combined_config = dict(default_config)
 
     for category, contents in combined_config.items():
@@ -232,29 +230,6 @@ def setup_config(supplied_config, source):
         overwrite(old_dict=contents, new_dict=supplied_config[category])
 
     return combined_config
-
-
-def load_config(config_source):
-    """Loads config parameters from file
-    """
-    config_filepath = grid_strings.config_filepath(source=config_source,
-                                                   module_dir='grids')
-    print(f'Loading config: {config_filepath}')
-
-    if not os.path.exists(config_filepath):
-        raise FileNotFoundError(f'Config file not found: {config_filepath}.'
-                                "\nTry making one from the template 'default.ini'")
-
-    ini = configparser.ConfigParser()
-    ini.read(config_filepath)
-
-    config = {}
-    for section in ini.sections():
-        config[section] = {}
-        for option in ini.options(section):
-            config[section][option] = ast.literal_eval(ini.get(section, option))
-
-    return config
 
 
 def exclude_params(params_expanded, exclude):

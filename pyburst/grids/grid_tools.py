@@ -5,6 +5,8 @@ import os
 import itertools
 import subprocess
 from astropy.io import ascii
+import configparser
+import ast
 
 # kepler_grids
 from pyburst.misc.pyprint import print_dashes, printv, print_warning
@@ -26,6 +28,29 @@ FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
               'mass': flt2, 'accmass': exp2, 'accdepth': exp2}
 
 # TODO: rewrite docstrings
+
+
+def load_config(config_source):
+    """Loads config parameters from file
+    """
+    config_filepath = grid_strings.config_filepath(source=config_source,
+                                                   module_dir='grids')
+    print(f'Loading config: {config_filepath}')
+
+    if not os.path.exists(config_filepath):
+        raise FileNotFoundError(f'Config file not found: {config_filepath}.'
+                                "\nTry making one from the template 'default.ini'")
+
+    ini = configparser.ConfigParser()
+    ini.read(config_filepath)
+
+    config = {}
+    for section in ini.sections():
+        config[section] = {}
+        for option in ini.options(section):
+            config[section][option] = ast.literal_eval(ini.get(section, option))
+
+    return config
 
 
 def write_pandas_table(table, filepath, justify='left', verbose=True):
