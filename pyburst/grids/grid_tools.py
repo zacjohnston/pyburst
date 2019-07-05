@@ -30,8 +30,15 @@ FORMATTERS = {'z': flt4, 'y': flt4, 'x': flt4, 'accrate': flt4,
 # TODO: rewrite docstrings
 
 
-def load_config(config_source):
-    """Loads config parameters from file
+def load_config(config_source, select=None):
+    """Loads config parameters from file and returns as dict
+
+    parameters
+    ----------
+    config_source : str
+        soure to load
+    select : str (optional)
+        select and return only a single section of the config
     """
     config_filepath = grid_strings.config_filepath(source=config_source,
                                                    module_dir='grids')
@@ -50,7 +57,10 @@ def load_config(config_source):
         for option in ini.options(section):
             config[section][option] = ast.literal_eval(ini.get(section, option))
 
-    return config
+    if select is None:
+        return config
+    else:
+        return config[select]
 
 
 def write_pandas_table(table, filepath, justify='left', verbose=True):
