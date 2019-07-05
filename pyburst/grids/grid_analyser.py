@@ -424,9 +424,6 @@ class Kgrid:
 
         var_unique = self.unique_params[var]
         params = dict(fixed)
-        uncertainty_keys = {'dt': 'u_dt', 'fluence': 'u_fluence',
-                            'peak': 'u_peak', 'rate': 'u_rate',
-                            'alpha': 'u_alpha'}
 
         y_labels = {'dt': r'$\Delta t$ (hr)',
                     'fluence': r'$E_b$ ($10^{39}$ erg)',
@@ -476,9 +473,7 @@ class Kgrid:
         ax[-1].set_xlabel(xlabel, fontsize=fontsize)
 
         for i, bprop in enumerate(bprops):
-            u_bprop = uncertainty_keys.get(bprop, f'u_{bprop}')
             y_factor = y_factors.get(bprop, 1.0)
-
             y_label = y_labels.get(bprop, bprop)
             ax[i].set_ylabel(y_label, fontsize=fontsize)
 
@@ -502,7 +497,7 @@ class Kgrid:
                         continue
                     mdot_tmp = np.full(len(subset), x_value)
                     prop_tmp = np.array(self.summ.loc[idxs][bprop] / y_factor)
-                    u_tmp = np.array(self.summ.loc[idxs][u_bprop] / y_factor)
+                    u_tmp = np.array(self.summ.loc[idxs][f'u_{bprop}'] / y_factor)
 
                     mdot_x = np.concatenate([mdot_x, mdot_tmp])
                     prop_y = np.concatenate([prop_y, prop_tmp])
