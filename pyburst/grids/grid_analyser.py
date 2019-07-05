@@ -433,33 +433,11 @@ class Kgrid:
                     'length': 'Burst length (min)',
                     'tail_index': 'Power Index',
                     }
-        # TODO: Move these into config file [plotting]
-        ylims = {'rate': {
-                    'grid5': [0.0, 24],
-                    'he2': [0.0, 55],
-                    'ks1': [2.0, 20],
-                  },
-                 'dt': {
-                     'grid5': [0.0, 10],
-                     'he2': [0.0, 14],
-                     'ks1': [0.0, 8],
-                 },
-                 'fluence': {
-                     'grid5': [3.0, 14],
-                     'he2': [0.5, 9],
-                     'ks1': [2.0, 10],
-                 },
-                 'peak': {
-                     'grid5': [0.0, 7.0],
-                     'ks1': [1.0, 7],
-                 },
-                 'length': [4, 32],
-                 }
         y_factors = {'tDel': 3600, 'dt': 3600, 'length': 60,
                      'fluence': 1e39, 'peak': 1e38}
 
         n_bprops = len(bprops)
-        fig, ax = plt.subplots(n_bprops, 1, figsize=(6, 4*n_bprops))
+        fig, ax = plt.subplots(n_bprops, 1, figsize=(8, 4*n_bprops))
         if not isinstance(ax, np.ndarray):
             ax = [ax]
 
@@ -524,10 +502,9 @@ class Kgrid:
                     rate = row.m * np.array(xlims) + row.y0
                     ax[i].plot(xlims, rate)
 
-            bprop_ylims = ylims.get(bprop)
-            if fix_ylims and (bprop_ylims is not None):
-                ylim = bprop_ylims.get(self.source)
-                ax[i].set_ylim(ylim)
+            ylims = self.config['ylims'].get(bprop)
+            if fix_ylims and (ylims is not None):
+                ax[i].set_ylim(ylims)
 
         if legend:
             loc = {'rate': 'upper left'}.get(bprops[0], 'upper right')
