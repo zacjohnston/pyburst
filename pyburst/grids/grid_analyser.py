@@ -60,6 +60,7 @@ class Kgrid:
         self.lampe_analyser = lampe_analyser
         self.grid_version = grid_versions.GridVersion(source, grid_version)
         self.printv(self.grid_version)
+        self.config = grid_tools.load_config(source, select='plotting')
 
         # ==== Load tables of models attributes ====
         self.use_sub_cols = use_sub_cols
