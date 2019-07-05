@@ -60,7 +60,7 @@ class Kgrid:
         self.lampe_analyser = lampe_analyser
         self.grid_version = grid_versions.GridVersion(source, grid_version)
         self.printv(self.grid_version)
-        self.config = grid_tools.load_config(source, select='plotting')
+        self.config = grid_tools.setup_config(source, select='plotting')
 
         # ==== Load tables of models attributes ====
         self.use_sub_cols = use_sub_cols
@@ -425,14 +425,6 @@ class Kgrid:
         var_unique = self.unique_params[var]
         params = dict(fixed)
 
-        y_labels = {'dt': r'$\Delta t$ (hr)',
-                    'fluence': r'$E_b$ ($10^{39}$ erg)',
-                    'peak': r'$L_{peak}$ ($10^{38}$ erg s$^{-1}$)',
-                    'rate': 'Burst rate (day$^{-1}$)',
-                    'alpha': r'$\alpha$',
-                    'length': 'Burst length (min)',
-                    'tail_index': 'Power Index',
-                    }
         y_factors = {'tDel': 3600, 'dt': 3600, 'length': 60,
                      'fluence': 1e39, 'peak': 1e38}
 
@@ -452,7 +444,7 @@ class Kgrid:
 
         for i, bprop in enumerate(bprops):
             y_factor = y_factors.get(bprop, 1.0)
-            y_label = y_labels.get(bprop, bprop)
+            y_label = self.config['y_labels'].get(bprop, bprop)
             ax[i].set_ylabel(y_label, fontsize=fontsize)
 
             for v in var_unique:
