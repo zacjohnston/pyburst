@@ -403,16 +403,20 @@ class Kgrid:
             self.load_mean_lightcurves(batch=batch)
         self.printv('')
 
-    def plot_burst_property(self, bprop, var, fixed, xaxis='accrate', save=False,
+    def plot_burst_property(self, bprops, var, fixed, xaxis='accrate', save=False,
                             show=True, linear_rates=False, interpolate=True,
                             shaded=True, exclude_stable=False, legend=True,
                             fix_ylims=True):
         """Plots given burst property against accretion rate
         
-        bprop   =  str   : property to plot on y-axis (e.g. 'tDel')
-        var     =  str   : variable to iterate over (e.g. plot all available 'Qb')
-        fixed   =  dict  : variables to hold fixed (e.g. 'z':0.01)
+        bprop : [str]
+            properties to plot on y-axis (e.g. 'tDel')
+        var : str
+            variable to iterate over (e.g. plot all available 'Qb')
+        fixed : dict
+            variables to hold fixed (e.g. 'z':0.01)
         """
+        fontsize = 14
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = check_var_fixed(var=var, fixed=fixed)
         xlabel = {'accrate': r'$\dot{M} / \dot{M}_\mathrm{Edd}$'}.get(xaxis, xaxis)
@@ -420,7 +424,7 @@ class Kgrid:
 
         var_unique = self.unique_params[var]
         params = dict(fixed)
-
+        # TODO: deprecate lampe handling
         uncertainty_keys = {True: {'tDel': 'uTDel', 'fluence': 'uFluence',
                                    'peakLum': 'uPeakLum'},
                             False: {'dt': 'u_dt', 'fluence': 'u_fluence',
@@ -428,16 +432,15 @@ class Kgrid:
                                     'alpha': 'u_alpha'},
                             }.get(self.lampe_analyser)
 
-        u_prop = uncertainty_keys.get(bprop, f'u_{bprop}')
-        y_label = {'dt': r'$\Delta t$ (hr)',
-                   'fluence': r'$E_b$ ($10^{39}$ erg)',
-                   'peak': r'$L_{peak}$ ($10^{38}$ erg s$^{-1}$)',
-                   'rate': 'Burst rate (day$^{-1}$)',
-                   'alpha': r'$\alpha$',
-                   'length': 'Burst length (min)',
-                   'tail_index': 'Power Index',
-                   }.get(bprop, bprop)
-        # TODO: Move these into config file
+        y_labels = {'dt': r'$\Delta t$ (hr)',
+                    'fluence': r'$E_b$ ($10^{39}$ erg)',
+                    'peak': r'$L_{peak}$ ($10^{38}$ erg s$^{-1}$)',
+                    'rate': 'Burst rate (day$^{-1}$)',
+                    'alpha': r'$\alpha$',
+                    'length': 'Burst length (min)',
+                    'tail_index': 'Power Index',
+                    }
+        # TODO: Move these into config file [plotting]
         ylims = {'rate': {
                     'grid5': [0.0, 24],
                     'he2': [0.0, 55],
@@ -449,7 +452,6 @@ class Kgrid:
                      'ks1': [0.0, 8],
                  },
                  'fluence': {
-                     # 'grid5': [0.0, 21],
                      'grid5': [3.0, 14],
                      'he2': [0.5, 9],
                      'ks1': [2.0, 10],
@@ -460,78 +462,89 @@ class Kgrid:
                  },
                  'length': [4, 32],
                  }
-        unit_f = {'tDel': 3600, 'dt': 3600, 'length': 60,
-                  'fluence': 1e39, 'peak': 1e38}.get(bprop, 1.0)
+        y_factors = {'tDel': 3600, 'dt': 3600, 'length': 60,
+                     'fluence': 1e39, 'peak': 1e38}
 
-        fig, ax = plt.subplots(figsize=(6, 4))
+        n_bprops = len(bprops)
+        fig, ax = plt.subplots(n_bprops, 1, figsize=(6, 4*n_bprops))
+        if not isinstance(ax, np.ndarray):
+            ax = [ax]
+
+        # === make title ===
         title = ''
         for p, pv in fixed.items():
             precision = precisions.get(p, 3)
             title += f'{p}={pv:.{precision}f}, '
 
-        fontsize = 14
-        ax.set_xlabel(xlabel, fontsize=fontsize)
-        ax.set_ylabel(y_label, fontsize=fontsize)
-        ax.set_title(title, fontsize=14)
-        plt.tight_layout()
+        ax[0].set_title(title, fontsize=14)
+        ax[-1].set_xlabel(xlabel, fontsize=fontsize)
 
-        for v in var_unique:
-            # ===== check if any models exist =====
-            params[var] = v
-            subset = self.get_params(params=params)
-            if len(subset) == 0:
-                continue
+        for i, bprop in enumerate(bprops):
+            u_bprop = uncertainty_keys.get(bprop, f'u_{bprop}')
+            y_factor = y_factors.get(bprop, 1.0)
 
-            mdot_x = []
-            prop_y = []
-            u_y = []
+            y_label = y_labels.get(bprop, bprop)
+            ax[i].set_ylabel(y_label, fontsize=fontsize)
 
-            for x_value in x_unique:
-                params[xaxis] = x_value
+            for v in var_unique:
+                # ===== check if any models exist =====
+                params[var] = v
                 subset = self.get_params(params=params)
-                idxs = subset.index
-
-                if exclude_stable and self.summ.loc[idxs]['stable_burning'].bool():
+                if len(subset) == 0:
                     continue
-                mdot_tmp = np.full(len(subset), x_value)
-                prop_tmp = np.array(self.summ.loc[idxs][bprop] / unit_f)
-                u_tmp = np.array(self.summ.loc[idxs][u_prop] / unit_f)
 
-                mdot_x = np.concatenate([mdot_x, mdot_tmp])
-                prop_y = np.concatenate([prop_y, prop_tmp])
-                u_y = np.concatenate([u_y, u_tmp])
+                mdot_x = []
+                prop_y = []
+                u_y = []
 
-            precision = precisions.get(var, 3)
-            if var == 'z':
-                label = r'$Z_{CNO}$' + f'={v:.{precision}f}'
-            else:
-                label = f'{var}={v:.{precision}f}'
+                for x_value in x_unique:
+                    params[xaxis] = x_value
+                    subset = self.get_params(params=params)
+                    idxs = subset.index
 
-            if shaded:
-                ax.fill_between(mdot_x, prop_y+u_y, prop_y-u_y, alpha=0.3)
+                    if exclude_stable and self.summ.loc[idxs]['stable_burning'].bool():
+                        continue
+                    mdot_tmp = np.full(len(subset), x_value)
+                    prop_tmp = np.array(self.summ.loc[idxs][bprop] / y_factor)
+                    u_tmp = np.array(self.summ.loc[idxs][u_bprop] / y_factor)
 
-            ax.errorbar(x=mdot_x, y=prop_y, yerr=u_y, marker='o',
-                        label=label, capsize=3, ls='-' if interpolate else 'none')
-            del (params[xaxis])
+                    mdot_x = np.concatenate([mdot_x, mdot_tmp])
+                    prop_y = np.concatenate([prop_y, prop_tmp])
+                    u_y = np.concatenate([u_y, u_tmp])
 
-        if linear_rates:
-            xlims = (0.0, 1.0)
-            ax.set_prop_cycle(None)  # reset color cycle
-            linear = grid_tools.reduce_table(self.linear_rates, params=fixed)
-            for row in linear.itertuples():
-                rate = row.m * np.array(xlims) + row.y0
-                ax.plot(xlims, rate)
+                precision = precisions.get(var, 3)
+                if var == 'z':
+                    label = r'$Z_{CNO}$' + f'={v:.{precision}f}'
+                else:
+                    label = f'{var}={v:.{precision}f}'
+
+                if shaded:
+                    ax[i].fill_between(mdot_x, prop_y+u_y, prop_y-u_y, alpha=0.3)
+
+                ax[i].errorbar(x=mdot_x, y=prop_y, yerr=u_y, marker='o',
+                               label=label, capsize=3, ls='-' if interpolate else 'none')
+                del (params[xaxis])
+
+            if linear_rates:
+                xlims = (0.0, 1.0)
+                ax[i].set_prop_cycle(None)  # reset color cycle
+                linear = grid_tools.reduce_table(self.linear_rates, params=fixed)
+                for row in linear.itertuples():
+                    rate = row.m * np.array(xlims) + row.y0
+                    ax[i].plot(xlims, rate)
+
+            bprop_ylims = ylims.get(bprop)
+            if fix_ylims and (bprop_ylims is not None):
+                ylim = bprop_ylims.get(self.source)
+                ax[i].set_ylim(ylim)
 
         if legend:
-            loc = {'rate': 'upper left'}.get(bprop, 'upper right')
-            ax.legend(fontsize=fontsize-2, loc=loc)
-
-        bprop_ylims = ylims.get(bprop)
-        if fix_ylims and (bprop_ylims is not None):
-            ylim = bprop_ylims.get(self.source)
-            ax.set_ylim(ylim)
+            loc = {'rate': 'upper left'}.get(bprops[0], 'upper right')
+            ax[0].legend(fontsize=fontsize - 2, loc=loc)
 
         plt.tight_layout()
+
+        # TODO: use generic save_display()
         if show:
             plt.show(block=False)
         if save:
@@ -540,13 +553,12 @@ class Kgrid:
                 precision = precisions.get(p, 3)
                 fixed_str += f'_{p}={v:.{precision}f}'
 
-            save_dir = os.path.join(self.source_path, 'plots', bprop)
-            filename = f'bprop_{bprop}_{self.source}{fixed_str}.png'
+            save_dir = os.path.join(self.source_path, 'plots', 'grid')
+            filename = f'grid_{self.source}{fixed_str}.png'
             filepath = os.path.join(save_dir, filename)
 
             self.printv(f'Saving {filepath}')
             plt.savefig(filepath)
-        print(bprop)
         return ax
 
     def plot_summ(self, var='num', batch=None, vlines=True, hline=None):
@@ -604,9 +616,9 @@ class Kgrid:
         for i in range(n_fixed):
             fixed_input = {x: full_fixed[x][i] for x in full_fixed}
 
-            for bprop in bprops:
-                self.plot_burst_property(bprop=bprop, var=var, xaxis=xaxis, save=True,
-                                         fixed=fixed_input, show=False, **kwargs)
+            self.plot_burst_property(bprops=bprops, var=var, xaxis=xaxis, save=True,
+                                     fixed=fixed_input, show=False, **kwargs)
+            # TODO: grab fig from plot_burst_property and close explicitly
             plt.close('all')
 
     def print_params(self, batch, run):
