@@ -496,7 +496,7 @@ class Kgrid:
                 ax[i].set_ylim(ylims)
 
         if legend:
-            loc = {'rate': 'upper left'}.get(bprops[0], 'upper right')
+            loc = self.config['legend_loc'].get(bprops[0], 'upper right')
             ax[0].legend(fontsize=fontsize - 2, loc=loc)
 
         plt.tight_layout()
