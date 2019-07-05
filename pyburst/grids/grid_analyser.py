@@ -424,11 +424,8 @@ class Kgrid:
 
         var_unique = self.unique_params[var]
         params = dict(fixed)
-
-        y_factors = {'tDel': 3600, 'dt': 3600, 'length': 60,
-                     'fluence': 1e39, 'peak': 1e38}
-
         n_bprops = len(bprops)
+
         fig, ax = plt.subplots(n_bprops, 1, figsize=(8, 4*n_bprops))
         if not isinstance(ax, np.ndarray):
             ax = [ax]
@@ -443,7 +440,7 @@ class Kgrid:
         ax[-1].set_xlabel(xlabel, fontsize=fontsize)
 
         for i, bprop in enumerate(bprops):
-            y_factor = y_factors.get(bprop, 1.0)
+            y_factor = self.config['y_factors'].get(bprop, 1.0)
             y_label = self.config['y_labels'].get(bprop, bprop)
             ax[i].set_ylabel(y_label, fontsize=fontsize)
 
