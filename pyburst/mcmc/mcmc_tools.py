@@ -177,7 +177,10 @@ def check_array(x, n):
     """Checks if x is array-like, and returns one of length 'n' if not
     """
     if type(x) in [np.ndarray, list, tuple]:
-        return x
+        if len(x) == n:
+            return x
+        else:
+            raise ValueError(f'A supplied array is not of length n={n}')
     else:
         return np.full(n, x)
 
