@@ -345,8 +345,8 @@ def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
     plt.show(block=False)
 
 
-def setup_epochs_chainconsumer(chains, param_keys, discard, cap=None, sigmas=None,
-                               cloud=None):
+def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=1000,
+                               cap=None, sigmas=None, cloud=None):
     """Setup multiple MCMC chains fit to individual epochs
 
     chains : [n_epochs]
@@ -358,6 +358,9 @@ def setup_epochs_chainconsumer(chains, param_keys, discard, cap=None, sigmas=Non
     sigmas : [] (optional)
     cloud : bool (optional)
     """
+    param_keys = mcmc_tools.load_multi_param_keys(source, versions=versions)
+    chains = mcmc_tools.load_multi_chains(source, versions=versions, n_steps=n_steps,
+                                          n_walkers=n_walkers)
     chains_flat = []
     for chain in chains:
         sliced = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
