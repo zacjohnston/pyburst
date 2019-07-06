@@ -345,6 +345,23 @@ def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
     plt.show(block=False)
 
 
+def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, discard,
+                               n_walkers=1000, epoch_discard=None, epoch_n_steps=None,
+                               epoch_n_walkers=None, cap=None, sigmas=None, cloud=None):
+    """Setup multiple MCMC chains, including multi-epoch and single-epochs
+    """
+    if epoch_discard is None:
+        epoch_discard = discard
+    if epoch_n_steps is None:
+        epoch_n_steps = n_steps
+    if epoch_n_walkers is None:
+        epoch_n_walkers = n_walkers
+
+    cc = setup_epochs_chainconsumer(source, versions=epoch_versions, n_steps=epoch_n_steps,
+                                    discard=epoch_discard, n_walkers=epoch_n_walkers,
+                                    cap=cap, sigmas=sigmas, cloud=cloud)
+
+
 def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=1000,
                                cap=None, sigmas=None, cloud=None):
     """Setup multiple MCMC chains fit to individual epochs
@@ -363,9 +380,8 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
                                           n_walkers=n_walkers)
     chains_flat = []
     for chain in chains:
-        sliced = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
-        _, _, n_dimensions = sliced.shape
-        chains_flat += [sliced.reshape((-1, n_dimensions))]
+        sliced_flat = mcmc_tools.slice_chain(chain, discard=discard, cap=cap, flatten=True)
+        chains_flat += [sliced_flat]
 
     cc = chainconsumer.ChainConsumer()
 
