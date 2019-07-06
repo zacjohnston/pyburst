@@ -45,7 +45,7 @@ elif [[ "${cluster}" == "oz" ]]; then
   SERVER='oz'
   KPATH='/fred/oz011/zac/kepler/runs'
 else
-  echo "Must choose one of (icer, monarch, oz)"
+  echo "Must choose one of (icer, iscratch, monarch, oz)"
   exit 1
 fi
 
