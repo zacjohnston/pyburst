@@ -12,15 +12,18 @@ from . import mcmc_versions, mcmc_params
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
 
-def slice_chain(chain, discard=None, cap=None):
+def slice_chain(chain, discard=None, cap=None, flatten=False):
     """Return a subset of a chain
 
     parameters
     ----------
+    chain : nparray
     discard : int
         number of steps to discard (from start)
     cap : int, optional
          step number of endpoint
+    flatten : bool
+        return chain with the steps and walkers dimensions flattened
     """
     cap = {None: chain.shape[1]}.get(cap, cap)  # default to final step
     discard = {None: 0}.get(discard, discard)  # default to discard 0
@@ -34,8 +37,11 @@ def slice_chain(chain, discard=None, cap=None):
         if discard < 0:
             print("LTZ")
             raise ValueError(f"{name} ({val}) can't be negative")
-
-    return chain[:, discard:cap, :]
+    if flatten:
+        n_dimensions = chain.shape[2]
+        return chain[:, discard:cap, :].reshape((-1, n_dimensions))
+    else:
+        return chain[:, discard:cap, :]
 
 
 def load_chain(source, version, n_steps, n_walkers, verbose=True):
