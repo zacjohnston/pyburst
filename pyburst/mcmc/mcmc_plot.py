@@ -362,6 +362,7 @@ def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, 
                                     cap=cap, sigmas=sigmas, cloud=cloud)
 
 
+
 def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=1000,
                                cap=None, sigmas=None, cloud=None):
     """Setup multiple MCMC chains fit to individual epochs
@@ -418,11 +419,10 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
         param_keys = mcmc_versions.get_parameter(source, version, 'param_keys')
         param_labels = plot_tools.convert_mcmc_labels(param_keys)
 
-    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
-    n_dimensions = chain.shape[2]
+    chain_flat = mcmc_tools.slice_chain(chain, discard=discard, cap=cap, flatten=True)
 
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(chain[:, :, :].reshape(-1, n_dimensions), parameters=param_labels)
+    cc.add_chain(chain_flat, parameters=param_labels)
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
     return cc
 
