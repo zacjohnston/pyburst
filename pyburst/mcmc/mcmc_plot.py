@@ -151,13 +151,12 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
               version=version, display=display)
 
 
-# TODO: combine plot_mass_radius() and plot_xedd()
-
 def plot_mass_radius(chain, discard, source, version, cap=None,
                      display=True, save=False, max_lhood=False, verbose=True,
                      cloud=True, sigmas=np.linspace(0, 2, 10)):
     """Plots contours of mass versus radius from a given chain
     """
+    # TODO: combine and generalise with plot_xedd()
     default_plt_options()
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
@@ -361,6 +360,20 @@ def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, 
                                     discard=epoch_discard, n_walkers=epoch_n_walkers,
                                     cap=cap, sigmas=sigmas, cloud=cloud)
 
+    # ===== Setup master chain =====
+    master_mc_v = mcmc_versions.McmcVersion(source, version=master_version)
+
+    master_chain = mcmc_tools.load_chain(source, version=master_version, n_steps=n_steps,
+                                         n_walkers=n_walkers)
+    master_chain_sliced = mcmc_tools.slice_chain(master_chain, discard=discard, cap=cap,
+                                                 flatten=True)
+
+    formatted_params = plot_tools.convert_mcmc_labels(master_mc_v.param_keys)
+    cc.add_chain(master_chain_sliced, parameters=formatted_params, color='black',
+                 name='Multi-epoch')
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=False)
+
+    return cc
 
 
 def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=1000,
