@@ -28,10 +28,11 @@ default_plt_options()
 
 
 def save_plot(fig, prefix, save, source, version, display, chain=None, n_dimensions=None,
-              n_walkers=None, n_steps=None, label=None, extension='.png'):
+              n_walkers=None, n_steps=None, label=None, extension='.png',
+              enforce_chain_info=True):
     """Handles saving/displaying of a figure passed to it
     """
-    if None in (n_dimensions, n_walkers, n_steps):
+    if enforce_chain_info and (None in (n_dimensions, n_walkers, n_steps)):
         if chain is None:
             raise ValueError('Must provide chain, or specify each of '
                              '(n_dimensions, n_walkers, n_steps)')
@@ -342,6 +343,40 @@ def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
     ax.set_xlabel(r'$\dot{M} / \dot{M}_\mathrm{Edd}$', fontsize=fontsize)
     plt.tight_layout()
     plt.show(block=False)
+
+
+def plot_epoch_posteriors(master_cc, source, version, display=True, save=False):
+    """Plot posteriors for multiiple epoch chains
+
+    parameters
+    ----------
+    master_cc : ChainConsumer
+        Contains the multi-epoch chain, created with setup_master_chainconsumer()
+    source : str
+    version : int
+    display : bool
+    save : bool
+    """
+    param_order = {
+        'grid5': ['mdot1', 'mdot2', 'mdot3', 'qb1', 'qb2', 'qb3', 'x', 'z', 'm_nw',
+                  'm_gr', 'd_b', 'xi_ratio'],
+        'he2': ['mdot1', 'mdot2', 'qb1', 'qb2', 'x', 'z', 'm_nw', 'm_gr',
+                'd_b', 'xi_ratio'],
+    }
+    master_cc.plotter.plot_distributions()
+    param_keys = param_order[source]
+    formatted_params = plot_tools.convert_mcmc_labels(param_keys)
+    n_epochs = len(master_cc.chains) - 1
+
+    height = 3 * ceil(len(param_keys) / n_epochs)
+
+    fig = master_cc.plotter.plot_distributions(parameters=formatted_params,
+                                               col_wrap=n_epochs,
+                                               figsize=[8, height])
+    plt.tight_layout()
+
+    save_plot(fig, prefix='multi_posteriors', save=save, source=source, version=version,
+              display=display, enforce_chain_info=False)
 
 
 def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, discard,
