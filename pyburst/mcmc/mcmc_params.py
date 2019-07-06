@@ -4,6 +4,7 @@ import numpy as np
 from . import mcmc_versions
 from . import mcmc_tools
 from pyburst.physics import gravity
+from pyburst.observations import obs_tools
 
 """MCMC Parameters
 
@@ -114,7 +115,7 @@ def get_redshift(chain, discard, source, version, cap=None, r_nw=10,
     return redshift_reshape
 
 
-def epoch_param_keys(source, version, epochs):
+def epoch_param_keys(source, version):
     """Returns param_keys corrected for epoch-specific parameters
     """
     mcmc_version = mcmc_versions.McmcVersion(source, version=version)
@@ -124,14 +125,14 @@ def epoch_param_keys(source, version, epochs):
     if epoch is None:   # if not a single-epoch chain
         return param_keys
 
+    system_table = obs_tools.load_summary(mcmc_version.system)
+    epochs = list(system_table.epoch)
     epoch_n = epochs.index(epoch) + 1
 
     for i, param in enumerate(param_keys):
         split = param.split('1')[0]  # assumes default index is 1
 
-        print(split)
         if split in mcmc_version.epoch_unique:
-            print(i, param)
             param_keys[i] = split + str(epoch_n)
 
     return param_keys
