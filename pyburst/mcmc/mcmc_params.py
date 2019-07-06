@@ -112,3 +112,27 @@ def get_redshift(chain, discard, source, version, cap=None, r_nw=10,
     redshift_reshape = redshift.reshape(new_shape)
 
     return redshift_reshape
+
+
+def epoch_param_keys(source, version, epochs):
+    """Returns param_keys corrected for epoch-specific parameters
+    """
+    mcmc_version = mcmc_versions.McmcVersion(source, version=version)
+    epoch = mcmc_version.epoch
+    param_keys = list(mcmc_version.param_keys)
+
+    if epoch is None:   # if not a single-epoch chain
+        return param_keys
+
+    epoch_n = epochs.index(epoch) + 1
+
+    for i, param in enumerate(param_keys):
+        split = param.split('1')[0]  # assumes default index is 1
+
+        print(split)
+        if split in mcmc_version.epoch_unique:
+            print(i, param)
+            param_keys[i] = split + str(epoch_n)
+
+    return param_keys
+
