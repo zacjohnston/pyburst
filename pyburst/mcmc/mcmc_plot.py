@@ -345,43 +345,6 @@ def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
     plt.show(block=False)
 
 
-def setup_multiepoch(source, versions, n_steps, discard, n_walkers=1000, **kwargs):
-    """Sets up chainconsumer for given MCMC models
-
-    parameters
-    ----------
-    source : str
-    versions : [int]
-        list of each mcmc chain version
-    n_steps : [int], int
-        number of steps for each chain (if scalar, assume all chains identical)
-    discard : int
-        number of initial steps to discard as burn-in
-    n_walkers : [int], int (optional)
-        number of walkers for each chain (if scalar, assume all chains identical)
-    """
-    # TODO: merge with setup_epochs_chainconsumer()?
-    if type(versions) not in (np.ndarray, list, tuple):
-        raise TypeError("'versions' must be array-like")
-
-    n_chains = len(versions)
-    n_steps = mcmc_tools.check_array(n_steps, n=n_chains)
-    n_walkers = mcmc_tools.check_array(n_walkers, n=n_chains)
-
-    chains = []
-    param_keys = []
-
-    for i in range(n_chains):
-        chains += [mcmc_tools.load_chain(source, n_walkers=n_walkers[i],
-                                         n_steps=n_steps[i], version=versions[i])]
-
-        param_keys += [mcmc_params.epoch_param_keys(source, version=versions[i])]
-
-    cc = setup_epochs_chainconsumer(chains=chains, param_keys=param_keys, discard=discard,
-                                    **kwargs)
-    return cc
-
-
 def setup_epochs_chainconsumer(chains, param_keys, discard, cap=None, sigmas=None,
                                cloud=None):
     """Setup multiple MCMC chains fit to individual epochs

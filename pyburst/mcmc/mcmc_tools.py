@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 # kepler_grids
 from pyburst.misc import pyprint
 from pyburst.grids import grid_strings
-from . import mcmc_versions
+from . import mcmc_versions, mcmc_params
+
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
@@ -49,6 +50,48 @@ def load_chain(source, version, n_steps, n_walkers, verbose=True):
     pyprint.printv(f'Loading chain: {filepath}', verbose=verbose)
 
     return np.load(filepath)
+
+
+def load_multi_chains(source, versions, n_steps, n_walkers=1000):
+    """Loads multiple chains of MCMC runs
+
+    parameters
+    ----------
+    source : str
+    versions : [int]
+        list of each mcmc chain version
+    n_steps : [int], int
+        number of steps for each chain (if scalar, assume all chains identical)
+    n_walkers : [int], int (optional)
+        number of walkers for each chain (if scalar, assume all chains identical)
+    """
+    if type(versions) not in (np.ndarray, list, tuple):
+        raise TypeError("'versions' must be array-like")
+
+    n_chains = len(versions)
+    n_steps = check_array(n_steps, n=n_chains)
+    n_walkers = check_array(n_walkers, n=n_chains)
+    chains = []
+
+    for i in range(n_chains):
+        chains += [load_chain(source, n_walkers=n_walkers[i],
+                              n_steps=n_steps[i], version=versions[i])]
+    return chains
+
+
+def load_multi_param_keys(source, versions):
+    """Returns list of epoch-specific param_keys for multiple chains
+    """
+    if type(versions) not in (np.ndarray, list, tuple):
+        raise TypeError("'versions' must be array-like")
+
+    n_chains = len(versions)
+    param_keys = []
+
+    for i in range(n_chains):
+        param_keys += [mcmc_params.epoch_param_keys(source, version=versions[i])]
+
+    return param_keys
 
 
 def get_mcmc_string(source, version, n_walkers=None, n_steps=None,
