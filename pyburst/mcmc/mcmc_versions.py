@@ -270,6 +270,12 @@ grid_bounds = {
             (1., 20.),  # d_b
             (0.1, 10.),  # xi_ratio
             ),
+        3: ((0.175, 0.5),  # mdot1
+            (0.01, 0.5),  # qb1
+            (1.0, 10.0),  # m_gr
+            (1., 20.),  # d_b
+            (0.1, 10.),  # xi_ratio
+            ),
     },
 
     # xedd_ratio (Fixed mass, grid5)
@@ -608,6 +614,10 @@ source_defaults = {
 #   26 : as 23, (limit m_gr < 2.2)
 #   27 : as 23, (mass=1.4)
 
+#   28 : as 24, epoch 1997
+#   29 : as 24, epoch 2009
+
+
 version_definitions = {
     'interpolator': {
         'grid5': {
@@ -654,6 +664,8 @@ version_definitions = {
             25: 7,
             26: 5,
             27: 6,
+            28: 6,
+            29: 6,
         },
     },
 
@@ -711,6 +723,8 @@ version_definitions = {
             25: 24,
             26: grid_bounds[7][4],
             27: 26,
+            28: grid_bounds[8][3],
+            29: 28,
         },
     },
 
@@ -769,6 +783,8 @@ version_definitions = {
             25: 20,
             26: initial_position[7][3],
             27: initial_position[7][4],
+            28: 21,
+            29: 22,
         },
     },
 
@@ -831,6 +847,8 @@ version_definitions = {
             25: 8,
             26: 8,
             27: 8,
+            28: 9,
+            29: 9,
         },
     },
 
@@ -865,6 +883,8 @@ version_definitions = {
             19: 2009,
             21: 1997,
             22: 2009,
+            28: 1997,
+            29: 2009,
         },
     },
 
@@ -892,6 +912,8 @@ version_definitions = {
             25: ('rate',),
             26: ('rate',),
             27: ('rate',),
+            28: ('rate',),
+            29: ('rate',),
         },
     },
 
@@ -930,6 +952,8 @@ version_definitions = {
             25: {'m_nw': 1.7},
             26: {'m_nw': 2.0},
             27: {'m_nw': 1.4},
+            28: {'m_nw': 1.4},
+            29: {'m_nw': 1.4},
         },
     },
 
@@ -968,6 +992,8 @@ version_definitions = {
             25: 8,
             26: 8,
             27: 8,
+            28: 8,
+            29: 8,
         },
     },
 
