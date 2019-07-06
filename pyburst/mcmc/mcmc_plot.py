@@ -370,8 +370,9 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
     cc = chainconsumer.ChainConsumer()
 
     for i, chain_flat in enumerate(chains_flat):
+        epoch = mcmc_versions.get_parameter(source, version=versions[i], parameter='epoch')
         param_labels = plot_tools.convert_mcmc_labels(param_keys[i])
-        cc.add_chain(chain_flat, parameters=param_labels)
+        cc.add_chain(chain_flat, parameters=param_labels, name=str(epoch))
 
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
     return cc
