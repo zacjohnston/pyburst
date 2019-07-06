@@ -513,6 +513,11 @@ source_defaults = {
         'he2': False,
     },
 
+    'system': {
+        'grid5': 'gs1826',
+        'he2': '4u1820'
+    },
+
     # ===== Special definitions for synthetic data sources =====
     'interp_source': {  # Source interpolator to use
         'synth5': 'grid5',
@@ -1027,6 +1032,7 @@ class McmcVersion:
         self.priors = self.get_priors()
         self.synthetic = source_defaults['synthetic'][source]
         self.disc_model = None
+        self.system = source_defaults['system'].get(source)
 
         if self.synthetic:
             self.setup_synthetic()
@@ -1053,6 +1059,7 @@ class McmcVersion:
             priors_str += f'\n  {param}   \t{prior}'
 
         return (f'MCMC version definitions for {self.source} V{self.version}'
+                + f'\nsystem           : {self.system}'
                 + f'\nparam keys       : {self.param_keys}'
                 + f'\ninterp keys      : {self.interp_keys}'
                 + f'\nepoch            : {self.epoch}'
