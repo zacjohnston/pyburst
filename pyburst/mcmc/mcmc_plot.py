@@ -171,7 +171,7 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
         n_walkers, n_steps = chain[:, :, 0].shape
         max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
                                                      n_steps=n_steps, verbose=verbose)
-        fig = cc.plotter.plot_distributions(displayfigsize=[10, height],
+        fig = cc.plotter.plot_distributions(figsize=[10, height],
                                             truth=max_params)
     else:
         fig = cc.plotter.plot_distributions(figsize=[10, height])
