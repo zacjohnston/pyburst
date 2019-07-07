@@ -360,8 +360,7 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False):
     param_order = {
         'grid5': ['mdot1', 'mdot2', 'mdot3', 'qb1', 'qb2', 'qb3', 'x', 'z', 'm_nw',
                   'm_gr', 'd_b', 'xi_ratio'],
-        'he2': ['mdot1', 'mdot2', 'qb1', 'qb2', 'x', 'z', 'm_nw', 'm_gr',
-                'd_b', 'xi_ratio'],
+        'he2': ['mdot1', 'mdot2', 'qb1', 'qb2', 'x', 'z', 'm_gr', 'd_b', 'xi_ratio'],
     }
     master_cc.plotter.plot_distributions()
     param_keys = param_order[source]
@@ -369,7 +368,6 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False):
     n_epochs = len(master_cc.chains) - 1
 
     height = 3 * ceil(len(param_keys) / n_epochs)
-
     fig = master_cc.plotter.plot_distributions(parameters=formatted_params,
                                                col_wrap=n_epochs,
                                                figsize=[8, height])
