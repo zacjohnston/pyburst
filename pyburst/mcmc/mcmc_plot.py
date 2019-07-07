@@ -362,7 +362,7 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False):
                   'm_gr', 'd_b', 'xi_ratio'],
         'he2': ['mdot1', 'mdot2', 'qb1', 'qb2', 'm_gr', 'd_b', 'xi_ratio'],
     }
-    master_cc.plotter.plot_distributions()
+    
     param_keys = param_order[source]
     formatted_params = plot_tools.convert_mcmc_labels(param_keys)
     n_epochs = len(master_cc.chains) - 1
