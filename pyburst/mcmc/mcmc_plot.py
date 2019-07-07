@@ -104,15 +104,15 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
         n_walkers, n_steps = chain[:, :, 0].shape
         max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
                                                      n_steps=n_steps, verbose=verbose)
-        fig = cc.plotter.plot(truth=max_params, display=display)
+        fig = cc.plotter.plot(truth=max_params)
     elif truth:
         if truth_values is None:
             truth_values = get_summary(chain, discard=discard, cap=cap,
                                        source=source, version=version)[:, 1]
 
-        fig = cc.plotter.plot(truth=truth_values, display=display)
+        fig = cc.plotter.plot(truth=truth_values)
     else:
-        fig = cc.plotter.plot(display=display)
+        fig = cc.plotter.plot()
 
     plt.tight_layout()
     save_plot(fig, prefix='contours', chain=chain, save=save, source=source,
@@ -136,16 +136,16 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
                              cap=cap)
     height = 3 * ceil(len(pkeys) / 4)
     if truth_values is not None:
-        fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
+        fig = cc.plotter.plot_distributions(figsize=[10, height],
                                             truth=truth_values)
     elif max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
         max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
                                                      n_steps=n_steps, verbose=verbose)
-        fig = cc.plotter.plot_distributions(display=display, figsize=[10, height],
+        fig = cc.plotter.plot_distributions(displayfigsize=[10, height],
                                             truth=max_params)
     else:
-        fig = cc.plotter.plot_distributions(display=display, figsize=[10, height])
+        fig = cc.plotter.plot_distributions(figsize=[10, height])
 
     plt.tight_layout()
     save_plot(fig, prefix='posteriors', chain=chain, save=save, source=source,
@@ -181,10 +181,10 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
             mass_gr = max_params[pkeys.index('m_gr')]
 
         radius = mcmc_params.get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
-        fig = cc.plotter.plot(display=True, figsize=[6, 6], truth=[mass_gr, radius])
+        fig = cc.plotter.plot(figsize=[6, 6], truth=[mass_gr, radius])
 
     else:
-        fig = cc.plotter.plot(display=True, figsize=[6, 6])
+        fig = cc.plotter.plot(figsize=[6, 6])
 
     save_plot(fig, prefix='mass-radius', chain=chain, save=save, source=source,
               version=version, display=display)
@@ -202,7 +202,7 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
     cc.add_chain(redshift_chain.reshape(-1), parameters=['(1+z)'])
     cc.configure(kde=False, smooth=0)
 
-    fig = cc.plotter.plot_distributions(display=display, figsize=[5, 5])
+    fig = cc.plotter.plot_distributions(figsize=[5, 5])
     plt.tight_layout()
 
     save_plot(fig, prefix='redshift', chain=chain, save=save, source=source,
@@ -231,9 +231,9 @@ def plot_xedd(chain, discard, source, version, cap=None,
                                                      verbose=verbose)
         xedd = (max_params[pkeys.index('xedd_ratio')]
                 * max_params[pkeys.index('xedd_ratio')])
-        fig = cc.plotter.plot(display=True, figsize=[6, 6], truth=[xedd])
+        fig = cc.plotter.plot(figsize=[6, 6], truth=[xedd])
     else:
-        fig = cc.plotter.plot(display=True, figsize=[6, 6])
+        fig = cc.plotter.plot(figsize=[6, 6])
 
     save_plot(fig, prefix='xedd', chain=chain, save=save, source=source,
               version=version, display=display)
