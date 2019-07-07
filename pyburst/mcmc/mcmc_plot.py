@@ -5,13 +5,14 @@ import matplotlib.pyplot as plt
 import chainconsumer
 from math import ceil
 
-# kepler_grids
+# pyburst
 from . import mcmc_versions
 from . import mcmc_tools
 from . import burstfit
 from . import mcmc_params
 from pyburst.plotting import plot_tools
 from pyburst.grids.grid_strings import get_source_path, print_warning
+from pyburst.misc.pyprint import printv
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
@@ -86,6 +87,34 @@ def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960
         if mass_radius:
             plot_mass_radius(chain, source=full_source, save=True, discard=discard,
                              display=display, version=version, max_lhood=max_lhood)
+
+
+def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=False,
+                   save=True, cap=None, max_lhood=True, posteriors=True, contours=True,
+                   redshift=True, mass_radius=True, verbose=True):
+    """Saves (and/or displays) main MCMC plots
+    """
+    chain = mcmc_tools.load_chain(source, version=version, n_steps=n_steps,
+                                  n_walkers=n_walkers, verbose=verbose)
+    if posteriors:
+        printv('Plotting posteriors', verbose=verbose)
+        plot_posteriors(chain, source=source, save=save, discard=discard, cap=cap,
+                        display=display, version=version, max_lhood=max_lhood)
+
+    if contours:
+        printv('Plotting contours', verbose=verbose)
+        plot_contours(chain, source=source, save=save, discard=discard, cap=cap,
+                      display=display, version=version, max_lhood=max_lhood)
+
+    if mass_radius:
+        printv('Plotting mass-radius', verbose=verbose)
+        plot_mass_radius(chain, source=source, save=save, discard=discard, cap=cap,
+                         display=display, version=version, max_lhood=max_lhood)
+
+    if redshift:
+        printv('Plotting redshift', verbose=verbose)
+        plot_redshift(chain, source=source, save=save, discard=discard, cap=cap,
+                      display=display, version=version)
 
 
 def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lhood=False,
