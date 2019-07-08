@@ -5,13 +5,13 @@ version_defaults = {
         'grid5': ['accrate', 'x', 'z', 'qb', 'mass'],
         'grid6': ['accrate', 'x', 'z', 'qb', 'mass'],
         'he1': ['accrate', 'x', 'z', 'qb', 'mass'],
-        'he2': ['accrate', 'qb', 'mass'],
+        'he2': ['accrate', 'qb'],
     },
     'bprops': {
         'grid5': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         'grid6': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         'he1': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
-        'he2': ('rate', 'u_rate', 'fluence', 'u_fluence'),
+        'he2': ('rate', 'u_rate'),
     },
 }
 
@@ -25,13 +25,7 @@ version_definitions = {
         },
         'grid6': {},
         'he1': {},
-        'he2': {
-            3: ['accrate', 'qb'],
-            4: ['accrate', 'qb'],
-            5: ['accrate', 'qb'],
-            6: ['accrate', 'qb'],
-            7: ['accrate', 'qb'],
-        },
+        'he2': {},
     },
 
     # The burst properties being interpolated
@@ -39,15 +33,7 @@ version_definitions = {
         'grid5': {},
         'grid6': {},
         'he1': {},
-        'he2': {
-            1: ('rate', 'u_rate', 'fluence', 'u_fluence', 'tail_index', 'u_tail_index'),
-            2: ('rate', 'u_rate'),
-            3: ('rate', 'u_rate'),
-            4: ('rate', 'u_rate'),
-            5: ('rate', 'u_rate'),
-            6: ('rate', 'u_rate'),
-            7: ('rate', 'u_rate'),
-        },
+        'he2': {},
     },
 
     # The base grid to interpolate over (see: grids/grid_versions.py)
@@ -56,10 +42,7 @@ version_definitions = {
         'grid5': {},
         'grid6': {},
         'he1': {},
-        'he2': {
-            1: 0,
-            2: 0,
-        },
+        'he2': {},
     },
 }
 
