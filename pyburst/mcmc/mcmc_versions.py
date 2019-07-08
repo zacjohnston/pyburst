@@ -493,36 +493,6 @@ source_defaults = {
 
 #   7 : as 1, m_gr prior (1.6 +/- 0.1)
 
-#   8  : as 1, (fixed mass=1.2)
-#   9  : as 8, epoch 1997
-#   10 : as 8, epoch 2009
-
-#   11 : interpolating only rate (not fluence)
-#   12 : as 11, epoch 1997
-#   13 : as 11, epoch 2009
-
-#   14 : as 11, m_gr=10
-#   15 : as 14, epoch 1997
-#   16 : as 14, epoch 2009
-
-#   17 : as 14, (m_gr = 1.6 +/- 0.1)
-#   18 : as 17, epoch 1997
-#   19 : as 17, epoch 2009
-
-#   20 : as 8, m_gr=10 (fixed mass=1.2)
-#   21 : as 20, epoch 1997
-#   22 : as 20, epoch 2009
-
-#   23 : as 20, (fixed mass=2.0)
-#   24 : as 23, (fixed mass=1.4)
-#   25 : as 23, (fixed mass=1.7)
-
-#   26 : as 23, (limit m_gr < 2.2)
-#   27 : as 23, (mass=1.4)
-
-#   28 : as 24, epoch 1997
-#   29 : as 24, epoch 2009
-
 
 version_definitions = {
     'interpolator': {
@@ -548,30 +518,7 @@ version_definitions = {
             26: 1,
         },
         'synth5': {},
-        'he2': {
-            8: 3,
-            9: 3,
-            10: 3,
-            11: 2,
-            12: 2,
-            13: 2,
-            14: 2,
-            15: 2,
-            16: 2,
-            17: 2,
-            18: 2,
-            19: 2,
-            20: 4,
-            21: 4,
-            22: 4,
-            23: 5,
-            24: 6,
-            25: 7,
-            26: 5,
-            27: 6,
-            28: 6,
-            29: 6,
-        },
+        'he2': {},
     },
 
     'grid_bounds': {
@@ -646,7 +593,7 @@ version_definitions = {
             4: initial_position[3][2],
             5: initial_position[4][3],
             6: initial_position[4][4],
-            7: initial_position[3][2],
+            7: initial_position[3][3],
         },
     },
 
@@ -658,9 +605,6 @@ version_definitions = {
         'synth5': {},
         'he2': {
             7: {'m_gr': gaussian(mean=1.6, std=0.1)},
-            17: {'m_gr': gaussian(mean=1.8, std=0.1)},
-            18: {'m_gr': gaussian(mean=1.8, std=0.1)},
-            19: {'m_gr': gaussian(mean=1.8, std=0.1)},
         },
     },
 
