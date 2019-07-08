@@ -374,7 +374,8 @@ def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
     plt.show(block=False)
 
 
-def plot_epoch_posteriors(master_cc, source, version, display=True, save=False):
+def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
+                          col_wrap=None):
     """Plot posteriors for multiiple epoch chains
 
     parameters
@@ -383,8 +384,9 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False):
         Contains the multi-epoch chain, created with setup_master_chainconsumer()
     source : str
     version : int
-    display : bool
-    save : bool
+    display : bool (optional)
+    save : bool (optional)
+    col_wrap : int (optional)
     """
     param_order = {
         'grid5': ['mdot1', 'mdot2', 'mdot3', 'qb1', 'qb2', 'qb3', 'x', 'z', 'm_nw',
