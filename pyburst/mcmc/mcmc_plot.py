@@ -398,9 +398,12 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
     formatted_params = plot_tools.convert_mcmc_labels(param_keys)
     n_epochs = len(master_cc.chains) - 1
 
+    if col_wrap is None:
+        col_wrap = n_epochs
+
     height = 3 * ceil(len(param_keys) / n_epochs)
     fig = master_cc.plotter.plot_distributions(parameters=formatted_params,
-                                               col_wrap=n_epochs,
+                                               col_wrap=col_wrap,
                                                figsize=[8, height],
                                                display=False)
     plt.tight_layout()
