@@ -1,5 +1,5 @@
 import numpy as np
-
+ 
 # Defines various versions/subsets of model grids
 # TODO: change format to specify *included* instead of excluded
 
@@ -36,12 +36,12 @@ version_defaults = {
             'qb': [0.0, 0.4],
         },
         'he2': {
-            'qnuc': [1.0, 3.0],
-            'qb': [0.00, 0.5, 0.55, 0.6, 0.8],
-            'mass': [1.1, 1.4, 1.7, 2.6],
-            'x': [0.001, 0.01, 0.03, 0.05, 0.10],
-            'accrate': [0.15, 0.525, 0.55],
-            'z': [0.005],
+                'qnuc': [1.0, 3.0],
+                'qb': [0.00, 0.55, 0.6, 0.8],
+                'mass': [1.1, 1.2, 1.7, 2.0, 2.6],  # mass=1.4
+                'x': [0.001, 0.01, 0.03, 0.05, 0.10],
+                'accrate': [0.15, 0.525, 0.55],
+                'z': [0.005],
         },
         'alpha1': {},
         'alpha2': {},
