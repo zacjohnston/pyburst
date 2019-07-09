@@ -206,6 +206,7 @@ class Ksample:
              fontsize=16):
         n_subplots = {True: 2, False: 1}.get(residuals)
         fig, ax = plt.subplots(self.n_epochs, n_subplots, sharex=True, figsize=(14, 10))
+        y_scale=1e-8
 
         if residuals:
             lc_ax = ax[:, 0]
@@ -218,16 +219,16 @@ class Ksample:
             batch = self.batches[epoch_i]
             obs_burst = self.obs[epoch_i]
             obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)
-            obs_y = np.array(obs_burst.flux)
-            obs_y_u = np.array(obs_burst.flux_err)
+            obs_y = np.array(obs_burst.flux) / y_scale
+            obs_y_u = np.array(obs_burst.flux_err) / y_scale
 
             for run_i, run in enumerate(self.runs):
                 model = self.shifted_lc[batch][run]
                 t_shift = self.t_shifts[epoch_i, run_i]
 
                 m_x = model[:, 0] + t_shift
-                m_y = model[:, 1]
-                m_y_u = model[:, 2]
+                m_y = model[:, 1] / y_scale
+                m_y_u = model[:, 2] / y_scale
                 m_y_upper = m_y + m_y_u
                 m_y_lower = m_y - m_y_u
 
@@ -240,7 +241,7 @@ class Ksample:
                 # ====== Plot residuals ======
                 if residuals:
                     res_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
-                    res_ax[1].set_ylabel(r'Residuals (erg cm$^{-2}$ s$^{-1}$)',
+                    res_ax[1].set_ylabel(r'Residuals ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
                                          fontsize=fontsize)
                     # y_residuals = m_y - self.interp_lc['obs'][epoch_i]['flux'](m_x)
                     y_residuals = self.interp_lc[batch][run]['flux'](obs_x-t_shift) - obs_y
@@ -260,7 +261,7 @@ class Ksample:
             lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
 
         lc_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
-        lc_ax[1].set_ylabel(r'Flux (erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
+        lc_ax[1].set_ylabel(r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
         lc_ax[-1].set_xlim([-10, 200])
         plt.tight_layout()
         plt.show(block=False)
