@@ -289,8 +289,14 @@ def setup_mcmc_sample(batch0, sample_source, chain, discard, n_models_epoch, n_e
     # TODO: - use config defaults for constants
     #       - account for different variable params (he2, grid5 with x,z)
     if constant is None:
-        constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
-                    'accmass': 1e16, 'accdepth': 1e20, 'x': 0.0, 'z': 0.015}
+        # TODO: hack fix for he2/grid5 different params
+        if ref_source == 'he2':
+            constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
+                        'accmass': 1e16, 'accdepth': 1e20,
+                        'x': 0.0, 'z': 0.015, 'mass': 1.4}
+        elif ref_source == 'grid5':
+            constant = {'tshift': 0.0, 'acc_mult': 1.0, 'qnuc': 5.0, 'qb_delay': 0.0,
+                        'accmass': 1e16, 'accdepth': 1e20}
 
     mv = mcmc_versions.McmcVersion(source=ref_source, version=ref_mcmc_version)
     params_full = {}
