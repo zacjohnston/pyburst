@@ -203,7 +203,7 @@ class Ksample:
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
     def plot(self, residuals=True, shaded=False, alpha_lines=0.3, alpha_shaded=0.7,
-             fontsize=16):
+             fontsize=16, xlims=(-10, 200)):
         """Plot lightcurve comparison between observed and sample models
         """
         n_subplots = {True: 2, False: 1}.get(residuals)
@@ -226,6 +226,8 @@ class Ksample:
 
             if residuals:
                 res_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
+                res_ax[epoch_i].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
+                                         ls='none', capsize=3, color='C1')
 
             for run_i, run in enumerate(self.runs):
                 model = self.shifted_lc[batch][run]
@@ -260,8 +262,6 @@ class Ksample:
                                                      y_residuals + y_residuals_err,
                                                      color='0.7', alpha=alpha_shaded)
 
-                    res_ax[epoch_i].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
-                                             ls='none', capsize=3, color='C1')
 
             # ====== Plot observed lightcurves ======
             lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
@@ -270,7 +270,7 @@ class Ksample:
             lc_ax[epoch_i].set_ylabel(r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
 
         lc_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
-        lc_ax[-1].set_xlim([-10, 200])
+        lc_ax[-1].set_xlim(xlims)
 
         plt.tight_layout()
         plt.show(block=False)
