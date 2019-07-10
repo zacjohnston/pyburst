@@ -37,8 +37,7 @@ interp_keys = {
 
 # ===== Define params that are unique for each epoch =====
 epoch_unique = {
-    1: ['mdot'],
-    2: ['mdot', 'qb'],
+    1: ['mdot', 'qb'],
 }
 
 # ===== Define alias from interp-->param keys =====
@@ -369,9 +368,9 @@ source_defaults = {
     },
 
     'epoch_unique': {
-        'grid5': epoch_unique[2],
-        'synth5': epoch_unique[2],
-        'he2': epoch_unique[2],
+        'grid5': epoch_unique[1],
+        'synth5': epoch_unique[1],
+        'he2': epoch_unique[1],
     },
 
     'epoch': {
