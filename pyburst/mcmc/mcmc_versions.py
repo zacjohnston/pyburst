@@ -29,9 +29,8 @@ param_keys = {
 interp_keys = {
     1: ['mdot', 'x', 'z', 'qb', 'mass'],
     2: ['mdot', 'x', 'z', 'qb'],
-    3: ['mdot', 'x', 'qb', 'mass'],
+    3: ['mdot', 'qb'],
     4: ['mdot', 'qb', 'mass'],
-    6: ['mdot', 'qb'],
 }
 
 # ===== Define params that are unique for each epoch =====
@@ -357,7 +356,7 @@ source_defaults = {
 
     'interp_keys': {
         'grid5': interp_keys[1],
-        'he2': interp_keys[6],
+        'he2': interp_keys[3],
     },
 
     'epoch_unique': {
