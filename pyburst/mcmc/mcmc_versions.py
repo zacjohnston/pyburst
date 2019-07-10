@@ -297,7 +297,7 @@ source_defaults = {
 
 #   5 : as 1, (prior: m_gr = 1.6 +/- 0.1)
 
-#   6 : as 1, (with x_edd)
+#   6 : as 1, (all masses: 1.4, 1.7, 2.0, 2.6)
 #   7 : as 6, epoch 1998
 #   8 : as 6, epoch 2000
 #   9 : as 6, epoch 2007
@@ -320,6 +320,7 @@ source_defaults = {
 version_definitions = {
     'interpolator': {
         'grid5': {
+            6: 1,
             7: 1,
             8: 1,
             9: 1,
@@ -332,10 +333,9 @@ version_definitions = {
             2: grid_bounds[2][1],
             3: 2,
             4: 2,
-            6: grid_bounds[10][1],
-            7: grid_bounds[2][2],
-            8: 7,
-            9: 7,
+            7: 2,
+            8: 2,
+            9: 2,
             11: grid_bounds[1][2],
         },
         'he2': {
@@ -353,7 +353,6 @@ version_definitions = {
             3: initial_position[2][2],
             4: initial_position[2][3],
             5: initial_position[1][2],
-            6: initial_position[10][1],
             7: 2,
             8: 3,
             9: 4,
@@ -383,7 +382,6 @@ version_definitions = {
             2: param_keys[2],
             3: 2,
             4: 2,
-            6: 2,
             7: 2,
             8: 2,
             9: 2,
