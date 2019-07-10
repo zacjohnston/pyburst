@@ -21,8 +21,6 @@ param_keys = {
     4: ['mdot1', 'qb1', 'm_gr', 'd_b', 'xi_ratio'],
     5: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_gr', 'd_b', 'xi_ratio'],
     6: ['mdot1', 'x', 'z', 'qb1', 'm_gr', 'd_b', 'xi_ratio'],
-    9: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
-    10: ['mdot1', 'mdot2', 'mdot3', 'x', 'z', 'qb1', 'qb2', 'qb3', 'm_nw', 'm_gr', 'd_b', 'xi_ratio', 'xedd_ratio'],
 }
 
 # ===== Define order/number of params for a single interpolated point =====
@@ -195,41 +193,6 @@ grid_bounds = {
             (0.1, 10.),  # xi_ratio
             ),
     },
-
-    # xedd_ratio (Fixed mass, grid5)
-    9: {
-        1: ((0.07, 0.18),  # mdot1
-            (0.07, 0.18),  # mdot2
-            (0.07, 0.18),  # mdot3
-            (0.64, 0.76),  # x
-            (0.0025, 0.03),  # z
-            (0.0, 0.6),  # qb1
-            (0.0, 0.6),  # qb2
-            (0.0, 0.6),  # qb3
-            (1.0, 2.2),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            (0.0, 1.0),  # xedd_ratio
-            ),
-    },
-
-    # xedd_ratio (varying mass, grid5)
-    10: {
-        1: ((0.07, 0.18),  # mdot1
-            (0.07, 0.18),  # mdot2
-            (0.07, 0.18),  # mdot3
-            (0.64, 0.76),  # x
-            (0.0025, 0.02),  # z
-            (0.0, 0.6),  # qb1
-            (0.0, 0.6),  # qb2
-            (0.0, 0.6),  # qb3
-            (1.4, 2.6),  # m_nw
-            (1.0, 2.2),  # m_gr
-            (1., 15.),  # d_b
-            (0.1, 10.),  # xi_ratio
-            (0.0, 1.0),  # xedd_ratio
-            ),
-    },
 }
 
 # ===== Define prior pdfs for parameters =====
@@ -304,14 +267,6 @@ initial_position = {
         1: (0.08, 0.71, 0.01, 0.5, 2.0, 6.7, 1.4),
         2: (0.11, 0.71, 0.01, 0.3, 2.0, 6.7, 1.4),
         3: (0.13, 0.71, 0.01, 0.3, 2.0, 6.7, 1.4),
-    },
-    9: {
-        1: (0.072, 0.095, 0.11, 0.66, 0.012, 0.15, 0.08, 0.12, 2.1, 7.6, 1.3, 0.5),
-        2: (0.073, 0.10, 0.114, 0.67, 0.011, 0.13, 0.1, 0.13, 2.1, 7.1, 1.35, 0.78),
-        3: (0.077, 0.104, 0.12, 0.72, 0.014, 0.5, 0.2, 0.2, 2.1, 6.6, 1.4, 0.8),
-    },
-    10: {
-        1: (0.072, 0.095, 0.11, 0.66, 0.012, 0.15, 0.08, 0.12, 2.0, 2.1, 7.6, 1.3, 0.5),
     },
 }
 # To add a new version definition, add an entry to each of the parameters
@@ -506,7 +461,7 @@ version_definitions = {
             2: param_keys[2],
             3: 2,
             4: 2,
-            6: param_keys[10],
+            6: 2,
             7: 2,
             8: 2,
             9: 2,
