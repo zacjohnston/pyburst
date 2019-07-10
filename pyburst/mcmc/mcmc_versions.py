@@ -608,7 +608,6 @@ class McmcVersion:
         self.constants = self.get_parameter_dict('constants')
         self.priors = self.get_priors()
         self.synthetic = source_defaults['synthetic'][source]
-        self.disc_model = None
         self.system = source_defaults['system'].get(source)
 
         if self.synthetic:
@@ -647,7 +646,6 @@ class McmcVersion:
                 + f'\nanalytic_bprops  : {self.analytic_bprops}'
                 + f'\nweights          : {self.weights}'
                 + f'\ninitial position : {self.initial_position}'
-                + f'\ndisc model       : {self.disc_model}'
                 + f'\ninterpolator     : {self.interpolator}'
                 + f'\nx_edd option     : {self.x_edd_option}'
                 + f'\nconstants        : {self.constants}'
