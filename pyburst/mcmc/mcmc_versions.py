@@ -458,28 +458,7 @@ source_defaults = {
 #   8 : as 6, epoch 2000
 #   9 : as 6, epoch 2007
 
-#   10 : as 6, (mass=2.6)
 #   11 : as 1, (m_gr < 10)
-#   12 : as 10, (m_gr = 1.6 +/- 0.1)
-
-#   13 : as 1, (m_nw=2.0)
-#   14 : as 13, epoch 1998
-#   15 : as 13, epoch 2000
-#   16 : as 13, epoch 2007
-
-#   17 : as 13, (m_nw=1.4)
-#   18 : as 17, epoch 1998
-#   19 : as 17, epoch 2000
-#   20 : as 17, epoch 2007
-
-#   21 : as 17, (m_nw=1.4, m_gr < 10)
-#   22 : as 21, (m_nw=1.7)
-
-#   23 : as 17, (m_nw=1.4, with x_edd)
-#   24 : as 23, (m_nw=1.7)
-#   25 : as 23, (m_nw=2.0)
-
-#   26 : as 1, (mass=1.4-1.7)
 
 # ------------------------------
 # he2
@@ -500,22 +479,6 @@ version_definitions = {
             7: 1,
             8: 1,
             9: 1,
-            10: 2,
-            12: 2,
-            13: 3,
-            14: 3,
-            15: 3,
-            16: 3,
-            17: 4,
-            18: 4,
-            19: 4,
-            20: 4,
-            21: 4,
-            22: 5,
-            23: 4,
-            24: 5,
-            25: 3,
-            26: 1,
         },
         'synth5': {},
         'he2': {},
@@ -530,23 +493,7 @@ version_definitions = {
             7: grid_bounds[2][2],
             8: 7,
             9: 7,
-            10: grid_bounds[1][3],
             11: grid_bounds[1][2],
-            12: 10,
-            13: grid_bounds[5][1],
-            14: grid_bounds[6][1],
-            15: 14,
-            16: 14,
-            17: 13,
-            18: 14,
-            19: 14,
-            20: 14,
-            21: grid_bounds[5][2],
-            22: 21,
-            23: grid_bounds[9][1],
-            24: 23,
-            25: 23,
-            26: grid_bounds[1][2],
         },
         'synth5': {},
         'he2': {
@@ -568,23 +515,7 @@ version_definitions = {
             7: 2,
             8: 3,
             9: 4,
-            10: initial_position[1][2],
             11: initial_position[1][3],
-            12: initial_position[1][4],
-            13: initial_position[5][1],
-            14: initial_position[6][1],
-            15: initial_position[6][2],
-            16: initial_position[6][3],
-            17: initial_position[5][2],
-            18: 14,
-            19: 15,
-            20: 16,
-            21: 17,
-            22: 17,
-            23: initial_position[9][1],
-            24: initial_position[9][2],
-            25: initial_position[9][3],
-            26: initial_position[1][2],
         },
         'synth5': {},
         'he2': {
@@ -600,7 +531,6 @@ version_definitions = {
     'priors': {
         'grid5': {
             5: {'m_gr': gaussian(mean=1.6, std=0.1)},
-            12: {'m_gr': gaussian(mean=1.6, std=0.1)},
         },
         'synth5': {},
         'he2': {
@@ -617,19 +547,6 @@ version_definitions = {
             7: 2,
             8: 2,
             9: 2,
-            13: param_keys[5],
-            14: param_keys[6],
-            15: 14,
-            16: 14,
-            17: 13,
-            18: 14,
-            19: 14,
-            20: 14,
-            21: 13,
-            22: 13,
-            23: param_keys[9],
-            24: 23,
-            25: 23,
         },
         'synth5': {},
         'he2': {
@@ -648,12 +565,6 @@ version_definitions = {
             7: 1998,
             8: 2000,
             9: 2007,
-            14: 1998,
-            15: 2000,
-            16: 2007,
-            18: 1998,
-            19: 2000,
-            20: 2007,
         },
         'synth5': {},
         'he2': {
@@ -677,21 +588,7 @@ version_definitions = {
     },
 
     'constants': {
-        'grid5': {
-            13: {'m_nw': 2.0},
-            14: {'m_nw': 2.0},
-            15: {'m_nw': 2.0},
-            16: {'m_nw': 2.0},
-            17: {'m_nw': 1.4},
-            18: {'m_nw': 1.4},
-            19: {'m_nw': 1.4},
-            20: {'m_nw': 1.4},
-            21: {'m_nw': 1.4},
-            22: {'m_nw': 1.7},
-            23: {'m_nw': 1.4},
-            24: {'m_nw': 1.7},
-            25: {'m_nw': 2.0},
-        },
+        'grid5': {},
         'synth5': {},
         'he2': {},
     },
@@ -703,21 +600,7 @@ version_definitions = {
     },
 
     'interp_keys': {
-        'grid5': {
-            13: interp_keys[5],
-            14: 13,
-            15: 13,
-            16: 13,
-            17: 13,
-            18: 13,
-            19: 13,
-            20: 13,
-            21: 13,
-            22: 13,
-            23: 13,
-            24: 13,
-            25: 13,
-        },
+        'grid5': {},
         'synth5': {},
         'he2': {},
     },
@@ -735,12 +618,7 @@ version_definitions = {
     },
 
     'x_edd_option': {
-        'grid5': {
-            6: None,
-            23: None,
-            24: None,
-            25: None,
-        },
+        'grid5': {},
         'synth5': {},
         'he2': {},
     },
