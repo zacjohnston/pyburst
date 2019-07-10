@@ -28,10 +28,9 @@ param_keys = {
 # ===== Define order/number of params for a single interpolated point =====
 interp_keys = {
     1: ['mdot', 'x', 'z', 'qb', 'mass'],
-    2: ['mdot', 'x', 'z', 'mass'],
+    2: ['mdot', 'x', 'z', 'qb'],
     3: ['mdot', 'x', 'qb', 'mass'],
     4: ['mdot', 'qb', 'mass'],
-    5: ['mdot', 'x', 'z', 'qb'],
     6: ['mdot', 'qb'],
 }
 
