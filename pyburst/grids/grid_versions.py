@@ -31,16 +31,17 @@ version_defaults = {
         'heat': {
             'batch': [1]
         },
+        'heger07': {},
         'triplets': {},
         'he1': {
             'qb': [0.0, 0.4],
         },
         'he2': {
                 'qnuc': [1.0, 3.0],
-                'qb': [0.00, 0.55, 0.6, 0.8],
+                'qb': [0.00, 0.45, 0.5, 0.55, 0.6, 0.8],
                 'mass': [1.1, 1.2, 1.7, 2.0, 2.6],  # mass=1.4
                 'x': [0.001, 0.01, 0.03, 0.05, 0.10],
-                'accrate': [0.15, 0.5, 0.525, 0.55],
+                'accrate': [0.15, 0.525, 0.55],
                 'z': [0.005],
         },
         'alpha1': {},
@@ -60,6 +61,7 @@ version_defaults = {
         'sample5': [{}],
         'sample2': [{}],
         'heat': [{}],
+        'heger07': {},
         'res1': [{}],
         'test1': [{}],
         'triplets': [{}],
@@ -163,6 +165,7 @@ version_definitions = {
                 },
             },
             'alpha1': {},
+            'heger07': {},
             'alpha2': {},
             'mesa': {},
             'ks1': {},
@@ -179,6 +182,7 @@ version_definitions = {
             'sample5': {},
             'sample2': {},
             'heat': {},
+            'heger07': {},
             'res1': {},
             'test1': {},
             'triplets': {},
