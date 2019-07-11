@@ -203,7 +203,7 @@ class Ksample:
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
     def plot(self, residuals=True, shaded=False, alpha_lines=0.3, alpha_shaded=0.7,
-             fontsize=16, xlims=(-10, 200)):
+             fontsize=16, xlims=(-10, 200), markersize=2):
         """Plot lightcurve comparison between observed and sample models
         """
         n_subplots = {True: 2, False: 1}.get(residuals)
@@ -224,10 +224,20 @@ class Ksample:
             obs_y = np.array(obs_burst.flux) / y_scale
             obs_y_u = np.array(obs_burst.flux_err) / y_scale
 
+            # ====== Labelling =====
+            lc_ax[epoch_i].set_ylabel(r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
+                                      fontsize=fontsize)
+
             if residuals:
                 res_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
                 res_ax[epoch_i].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
-                                         ls='none', capsize=3, color='C1')
+                                         ls='none', capsize=3, color='C1',
+                                         markeredgewidth=markersize)
+
+            # ====== Plot observed lightcurves ======
+            lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none',
+                                    capsize=3, color='C1', markersize=markersize,
+                                    markeredgewidth=markersize)
 
             for run_i, run in enumerate(self.runs):
                 model = self.shifted_lc[batch][run]
@@ -247,7 +257,8 @@ class Ksample:
 
                 # ====== Plot residuals ======
                 if residuals:
-                    res_ax[epoch_i].set_ylabel(r'Residuals ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
+                    res_ax[epoch_i].set_ylabel(r'Residuals '
+                                               r'($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
                                                fontsize=fontsize)
                     # y_residuals = m_y - self.interp_lc['obs'][epoch_i]['flux'](m_x)
                     y_residuals = (self.interp_lc[batch][run]['flux'](obs_x-t_shift)
@@ -255,23 +266,16 @@ class Ksample:
                     y_residuals_err = (self.interp_lc[batch][run]['flux_err']
                                        (obs_x-t_shift)) / y_scale
 
-                    res_ax[epoch_i].plot(obs_x, y_residuals, color='black', alpha=alpha_lines)
+                    res_ax[epoch_i].plot(obs_x, y_residuals, color='black',
+                                         alpha=alpha_lines)
 
                     if shaded:
                         res_ax[epoch_i].fill_between(obs_x, y_residuals - y_residuals_err,
                                                      y_residuals + y_residuals_err,
                                                      color='0.7', alpha=alpha_shaded)
 
-
-            # ====== Plot observed lightcurves ======
-            lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none', capsize=3, color='C1')
-
-            # ====== Labelling =====
-            lc_ax[epoch_i].set_ylabel(r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)', fontsize=fontsize)
-
         lc_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
         lc_ax[-1].set_xlim(xlims)
-
         plt.tight_layout()
         plt.show(block=False)
 
