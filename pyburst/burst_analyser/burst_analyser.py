@@ -1213,7 +1213,7 @@ class BurstRun(object):
              burst_stages=False, candidates=False, legend=False, time_unit='h',
              short_wait=True, fontsize=14, title=True,
              outliers=True, show_all=False, dumps=False, dump_start=False,
-             spikes=False, fix_ylim=True):
+             spikes=False, fix_ylim=True, ylims=None):
         """Plots overall model lightcurve, with detected bursts
         """
         if not self.flags['lum_loaded']:
@@ -1241,13 +1241,16 @@ class BurstRun(object):
             yscale = 1
             ax.set_yscale('log')
             ax.set_ylabel('Luminosity (erg s$^{-1}$)', fontsize=fontsize)
-            if fix_ylim:
-                ax.set_ylim([1e34, 1e40])
+            if ylims is None:
+                ylims = [1e34, 1e40]
         else:
             ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
             yscale = 1e38
-            if fix_ylim:
-                ax.set_ylim([-0.2, 7.5])
+            if ylims is None:
+                ylims = [-0.2, 7.5]
+
+        if fix_ylim:
+            ax.set_ylim(ylims)
 
         ax.plot(self.lum[:, 0]/timescale, self.lum[:, 1]/yscale, c='black')
 
