@@ -1458,7 +1458,8 @@ class BurstRun(object):
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
                          zero_time=True, fontsize=14, ylims=None, title=True,
-                         color=None, legend=False, power_fits=False, **kwargs):
+                         color=None, legend=False, power_fits=False,
+                         xlims=None, **kwargs):
         """Plot individual burst lightcurve
 
         parameters
@@ -1471,6 +1472,7 @@ class BurstRun(object):
         zero_time : bool (optional)
         fontsize : int (optional)
         ylims : [int, int] (optional)
+        xlims : [int, int] (optional)
         title : bool (optional)
         color : str (optional)
             colour of all curves. If None, use default pyplot color cycle
@@ -1483,7 +1485,8 @@ class BurstRun(object):
         if bursts is None:
             bursts = np.arange(self.n_bursts)
 
-        xlims = {'grid5': [-2, 60], 'he2': [-2, 10], 'ks1': [-2, 60]}.get(self.source)
+        if xlims is None:
+            xlims = {'grid5': [-2, 60], 'he2': [-2, 10], 'ks1': [-2, 60]}.get(self.source)
         if ylims is None:
             ylims = {'grid5': [-0.1, 4], 'he2': [-0.1, 5.5],
                      'ks1': [-0.1, 7]}.get(self.source)
