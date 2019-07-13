@@ -503,7 +503,7 @@ def check_finished(batches, source, efficiency=True, show='all',
     def progress_string(batch, basename, run, progress, elapsed, remaining,
                         eff_str, eff2_str):
         string = [f'{batch}    {basename}{run:02}  {progress:.0f}%   ' +
-                  f'{elapsed:.0f}hrs     ~{remaining:.0f}hrs,    ' +
+                  f'{elapsed:.0f}hrs     ~{remaining:.1f}hrs,    ' +
                   f'{eff_str},    {eff2_str}']
         return string
 
