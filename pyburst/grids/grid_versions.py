@@ -52,27 +52,27 @@ version_defaults = {
     },
 
     'exclude_all': {
-        'adelle': [{}],
-        'biggrid2': [{}],
-        'biggrid3': [{}],
-        'grid4': [{}],
-        'grid5': [{}],
-        'grid6': [{}],
-        'synth5': [{}],
-        'sample5': [{}],
-        'sample2': [{}],
-        'heat': [{}],
-        'heger07': [{}],
-        'res1': [{}],
-        'test1': [{}],
-        'triplets': [{}],
-        'he1': [{}],
-        'he2': [{}],
-        'alpha1': [{}],
-        'alpha2': [{}],
-        'preheat': [{}],
-        'mesa': [{}],
-        'ks1': [{}],
+        'adelle': {},
+        'biggrid2': {},
+        'biggrid3': {},
+        'grid4': {},
+        'grid5': {},
+        'grid6': {},
+        'synth5': {},
+        'sample5': {},
+        'sample2': {},
+        'heat': {},
+        'heger07': {},
+        'res1': {},
+        'test1': {},
+        'triplets': {},
+        'he1': {},
+        'he2': {},
+        'alpha1': {},
+        'alpha2': {},
+        'preheat': {},
+        'mesa': {},
+        'ks1': {},
     },
 }
 
@@ -224,7 +224,7 @@ class GridVersion:
 
 def get_parameter(source, version, parameter):
     if version == -1:
-        return {'exclude_any': {}, 'exclude_all': [{}]}.get(parameter)
+        return {'exclude_any': {}, 'exclude_all': {}}.get(parameter)
 
     default = version_defaults[parameter][source]
     out = version_definitions[parameter][source].get(version, default)
