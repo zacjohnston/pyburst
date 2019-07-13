@@ -291,16 +291,18 @@ source_defaults = {
 # ------------------------------
 # grid5:
 #   1  : base grid
-#   2 : as 1, epoch 1998
-#   3 : as 1, epoch 2000
-#   4 : as 1, epoch 2007
+#   2  : as 1, epoch 1998
+#   3  : as 1, epoch 2000
+#   4  : as 1, epoch 2007
 
-#   5 : as 1, (prior: m_gr = 1.6 +/- 0.1)
+#   5  : as 1, (prior: m_gr = 1.6 +/- 0.1)
 
-#   6 : as 1, (all masses: 1.4, 1.7, 2.0, 2.6)
-#   7 : as 6, epoch 1998
-#   8 : as 6, epoch 2000
-#   9 : as 6, epoch 2007
+#   6  : as 1, (all masses: 1.4, 1.7, 2.0, 2.6)
+#   7  : as 6, epoch 1998
+#   8  : as 6, epoch 2000
+#   9  : as 6, epoch 2007
+
+#   10 : as 6, (prior: m_gr = 1.6 +/- 0.1)
 
 #   11 : as 1, (m_gr < 10)
 
@@ -324,6 +326,7 @@ version_definitions = {
             7: 1,
             8: 1,
             9: 1,
+            10: 1,
         },
         'he2': {},
     },
@@ -356,6 +359,7 @@ version_definitions = {
             7: 2,
             8: 3,
             9: 4,
+            10: 5,
             11: initial_position[1][3],
         },
         'he2': {
@@ -371,6 +375,7 @@ version_definitions = {
     'priors': {
         'grid5': {
             5: {'m_gr': gaussian(mean=1.6, std=0.1)},
+            10: {'m_gr': gaussian(mean=1.6, std=0.1)},
         },
         'he2': {
             7: {'m_gr': gaussian(mean=1.6, std=0.1)},
