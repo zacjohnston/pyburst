@@ -500,10 +500,11 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
         param_keys = mcmc_versions.get_parameter(source, version, 'param_keys')
         param_labels = plot_tools.convert_mcmc_labels(param_keys)
 
+    n_walkers = chain.shape[0]
     chain_flat = mcmc_tools.slice_chain(chain, discard=discard, cap=cap, flatten=True)
 
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(chain_flat, parameters=param_labels)
+    cc.add_chain(chain_flat, parameters=param_labels, walkers=n_walkers)
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
     return cc
 
