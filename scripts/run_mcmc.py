@@ -23,6 +23,8 @@ def main(source, version, n_steps, dump_step=None, n_walkers=1000, n_threads=8,
     if dump_step is None:
         dump_step = n_steps
     dump_step = int(dump_step)
+    n_threads = int(n_threads)
+    n_walkers = int(n_walkers)
 
     if (n_steps % dump_step) != 0:
         raise ValueError(f'n_steps={n_steps} is not divisible by dump_step={dump_step}')
