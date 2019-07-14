@@ -3,11 +3,6 @@ import numpy as np
 import pandas as pd
 import os
 
-# kepler_grids
-from . import grid_analyser
-
-GRIDS_PATH = os.environ['KEPLER_GRIDS']
-
 
 def show_plot(fig, save, savepath, savename):
     if save:
@@ -77,3 +72,35 @@ def get_subset(kgrid, sub_params=None):
         subsets += kgrid.get_params(params={'x': x})
 
     return pd.concat(subsets, ignore_index=True)
+
+
+def compare_models(models, labels, bprops, display=True):
+    """Plots burst properties of multiple models against each other
+
+    parameters
+    ----------
+    models : [BurstRun]
+    labels : [str]
+    bprops : [str]
+    display : bool
+    """
+    n_bprops = len(bprops)
+    n_models = len(models)
+
+    fig, ax = plt.subplots(n_bprops, figsize=(6, n_models*n_bprops))
+    if not isinstance(ax, np.ndarray):
+        ax = [ax]
+
+    for i, bprop in enumerate(bprops):
+        ax[i].set_xlabel(bprop)
+        ax[i].get_yaxis().set_visible(False)
+        for j, model in enumerate(models):
+            label = labels[j]
+            ax[i].errorbar([model.summary[bprop]], [label],
+                           xerr=model.summary[f'u_{bprop}'], marker='o', capsize=3,
+                           label=label)
+
+    ax[0].legend()
+    plt.tight_layout()
+    if display:
+        plt.show(block=False)
