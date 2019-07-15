@@ -80,7 +80,7 @@ def save_compressed_chain(chain, source, version, verbose=True):
         np.save(f, chain)
 
 
-def load_multi_chains(source, versions, n_steps, n_walkers=1000):
+def load_multi_chains(source, versions, n_steps, n_walkers=1000, compressed=False):
     """Loads multiple chains of MCMC runs
 
     parameters
@@ -92,6 +92,7 @@ def load_multi_chains(source, versions, n_steps, n_walkers=1000):
         number of steps for each chain (if scalar, assume all chains identical)
     n_walkers : [int], int (optional)
         number of walkers for each chain (if scalar, assume all chains identical)
+    compressed : bool (optional)
     """
     if type(versions) not in (np.ndarray, list, tuple):
         raise TypeError("'versions' must be array-like")
@@ -103,7 +104,8 @@ def load_multi_chains(source, versions, n_steps, n_walkers=1000):
 
     for i in range(n_chains):
         chains += [load_chain(source, n_walkers=n_walkers[i],
-                              n_steps=n_steps[i], version=versions[i])]
+                              n_steps=n_steps[i], version=versions[i],
+                              compressed=compressed)]
     return chains
 
 

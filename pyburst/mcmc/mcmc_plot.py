@@ -58,7 +58,7 @@ def save_plot(fig, prefix, save, source, version, display, chain=None, n_dimensi
 def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960,
                         walkers=True, posteriors=True, contours=False,
                         display=False, max_lhood=False, mass_radius=True,
-                        synth=True):
+                        synth=True, compressed=False):
     """Save plots for multiple series in a synthetic data batch
     """
     # TODO reuse max_lhood point
@@ -70,7 +70,7 @@ def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960
             full_source = source
 
         chain = mcmc_tools.load_chain(full_source, n_walkers=n_walkers, n_steps=n_steps,
-                                      version=version)
+                                      version=version, compressed=compressed)
 
         if walkers:
             plot_walkers(chain, source=full_source, save=True,
@@ -91,11 +91,12 @@ def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960
 
 def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=False,
                    save=True, cap=None, max_lhood=True, posteriors=True, contours=True,
-                   redshift=True, mass_radius=True, verbose=True):
+                   redshift=True, mass_radius=True, verbose=True, compressed=False):
     """Saves (and/or displays) main MCMC plots
     """
     chain = mcmc_tools.load_chain(source, version=version, n_steps=n_steps,
-                                  n_walkers=n_walkers, verbose=verbose)
+                                  n_walkers=n_walkers, verbose=verbose,
+                                  compressed=compressed)
     if posteriors:
         printv('Plotting posteriors', verbose=verbose)
         plot_posteriors(chain, source=source, save=save, discard=discard, cap=cap,
@@ -183,7 +184,7 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
                      display=True, save=False, max_lhood=False, verbose=True,
-                     cloud=True, sigmas=np.linspace(0, 2, 10)):
+                     cloud=True, sigmas=np.linspace(0, 2, 10), compressed=False):
     """Plots contours of mass versus radius from a given chain
     """
     # TODO: combine and generalise with plot_xedd()
@@ -426,13 +427,13 @@ def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, 
 
     cc = setup_epochs_chainconsumer(source, versions=epoch_versions, n_steps=epoch_n_steps,
                                     discard=epoch_discard, n_walkers=epoch_n_walkers,
-                                    cap=cap, sigmas=sigmas, cloud=cloud)
+                                    cap=cap, sigmas=sigmas, cloud=cloud, compressed=False)
 
     # ===== Setup master chain =====
     master_mc_v = mcmc_versions.McmcVersion(source, version=master_version)
 
     master_chain = mcmc_tools.load_chain(source, version=master_version, n_steps=n_steps,
-                                         n_walkers=n_walkers)
+                                         n_walkers=n_walkers, compressed=compressed)
     master_chain_sliced = mcmc_tools.slice_chain(master_chain, discard=discard, cap=cap,
                                                  flatten=True)
 
@@ -445,7 +446,7 @@ def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, 
 
 
 def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=1000,
-                               cap=None, sigmas=None, cloud=None):
+                               cap=None, sigmas=None, cloud=None, compressed=False):
     """Setup multiple MCMC chains fit to individual epochs
 
     chains : [n_epochs]
@@ -459,7 +460,7 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
     """
     param_keys = mcmc_tools.load_multi_param_keys(source, versions=versions)
     chains = mcmc_tools.load_multi_chains(source, versions=versions, n_steps=n_steps,
-                                          n_walkers=n_walkers)
+                                          n_walkers=n_walkers, compressed=compressed)
     chains_flat = []
     for chain in chains:
         sliced_flat = mcmc_tools.slice_chain(chain, discard=discard, cap=cap, flatten=True)
