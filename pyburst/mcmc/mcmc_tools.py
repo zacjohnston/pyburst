@@ -44,18 +44,25 @@ def slice_chain(chain, discard=None, cap=None, flatten=False):
         return chain[:, discard:cap, :]
 
 
-def load_chain(source, version, n_steps, n_walkers, verbose=True):
+def load_chain(source, version, n_steps, n_walkers, compressed=False, verbose=True):
     """Loads from file and returns np array of chain
     """
+    extension = {True: '.npy.gz', False: '.npy'}[compressed]
     filename = get_mcmc_string(source=source, version=version,
                                n_steps=n_steps, n_walkers=n_walkers,
-                               prefix='chain', extension='.npy')
+                               prefix='chain', extension=extension)
 
     mcmc_path = get_mcmc_path(source)
     filepath = os.path.join(mcmc_path, filename)
     pyprint.printv(f'Loading chain: {filepath}', verbose=verbose)
 
-    return np.load(filepath)
+    if compressed:
+        f = gzip.GzipFile(filepath, 'r')
+        chain = np.load(f)
+    else:
+        chain = np.load(filepath)
+
+    return chain
 
 
 def save_compressed_chain(chain, source, version, verbose=True):
