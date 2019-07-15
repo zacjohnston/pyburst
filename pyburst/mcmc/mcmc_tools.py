@@ -241,9 +241,12 @@ def autocorrelation(y, c=5.0):
     """Estimates integrated autocorrelation time
     """
     f = np.zeros(y.shape[1])
+
+    # Calculate for each walker, then average
     for yy in y:
         f += autocorr_func_1d(yy)
     f /= len(y)
+
     taus = 2.0*np.cumsum(f)-1.0
     window = auto_window(taus, c)
     return taus[window]
