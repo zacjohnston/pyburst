@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import pickle
-import matplotlib.pyplot as plt
+import gzip
 
 # kepler_grids
 from pyburst.misc import pyprint
@@ -56,6 +56,21 @@ def load_chain(source, version, n_steps, n_walkers, verbose=True):
     pyprint.printv(f'Loading chain: {filepath}', verbose=verbose)
 
     return np.load(filepath)
+
+
+def save_compressed_chain(chain, source, version, verbose=True):
+    """Saves a chain as a compressed zip
+    """
+    n_walkers, n_steps, n_dim = chain.shape
+    filename = get_mcmc_string(source=source, version=version,
+                               n_steps=n_steps, n_walkers=n_walkers,
+                               prefix='chain', extension='.npy.gz')
+    mcmc_path = get_mcmc_path(source)
+    filepath = os.path.join(mcmc_path, filename)
+    pyprint.printv(f'Saving compressed chain: {filepath}', verbose=verbose)
+
+    with gzip.GzipFile(filepath, 'w') as f:
+        np.save(f, chain)
 
 
 def load_multi_chains(source, versions, n_steps, n_walkers=1000):
