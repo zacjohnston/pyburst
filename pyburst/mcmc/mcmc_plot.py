@@ -1,6 +1,6 @@
 import numpy as np
 import os
-import subprocess
+import sys
 import matplotlib.pyplot as plt
 import chainconsumer
 from math import ceil
@@ -527,3 +527,40 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
     save_plot(fig, prefix='compare', n_dimensions=len(max_params),
               n_walkers=n_walkers, n_steps=n_steps, save=save, source=source,
               version=version, display=display)
+
+
+def plot_autocorrelation(chain, source, version, n_steps=10):
+    """Plots estimated integrated autocorrelation time
+
+        Note: Adapted from https://dfm.io/posts/autocorr/
+    """
+    if n_steps < 2:
+        raise ValueError('n_steps must be greater than 1')
+
+    mv = mcmc_versions.McmcVersion(source=source, version=version)
+    params_fmt = plot_tools.convert_mcmc_labels(mv.param_keys)
+
+    sample_steps = np.exp(np.linspace(np.log(100), np.log(chain.shape[1]),
+                                      n_steps)).astype(int)
+    fig, ax = plt.subplots()
+
+    for i, param in enumerate(mv.param_keys):
+        print(f'Calculating parameter: {param}')
+        autoc = np.empty(n_steps)
+
+        for j, n in enumerate(sample_steps):
+            sys.stdout.write(f'\r{j+1}/{n_steps}  (step size={n})')
+            autoc[j] = mcmc_tools.autocorrelation(chain[:, :n, i])
+
+        ax.loglog(sample_steps, autoc, "o-", label=rf"{params_fmt[i]}")
+        sys.stdout.write('\n')
+
+    ylim = ax.get_ylim()
+    ax.set_ylim(ylim)
+
+    ax.plot(sample_steps, sample_steps / 50.0, "--k", label=r"$\tau = N/50$")
+    ax.set_xlabel("number of samples, $N$")
+    ax.set_ylabel(r"$\tau$ estimates")
+    ax.legend(fontsize=14, ncol=2)
+
+    plt.show(block=False)
