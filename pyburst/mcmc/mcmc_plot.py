@@ -240,6 +240,24 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
               version=version, display=display)
 
 
+def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False):
+    """Plots posterior distribution of redshift given a chain
+    """
+    inclination_chain = mcmc_params.get_inclination_chain(chain=chain, discard=discard,
+                                                          source=source, version=version,
+                                                          cap=cap)
+
+    cc = chainconsumer.ChainConsumer()
+    cc.add_chain(inclination_chain.reshape(-1), parameters=['i'])
+    cc.configure(kde=False, smooth=0)
+
+    fig = cc.plotter.plot_distributions(figsize=[5, 5])
+    plt.tight_layout()
+
+    save_plot(fig, prefix='inclination', chain=chain, save=save, source=source,
+              version=version, display=display)
+
+
 def plot_xedd(chain, discard, source, version, cap=None,
               display=True, save=False, max_lhood=False, verbose=True,
               cloud=True, sigmas=np.linspace(0, 2, 10)):
