@@ -113,13 +113,10 @@ def get_redshift(chain, discard, source, version, cap=None, r_nw=10,
     mass_ratio = mass_gr / mass_nw
     _, redshift = gravity.gr_corrections(r=r_nw, m=mass_nw, phi=mass_ratio)
 
-    new_shape = (n_walkers, n_steps)
-    redshift_reshape = redshift.reshape(new_shape)
-
-    return redshift_reshape
+    return redshift.reshape((n_walkers, n_steps))
 
 
-def get_inclination(chain, discard, source, version, cap=None):
+def get_inclination_chain(chain, discard, source, version, cap=None):
     """returns inclination chain for given chain of xi_ratio, using simple disc model
     """
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')

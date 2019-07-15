@@ -535,6 +535,7 @@ def plot_autocorrelation(chain, source, version, n_steps=10):
 
         Note: Adapted from https://dfm.io/posts/autocorr/
     """
+    # TODO: use save_plot()
     if n_steps < 2:
         raise ValueError('n_steps must be greater than 1')
 
