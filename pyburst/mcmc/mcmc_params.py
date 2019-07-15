@@ -6,13 +6,17 @@ from . import mcmc_tools
 from pyburst.physics import gravity
 from pyburst.observations import obs_tools
 
+# Concord
+try:
+    import anisotropy
+except ModuleNotFoundError:
+    print("pyburst/MCMC: Concord not installed, some functionality won't be available")
+
 """MCMC Parameters
 
 Module for manipulating and calculating parameters derived from MCMC chains
 """
 
-# TODO:
-#       - get_inclination(xi_ratio)
 
 def get_constant_masses(source, version):
     """Returns constant values for mass_nw, mass_gr (if they exist, else return None)
@@ -113,6 +117,21 @@ def get_redshift(chain, discard, source, version, cap=None, r_nw=10,
     redshift_reshape = redshift.reshape(new_shape)
 
     return redshift_reshape
+
+
+def get_inclination(chain, discard, source, version, cap=None):
+    """returns inclination chain for given chain of xi_ratio, using simple disc model
+    """
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+
+    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
+    n_walkers, n_steps, n_dimensions = chain.shape
+    chain_flat = chain.reshape((-1, n_dimensions))
+
+    xi_ratio = chain_flat[:, pkeys.index('xi_ratio')]
+    inc = anisotropy.inclination_ratio(xi_ratio, model='he16_a')
+
+    return inc.reshape((n_walkers, n_steps))
 
 
 def epoch_param_keys(source, version):
