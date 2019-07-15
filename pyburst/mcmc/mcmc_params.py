@@ -99,8 +99,8 @@ def get_xedd_chain(chain, discard, source, version, cap=None):
     return xedd_chain
 
 
-def get_redshift(chain, discard, source, version, cap=None, r_nw=10,
-                 mass_nw=None, mass_gr=None):
+def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
+                       mass_nw=None, mass_gr=None):
     """Returns chain of redshift samples for given MCMC chain
     """
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)

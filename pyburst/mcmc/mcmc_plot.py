@@ -224,9 +224,10 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
     """Plots posterior distribution of redshift given a chain
     """
     mass_nw, mass_gr = mcmc_params.get_constant_masses(source, version)
-    redshift_chain = mcmc_params.get_redshift(chain=chain, discard=discard,
-                                              source=source, version=version,
-                                              cap=cap, mass_nw=mass_nw, mass_gr=mass_gr)
+    redshift_chain = mcmc_params.get_redshift_chain(chain=chain, discard=discard,
+                                                    source=source, version=version,
+                                                    cap=cap, mass_nw=mass_nw,
+                                                    mass_gr=mass_gr)
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(redshift_chain.reshape(-1), parameters=['(1+z)'])
