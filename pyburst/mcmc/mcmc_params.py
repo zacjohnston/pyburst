@@ -116,7 +116,7 @@ def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
     return redshift.reshape((n_walkers, n_steps))
 
 
-def get_inclination_chain(chain, discard, source, version, cap=None):
+def get_inclination_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
     """returns inclination chain for given chain of xi_ratio, using simple disc model
     """
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
@@ -126,7 +126,7 @@ def get_inclination_chain(chain, discard, source, version, cap=None):
     chain_flat = chain.reshape((-1, n_dimensions))
 
     xi_ratio = chain_flat[:, pkeys.index('xi_ratio')]
-    inc = anisotropy.inclination_ratio(xi_ratio, model='he16_a')
+    inc = anisotropy.inclination_ratio(xi_ratio, model=disc_model)
 
     return inc.reshape((n_walkers, n_steps))
 

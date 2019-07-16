@@ -150,7 +150,8 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
 
 
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
-                    display=True, save=False, truth_values=None, verbose=True):
+                    display=True, save=False, truth_values=None, verbose=True,
+                    cc=None):
     """Plots posterior distributions of mcmc chain
 
     max_lhood : bool
@@ -162,8 +163,9 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
     default_plt_options()
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
-    cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
-                             cap=cap)
+    if cc is None:
+        cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
+                                 cap=cap)
     height = 3 * ceil(len(pkeys) / 4)
     if truth_values is not None:
         fig = cc.plotter.plot_distributions(figsize=[10, height],
@@ -240,12 +242,13 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
               version=version, display=display)
 
 
-def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False):
+def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False,
+                     disc_model='he16_a'):
     """Plots posterior distribution of redshift given a chain
     """
     inclination_chain = mcmc_params.get_inclination_chain(chain=chain, discard=discard,
                                                           source=source, version=version,
-                                                          cap=cap)
+                                                          cap=cap, disc_model=disc_model)
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(inclination_chain.reshape(-1), parameters=['i'])
