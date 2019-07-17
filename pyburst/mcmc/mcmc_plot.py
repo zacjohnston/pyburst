@@ -437,7 +437,8 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
 
 def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, discard,
                                n_walkers=1000, epoch_discard=None, epoch_n_steps=None,
-                               epoch_n_walkers=None, cap=None, sigmas=None, cloud=None):
+                               epoch_n_walkers=None, cap=None, sigmas=None, cloud=None,
+                               compressed=False):
     """Setup multiple MCMC chains, including multi-epoch and single-epochs
     """
     if epoch_discard is None:
