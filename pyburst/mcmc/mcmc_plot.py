@@ -358,44 +358,32 @@ def plot_walkers(chain, source, version, params=None, n_lines=30, xlim=-1,
               label=label, extension='.png')
 
 
-def plot_qb(chain, discard, source, version, cap=None, summ=None, log=False):
-    """Plot Qb versus accrate from MCMC run
+def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=False):
+    """Plots 2D contours of Qb versus Mdot for each epoch (from multi-epoch chain)
     """
-    fontsize = 14
-    mc_version = mcmc_versions.McmcVersion(source, version=version)
-    if 'qb' not in mc_version.epoch_unique:
-        raise ValueError(f"Qb is not an epoch parameter in "
-                         f"source '{source}', version '{version}'")
-    if summ is None:
-        summ = get_summary(chain, discard=discard, source=source, version=version, cap=cap)
+    mv = mcmc_versions.McmcVersion(source=source, version=version)
+    chain_flat = mcmc_tools.slice_chain(chain, discard=discard, cap=cap, flatten=True)
 
-    fig, ax = plt.subplots()
+    system_table = obs_tools.load_summary(mv.system)
+    epochs = list(system_table.epoch)
+    cc = chainconsumer.ChainConsumer()
 
-    n_epochs = 3
-    mdot_i0 = mc_version.param_keys.index('mdot1')
-    qb_i0 = mc_version.param_keys.index('qb1')
+    param_labels = [r'$\dot{M} / \dot{M}_\mathrm{Edd}$',
+                    r'$Q_\mathrm{b}$ (MeV nucleon$^{-1}$)']
 
-    mdot = summ[mdot_i0:mdot_i0 + n_epochs]
-    qb = summ[qb_i0:qb_i0 + n_epochs]
-    xerr = np.diff(mdot).transpose()
-    yerr = np.diff(qb).transpose()
+    for i, epoch in enumerate(epochs):
+        mdot_idx = mv.param_keys.index(f'mdot{i + 1}')
+        qb_idx = mv.param_keys.index(f'qb{i + 1}')
+        param_idxs = [mdot_idx, qb_idx]
 
-    x = mdot[:, 1]
-    y = qb[:, 1]
+        cc.add_chain(chain_flat[:, param_idxs], parameters=param_labels,
+                     name=str(epoch))
 
-    if log:
-        xerr = xerr / (x * np.log(10))
-        yerr = yerr / (y * np.log(10))
-        x = np.log10(x)
-        y = np.log10(y)
-
-    ax.errorbar(x=x, y=y, xerr=xerr, yerr=yerr,
-                marker='o', capsize=3, color='C0', ls='none')
-
-    ax.set_ylabel(r'$Q_\mathrm{b}$ (MeV nucleon$^{-1}$)', fontsize=fontsize)
-    ax.set_xlabel(r'$\dot{M} / \dot{M}_\mathrm{Edd}$', fontsize=fontsize)
+    cc.configure(kde=False, smooth=0)
+    fig = cc.plotter.plot(display=False, figsize=(6, 6))
     plt.tight_layout()
-    plt.show(block=False)
+    save_plot(fig, prefix='qb', save=save, source=source, version=version,
+              display=display, chain=chain)
 
 
 def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
@@ -591,32 +579,3 @@ def plot_autocorrelation(chain, source, version, n_steps=10):
     ax.legend(fontsize=14, ncol=2)
 
     plt.show(block=False)
-
-
-def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=False,
-                 ):
-    """Plots 2D contours of Qb versus Mdot for each epoch (from multi-epoch chain)
-    """
-    mv = mcmc_versions.McmcVersion(source=source, version=version)
-    chain_flat = mcmc_tools.slice_chain(chain, discard=discard, cap=cap, flatten=True)
-
-    system_table = obs_tools.load_summary(mv.system)
-    epochs = list(system_table.epoch)
-    cc = chainconsumer.ChainConsumer()
-
-    param_labels = [r'$\dot{M} / \dot{M}_\mathrm{Edd}$',
-                    r'$Q_\mathrm{b}$ (MeV nucleon$^{-1}$)']
-
-    for i, epoch in enumerate(epochs):
-        mdot_idx = mv.param_keys.index(f'mdot{i+1}')
-        qb_idx = mv.param_keys.index(f'qb{i+1}')
-        param_idxs = [mdot_idx, qb_idx]
-
-        cc.add_chain(chain_flat[:, param_idxs], parameters=param_labels,
-                     name=str(epoch))
-        
-    cc.configure(kde=False, smooth=0)
-    fig = cc.plotter.plot(display=False, figsize=(6, 6))
-    plt.tight_layout()
-    save_plot(fig, prefix='qb', save=save, source=source, version=version,
-              display=display, chain=chain)
