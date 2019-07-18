@@ -604,13 +604,17 @@ def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=F
     epochs = list(system_table.epoch)
     cc = chainconsumer.ChainConsumer()
 
+    param_labels = [r'$\dot{M} / \dot{M}_\mathrm{Edd}$',
+                    r'$Q_\mathrm{b}$ (MeV nucleon$^{-1}$)']
+
     for i, epoch in enumerate(epochs):
         mdot_idx = mv.param_keys.index(f'mdot{i+1}')
         qb_idx = mv.param_keys.index(f'qb{i+1}')
         param_idxs = [mdot_idx, qb_idx]
 
-        cc.add_chain(chain_flat[:, param_idxs], parameters=['mdot', 'qb'],
+        cc.add_chain(chain_flat[:, param_idxs], parameters=param_labels,
                      name=str(epoch))
+        
     cc.configure(kde=False, smooth=0)
     fig = cc.plotter.plot(display=False, figsize=(6, 6))
     plt.tight_layout()
