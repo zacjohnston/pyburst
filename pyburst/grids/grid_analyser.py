@@ -406,7 +406,7 @@ class Kgrid:
     def plot_burst_property(self, bprops, var, fixed, xaxis='accrate', save=False,
                             show=True, linear_rates=False, interpolate=True,
                             shaded=True, exclude_stable=False, legend=True,
-                            fix_ylims=True, title=True):
+                            fix_ylims=True, title=True, fontsize=14):
         """Plots given burst property against accretion rate
         
         bprop : [str]
@@ -416,7 +416,6 @@ class Kgrid:
         fixed : dict
             variables to hold fixed (e.g. 'z':0.01)
         """
-        fontsize = 14
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = check_var_fixed(var=var, fixed=fixed)
         xlabel = {'accrate': r'$\dot{M} / \dot{M}_\mathrm{Edd}$'}.get(xaxis, xaxis)
