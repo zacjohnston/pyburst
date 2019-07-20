@@ -1,5 +1,19 @@
-import numpy as np
 import matplotlib.pyplot as plt
+
+
+def default_plt_options():
+    """Initialise default plot parameters"""
+    params = {'mathtext.default': 'regular',
+              'font.family': 'serif',
+              'text.usetex': False}
+    plt.rcParams.update(params)
+
+
+default_plt_options()
+
+
+
+
 
 def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
              fontsize=14, yticks=True, xticks=True):
