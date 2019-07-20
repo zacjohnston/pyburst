@@ -1315,7 +1315,9 @@ class BurstRun(object):
 
         if legend:
             ax.legend(loc=1, framealpha=1, edgecolor='0')
+
         self.show_save_fig(fig, display=display, save=save, plot_name='model')
+        return fig, ax
 
     def plot_convergence(self, bprops=('rate', 'fluence', 'peak'), discard=None,
                          legend=False, display=True, save=False, fix_xticks=False,
@@ -1403,7 +1405,9 @@ class BurstRun(object):
         ax[0].set_title(self.model_str, fontsize=fontsize)
         ax[-1].set_xlabel('Burst num', fontsize=fontsize)
         plt.tight_layout()
+
         self.show_save_fig(fig, display=display, save=save, plot_name='convergence')
+        return fig, ax
 
     def plot_linregress(self, display=True, save=False, short_waits=True,
                         outliers=True, legend=False, sigma=1):
@@ -1454,7 +1458,9 @@ class BurstRun(object):
         if legend:
             ax[0].legend()
         plt.tight_layout()
+
         self.show_save_fig(fig, display=display, save=save, plot_name='linregress')
+        return fig, ax
 
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
                          zero_time=True, fontsize=14, ylims=None, title=True,
@@ -1519,6 +1525,7 @@ class BurstRun(object):
 
         self.show_save_fig(fig, display=display, save=save, plot_name='lightcurve',
                            path=plot_path, extra='')
+        return fig, ax
 
     def add_lightcurve(self, burst, ax, align='t_start', zero_time=True, color='C0',
                        alpha=1.0, linewidth=1, yscale=1e38):
