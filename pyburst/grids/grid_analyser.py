@@ -406,7 +406,8 @@ class Kgrid:
     def plot_burst_property(self, bprops, var, fixed, xaxis='accrate', save=False,
                             show=True, linear_rates=False, interpolate=True,
                             shaded=True, exclude_stable=False, legend=True,
-                            fix_ylims=True, title=True, fontsize=14):
+                            fix_ylims=True, title=True, fontsize=14,
+                            subplot_figsize=(8, 4)):
         """Plots given burst property against accretion rate
         
         bprop : [str]
@@ -425,7 +426,8 @@ class Kgrid:
         params = dict(fixed)
         n_bprops = len(bprops)
 
-        fig, ax = plt.subplots(n_bprops, 1, figsize=(8, 4*n_bprops))
+        fig, ax = plt.subplots(n_bprops, 1,
+                               figsize=(subplot_figsize[0], subplot_figsize[1]*n_bprops))
         if not isinstance(ax, np.ndarray):
             ax = [ax]
 
