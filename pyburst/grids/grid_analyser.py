@@ -407,7 +407,7 @@ class Kgrid:
                             show=True, linear_rates=False, interpolate=True,
                             shaded=True, exclude_stable=False, legend=True,
                             fix_ylims=True, title=True, fontsize=14,
-                            subplot_figsize=(8, 4)):
+                            subplot_figsize=(8, 4), legend_fontsize=12):
         """Plots given burst property against accretion rate
         
         bprop : [str]
@@ -499,7 +499,7 @@ class Kgrid:
 
         if legend:
             loc = self.config['legend_loc'].get(bprops[0], 'upper right')
-            ax[0].legend(fontsize=fontsize - 2, loc=loc)
+            ax[0].legend(fontsize=legend_fontsize, loc=loc, ncol=2)
 
         plt.tight_layout()
 
