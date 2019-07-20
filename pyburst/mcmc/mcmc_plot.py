@@ -91,7 +91,7 @@ def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960
 
 
 def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=False,
-                   save=True, cap=None, max_lhood=True, posteriors=True, contours=True,
+                   save=True, cap=None, max_lhood=False, posteriors=True, contours=True,
                    redshift=True, mass_radius=True, verbose=True, compressed=False):
     """Saves (and/or displays) main MCMC plots
     """
