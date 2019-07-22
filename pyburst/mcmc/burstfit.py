@@ -8,7 +8,6 @@ import astropy.constants as const
 # pyburst
 from pyburst.interpolator import interpolator
 from .mcmc_versions import McmcVersion
-from pyburst.mcmc.mcmc_tools import print_params
 from pyburst.misc import pyprint
 from pyburst.synth import synth
 from pyburst.physics import gravity, accretion
