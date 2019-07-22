@@ -250,7 +250,7 @@ class BurstFit:
                                                     analytic_local=analytic_local,
                                                     params=params)
 
-        return interp_shifted, analytic_shifted
+        return np.concatenate([interp_shifted, analytic_shifted], axis=1)
 
     def get_params_dict(self, x):
         """Returns params in form of dict
