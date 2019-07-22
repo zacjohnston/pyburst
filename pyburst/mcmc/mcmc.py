@@ -144,28 +144,3 @@ def convert_params(params, source, version):
         raise TypeError('type(params) must be dict or array-like')
 
     return params_out
-
-
-def save_all_plots(source, versions, n_steps, n_walkers,
-                   discard, cap=None, display=False):
-    """Saves all primary plots for given source/version
-
-    version : int|list
-        if type(list), iterates over each version
-    """
-    versions = grid_tools.ensure_np_list(versions)
-
-    for version in versions:
-        pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-
-        chain = mcmc_tools.load_chain(source, version=version, n_steps=n_steps,
-                                      n_walkers=n_walkers)
-
-        mcmc_plot.plot_posteriors(chain, source=source, version=version,
-                                  discard=discard, cap=cap, save=True, display=display)
-
-        mcmc_plot.plot_mass_radius(chain, source=source, version=version,
-                                   discard=discard, cap=cap, save=True, display=display)
-
-        mcmc_plot.plot_walkers(chain, source=source, version=version,
-                               params=pkeys[:5], save=True, display=display)
