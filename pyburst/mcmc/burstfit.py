@@ -353,19 +353,15 @@ class BurstFit:
         all_shifted = np.concatenate([interp_shifted, analytic_shifted], axis=1)
 
         for i, bprop in enumerate(self.mcmc_version.bprops):
-            u_bprop = f'u_{bprop}'
             bprop_idx = 2 * i
             u_bprop_idx = bprop_idx + 1
 
             model = all_shifted[:, bprop_idx]
             u_model = all_shifted[:, u_bprop_idx]
 
-            lh += self.compare(model=model, u_model=u_model,
-                               obs=self.obs_data[bprop], bprop=bprop,
-                               u_obs=self.obs_data[u_bprop], label=bprop)
+            lh += self.compare(model=model, u_model=u_model, bprop=bprop, label=bprop)
             if plot:
-                self.plot_compare(model=model, u_model=u_model, obs=self.obs_data[bprop],
-                                  u_obs=self.obs_data[u_bprop], bprop=bprop,
+                self.plot_compare(model=model, u_model=u_model, bprop=bprop,
                                   ax=ax[i], display=False,
                                   legend=True if i == 0 else False,
                                   xlabel=True if i == self.n_bprops-1 else False)
@@ -508,7 +504,7 @@ class BurstFit:
         self.debug.end_function()
         return prior_lhood
 
-    def compare(self, model, u_model, obs, u_obs, bprop, label='', plot=False):
+    def compare(self, model, u_model, bprop, label='', plot=False):
         """Returns logarithmic likelihood of given model values
 
         Calculates difference between modelled and observed values.
@@ -518,12 +514,8 @@ class BurstFit:
         ----------
         model : 1darray
             Model values for particular property
-        obs : 1darray
-            Observed values for particular property.
         u_model : 1darray
             Corresponding model uncertainties
-        u_obs : 1darray
-            corresponding observed uncertainties
         bprop : str
             burst property being compared
         label : str
@@ -532,6 +524,10 @@ class BurstFit:
             whether to plot the comparison
         """
         self.debug.start_function('compare')
+
+        obs = self.obs_data[bprop]
+        u_obs = self.obs_data[f'u_{bprop}']
+
         pyprint.check_same_length(model, obs, 'model and obs arrays')
         pyprint.check_same_length(u_model, u_obs, 'u_model and u_obs arrays')
 
@@ -542,12 +538,11 @@ class BurstFit:
         self.debug.print_(f'lhood breakdown: {label} {lh}')
 
         if plot:
-            self.plot_compare(model=model, u_model=u_model, obs=obs,
-                              u_obs=u_obs, bprop=label)
+            self.plot_compare(model=model, u_model=u_model, bprop=label)
         self.debug.end_function()
         return lh.sum()
 
-    def plot_compare(self, model, u_model, obs, u_obs, bprop, ax=None, title=False,
+    def plot_compare(self, model, u_model, bprop, ax=None, title=False,
                      display=True, xlabel=False, legend=False):
         """Plots comparison of modelled and observed burst property
 
@@ -585,6 +580,10 @@ class BurstFit:
                    'fedd': r'$10^{-8}$ erg cm$^{-2}$ s$^{-1}$',
                    'tail_index': '',
                    }.get(bprop)
+
+        obs = self.obs_data[bprop]
+        u_obs = self.obs_data[f'u_{bprop}']
+
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 
