@@ -569,10 +569,9 @@ def plot_autocorrelation(chain, source, version, n_steps=10):
         ax.loglog(sample_steps, autoc, "o-", label=rf"{params_fmt[i]}")
         sys.stdout.write('\n')
 
-    ylim = ax.get_ylim()
-    ax.set_ylim(ylim)
+    xlim = ax.get_xlim()
+    ax.set_ylim([8, xlim[1] / 10])
 
-    ax.plot(sample_steps, sample_steps / 50.0, "--k", label=r"$\tau = N/50$")
     ax.plot(sample_steps, sample_steps / 10.0, "--k", label=r"$\tau = N/10$")
     ax.set_xlabel("number of samples, $N$")
     ax.set_ylabel(r"$\tau$ estimates")
