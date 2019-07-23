@@ -13,6 +13,7 @@ from pyburst.grids.grid_tools import write_pandas_table
 #   - add rate column
 #   - add length column
 
+
 def load_summary(source):
     """Loads summary of observed data
 
@@ -21,19 +22,21 @@ def load_summary(source):
     source : str
     """
     filepath = obs_strings.summary_filepath(source)
-    return pd.read_csv(filepath, delim_whitespace=True)
+    return pd.read_table(filepath, delim_whitespace=True)
 
 
-def save_summary(table, source):
-    """Saves summary table to file
-
-    parameters
-    ----------
-    table : pandas.DataFrame
-    source : str
-    """
-    filepath = obs_strings.summary_filepath(source)
-    write_pandas_table(table, filepath=filepath)
+# TODO: WARNING
+#   LOSES PRECISION ON FLUENCE DUE TO STRING REPRESENTATION
+# def save_summary(table, source):
+#     """Saves summary table to file
+#
+#     parameters
+#     ----------
+#     table : pandas.DataFrame
+#     source : str
+#     """
+#     filepath = obs_strings.summary_filepath(source)
+#     write_pandas_table(table, filepath=filepath)
 
 
 def load_epoch_lightcurve(epoch, source):
@@ -54,44 +57,6 @@ def load_epoch_lightcurve(epoch, source):
     for key, item in factors.items():
         table[key] *= item
     return table
-
-
-def add_tail_timescales(source, percent=50):
-    """Calculates decay tail timescales from observed lightcurves, and adds to summary
-    """
-    # TODO: needs refining, get correct uncertainty statistics
-    table = load_summary(source)
-
-    for epoch in table.itertuples():
-        lcurve = load_epoch_lightcurve(epoch=epoch.epoch, source=source)
-        timescale, u_timescale = get_tail_timescale(lcurve, epoch_row=epoch,
-                                                    frac=percent/100)
-        table.loc[epoch.Index, f'tail_{percent}'] = timescale
-        table.loc[epoch.Index, f'u_tail_{percent}'] = u_timescale
-
-    save_summary(table, source=source)
-    return table
-
-
-def get_tail_timescale(lc_table, epoch_row, frac=0.5):
-    """Returns tail timescales for given lightcurve table
-    """
-    # TODO: Very rough at the moment
-    lc = extract_lightcurve_array(lc_table)
-    frac_lum = epoch_row.peak * frac
-    peak_idx = np.argmax(lc[:, 1])
-
-    lc = lc[peak_idx:]
-    time_since_peak = lc[:, 0] - lc[0, 0]
-
-    mask = lc[:, 1] < frac_lum
-    mask_left = (lc[:, 1] - lc[:, 2]) < frac_lum
-    mask_right = (lc[:, 1] + lc[:, 2]) < frac_lum
-
-    time_diff = time_since_peak[mask][0]
-    u_time_diff = (time_since_peak[mask_right][0] - time_since_peak[mask_left][0])/2
-
-    return time_diff, u_time_diff
 
 
 def add_power_laws(source):
