@@ -1,12 +1,13 @@
 import numpy as np
 import os
+import sys
 import pickle
 import gzip
 
 # kepler_grids
 from pyburst.misc import pyprint
 from pyburst.grids import grid_strings
-from . import mcmc_versions, mcmc_params
+from . import mcmc_versions, mcmc_params, burstfit
 
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -223,6 +224,21 @@ def load_sampler_state(source, version, n_steps, n_walkers):
     sampler_state = pickle.load(open(filepath, 'rb'))
 
     return sampler_state
+
+
+def bprop_sample(chain, n, source, version, discard, cap=None):
+    """Get sample of burst properties from a chain
+    """
+    bfit = burstfit.BurstFit(source=source, version=version)
+    p_sample, i_sample = get_random_sample(chain, n=n, discard=discard, cap=cap)
+    bprops_full = np.full([bfit.n_epochs, bfit.n_bprops, n], np.nan)
+
+    for i, x in enumerate(p_sample):
+        sys.stdout.write(f'\r{i+1}/{n}')
+        bprops_full[:, :, i] = bfit.bprop_sample(x)[:, ::2]
+
+    sys.stdout.write('\n')
+    return bprops_full
 
 
 def get_sampler_state(sampler):
