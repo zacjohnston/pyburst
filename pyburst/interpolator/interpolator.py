@@ -39,32 +39,21 @@ class Kemulator:
         self.source = source
         self.version = version
         self.lampe_analyser = lampe_analyser
+
         self.interpolator = None
+        self.params = None
+        self.summ = None
 
-        summ = grid_tools.load_grid_table('summ', source=source, lampe_analyser=lampe_analyser)
-        params = grid_tools.load_grid_table('params', source=source)
-
+        self.grid_def = None
         self.version_def = interp_versions.InterpVersion(source=source, version=version)
-        self.grid_def = grid_versions.GridVersion(source=source,
-                                                  version=self.version_def.grid_version)
         self.bprops = self.version_def.bprops
 
-        params = grid_tools.exclude_params(table=params,
-                                           params=self.grid_def.exclude_any,
-                                           logic='any')
-        params = grid_tools.exclude_params(table=params,
-                                           params=self.grid_def.exclude_all,
-                                           logic='all')
-        idxs_kept = params.index
-        summ = summ.loc[idxs_kept]
-        self.summ = summ
-        self.params = params
-
-        if check_complete:
-            grid_tools.check_complete(param_table=self.params, raise_error=True,
-                                      param_list=self.version_def.param_keys)
-
         if re_interp:
+            self.load_tables()
+
+            if check_complete:
+                grid_tools.check_complete(param_table=self.params, raise_error=True,
+                                          param_list=self.version_def.param_keys)
             self.setup_interpolator(self.bprops)
         else:
             self.load_interpolator()
@@ -74,6 +63,26 @@ class Kemulator:
         """
         if self.verbose:
             print(string, **kwargs)
+
+    def load_tables(self):
+        """Loads param and summ tables, and excludes scpecified models
+        """
+        raw_summ = grid_tools.load_grid_table('summ', source=self.source,
+                                              lampe_analyser=self.lampe_analyser)
+        raw_params = grid_tools.load_grid_table('params', source=self.source)
+
+        self.grid_def = grid_versions.GridVersion(source=self.source,
+                                                  version=self.version_def.grid_version)
+
+        params = grid_tools.exclude_params(table=raw_params,
+                                           params=self.grid_def.exclude_any,
+                                           logic='any')
+        params = grid_tools.exclude_params(table=params,
+                                           params=self.grid_def.exclude_all,
+                                           logic='all')
+        idxs_kept = params.index
+        self.summ = raw_summ.loc[idxs_kept]
+        self.params = params
 
     def reduce_summ(self, params):
         """Returns reduced summ table with specified parameters (e.g., mass, qb)
