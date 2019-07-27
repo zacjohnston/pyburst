@@ -473,10 +473,8 @@ class Kgrid:
                     u_y = np.concatenate([u_y, u_tmp])
 
                 precision = precisions.get(var, 3)
-                if var == 'z':
-                    label = r'$Z_{CNO}$' + f'={v:.{precision}f}'
-                else:
-                    label = f'{var}={v:.{precision}f}'
+                param_label = self.config['labels'].get(var, var)
+                label = f'{param_label}={v:.{precision}f}'
 
                 if shaded:
                     ax[i].fill_between(mdot_x, prop_y+u_y, prop_y-u_y, alpha=0.3)
