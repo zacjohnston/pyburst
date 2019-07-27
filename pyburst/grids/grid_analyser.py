@@ -14,6 +14,7 @@ import sys
 # kepler_grids
 from . import grid_tools, grid_strings, grid_versions
 from pyburst.burst_analyser import burst_tools
+from pyburst.plotting import plot_tools
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 MODELS_PATH = os.environ['KEPLER_MODELS']
@@ -419,7 +420,7 @@ class Kgrid:
         """
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = check_var_fixed(var=var, fixed=fixed)
-        xlabel = self.config['labels'].get(xaxis, xaxis)
+        xlabel = plot_tools.full_label(xaxis)
         x_unique = self.unique_params[xaxis]
 
         var_unique = self.unique_params[var]
@@ -443,7 +444,7 @@ class Kgrid:
 
         for i, bprop in enumerate(bprops):
             y_factor = self.config['y_factors'].get(bprop, 1.0)
-            y_label = self.config['labels'].get(bprop, bprop)
+            y_label = plot_tools.full_label(bprop)
             ax[i].set_ylabel(y_label, fontsize=fontsize)
 
             for v in var_unique:
@@ -473,8 +474,7 @@ class Kgrid:
                     u_y = np.concatenate([u_y, u_tmp])
 
                 precision = precisions.get(var, 3)
-                param_label = self.config['labels'].get(var, var)
-                label = f'{param_label}={v:.{precision}f}'
+                label = plot_tools.value_label(var, value=v, precision=precision)
 
                 if shaded:
                     ax[i].fill_between(mdot_x, prop_y+u_y, prop_y-u_y, alpha=0.3)
