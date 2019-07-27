@@ -54,6 +54,13 @@ def full_label(quantity):
     return label
 
 
+def value_label(quantity, value):
+    """Returns formatted label including a float value
+    """
+    quant_str = quantity_label(quantity)
+    return f'{quant_str}={value}'
+
+
 def unit_label(quantity):
     """Returns units as a string, for given quantity
     """
