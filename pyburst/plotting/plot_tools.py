@@ -54,11 +54,14 @@ def full_label(quantity):
     return label
 
 
-def value_label(quantity, value):
+def value_label(quantity, value, precision=None):
     """Returns formatted label including a float value
     """
     quant_str = quantity_label(quantity)
-    return f'{quant_str}={value}'
+    if precision is None:
+        return f'{quant_str}={value}'
+    else:
+        return f'{quant_str}={value:.{precision}f}'
 
 
 def unit_label(quantity):
