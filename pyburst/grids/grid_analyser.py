@@ -419,7 +419,7 @@ class Kgrid:
         """
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = check_var_fixed(var=var, fixed=fixed)
-        xlabel = self.config['y_labels'].get(xaxis, xaxis)
+        xlabel = self.config['labels'].get(xaxis, xaxis)
         x_unique = self.unique_params[xaxis]
 
         var_unique = self.unique_params[var]
@@ -443,7 +443,7 @@ class Kgrid:
 
         for i, bprop in enumerate(bprops):
             y_factor = self.config['y_factors'].get(bprop, 1.0)
-            y_label = self.config['y_labels'].get(bprop, bprop)
+            y_label = self.config['labels'].get(bprop, bprop)
             ax[i].set_ylabel(y_label, fontsize=fontsize)
 
             for v in var_unique:
