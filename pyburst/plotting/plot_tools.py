@@ -12,9 +12,6 @@ def default_plt_options():
 default_plt_options()
 
 
-
-
-
 def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
              fontsize=14, yticks=True, xticks=True):
     """Standardised formatting of labels etc.
@@ -47,15 +44,15 @@ def unit_label(quantity):
     """Returns units as a string, for given quantity
     """
     labels = {
-        'rate': r'day$^{-1}$',
-        'dt': 'hr',
-        'fluence': r'$10^{39}$ erg',
-        'peak': r'$10^{38}$ erg s$^{-1}$',
+        'rate': 'day$^{-1}$',
+        'dt': 'h',
+        'fluence': '$10^{39}$ erg',
+        'peak': '$10^{38}$ erg s$^{-1}$',
     }
     return labels.get(quantity, '')
 
 
-def mcmc_label(quantity):
+def label(quantity):
     """Returns string of MCMC parameter label
     """
     labels = {
@@ -84,5 +81,5 @@ def convert_mcmc_labels(param_keys):
     """
     keys = list(param_keys)
     for i, key in enumerate(keys):
-        keys[i] = mcmc_label(key)
+        keys[i] = label(key)
     return keys
