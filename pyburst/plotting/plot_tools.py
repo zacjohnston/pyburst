@@ -66,20 +66,22 @@ def label(quantity):
         'xedd_ratio': r'$X_\mathrm{Edd} / X_0$',
         'xedd': r'$X_\mathrm{Edd}$',
     }
-
-    # assumes last character is a single integer specifying epoch
-    if 'qb' in quantity:
-        return r'$Q_\mathrm{b' + f'{quantity[-1]}' + '}$'
-    elif 'mdot' in quantity:
-        return rf'$\dot{{M}}_{quantity[-1]}$'
-    else:
-        return labels.get(quantity, quantity)
+    return labels.get(quantity, quantity)
 
 
 def convert_mcmc_labels(param_keys):
-    """Returns sequence of formatted parameter labels
+    """Returns sequence of formatted MCMC parameter labels
     """
     keys = list(param_keys)
+
     for i, key in enumerate(keys):
-        keys[i] = label(key)
+        if 'qb' in key:
+            label_str = r'$Q_\mathrm{b' + f'{key[-1]}' + '}$'
+        elif 'mdot' in key:
+            label_str = rf'$\dot{{M}}_{key[-1]}$'
+        else:
+            label_str = label(key)
+
+        keys[i] = label_str
+
     return keys
