@@ -408,7 +408,8 @@ class Kgrid:
                             show=True, linear_rates=False, interpolate=True,
                             shaded=True, exclude_stable=False, legend=True,
                             fix_ylims=True, title=True, fontsize=14,
-                            subplot_figsize=(8, 4), legend_fontsize=12):
+                            subplot_figsize=(8, 4), legend_fontsize=12,
+                            leg_ncol=2):
         """Plots given burst property against accretion rate
         
         bprop : [str]
@@ -421,6 +422,7 @@ class Kgrid:
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = check_var_fixed(var=var, fixed=fixed)
         xlabel = plot_tools.full_label(xaxis)
+        var_label = plot_tools.full_label(var)
         x_unique = self.unique_params[xaxis]
 
         var_unique = self.unique_params[var]
@@ -447,7 +449,7 @@ class Kgrid:
             y_label = plot_tools.full_label(bprop)
             ax[i].set_ylabel(y_label, fontsize=fontsize)
 
-            for v in var_unique:
+            for j, v in enumerate(var_unique):
                 # ===== check if any models exist =====
                 params[var] = v
                 subset = self.get_params(params=params)
@@ -474,13 +476,13 @@ class Kgrid:
                     u_y = np.concatenate([u_y, u_tmp])
 
                 precision = precisions.get(var, 3)
-                label = plot_tools.value_label(var, value=v, precision=precision)
 
                 if shaded:
                     ax[i].fill_between(mdot_x, prop_y+u_y, prop_y-u_y, alpha=0.3)
 
                 ax[i].errorbar(x=mdot_x, y=prop_y, yerr=u_y, marker='o',
-                               label=label, capsize=3, ls='-' if interpolate else 'none')
+                               label=f'{v:.{precision}f}',
+                               capsize=3, ls='-' if interpolate else 'none')
                 del (params[xaxis])
 
             if linear_rates:
@@ -497,7 +499,8 @@ class Kgrid:
 
         if legend:
             loc = self.config['legend_loc'].get(bprops[0], 'upper right')
-            ax[0].legend(fontsize=legend_fontsize, loc=loc, ncol=2)
+            ax[0].legend(fontsize=legend_fontsize, loc=loc, ncol=leg_ncol,
+                         title=f'{var_label}', title_fontsize=legend_fontsize)
 
         plt.tight_layout()
 
