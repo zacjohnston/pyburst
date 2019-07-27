@@ -40,6 +40,12 @@ def unit_scale(quantity):
     return scales.get(quantity, 1.0)
 
 
+def formatted_label(quantity, units=True):
+    """Returns full string of formatted label (with/without units)
+    """
+    pass
+
+
 def unit_label(quantity):
     """Returns units as a string, for given quantity
     """
@@ -54,7 +60,7 @@ def unit_label(quantity):
     return labels.get(quantity, '')
 
 
-def label(quantity):
+def quantity_label(quantity):
     """Returns formatted string of parameter label
     """
     labels = {
@@ -91,7 +97,7 @@ def convert_mcmc_labels(param_keys):
         elif 'mdot' in key:
             label_str = rf'$\dot{{M}}_{key[-1]}$'
         else:
-            label_str = label(key)
+            label_str = quantity_label(key)
 
         keys[i] = label_str
 

@@ -273,7 +273,7 @@ def plot_xedd(chain, discard, source, version, cap=None,
                                             version=version, cap=cap)
 
     cc = chainconsumer.ChainConsumer()
-    label = plot_tools.label('xedd')
+    label = plot_tools.quantity_label('xedd')
     cc.add_chain(xedd_chain.reshape(-1), parameters=[label])
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
 
