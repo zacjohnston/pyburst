@@ -419,7 +419,7 @@ class Kgrid:
         """
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = check_var_fixed(var=var, fixed=fixed)
-        xlabel = {'accrate': r'$\dot{M} / \dot{M}_\mathrm{Edd}$'}.get(xaxis, xaxis)
+        xlabel = self.config['y_labels'].get(xaxis, xaxis)
         x_unique = self.unique_params[xaxis]
 
         var_unique = self.unique_params[var]
