@@ -48,12 +48,14 @@ def unit_label(quantity):
         'dt': 'h',
         'fluence': '$10^{39}$ erg',
         'peak': '$10^{38}$ erg s$^{-1}$',
+        'accrate': r'$\dot{M}_\mathrm{Edd}$',
+        'mdot': r'$\dot{M}_\mathrm{Edd}$',
     }
     return labels.get(quantity, '')
 
 
 def label(quantity):
-    """Returns string of MCMC parameter label
+    """Returns formatted string of parameter label
     """
     labels = {
         'x': r'$X_0$',
@@ -65,6 +67,15 @@ def label(quantity):
         'm_nw': r'$M_\mathrm{NW}$',
         'xedd_ratio': r'$X_\mathrm{Edd} / X_0$',
         'xedd': r'$X_\mathrm{Edd}$',
+        'qb': r'$Q_\mathrm{b}$',
+        'accrate': r'$\dot{M}$',
+        'mdot': r'$\dot{M}$',
+        'dt': r'$\Delta t$',
+        'fluence': '$E_b$',
+        'peak': '$L_{peak}$',
+        'rate': r'Burst rate',
+        'alpha': r'$\alpha$',
+        'length': 'Burst length',
     }
     return labels.get(quantity, quantity)
 
