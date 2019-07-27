@@ -40,10 +40,18 @@ def unit_scale(quantity):
     return scales.get(quantity, 1.0)
 
 
-def formatted_label(quantity, units=True):
-    """Returns full string of formatted label (with/without units)
+def full_label(quantity):
+    """Returns string of formatted label with units
     """
-    pass
+    quant_str = quantity_label(quantity)
+    unit_str = unit_label(quantity)
+
+    if unit_str is '':
+        label = f'{quant_str}'
+    else:
+        label = f'{quant_str} ({unit_str})'
+
+    return label
 
 
 def unit_label(quantity):
@@ -56,6 +64,7 @@ def unit_label(quantity):
         'peak': '$10^{38}$ erg s$^{-1}$',
         'accrate': r'$\dot{M}_\mathrm{Edd}$',
         'mdot': r'$\dot{M}_\mathrm{Edd}$',
+        'qb': r'MeV $\mathrm{nucleon}^{-1}$'
     }
     return labels.get(quantity, '')
 
