@@ -111,6 +111,15 @@ def quantity_label(quantity):
     return labels.get(quantity, quantity)
 
 
+def convert_full_labels(quantities):
+    """Returns formatted sequence of labels
+    """
+    keys = list(quantities)
+    for i, key in enumerate(keys):
+        keys[i] = full_label(key)
+    return keys
+
+
 def convert_mcmc_labels(param_keys):
     """Returns sequence of formatted MCMC parameter labels
     """
