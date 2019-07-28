@@ -74,7 +74,8 @@ def unit_label(quantity):
         'peak': '$10^{38}$ erg s$^{-1}$',
         'accrate': r'$\dot{M}_\mathrm{Edd}$',
         'mdot': r'$\dot{M}_\mathrm{Edd}$',
-        'qb': r'MeV $\mathrm{nucleon}^{-1}$'
+        'qb': r'MeV $\mathrm{nucleon}^{-1}$',
+        'lum': 'erg s$^{-1}$',
     }
     return labels.get(quantity, '')
 
@@ -101,6 +102,7 @@ def quantity_label(quantity):
         'rate': r'Burst rate',
         'alpha': r'$\alpha$',
         'length': 'Burst length',
+        'lum': r'$\mathit{L}$',
     }
     return labels.get(quantity, quantity)
 
