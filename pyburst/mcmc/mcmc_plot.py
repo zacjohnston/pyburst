@@ -121,7 +121,7 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
 
 def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lhood=False,
                   display=True, save=False, truth_values=None, verbose=True,
-                  smoothing=False):
+                  smoothing=False, sigmas=None):
     """Plots posterior contours of mcmc chain
     """
     default_plt_options()
@@ -129,7 +129,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
     pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
     # TODO: re-use the loaded chainconsumer here instead of reloading
     cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
-                             cap=cap)
+                             cap=cap, sigmas=sigmas)
 
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
@@ -148,7 +148,6 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
     plt.tight_layout()
     save_plot(fig, prefix='contours', chain=chain, save=save, source=source,
               version=version, display=display)
-
 
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
                     display=True, save=False, truth_values=None, verbose=True,
