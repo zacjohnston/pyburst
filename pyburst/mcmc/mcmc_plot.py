@@ -120,8 +120,7 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
 
 
 def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lhood=False,
-                  display=True, save=False, truth_values=None, verbose=True,
-                  smoothing=False, sigmas=None):
+                  display=True, save=False, truth_values=None, verbose=True, sigmas=None):
     """Plots posterior contours of mcmc chain
     """
     default_plt_options()
