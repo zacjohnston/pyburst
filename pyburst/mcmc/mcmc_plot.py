@@ -188,7 +188,7 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
                      display=True, save=False, max_lhood=False, verbose=True,
-                     cloud=True, sigmas=np.linspace(0, 2, 10), compressed=False):
+                     cloud=True, sigmas=np.linspace(0, 2, 10)):
     """Plots contours of mass versus radius from a given chain
     """
     # TODO: combine and generalise with plot_xedd()
