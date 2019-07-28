@@ -76,6 +76,8 @@ def unit_label(quantity):
         'mdot': r'$\dot{M}_\mathrm{Edd}$',
         'qb': r'MeV $\mathrm{nucleon}^{-1}$',
         'lum': 'erg s$^{-1}$',
+        'mass': r'$\mathrm{M_\odot}$',
+        'radius': 'km',
     }
     return labels.get(quantity, '')
 
@@ -103,6 +105,8 @@ def quantity_label(quantity):
         'alpha': r'$\alpha$',
         'length': 'Burst length',
         'lum': r'$\mathit{L}$',
+        'mass': '$M$',
+        'radius': '$R$',
     }
     return labels.get(quantity, quantity)
 
