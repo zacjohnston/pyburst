@@ -148,6 +148,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
     plt.tight_layout()
     save_plot(fig, prefix='contours', chain=chain, save=save, source=source,
               version=version, display=display)
+    return fig
 
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
                     display=True, save=False, truth_values=None, verbose=True,
