@@ -1213,19 +1213,19 @@ class BurstRun(object):
              burst_stages=False, candidates=False, legend=False, time_unit='h',
              short_wait=True, fontsize=14, title=True,
              outliers=True, show_all=False, dumps=False, dump_start=False,
-             spikes=False, fix_ylim=True, ylims=None):
+             spikes=False, fix_ylim=True, ylims=None, figsize=(8, 5)):
         """Plots overall model lightcurve, with detected bursts
         """
         if not self.flags['lum_loaded']:
             self.load_lum_file()
 
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
-        time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
+        time_label = {'s': 's', 'm': 'min', 'h': 'h', 'd': 'day'}.get(time_unit, 's')
         markersize = 10
         markeredgecolor = '0'
         dump_ylims = [0, 1e39]  # y-values to plot dump markers
 
-        fig, ax = plt.subplots(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=figsize)
         ax.set_xlabel(f'Time ({time_label})', fontsize=fontsize)
 
         if show_all:
