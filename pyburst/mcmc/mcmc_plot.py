@@ -188,7 +188,8 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
                      display=True, save=False, max_lhood=False, verbose=True,
-                     cloud=True, sigmas=np.linspace(0, 2, 10)):
+                     cloud=False, sigmas=np.linspace(0, 2, 5), fontsize=18,
+                     figsize='column'):
     """Plots contours of mass versus radius from a given chain
     """
     # TODO: combine and generalise with plot_xedd()
@@ -215,10 +216,22 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
             mass_gr = max_params[pkeys.index('m_gr')]
 
         radius = mcmc_params.get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
-        fig = cc.plotter.plot(figsize=[6, 6], truth=[mass_gr, radius])
+        fig = cc.plotter.plot(figsize=figsize, truth=[mass_gr, radius])
 
     else:
-        fig = cc.plotter.plot(figsize=[6, 6])
+        fig = cc.plotter.plot(figsize=figsize)
+
+    # Manually set axis labels
+    labels = plot_tools.convert_full_labels(['radius', 'mass'])
+    fig.axes[2].set_xlabel(labels[0], fontsize=fontsize)
+    fig.axes[2].set_ylabel(labels[1], fontsize=fontsize)
+
+    for tick in fig.axes[2].xaxis.get_major_ticks():
+        tick.label.set_fontsize(fontsize)
+    for tick in fig.axes[2].yaxis.get_major_ticks():
+        tick.label.set_fontsize(fontsize)
+
+    fig.subplots_adjust(left=0.16, bottom=0.15)
 
     save_plot(fig, prefix='mass-radius', chain=chain, save=save, source=source,
               version=version, display=display)
