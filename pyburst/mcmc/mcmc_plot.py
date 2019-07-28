@@ -149,6 +149,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
               version=version, display=display)
     return fig
 
+
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
                     display=True, save=False, truth_values=None, verbose=True,
                     cc=None):
@@ -182,6 +183,7 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
     plt.tight_layout()
     save_plot(fig, prefix='posteriors', chain=chain, save=save, source=source,
               version=version, display=display)
+    return fig
 
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
@@ -220,6 +222,7 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
 
     save_plot(fig, prefix='mass-radius', chain=chain, save=save, source=source,
               version=version, display=display)
+    return fig
 
 
 def plot_redshift(chain, discard, source, version, cap=None, display=True, save=False):
@@ -240,6 +243,7 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
 
     save_plot(fig, prefix='redshift', chain=chain, save=save, source=source,
               version=version, display=display)
+    return fig
 
 
 def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False,
@@ -383,6 +387,7 @@ def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=F
     plt.tight_layout()
     save_plot(fig, prefix='qb', save=save, source=source, version=version,
               display=display, chain=chain)
+    return fig
 
 
 def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
@@ -421,6 +426,7 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
 
     save_plot(fig, prefix='multi_posteriors', save=save, source=source, version=version,
               display=display, enforce_chain_info=False)
+    return fig
 
 
 def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, discard,
