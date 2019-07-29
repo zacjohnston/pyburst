@@ -588,8 +588,9 @@ class BurstFit:
             fig, ax = plt.subplots(figsize=(5, 4))
 
         epochs = np.array(self.obs.index)
-        x = epochs
-
+        # epochs_str = [str(x) for x in epochs]
+        # x = epochs
+        x = np.arange(3)
         ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
                     capsize=capsize, color='C3', label='Model', markersize=markersize)
         ax.errorbar(x=x + dx, y=obs / yscale, yerr=n_sigma * u_obs / yscale, ls='none',
@@ -601,7 +602,7 @@ class BurstFit:
 
         if xlabel:
             ax.set_xticklabels([f'{year}' for year in epochs])
-            ax.set_xlabel('Epoch year', fontsize=fontsize)
+            ax.set_xlabel('Epoch', fontsize=fontsize)
         else:
             ax.set_xticklabels([])
 
