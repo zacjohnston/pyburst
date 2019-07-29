@@ -591,6 +591,9 @@ class BurstFit:
         # epochs_str = [str(x) for x in epochs]
         # x = epochs
         x = np.arange(3)
+        # ax.set_xticks(epochs)
+        ax.set_xticks(x)
+
         ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
                     capsize=capsize, color='C3', label='Model', markersize=markersize)
         ax.errorbar(x=x + dx, y=obs / yscale, yerr=n_sigma * u_obs / yscale, ls='none',
@@ -598,7 +601,6 @@ class BurstFit:
                     markersize=markersize)
 
         ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
-        ax.set_xticks(epochs)
 
         if xlabel:
             ax.set_xticklabels([f'{year}' for year in epochs])
