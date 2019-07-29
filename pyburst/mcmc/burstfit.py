@@ -212,10 +212,11 @@ class BurstFit:
         # ===== Setup plotting =====
         n_bprops = len(self.mcmc_version.bprops)
         if plot:
-            plot_width = 3
-            plot_height = 2.25
-            fig, ax = plt.subplots(n_bprops, 1, sharex=True,
-                                   figsize=(plot_width, plot_height * n_bprops))
+            n_rows = int(np.ceil(n_bprops/2))
+            subplot_width = 3
+            subplot_height = 2.25
+            fig, ax = plt.subplots(n_rows, 2, sharex=True,
+                                   figsize=(2*subplot_width, n_rows * subplot_height))
         else:
             fig = ax = None
 
@@ -361,8 +362,10 @@ class BurstFit:
 
             lh += self.compare(model=model, u_model=u_model, bprop=bprop, label=bprop)
             if plot:
+                row_i = int(np.floor(i / 2))
+                col_i = i % 2
                 self.plot_compare(model=model, u_model=u_model, bprop=bprop,
-                                  ax=ax[i], display=False,
+                                  ax=ax[row_i, col_i], display=False,
                                   legend=True if i == 0 else False,
                                   xlabel=True if i == self.n_bprops-1 else False)
 
