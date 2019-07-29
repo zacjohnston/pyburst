@@ -214,7 +214,8 @@ class BurstFit:
         if plot:
             plot_width = 6
             plot_height = 2.25
-            fig, ax = plt.subplots(n_bprops, 1, figsize=(plot_width, plot_height * n_bprops))
+            fig, ax = plt.subplots(n_bprops, 1, sharex=True,
+                                   figsize=(plot_width, plot_height * n_bprops))
         else:
             fig = ax = None
 
@@ -587,24 +588,22 @@ class BurstFit:
             fig, ax = plt.subplots(figsize=(5, 4))
 
         epochs = np.array(self.obs.index)
-        y = np.arange(3)
-        ax.set_yticks(y)
+        x = np.arange(3)
+        ax.set_xticks(x)
 
-        ax.errorbar(x=model / yscale, y=y - dx, xerr=n_sigma * u_model / yscale, ls='none', marker='o',
+        ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
                     capsize=capsize, color='C3', label='Model', markersize=markersize)
-        ax.errorbar(x=obs / yscale, y=y + dx, xerr=n_sigma * u_obs / yscale, ls='none',
+        ax.errorbar(x=x + dx, y=obs / yscale, yerr=n_sigma * u_obs / yscale, ls='none',
                     marker='o', capsize=capsize, color='C0', label='Observed',
                     markersize=markersize)
 
-        ax.set_yticklabels([f'{year}' for year in epochs])
-        ax.set_ylabel('Epoch', fontsize=fontsize)
-        ax.set_xlabel(f'{ylabel} ({y_units})', fontsize=fontsize)
+        ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
 
-        # if xlabel:
-        #     ax.set_xticklabels([f'{year}' for year in epochs])
-        #     ax.set_xlabel('Epoch', fontsize=fontsize)
-        # else:
-        #     ax.set_xticklabels([])
+        if xlabel:
+            ax.set_xticklabels([f'{year}' for year in epochs])
+            ax.set_xlabel('Epoch', fontsize=fontsize)
+        else:
+            ax.set_xticklabels([])
 
         if title:
             ax.set_title(ylabel, fontsize=fontsize)
