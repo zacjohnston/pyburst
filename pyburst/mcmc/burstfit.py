@@ -214,8 +214,7 @@ class BurstFit:
         if plot:
             plot_width = 6
             plot_height = 2.25
-            fig, ax = plt.subplots(n_bprops, 1, sharex=True,
-                                   figsize=(plot_width, plot_height * n_bprops))
+            fig, ax = plt.subplots(n_bprops, 1, figsize=(plot_width, plot_height * n_bprops))
         else:
             fig = ax = None
 
