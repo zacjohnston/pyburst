@@ -213,7 +213,7 @@ class BurstFit:
         n_bprops = len(self.mcmc_version.bprops)
         if plot:
             n_rows = int(np.ceil(n_bprops/2))
-            subplot_width = 3
+            subplot_width = 2.25
             subplot_height = 2.25
 
             fig, ax = plt.subplots(n_rows, 2, sharex=True,
