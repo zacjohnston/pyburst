@@ -212,7 +212,7 @@ class BurstFit:
         # ===== Setup plotting =====
         n_bprops = len(self.mcmc_version.bprops)
         if plot:
-            plot_width = 6
+            plot_width = 3
             plot_height = 2.25
             fig, ax = plt.subplots(n_bprops, 1, sharex=True,
                                    figsize=(plot_width, plot_height * n_bprops))
