@@ -557,7 +557,7 @@ class BurstFit:
         markersize = 6
         capsize = 3
         n_sigma = 3
-        dx = 0.13  # horizontal offset of plot points
+        dx = 0.08  # horizontal offset of plot points
         yscale = {'dt': 1.0, 'rate': 1.0, 'tail_50': 1.0, 'fedd': 1e-8,
                   'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9,
                   'tail_index': 1.0}.get(bprop)
@@ -588,25 +588,24 @@ class BurstFit:
             fig, ax = plt.subplots(figsize=(5, 4))
 
         epochs = np.array(self.obs.index)
-        # epochs_str = [str(x) for x in epochs]
-        # x = epochs
-        x = np.arange(3)
-        # ax.set_xticks(epochs)
-        ax.set_xticks(x)
+        y = np.arange(3)
+        ax.set_yticks(y)
 
-        ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
+        ax.errorbar(x=model / yscale, y=y - dx, xerr=n_sigma * u_model / yscale, ls='none', marker='o',
                     capsize=capsize, color='C3', label='Model', markersize=markersize)
-        ax.errorbar(x=x + dx, y=obs / yscale, yerr=n_sigma * u_obs / yscale, ls='none',
+        ax.errorbar(x=obs / yscale, y=y + dx, xerr=n_sigma * u_obs / yscale, ls='none',
                     marker='o', capsize=capsize, color='C0', label='Observed',
                     markersize=markersize)
 
-        ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
+        ax.set_yticklabels([f'{year}' for year in epochs])
+        ax.set_ylabel('Epoch', fontsize=fontsize)
+        ax.set_xlabel(f'{ylabel} ({y_units})', fontsize=fontsize)
 
-        if xlabel:
-            ax.set_xticklabels([f'{year}' for year in epochs])
-            ax.set_xlabel('Epoch', fontsize=fontsize)
-        else:
-            ax.set_xticklabels([])
+        # if xlabel:
+        #     ax.set_xticklabels([f'{year}' for year in epochs])
+        #     ax.set_xlabel('Epoch', fontsize=fontsize)
+        # else:
+        #     ax.set_xticklabels([])
 
         if title:
             ax.set_title(ylabel, fontsize=fontsize)
