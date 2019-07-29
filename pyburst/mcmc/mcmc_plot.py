@@ -542,6 +542,18 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
               version=version, display=display)
 
 
+# def plot_bprop_sample(bprop_sample, source, version):
+#     """Plot burst properties from large sample against observations
+#     """
+#     bfit = burstfit.BurstFit(source=source, version=version, verbose=False)
+#     n_bprops = bprop_sample.shape[1]
+#     bprop_mean = np.mean(bprop_sample, axis=2)
+#     bprop_std = np.std(bprop_sample, axis=2)
+#
+#     fig, ax = plt.subplots()
+
+
+
 def plot_autocorrelation(chain, source, version, n_steps=10):
     """Plots estimated integrated autocorrelation time
 
