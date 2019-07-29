@@ -12,9 +12,6 @@ def default_plt_options():
 default_plt_options()
 
 
-
-
-
 def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
              fontsize=14, yticks=True, xticks=True):
     """Standardised formatting of labels etc.
@@ -43,20 +40,50 @@ def unit_scale(quantity):
     return scales.get(quantity, 1.0)
 
 
+def full_label(quantity):
+    """Returns string of formatted label with units
+    """
+    quant_str = quantity_label(quantity)
+    unit_str = unit_label(quantity)
+
+    if unit_str is '':
+        label = f'{quant_str}'
+    else:
+        label = f'{quant_str} ({unit_str})'
+
+    return label
+
+
+def value_label(quantity, value, precision=None):
+    """Returns formatted label including a float value
+    """
+    quant_str = quantity_label(quantity)
+    if precision is None:
+        return f'{quant_str}={value}'
+    else:
+        return f'{quant_str}={value:.{precision}f}'
+
+
 def unit_label(quantity):
     """Returns units as a string, for given quantity
     """
     labels = {
-        'rate': r'day$^{-1}$',
-        'dt': 'hr',
-        'fluence': r'$10^{39}$ erg',
-        'peak': r'$10^{38}$ erg s$^{-1}$',
+        'rate': 'day$^{-1}$',
+        'dt': 'h',
+        'fluence': '$10^{39}$ erg',
+        'peak': '$10^{38}$ erg s$^{-1}$',
+        'accrate': r'$\dot{M}_\mathrm{Edd}$',
+        'mdot': r'$\dot{M}_\mathrm{Edd}$',
+        'qb': r'MeV $\mathrm{nucleon}^{-1}$',
+        'lum': 'erg s$^{-1}$',
+        'mass': r'$\mathrm{M_\odot}$',
+        'radius': 'km',
     }
     return labels.get(quantity, '')
 
 
-def mcmc_label(quantity):
-    """Returns string of MCMC parameter label
+def quantity_label(quantity):
+    """Returns formatted string of parameter label
     """
     labels = {
         'x': r'$X_0$',
@@ -68,21 +95,44 @@ def mcmc_label(quantity):
         'm_nw': r'$M_\mathrm{NW}$',
         'xedd_ratio': r'$X_\mathrm{Edd} / X_0$',
         'xedd': r'$X_\mathrm{Edd}$',
+        'qb': r'$Q_\mathrm{b}$',
+        'accrate': r'$\dot{M}$',
+        'mdot': r'$\dot{M}$',
+        'dt': r'$\Delta t$',
+        'fluence': '$E_b$',
+        'peak': '$L_{peak}$',
+        'rate': r'Burst rate',
+        'alpha': r'$\alpha$',
+        'length': 'Burst length',
+        'lum': r'$\mathit{L}$',
+        'mass': '$M$',
+        'radius': '$R$',
     }
+    return labels.get(quantity, quantity)
 
-    # assumes last character is a single integer specifying epoch
-    if 'qb' in quantity:
-        return r'$Q_\mathrm{b' + f'{quantity[-1]}' + '}$'
-    elif 'mdot' in quantity:
-        return rf'$\dot{{M}}_{quantity[-1]}$'
-    else:
-        return labels.get(quantity, quantity)
+
+def convert_full_labels(quantities):
+    """Returns formatted sequence of labels
+    """
+    keys = list(quantities)
+    for i, key in enumerate(keys):
+        keys[i] = full_label(key)
+    return keys
 
 
 def convert_mcmc_labels(param_keys):
-    """Returns sequence of formatted parameter labels
+    """Returns sequence of formatted MCMC parameter labels
     """
     keys = list(param_keys)
+
     for i, key in enumerate(keys):
-        keys[i] = mcmc_label(key)
+        if 'qb' in key:
+            label_str = r'$Q_\mathrm{b' + f'{key[-1]}' + '}$'
+        elif 'mdot' in key:
+            label_str = rf'$\dot{{M}}_{key[-1]}$'
+        else:
+            label_str = quantity_label(key)
+
+        keys[i] = label_str
+
     return keys

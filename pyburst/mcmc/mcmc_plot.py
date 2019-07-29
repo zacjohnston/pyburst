@@ -120,8 +120,7 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
 
 
 def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lhood=False,
-                  display=True, save=False, truth_values=None, verbose=True,
-                  smoothing=False):
+                  display=True, save=False, truth_values=None, verbose=True, sigmas=None):
     """Plots posterior contours of mcmc chain
     """
     default_plt_options()
@@ -129,7 +128,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
     pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
     # TODO: re-use the loaded chainconsumer here instead of reloading
     cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
-                             cap=cap)
+                             cap=cap, sigmas=sigmas)
 
     if max_lhood:
         n_walkers, n_steps = chain[:, :, 0].shape
@@ -148,6 +147,7 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
     plt.tight_layout()
     save_plot(fig, prefix='contours', chain=chain, save=save, source=source,
               version=version, display=display)
+    return fig
 
 
 def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
@@ -183,11 +183,13 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
     plt.tight_layout()
     save_plot(fig, prefix='posteriors', chain=chain, save=save, source=source,
               version=version, display=display)
+    return fig
 
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
                      display=True, save=False, max_lhood=False, verbose=True,
-                     cloud=True, sigmas=np.linspace(0, 2, 10), compressed=False):
+                     cloud=False, sigmas=np.linspace(0, 2, 5), fontsize=18,
+                     figsize='column'):
     """Plots contours of mass versus radius from a given chain
     """
     # TODO: combine and generalise with plot_xedd()
@@ -214,13 +216,26 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
             mass_gr = max_params[pkeys.index('m_gr')]
 
         radius = mcmc_params.get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
-        fig = cc.plotter.plot(figsize=[6, 6], truth=[mass_gr, radius])
+        fig = cc.plotter.plot(figsize=figsize, truth=[mass_gr, radius])
 
     else:
-        fig = cc.plotter.plot(figsize=[6, 6])
+        fig = cc.plotter.plot(figsize=figsize)
+
+    # Manually set axis labels
+    labels = plot_tools.convert_full_labels(['radius', 'mass'])
+    fig.axes[2].set_xlabel(labels[0], fontsize=fontsize)
+    fig.axes[2].set_ylabel(labels[1], fontsize=fontsize)
+
+    for tick in fig.axes[2].xaxis.get_major_ticks():
+        tick.label.set_fontsize(fontsize)
+    for tick in fig.axes[2].yaxis.get_major_ticks():
+        tick.label.set_fontsize(fontsize)
+
+    fig.subplots_adjust(left=0.16, bottom=0.15)
 
     save_plot(fig, prefix='mass-radius', chain=chain, save=save, source=source,
               version=version, display=display)
+    return fig
 
 
 def plot_redshift(chain, discard, source, version, cap=None, display=True, save=False):
@@ -241,6 +256,7 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
 
     save_plot(fig, prefix='redshift', chain=chain, save=save, source=source,
               version=version, display=display)
+    return fig
 
 
 def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False,
@@ -273,7 +289,7 @@ def plot_xedd(chain, discard, source, version, cap=None,
                                             version=version, cap=cap)
 
     cc = chainconsumer.ChainConsumer()
-    label = plot_tools.mcmc_label('xedd')
+    label = plot_tools.quantity_label('xedd')
     cc.add_chain(xedd_chain.reshape(-1), parameters=[label])
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
 
@@ -384,6 +400,7 @@ def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=F
     plt.tight_layout()
     save_plot(fig, prefix='qb', save=save, source=source, version=version,
               display=display, chain=chain)
+    return fig
 
 
 def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
@@ -422,6 +439,7 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
 
     save_plot(fig, prefix='multi_posteriors', save=save, source=source, version=version,
               display=display, enforce_chain_info=False)
+    return fig
 
 
 def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, discard,

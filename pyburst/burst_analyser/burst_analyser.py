@@ -1213,20 +1213,21 @@ class BurstRun(object):
              burst_stages=False, candidates=False, legend=False, time_unit='h',
              short_wait=True, fontsize=14, title=True,
              outliers=True, show_all=False, dumps=False, dump_start=False,
-             spikes=False, fix_ylim=True, ylims=None):
+             spikes=False, fix_ylim=True, ylims=None, figsize=(8, 5)):
         """Plots overall model lightcurve, with detected bursts
         """
         if not self.flags['lum_loaded']:
             self.load_lum_file()
 
         timescale = {'s': 1, 'm': 60, 'h': 3600, 'd': 8.64e4}.get(time_unit, 1)
-        time_label = {'s': 's', 'm': 'min', 'h': 'hr', 'd': 'day'}.get(time_unit, 's')
+        time_label = {'s': 's', 'm': 'min', 'h': 'h', 'd': 'day'}.get(time_unit, 's')
         markersize = 10
         markeredgecolor = '0'
         dump_ylims = [0, 1e39]  # y-values to plot dump markers
 
-        fig, ax = plt.subplots(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=figsize)
         ax.set_xlabel(f'Time ({time_label})', fontsize=fontsize)
+        fig.subplots_adjust(right=0.95, top=0.95, bottom=0.15)
 
         if show_all:
             burst_stages = True
@@ -1465,7 +1466,7 @@ class BurstRun(object):
     def plot_lightcurves(self, bursts=None, save=False, display=True, log=False,
                          zero_time=True, fontsize=14, ylims=None, title=True,
                          color=None, legend=False, power_fits=False,
-                         xlims=None, **kwargs):
+                         xlims=None, figsize=(8, 5), **kwargs):
         """Plot individual burst lightcurve
 
         parameters
@@ -1497,7 +1498,9 @@ class BurstRun(object):
             ylims = {'grid5': [-0.1, 4], 'he2': [-0.1, 5.5],
                      'ks1': [-0.1, 7]}.get(self.source)
 
-        fig, ax = plt.subplots(figsize=(8, 5))
+        fig, ax = plt.subplots(figsize=figsize)
+        fig.subplots_adjust(right=0.95, top=0.95, bottom=0.15)
+
         ax.set_ylabel('Luminosity ($10^{38}$ erg s$^{-1}$)', fontsize=fontsize)
         ax.set_xlabel('Time (s)', fontsize=fontsize)
         if title:
