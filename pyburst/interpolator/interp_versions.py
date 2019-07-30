@@ -3,12 +3,14 @@
 version_defaults = {
     'param_keys': {
         'grid5': ['accrate', 'x', 'z', 'qb', 'mass'],
+        'synth5': ['accrate', 'x', 'z', 'qb', 'mass'],
         'grid6': ['accrate', 'x', 'z', 'qb', 'mass'],
         'he1': ['accrate', 'x', 'z', 'qb', 'mass'],
         'he2': ['accrate', 'qb'],
     },
     'bprops': {
         'grid5': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
+        'synth5': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         'grid6': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         'he1': ('rate', 'u_rate', 'fluence', 'u_fluence', 'peak', 'u_peak'),
         'he2': ('rate', 'u_rate'),
@@ -19,6 +21,7 @@ version_defaults = {
 version_definitions = {
     'param_keys': {  # The input params (and their order) when calling interpolator
         'grid5': {},
+        'synth5': {},
         'grid6': {},
         'he1': {},
         'he2': {},
@@ -27,6 +30,7 @@ version_definitions = {
     # The burst properties being interpolated
     'bprops': {
         'grid5': {},
+        'synth5': {},
         'grid6': {},
         'he1': {},
         'he2': {},
@@ -36,6 +40,7 @@ version_definitions = {
     #       Note: if not defined, defaults to: grid_version = interp_version
     'grid_version': {
         'grid5': {},
+        'synth5': {},
         'grid6': {},
         'he1': {},
         'he2': {},
