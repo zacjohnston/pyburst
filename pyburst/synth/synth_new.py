@@ -23,14 +23,15 @@ param_used = {'mdot1': 0.0987,
 
 def generate_synth_data(source, batches, run, mc_source, mc_version,
                         free_params=('m_gr', 'd_b', 'xi_ratio'),
-                        params=None):
+                        params=None, u_fedd_frac=0.08, u_fper_frac=0.02):
     """"""
     if params is None:
         params = generate_params(source, batches=batches, run=run,
                                  mc_source=mc_source, mc_version=mc_version,
                                  free_params=free_params)
 
-    bfit = burstfit.BurstFit(mc_source, version=mc_version, debug=False)
+    bfit = burstfit.BurstFit(mc_source, version=mc_version, debug=False,
+                             u_fper_frac=u_fper_frac, u_fedd_frac=u_fedd_frac)
     mv = mcmc_versions.McmcVersion(mc_source, version=mc_version)
 
     bprops = bfit.bprop_sample(x=None, params=params)
