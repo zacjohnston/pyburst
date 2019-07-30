@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 # pyburst
@@ -24,7 +25,8 @@ param_used = {'mdot1': 0.0987,
 
 def generate_synth_data(source, batches, run, mc_source, mc_version,
                         reproduce=True, free_params=('m_gr', 'd_b', 'xi_ratio'),
-                        u_fedd_frac=0.08, u_fper_frac=0.01):
+                        u_fedd_frac=0.08, u_fper_frac=0.01, noise_mag=0.01,
+                        introduce_noise=True):
     if reproduce:
         print('Reusing same params')
         params = param_used
@@ -39,9 +41,22 @@ def generate_synth_data(source, batches, run, mc_source, mc_version,
                               params=params, u_fedd_frac=u_fedd_frac,
                               u_fper_frac=u_fper_frac)
 
+    # add epoch column
+    epochs = np.arange(1, len(batches) + 1)
+    table['epoch'] = epochs
+    if introduce_noise:
+        add_noise(table, magnitude=noise_mag)
     obs_tools.save_summary(table, source=source)
 
-    
+
+def add_noise(table, magnitude=0.01):
+    print(f'adding noise: sigma={magnitude}')
+    n_rows = len(table)
+    for col in table:
+        noise = 1 + magnitude * np.random.normal(size=n_rows)
+        table[col] *= noise
+
+
 def setup_synth_table(source, batches, run, mc_source, mc_version,
                       free_params=('m_gr', 'd_b', 'xi_ratio'),
                       params=None, u_fedd_frac=0.08, u_fper_frac=0.01):
