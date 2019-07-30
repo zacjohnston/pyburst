@@ -236,7 +236,7 @@ class BurstFit:
             self.debug.end_function()
             return lhood
 
-    def bprop_sample(self, x):
+    def bprop_sample(self, x, params=None):
         """Returns the predicted observables for a given sample of parameters
 
         Effectively performs lhood() without the lhood parts
@@ -245,8 +245,11 @@ class BurstFit:
         ----------
         x : np.array
             set of parameters, same as input to lhood()
+        params : dict
+            pass param dict directly
         """
-        params = self.get_params_dict(x=x)
+        if params is None:
+            params = self.get_params_dict(x=x)
         interp_local, analytic_local = self.get_model_local(params=params)
 
         interp_shifted, analytic_shifted = self.get_model_shifted(
