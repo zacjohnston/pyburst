@@ -21,9 +21,10 @@ param_used = {'mdot1': 0.0987,
               'd_b': 7.036123,
               'xi_ratio': 0.73909}
 
-def generate_synth_data(source, batches, run, mc_source, mc_version,
-                        free_params=('m_gr', 'd_b', 'xi_ratio'),
-                        params=None, u_fedd_frac=0.08, u_fper_frac=0.02):
+
+def setup_synth_table(source, batches, run, mc_source, mc_version,
+                      free_params=('m_gr', 'd_b', 'xi_ratio'),
+                      params=None, u_fedd_frac=0.08, u_fper_frac=0.02):
     """"""
     if params is None:
         params = generate_params(source, batches=batches, run=run,
