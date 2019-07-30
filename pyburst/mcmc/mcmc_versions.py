@@ -204,21 +204,27 @@ initial_position = {
 source_defaults = {
     'interpolator': {
         'grid5': 0,
+        'synth5': 1,
         'he2': 0,
     },
 
     'grid_bounds': {
         'grid5': grid_bounds[1][1],
+        'synth5': grid_bounds[1][1],
         'he2': grid_bounds[3][1],
     },
 
     'initial_position': {
         'grid5': initial_position[1][1],
+        'synth5': initial_position[1][1],
         'he2': initial_position[3][1],
     },
 
     'priors': {  # if not defined here, the default/fallback will be flat_prior()
         'grid5': {
+            'z': log_z_beta,
+        },
+        'synth5': {
             'z': log_z_beta,
         },
         'he2': {
@@ -228,61 +234,73 @@ source_defaults = {
 
     'param_keys': {
         'grid5': param_keys[1],
+        'synth5': param_keys[1],
         'he2': param_keys[3],
     },
 
     'interp_keys': {
         'grid5': interp_keys[1],
+        'synth5': interp_keys[1],
         'he2': interp_keys[3],
     },
 
     'epoch_unique': {
         'grid5': epoch_unique[1],
+        'synth5': epoch_unique[1],
         'he2': epoch_unique[1],
     },
 
     'epoch': {
         'grid5': None,
+        'synth5': None,
         'he2': None,
     },
 
     'constants': {
         'grid5': {},
+        'synth5': {},
         'he2': {'m_nw': 1.4},
     },
 
     'param_aliases': {
         'grid5': param_aliases[1],
+        'synth5': param_aliases[1],
         'he2': param_aliases[1],
     },
     # TODO: rename interp_bprop_keys, etc.
     'interp_bprops': {
         'grid5': ('rate', 'fluence', 'peak'),
+        'synth5': ('rate', 'fluence', 'peak'),
         'he2': ('rate',),
     },
 
     'analytic_bprops': {
         'grid5': ('fper', 'fedd'),
+        'synth5': ('fper', 'fedd'),
         'he2': ('fper', 'fedd'),
     },
 
     'weights': {
         'grid5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
+        'synth5': {'rate': 1.0, 'fluence': 1.0, 'peak': 1.0, 'fper': 1.0, 'fedd': 1.0},
         'he2': {'rate': 1.0, 'fluence': 1.0, 'fper': 1.0, 'fedd': 1.0},
     },
 
     'x_edd_option': {
       'grid5': 'x_0',
+      'synth5': 'x_0',
       'he2': 0.0,
     },
 
     'synthetic': {  # whether the data being matches is synthetic
         'grid5': False,
+        'synth5': False,
         'he2': False,
     },
 
     'system': {
         'grid5': 'gs1826',
+        'synth5': 'synth5',
         'he2': '4u1820'
     },
 }
@@ -328,6 +346,7 @@ version_definitions = {
             9: 1,
             10: 1,
         },
+        'synth5': {},
         'he2': {},
     },
 
@@ -341,6 +360,7 @@ version_definitions = {
             9: 2,
             11: grid_bounds[1][2],
         },
+        'synth5': {},
         'he2': {
             2: grid_bounds[4][1],
             3: 2,
@@ -362,6 +382,7 @@ version_definitions = {
             10: 5,
             11: initial_position[1][3],
         },
+        'synth5': {},
         'he2': {
             2: initial_position[4][1],
             3: initial_position[4][2],
@@ -377,6 +398,7 @@ version_definitions = {
             5: {'m_gr': gaussian(mean=1.6, std=0.1)},
             10: {'m_gr': gaussian(mean=1.6, std=0.1)},
         },
+        'synth5': {},
         'he2': {
             7: {'m_gr': gaussian(mean=1.6, std=0.1)},
         },
@@ -391,6 +413,7 @@ version_definitions = {
             8: 2,
             9: 2,
         },
+        'synth5': {},
         'he2': {
             2: param_keys[4],
             3: 2,
@@ -408,6 +431,7 @@ version_definitions = {
             8: 2000,
             9: 2007,
         },
+        'synth5': {},
         'he2': {
             2: 1997,
             3: 2009,
@@ -418,41 +442,49 @@ version_definitions = {
 
     'interp_bprops': {
         'grid5': {},
+        'synth5': {},
         'he2': {},
     },
 
     'weights': {
         'grid5': {},
+        'synth5': {},
         'he2': {},
     },
 
     'constants': {
         'grid5': {},
+        'synth5': {},
         'he2': {},
     },
 
     'analytic_bprops': {
         'grid5': {},
+        'synth5': {},
         'he2': {},
     },
 
     'interp_keys': {
         'grid5': {},
+        'synth5': {},
         'he2': {},
     },
 
     'epoch_unique': {
         'grid5': {},
+        'synth5': {},
         'he2': {},
     },
 
     'param_aliases': {
         'grid5': {},
+        'synth5': {},
         'he2': {},
     },
 
     'x_edd_option': {
         'grid5': {},
+        'synth5': {},
         'he2': {},
     },
 }
