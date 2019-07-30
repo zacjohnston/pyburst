@@ -22,9 +22,29 @@ param_used = {'mdot1': 0.0987,
               'xi_ratio': 0.73909}
 
 
+def generate_synth_data(source, batches, run, mc_source, mc_version,
+                        reproduce=True, free_params=('m_gr', 'd_b', 'xi_ratio'),
+                        u_fedd_frac=0.08, u_fper_frac=0.01):
+    if reproduce:
+        print('Reusing same params')
+        params = param_used
+    else:
+        print('Generating new random params!')
+        params = generate_params(source, batches=batches, run=run,
+                                 mc_source=mc_source, mc_version=mc_version,
+                                 free_params=free_params)
+
+    table = setup_synth_table(source, batches=batches, run=run, mc_source=mc_source,
+                              mc_version=mc_version, free_params=free_params,
+                              params=params, u_fedd_frac=u_fedd_frac,
+                              u_fper_frac=u_fper_frac)
+
+    obs_tools.save_summary(table, source=source)
+
+    
 def setup_synth_table(source, batches, run, mc_source, mc_version,
                       free_params=('m_gr', 'd_b', 'xi_ratio'),
-                      params=None, u_fedd_frac=0.08, u_fper_frac=0.02):
+                      params=None, u_fedd_frac=0.08, u_fper_frac=0.01):
     """"""
     if params is None:
         params = generate_params(source, batches=batches, run=run,
