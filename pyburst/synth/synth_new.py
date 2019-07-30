@@ -10,37 +10,20 @@ from pyburst.observations import obs_tools
 quick n dirty module for synthetic data in MCMC paper (2019)
 """
 # ==========================
-# from: synth5_7-9, run=1
-# ==========================
-param_used = {'mdot1': 0.0987,
-              'mdot2': 0.1376,
-              'mdot3': 0.1567,
-              'x': 0.719,
-              'z': 0.0032,
-              'qb1': 0.059,
-              'qb2': 0.0231,
-              'qb3': 0.133,
-              'm_nw': 2.14,
-              'm_gr': 1.96420,
-              'd_b': 7.036123,
-              'xi_ratio': 0.73909}
-
-
-# ==========================
 # from: synth5_7-9, run=2
 # ==========================
-param_used2 = {'mdot1': 0.102,
-               'mdot2': 0.1371,
-               'mdot3': 0.1497,
-               'x': 0.6971,
-               'z': 0.0061,
-               'qb1': 0.1551,
-               'qb2': 0.1549,
-               'qb3': 0.1774,
-               'm_nw': 2.02,
-               'm_gr': 1.6918,
-               'd_b': 7.05839,
-               'xi_ratio': 1.0190}
+param_used = {'mdot1': 0.102,
+              'mdot2': 0.1371,
+              'mdot3': 0.1497,
+              'x': 0.6971,
+              'z': 0.0061,
+              'qb1': 0.1551,
+              'qb2': 0.1549,
+              'qb3': 0.1774,
+              'm_nw': 2.02,
+              'm_gr': 1.6918,
+              'd_b': 7.05839,
+              'xi_ratio': 1.0190}
 
 
 def generate_synth_data(source, batches, run, mc_source, mc_version,
@@ -49,7 +32,7 @@ def generate_synth_data(source, batches, run, mc_source, mc_version,
                         introduce_noise=True):
     if reproduce:
         print('Reusing same params')
-        params = param_used2
+        params = param_used
     else:
         print('Generating new random params!')
         params = generate_params(source, batches=batches, run=run,
