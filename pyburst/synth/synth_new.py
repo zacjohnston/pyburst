@@ -67,6 +67,8 @@ def generate_synth_data(source, batches, run, mc_source, mc_version,
     # add epoch column
     epochs = np.arange(1, len(batches) + 1)
     table['epoch'] = epochs
+    table['cbol'] = 1.0
+    table['u_cbol'] = 0.0
 
     obs_tools.save_summary(table, source=source)
 
