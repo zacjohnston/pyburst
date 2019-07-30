@@ -9,6 +9,9 @@ from pyburst.observations import obs_tools
 """
 quick n dirty module for synthetic data in MCMC paper (2019)
 """
+# ==========================
+# from: synth5_7-9, run=1
+# ==========================
 param_used = {'mdot1': 0.0987,
               'mdot2': 0.1376,
               'mdot3': 0.1567,
@@ -23,13 +26,30 @@ param_used = {'mdot1': 0.0987,
               'xi_ratio': 0.73909}
 
 
+# ==========================
+# from: synth5_7-9, run=2
+# ==========================
+param_used2 = {'mdot1': 0.102,
+               'mdot2': 0.1371,
+               'mdot3': 0.1497,
+               'x': 0.6971,
+               'z': 0.0061,
+               'qb1': 0.1551,
+               'qb2': 0.1549,
+               'qb3': 0.1774,
+               'm_nw': 2.02,
+               'm_gr': 1.6918,
+               'd_b': 7.05839,
+               'xi_ratio': 1.0190}
+
+
 def generate_synth_data(source, batches, run, mc_source, mc_version,
                         reproduce=True, free_params=('m_gr', 'd_b', 'xi_ratio'),
                         u_fedd_frac=0.08, u_fper_frac=0.01, noise_mag=0.01,
                         introduce_noise=True):
     if reproduce:
         print('Reusing same params')
-        params = param_used
+        params = param_used2
     else:
         print('Generating new random params!')
         params = generate_params(source, batches=batches, run=run,
@@ -41,11 +61,13 @@ def generate_synth_data(source, batches, run, mc_source, mc_version,
                               params=params, u_fedd_frac=u_fedd_frac,
                               u_fper_frac=u_fper_frac)
 
+    if introduce_noise:
+        add_noise(table, magnitude=noise_mag)
+
     # add epoch column
     epochs = np.arange(1, len(batches) + 1)
     table['epoch'] = epochs
-    if introduce_noise:
-        add_noise(table, magnitude=noise_mag)
+
     obs_tools.save_summary(table, source=source)
 
 
