@@ -31,8 +31,7 @@ def plot_posteriors(chain, source, version, discard, cap=None):
     """
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
-    cc = mcmc_plot.setup_chainconsumer(chain=chain, param_labels=pkey_labels,
-                                       discard=discard, cap=cap)
+
     truth = dict()
     for i, key in enumerate(pkeys):
         key_formatted = pkey_labels[i]
