@@ -29,6 +29,14 @@ param_used = {'mdot1': 0.102,
 def plot_posteriors(chain, source, version, discard, cap=None):
     """Plots posteriors against true values
     """
+    truth = get_truth_values(source, version)
+    mcmc_plot.plot_posteriors(chain, source=source, version=version,
+                              discard=discard, cap=cap, truth_values=truth)
+
+
+def get_truth_values(source, version):
+    """Returns truth values of original params, with formatted labels
+    """
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
 
@@ -37,8 +45,7 @@ def plot_posteriors(chain, source, version, discard, cap=None):
         key_formatted = pkey_labels[i]
         truth[key_formatted] = param_used[key]
 
-    mcmc_plot.plot_posteriors(chain, source=source, version=version,
-                              discard=discard, cap=cap, truth_values=truth)
+    return truth
 
 
 def generate_synth_data(source, batches, run, mc_source, mc_version,
