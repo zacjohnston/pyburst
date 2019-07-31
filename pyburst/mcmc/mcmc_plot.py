@@ -119,7 +119,7 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
                       display=display, version=version)
 
 
-def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lhood=False,
+def plot_contours(chain, discard, source, version, cap=None, max_lhood=False,
                   display=True, save=False, truth_values=None, verbose=True,
                   sigmas=np.linspace(0, 2, 5)):
     """Plots posterior contours of mcmc chain
@@ -136,11 +136,9 @@ def plot_contours(chain, discard, source, version, cap=None, truth=False, max_lh
         max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
                                                      n_steps=n_steps, verbose=verbose)
         fig = cc.plotter.plot(truth=max_params)
-    elif truth:
-        if truth_values is None:
-            truth_values = get_summary(chain, discard=discard, cap=cap,
-                                       source=source, version=version)[:, 1]
-
+    elif truth_values is not None:
+        truth_values = get_summary(chain, discard=discard, cap=cap,
+                                   source=source, version=version)[:, 1]
         fig = cc.plotter.plot(truth=truth_values)
     else:
         fig = cc.plotter.plot()
