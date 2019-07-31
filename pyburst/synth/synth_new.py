@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 
 # pyburst
-from pyburst.mcmc import burstfit, mcmc_versions, mcmc_tools
+from pyburst.mcmc import burstfit, mcmc_versions, mcmc_tools, mcmc_plot
 from pyburst.grids import grid_analyser
 from pyburst.observations import obs_tools
-
+from pyburst.plotting import plot_tools
 """
 quick n dirty module for synthetic data in MCMC paper (2019)
 """
@@ -24,6 +24,22 @@ param_used = {'mdot1': 0.102,
               'm_gr': 1.6918,
               'd_b': 7.05839,
               'xi_ratio': 1.0190}
+
+
+def plot_posteriors(chain, source, version, discard, cap=None):
+    """Plots posteriors against true values
+    """
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+    pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
+    cc = mcmc_plot.setup_chainconsumer(chain=chain, param_labels=pkey_labels,
+                                       discard=discard, cap=cap)
+    truth = dict()
+    for i, key in enumerate(pkeys):
+        key_formatted = pkey_labels[i]
+        truth[key_formatted] = param_used[key]
+
+    mcmc_plot.plot_posteriors(chain, source=source, version=version,
+                              discard=discard, cap=cap, truth_values=truth)
 
 
 def generate_synth_data(source, batches, run, mc_source, mc_version,
