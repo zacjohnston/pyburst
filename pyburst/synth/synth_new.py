@@ -34,6 +34,14 @@ def plot_posteriors(chain, source, version, discard, cap=None):
                               discard=discard, cap=cap, truth_values=truth)
 
 
+def plot_contours(chain, source, version, discard, cap=None):
+    """Plots contours against true values
+        """
+    truth = get_truth_values(source, version)
+    mcmc_plot.plot_contours(chain, source=source, version=version,
+                            discard=discard, cap=cap, truth_values=truth)
+
+
 def get_truth_values(source, version):
     """Returns truth values of original params, with formatted labels
     """
