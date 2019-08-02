@@ -214,7 +214,7 @@ class BurstFit:
         if plot:
             n_rows = int(np.ceil(n_bprops/2))
             subplot_width = 3
-            subplot_height = 2.25
+            subplot_height = 2.5
 
             fig, ax = plt.subplots(n_rows, 2, sharex=True,
                                    figsize=(2*subplot_width, n_rows * subplot_height))
@@ -617,7 +617,7 @@ class BurstFit:
         if title:
             ax.set_title(ylabel, fontsize=fontsize)
         if legend:
-            ax.legend()
+            ax.legend(loc='upper left')
         plt.tight_layout()
         if display:
             plt.show(block=False)
