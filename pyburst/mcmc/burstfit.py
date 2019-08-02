@@ -597,7 +597,7 @@ class BurstFit:
             fig, ax = plt.subplots(figsize=(5, 4))
 
         epochs = np.array(self.obs.index)
-        x = np.arange(3)
+        x = np.arange(self.n_epochs)
         ax.set_xticks(x)
 
         ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
