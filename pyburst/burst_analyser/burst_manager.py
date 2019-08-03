@@ -17,3 +17,16 @@ def save_all_lightcurves(batches, source, path=None, align='t_start', reload=Fal
             model = burst_analyser.BurstRun(run, batch=batch, source=source,
                                             reload=reload)
             model.save_burst_lightcurves(path=path, align=align)
+
+
+def save_all_average_lightcurves(batches, source, align='t_peak',
+                                 reload=False):
+    """Saves all lightcurve files for each model in given batches
+    """
+    for batch in batches:
+        n_runs = grid_tools.get_nruns(batch, source=source)
+        for run in range(1, n_runs+1):
+            model = burst_analyser.BurstRun(run, batch=batch, source=source,
+                                            reload=reload)
+            model.save_average_lightcurve(align=align)
+
