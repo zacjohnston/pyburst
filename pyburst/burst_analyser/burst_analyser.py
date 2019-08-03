@@ -571,6 +571,23 @@ class BurstRun(object):
 
         sys.stdout.write('\n')
 
+    def save_average_lightcurve(self, align='t_peak'):
+        """Saves averaged lightcurve to file
+        """
+        self.ensure_analysed_is(True)
+        path = grid_strings.batch_average_lightcurves_path(batch=self.batch,
+                                                           source=self.source)
+
+        self.printv(f'Saving averaged lightcurve to: {path}')
+        grid_tools.try_mkdir(path, skip=True, verbose=False)
+
+        lightcurve = self.average_lightcurve(align=align)
+        header = 'time (s), luminosity (erg/s), u_luminosity (erg/s)'
+        filepath = grid_strings.average_lightcurve_filepath(run=self.run,
+                                                            batch=self.batch,
+                                                            source=self.source)
+        np.savetxt(filepath, lightcurve, header=header)
+
     # ===========================================================
     # Analysis
     # ===========================================================
