@@ -382,16 +382,12 @@ class Kgrid:
         columns: [time (s), Lum (erg), u(Lum), Radius (cm), u(Radius)]
                   0         1          2       3            4
         """
-        batch_str = f'{self.source}_{batch}'
-        path = os.path.join(self.source_path, 'mean_lightcurves', batch_str)
         batch_table = self.get_params(batch=batch)
         self.mean_lc[batch] = {}
 
         for run in batch_table['run']:
-            run_str = grid_strings.get_run_string(run, basename=self.basename)
-            filename = f'{batch_str}_{run_str}_mean.data'
-            filepath = os.path.join(path, filename)
-
+            filepath = grid_strings.average_lightcurve_filepath(run=run, batch=batch,
+                                                                source=self.source)
             self.mean_lc[batch][run] = np.loadtxt(filepath)
 
     def load_all_mean_lightcurves(self):
