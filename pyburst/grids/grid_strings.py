@@ -97,6 +97,11 @@ def batch_lightcurves_path(batch, source):
     return os.path.join(analysis_path, 'output', 'lightcurves')
 
 
+def batch_average_lightcurves_path(batch, source):
+    analysis_path = batch_analysis_path(batch, source=source)
+    return os.path.join(analysis_path, 'output', 'average_lightcurves')
+
+
 def model_lightcurves_path(run, batch, source):
     batch_lc_path = batch_lightcurves_path(batch=batch, source=source)
     return os.path.join(batch_lc_path, f'run_{run}')
@@ -195,6 +200,11 @@ def cmd_filepath(run, batch, source, basename='xrb'):
 def burst_lightcurve_filepath(burst_i, run, batch, source):
     path = model_lightcurves_path(run, batch=batch, source=source)
     filename = f'lc_{burst_i}.txt'
+    return os.path.join(path, filename)
+
+def average_lightcurve_filepath(run, batch, source):
+    path = batch_average_lightcurves_path(batch=batch, source=source)
+    filename = f'average_lightcurve_{source}_{batch}_{run}.txt'
     return os.path.join(path, filename)
 
 # ======================================================
