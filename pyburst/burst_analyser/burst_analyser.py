@@ -1158,21 +1158,22 @@ class BurstRun(object):
         """
         bursts = self.clean_bursts(exclude_discard=True)
 
+        n_bursts = len(bursts)
         n_steps = int((right - left) / dt)
-        time = np.linspace(left, right, n_steps)
-        lum_temp = np.zeros_like(time)
 
-        for burst in bursts.itertuples():
+        time = np.linspace(left, right, n_steps)
+        lum_interp = np.full([n_steps, n_bursts], np.nan)
+
+        for i, burst in enumerate(bursts.itertuples()):
             lc = self.extract_lightcurve(burst.Index, align=align, zero_time=True)
             lum_func = interpolate.interp1d(lc[:, 0], lc[:, 1])
 
-            lum_interp = lum_func(time)
-            lum_temp += lum_interp
+            lum_interp[:, i] = lum_func(time)
 
-        n_bursts = len(bursts)
-        lum_avg = lum_temp / n_bursts
+        lum_avg = np.mean(lum_interp, axis=1)
+        lum_std = np.std(lum_interp, axis=1)
 
-        lum_out = np.stack([time, lum_avg], axis=1)
+        lum_out = np.stack([time, lum_avg, lum_std], axis=1)
         return lum_out
 
     def test_bimodal(self):
