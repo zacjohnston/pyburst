@@ -1141,6 +1141,40 @@ class BurstRun(object):
             self.summary['rate'] = sec_day / self.summary['dt']  # burst rate (per day)
             self.summary['u_rate'] = sec_day * self.summary['u_dt'] / self.summary['dt']**2
 
+    def average_lightcurve(self, align='t_peak', dt=0.1, left=-30,
+                           right=150):
+        """Calculates average lightcurve from all bursts (after discards)
+
+        parameters
+        ----------
+        align : str
+            point in all lightcurves to align by
+        dt : flt
+            timestep (s) of averaged lightcurve
+        left : flt
+            start time (s) of averaged lightcurve (relative to align)
+        right : flt
+            end time (s) of averaged lightcurve (relative to align)
+        """
+        bursts = self.clean_bursts(exclude_discard=True)
+
+        n_steps = int((right - left) / dt)
+        time = np.linspace(left, right, n_steps)
+        lum_temp = np.zeros_like(time)
+
+        for burst in bursts.itertuples():
+            lc = self.extract_lightcurve(burst.Index, align=align, zero_time=True)
+            lum_func = interpolate.interp1d(lc[:, 0], lc[:, 1])
+
+            lum_interp = lum_func(time)
+            lum_temp += lum_interp
+
+        n_bursts = len(bursts)
+        lum_avg = lum_temp / n_bursts
+
+        lum_out = np.stack([time, lum_avg], axis=1)
+        return lum_out
+
     def test_bimodal(self):
         """Determines if the burst sequence is bimodal
         """
