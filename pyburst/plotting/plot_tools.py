@@ -1,5 +1,5 @@
+import os
 import matplotlib.pyplot as plt
-
 
 def default_plt_options():
     """Initialise default plot parameters"""
@@ -10,6 +10,15 @@ def default_plt_options():
 
 
 default_plt_options()
+
+
+def save_plot(fig, label, path, extensions=('.pdf',)):
+    """Saves a figure passed to it
+    """
+    for ext in extensions:
+        filename = f'{label}{ext}'
+        filepath = os.path.join(path, filename)
+        fig.savefig(filepath)
 
 
 def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
