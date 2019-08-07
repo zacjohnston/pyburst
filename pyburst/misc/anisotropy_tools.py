@@ -20,32 +20,32 @@ def load_models(models=None):
     return tables
 
 
-def plot_xi(model='a', fontsize=18):
+def plot_xi(model='a'):
     """Plot xi_b, xi_p, and xi_p/xi_b
     """
     table = load_models(model)[model]
 
     fig, ax = plt.subplots()
-    ax.set_xlabel('$i$ (deg)', fontsize=fontsize)
-    ax.set_ylabel(r'$\xi$', fontsize=fontsize)
+    ax.set_xlabel('$i$ (deg)')
+    ax.set_ylabel(r'$\xi$')
     ax.set_xlim([0, 90])
-    ax.set_ylim([-0.0, 4])
+    ax.set_ylim([-0.0, 5])
 
     inc = table['col1']
     inv_xi_b = table['col2'] + table['col3']
     inv_xi_p = table['col4']
     xi_ratio = inv_xi_b / inv_xi_p
 
-    ax.plot(inc, 1/inv_xi_b, label=r'$\xi_\mathrm{b}$', linewidth=2)
-    ax.plot(inc, 1/inv_xi_p, ls='--', label=r'$\xi_\mathrm{p}$',
+    ax.plot(inc, inv_xi_b, label=r'$\xi_\mathrm{b}^{-1}$', linewidth=2)
+    ax.plot(inc, inv_xi_p, ls='--', label=r'$\xi_\mathrm{p}^{-1}$',
             linewidth=2)
     ax.plot(inc, xi_ratio, ls=':',
             label=r'$\xi_\mathrm{p} / \xi_\mathrm{b}$', linewidth=2)
 
-    ax.legend(fontsize=fontsize)
+    ax.legend()
     plt.tight_layout()
     plt.show(block=False)
-
+    return fig
 
 def plot_ratio(tables=None, models=None, fontsize=18):
     """Plot xi_p/xi_b ratio for different models"""
