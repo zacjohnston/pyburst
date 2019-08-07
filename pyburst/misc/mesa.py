@@ -30,7 +30,7 @@ def plot_compare(mesa_runs, mdots, grid_source='mesa',
         unit_f = 3600
     else:
         unit_f = plot_tools.unit_scale(bprop)
-        
+
     xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
 
     gr_correction = {
@@ -76,8 +76,9 @@ def setup_analyser(run):
     lc = load_model_lc(run)
     lc[:, 0] *= 3600
     model = burst_analyser.BurstRun(run=run, batch=1, source='meisel',
-                                 load_lum=False, load_config=False,
-                                 analyse=False, truncate_edd=False)
+                                    load_lum=False, analyse=False,
+                                    truncate_edd=False,
+                                    load_model_params=False)
 
     # inject lightcurve
     model.lum = lc
