@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import os
 
 # pyburst
@@ -25,16 +26,43 @@ def setup_analyser(run):
     """
     lc = load_model_lc(run)
     lc[:, 0] *= 3600
-    bg = burst_analyser.BurstRun(run=run, batch=1, source='meisel',
+    model = burst_analyser.BurstRun(run=run, batch=1, source='meisel',
                                  load_lum=False, load_config=False,
                                  analyse=False, truncate_edd=False)
 
     # inject lightcurve
-    bg.lum = lc
-    bg.setup_lum_interpolator()
+    model.lum = lc
+    model.setup_lum_interpolator()
 
-    bg.flags['lum_loaded'] = True
-    bg.options['load_model_params'] = False
+    model.flags['lum_loaded'] = True
+    model.options['load_model_params'] = False
 
-    bg.analyse()
-    return bg
+    model.analyse()
+    return model
+
+def extract_bprops(runs, mdots,
+                   bprops=('dt', 'rate', 'fluence', 'peak')):
+    """Quick and dirty extraction of burst properties from Mesa models
+    """
+    n_models = len(runs)
+    models = pd.DataFrame()
+    models['accrate'] = mdots
+
+    summ = dict.fromkeys(bprops)
+    for key in bprops:
+        u_key = f'u_{key}'
+        summ[key] = np.full(n_models, np.nan)
+        summ[u_key] = np.full(n_models, np.nan)
+
+    for i, run in enumerate(runs):
+        model = setup_analyser(run)
+
+        for bprop in bprops:
+            u_bprop = f'u_{bprop}'
+            summ[bprop][i] = model.summary[bprop]
+            summ[u_bprop][i] = model.summary[u_bprop]
+
+    for key in summ:
+        models[key] = summ[key]
+
+    return models
