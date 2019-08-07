@@ -1,9 +1,58 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import os
 
 # pyburst
+from pyburst.grids import grid_analyser
 from pyburst.burst_analyser import burst_analyser
+from pyburst.physics import gravity
+from pyburst.plotting import plot_tools
+
+
+def plot_compare(mesa_runs, mdots, grid_source='mesa',
+                 params=None, bprop='rate',
+                 mass=1.4, radius=10):
+    """Plot comparison of mesa and kepler models
+    """
+    if params is None:
+        print('Using default params')
+        params = {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': 0.0}
+
+    kgrid = grid_analyser.Kgrid(source=grid_source)
+    grid_summ = kgrid.get_summ(params=params)
+    grid_params = kgrid.get_params(params=params)
+
+    mesa_models = extract_bprops(runs=mesa_runs, mdots=mdots)
+
+    u_bprop = f'u_{bprop}'
+    if bprop == 'dt':
+        unit_f = 3600
+    else:
+        unit_f = plot_tools.unit_scale(bprop)
+        
+    xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
+
+    gr_correction = {
+        'rate': 1/redshift,
+        'dt': redshift,
+        'fluence': redshift,
+        'peak': redshift,
+    }.get(bprop, 1.0)
+
+    fig, ax = plt.subplots()
+    ax.errorbar(grid_params['accrate'], grid_summ[bprop]*gr_correction/unit_f,
+                yerr=grid_summ[u_bprop]*gr_correction/unit_f, marker='o',
+                capsize=3, label='kepler')
+    ax.errorbar(mesa_models['accrate'], mesa_models[bprop]/unit_f,
+                yerr=mesa_models[u_bprop]/unit_f, marker='o', capsize=3,
+                label='mesa')
+
+    ylabel = plot_tools.full_label(bprop)
+    ax.set_ylabel(ylabel)
+    ax.set_xlabel(plot_tools.full_label('mdot'))
+    ax.legend()
+    plt.show(block=False)
 
 
 def model_filepath(run):
