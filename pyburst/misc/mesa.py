@@ -10,7 +10,7 @@ from pyburst.physics import gravity
 from pyburst.plotting import plot_tools
 
 
-def plot(model_set, bprop='rate'):
+def plot(model_set, bprop='rate', actual_mdot=False):
     """Plot predefined set of mesa model comparisons
     """
     mesa_runs = {
@@ -22,14 +22,24 @@ def plot(model_set, bprop='rate'):
         1: [0.05, 0.07, 0.11, 0.15, 0.17],
         2: [0.05, 0.07, 0.08, 0.11, 0.15],
     }
+    mesa_mdots_actual = {
+        1: [0.061, 0.079, 0.123, 0.164, 0.185],
+        2: [0.065, 0.088, 0.09, 0.123, 0.164],
+    }
 
     params = {
         1: {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': 0.0},
         2: {'x': 0.7, 'z': 0.01, 'qb': 0.1, 'qnuc': 0.0},
     }
 
+    if actual_mdot:
+        mdots = mesa_mdots_actual[model_set]
+    else:
+        mdots = mesa_mdots[model_set]
+
     plot_compare(mesa_runs=mesa_runs[model_set],
-                 mesa_mdots=mesa_mdots[model_set], bprop=bprop)
+                 mesa_mdots=mdots, bprop=bprop,
+                 params=params[model_set])
 
 
 def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
@@ -58,12 +68,12 @@ def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
     gr_correction = {
         'rate': 1/redshift,
         'dt': redshift,
-        'fluence': redshift,
-        'peak': redshift,
+        'fluence': xi**2,
+        'peak': xi**2,
     }.get(bprop, 1.0)
 
     fig, ax = plt.subplots()
-    ax.errorbar(grid_params['accrate'], grid_summ[bprop]*gr_correction/unit_f,
+    ax.errorbar(grid_params['accrate']*xi**2, grid_summ[bprop]*gr_correction/unit_f,
                 yerr=grid_summ[u_bprop]*gr_correction/unit_f, marker='o',
                 capsize=3, label='kepler')
     ax.errorbar(mesa_models['accrate'], mesa_models[bprop]/unit_f,
