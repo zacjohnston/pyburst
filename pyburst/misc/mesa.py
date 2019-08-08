@@ -10,7 +10,8 @@ from pyburst.physics import gravity
 from pyburst.plotting import plot_tools
 
 
-def plot(model_set, bprop='rate', actual_mdot=True, qnuc=0.0):
+def plot(model_set, actual_mdot=True, qnuc=0.0,
+         bprops=('rate', 'fluence', 'peak')):
     """Plot predefined set of mesa model comparisons
     """
     mesa_runs = {
@@ -42,12 +43,12 @@ def plot(model_set, bprop='rate', actual_mdot=True, qnuc=0.0):
         mdots = mesa_mdots[model_set]
 
     plot_compare(mesa_runs=mesa_runs[model_set],
-                 mesa_mdots=mdots, bprop=bprop,
+                 mesa_mdots=mdots, bprops=bprops,
                  params=params[model_set])
 
 
 def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
-                 params=None, bprop='rate',
+                 params=None, bprops=('rate', 'fluence', 'peak'),
                  mass=1.4, radius=10):
     """Plot comparison of mesa and kepler models
     """
@@ -59,35 +60,45 @@ def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
     grid_summ = kgrid.get_summ(params=params)
     grid_params = kgrid.get_params(params=params)
 
-    mesa_models = extract_bprops(runs=mesa_runs, mesa_mdots=mesa_mdots)
-
-    u_bprop = f'u_{bprop}'
-    if bprop == 'dt':
-        unit_f = 3600
-    else:
-        unit_f = plot_tools.unit_scale(bprop)
-
     xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
 
-    gr_correction = {
+    mesa_models = extract_bprops(runs=mesa_runs, mesa_mdots=mesa_mdots)
+
+    gr_corrections = {
         'rate': 1/redshift,
         'dt': redshift,
         'fluence': xi**2,
         'peak': xi**2,
-    }.get(bprop, 1.0)
+    }
+    n_bprops = len(bprops)
+    figsize = (4.5, 2.5*n_bprops)
+    fig, ax = plt.subplots(n_bprops, 1, figsize=figsize, sharex='all')
 
-    fig, ax = plt.subplots()
-    ax.errorbar(grid_params['accrate']*xi**2, grid_summ[bprop]*gr_correction/unit_f,
-                yerr=grid_summ[u_bprop]*gr_correction/unit_f, marker='o',
-                capsize=3, label='kepler')
-    ax.errorbar(mesa_models['accrate'], mesa_models[bprop]/unit_f,
-                yerr=mesa_models[u_bprop]/unit_f, marker='o', capsize=3,
-                label='mesa')
+    for i, bprop in enumerate(bprops):
+        u_bprop = f'u_{bprop}'
+        if bprop == 'dt':
+            unit_f = 3600
+        else:
+            unit_f = plot_tools.unit_scale(bprop)
+        gr_f = gr_corrections[bprop]
 
-    ylabel = plot_tools.full_label(bprop)
-    ax.set_ylabel(ylabel)
-    ax.set_xlabel(plot_tools.full_label('mdot'))
-    ax.legend()
+        # === kepler model ===
+        ax[i].errorbar(grid_params['accrate']*xi**2,
+                       grid_summ[bprop]*gr_f/unit_f,
+                       yerr=grid_summ[u_bprop]*gr_f/unit_f, marker='o',
+                       capsize=3, label='kepler')
+
+        # === mesa model ===
+        ax[i].errorbar(mesa_models['accrate'], mesa_models[bprop]/unit_f,
+                       yerr=mesa_models[u_bprop]/unit_f, marker='o',
+                       capsize=3, label='mesa')
+
+        ylabel = plot_tools.full_label(bprop)
+        ax[i].set_ylabel(ylabel)
+
+    ax[0].legend()
+    ax[-1].set_xlabel(plot_tools.full_label('mdot'))
+    plt.tight_layout()
     plt.show(block=False)
 
 
