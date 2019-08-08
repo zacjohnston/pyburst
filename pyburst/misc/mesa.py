@@ -10,26 +10,30 @@ from pyburst.physics import gravity
 from pyburst.plotting import plot_tools
 
 
-def plot(model_set, bprop='rate', actual_mdot=False):
+def plot(model_set, bprop='rate', actual_mdot=True, qnuc=0.0):
     """Plot predefined set of mesa model comparisons
     """
     mesa_runs = {
         1: [1, 2, 4, 5, 6],
         2: np.arange(7, 12),
+        3: np.arange(16, 19),
     }
 
     mesa_mdots = {
-        1: [0.05, 0.07, 0.11, 0.15, 0.17],
-        2: [0.05, 0.07, 0.08, 0.11, 0.15],
+        1: [0.051, 0.069, 0.111, 0.15, 0.17],
+        2: [0.051, 0.069, 0.079, 0.111, 0.150],
+        3: [0.111, 0.15, 0.17],
     }
     mesa_mdots_actual = {
         1: [0.061, 0.079, 0.123, 0.164, 0.185],
         2: [0.065, 0.088, 0.09, 0.123, 0.164],
+        3: [0.128, 0.171, 0.192],
     }
 
     params = {
-        1: {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': 0.0},
-        2: {'x': 0.7, 'z': 0.01, 'qb': 0.1, 'qnuc': 0.0},
+        1: {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': qnuc},
+        2: {'x': 0.7, 'z': 0.01, 'qb': 0.1, 'qnuc': qnuc},
+        3: {'x': 0.7, 'z': 0.01, 'qb': 1.0, 'qnuc': qnuc},
     }
 
     if actual_mdot:
