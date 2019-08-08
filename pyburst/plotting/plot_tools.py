@@ -84,7 +84,7 @@ def unit_label(quantity):
         'accrate': r'$\dot{M}_\mathrm{Edd}$',
         'mdot': r'$\dot{M}_\mathrm{Edd}$',
         'qb': r'MeV $\mathrm{nucleon}^{-1}$',
-        'lum': 'erg s$^{-1}$',
+        'lum': '$10^{38}$ erg s$^{-1}$',
         'mass': r'$\mathrm{M_\odot}$',
         'radius': 'km',
     }
