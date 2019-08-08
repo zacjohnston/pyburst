@@ -59,6 +59,36 @@ def plot(model_set, actual_mdot=True, qnuc=0.0,
                  params=params[model_set])
 
 
+def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
+                radius=10, mass=1.4):
+    """Plots comparison of average lightcurves from mesa
+    """
+    mesa_model = setup_analyser(mesa_run)
+    kgrid = grid_analyser.Kgrid(source=grid_source)
+    kgrid.load_mean_lightcurves(grid_batch)
+
+    xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
+    lum_f = unit_factor('peak')
+    time_f = unit_factor('dt')
+
+    fig, ax = plt.subplots()
+
+    mesa_lc = mesa_model.average_lightcurve()
+    kepler_lc = kgrid.mean_lc[grid_batch][grid_run]
+
+    ax.plot(mesa_lc[:, 0] / time_f,
+            mesa_lc[:, 1] / lum_f,
+            label='mesa')
+
+    ax.plot(kepler_lc[:, 0] * redshift / time_f,
+            kepler_lc[:, 1] * xi**2 / lum_f,
+            label='kepler')
+
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel(plot_tools.full_label('lum'))
+    ax.legend()
+    plt.show(block=False)
+
 def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
                  params=None, bprops=('rate', 'fluence', 'peak'),
                  mass=1.4, radius=10):
@@ -76,23 +106,15 @@ def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
 
     mesa_models = extract_bprops(runs=mesa_runs, mesa_mdots=mesa_mdots)
 
-    gr_corrections = {
-        'rate': 1/redshift,
-        'dt': redshift,
-        'fluence': xi**2,
-        'peak': xi**2,
-    }
     n_bprops = len(bprops)
     figsize = (4.5, 2.5*n_bprops)
     fig, ax = plt.subplots(n_bprops, 1, figsize=figsize, sharex='all')
 
     for i, bprop in enumerate(bprops):
         u_bprop = f'u_{bprop}'
-        if bprop == 'dt':
-            unit_f = 3600
-        else:
-            unit_f = plot_tools.unit_scale(bprop)
-        gr_f = gr_corrections[bprop]
+
+        unit_f = unit_factor(bprop)
+        gr_f = gr_correction(bprop, xi=xi, redshift=redshift)
 
         # === kepler model ===
         ax[i].errorbar(grid_params['accrate']*xi**2,
@@ -112,6 +134,27 @@ def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
     ax[-1].set_xlabel(plot_tools.full_label('mdot'))
     plt.tight_layout()
     plt.show(block=False)
+
+
+def unit_factor(bprop):
+    """Returns scaling factor
+    """
+    if bprop == 'dt':
+        return 3600
+    else:
+        return plot_tools.unit_scale(bprop)
+
+
+def gr_correction(bprop, xi, redshift):
+    """Returns gr correction factor to convert from kepler to mesa frame
+    """
+    corrections = {
+        'rate': 1/redshift,  # mesa time in observer coordinate?
+        'dt': redshift,
+        'fluence': xi**2,
+        'peak': xi**2,
+    }
+    return corrections[bprop]
 
 
 def model_filepath(run):
