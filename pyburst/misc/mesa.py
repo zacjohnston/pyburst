@@ -60,7 +60,8 @@ def plot(model_set, actual_mdot=True, qnuc=0.0,
 
 
 def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
-                radius=10, mass=1.4):
+                radius=10, mass=1.4, shaded=True, ax=None,
+                display=True):
     """Plots comparison of average lightcurves from mesa
     """
     mesa_model = setup_analyser(mesa_run)
@@ -71,23 +72,40 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
     lum_f = unit_factor('peak')
     time_f = unit_factor('dt')
 
-    fig, ax = plt.subplots()
+    if ax is None:
+        fig, ax = plt.subplots(figsize=[6, 4])
 
     mesa_lc = mesa_model.average_lightcurve()
-    kepler_lc = kgrid.mean_lc[grid_batch][grid_run]
+    kep_lc = kgrid.mean_lc[grid_batch][grid_run]
 
-    ax.plot(mesa_lc[:, 0] / time_f,
-            mesa_lc[:, 1] / lum_f,
-            label='mesa')
+    mesa_time = mesa_lc[:, 0] / time_f
+    mesa_lum = mesa_lc[:, 1] / lum_f
+    mesa_u_lum = mesa_lc[:, 2] / lum_f
 
-    ax.plot(kepler_lc[:, 0] * redshift / time_f,
-            kepler_lc[:, 1] * xi**2 / lum_f,
-            label='kepler')
+    kep_time = kep_lc[:, 0] * redshift / time_f
+    kep_lum = kep_lc[:, 1] * xi**2 / lum_f
+    kep_u_lum = kep_lc[:, 2] * xi**2 / lum_f
+
+    if shaded:
+        ax.fill_between(kep_time, y1=kep_lum + kep_u_lum,
+                        y2=kep_lum - kep_u_lum,
+                        color='C0', alpha=0.5)
+
+        ax.fill_between(mesa_time, y1=mesa_lum + mesa_u_lum,
+                        y2=mesa_lum - mesa_u_lum,
+                        color='C1', alpha=0.5)
+
+    ax.plot(kep_time, kep_lum, label='kepler', color='C0')
+    ax.plot(mesa_time, mesa_lum, label='mesa', color='C1')
 
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(plot_tools.full_label('lum'))
     ax.legend()
-    plt.show(block=False)
+
+    plt.tight_layout()
+    if display:
+        plt.show(block=False)
+
 
 def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
                  params=None, bprops=('rate', 'fluence', 'peak'),
