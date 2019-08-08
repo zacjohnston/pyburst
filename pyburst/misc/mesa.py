@@ -10,7 +10,29 @@ from pyburst.physics import gravity
 from pyburst.plotting import plot_tools
 
 
-def plot_compare(mesa_runs, mdots, grid_source='mesa',
+def plot(model_set, bprop='rate'):
+    """Plot predefined set of mesa model comparisons
+    """
+    mesa_runs = {
+        1: [1, 2, 4, 5, 6],
+        2: np.arange(7, 12),
+    }
+
+    mesa_mdots = {
+        1: [0.05, 0.07, 0.11, 0.15, 0.17],
+        2: [0.05, 0.07, 0.08, 0.11, 0.15],
+    }
+
+    params = {
+        1: {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': 0.0},
+        2: {'x': 0.7, 'z': 0.01, 'qb': 0.1, 'qnuc': 0.0},
+    }
+
+    plot_compare(mesa_runs=mesa_runs[model_set],
+                 mesa_mdots=mesa_mdots[model_set], bprop=bprop)
+
+
+def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
                  params=None, bprop='rate',
                  mass=1.4, radius=10):
     """Plot comparison of mesa and kepler models
@@ -23,7 +45,7 @@ def plot_compare(mesa_runs, mdots, grid_source='mesa',
     grid_summ = kgrid.get_summ(params=params)
     grid_params = kgrid.get_params(params=params)
 
-    mesa_models = extract_bprops(runs=mesa_runs, mdots=mdots)
+    mesa_models = extract_bprops(runs=mesa_runs, mesa_mdots=mesa_mdots)
 
     u_bprop = f'u_{bprop}'
     if bprop == 'dt':
@@ -90,13 +112,13 @@ def setup_analyser(run):
     model.analyse()
     return model
 
-def extract_bprops(runs, mdots,
+def extract_bprops(runs, mesa_mdots,
                    bprops=('dt', 'rate', 'fluence', 'peak')):
     """Quick and dirty extraction of burst properties from Mesa models
     """
     n_models = len(runs)
     models = pd.DataFrame()
-    models['accrate'] = mdots
+    models['accrate'] = mesa_mdots
 
     summ = dict.fromkeys(bprops)
     for key in bprops:
