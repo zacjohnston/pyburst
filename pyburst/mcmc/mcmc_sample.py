@@ -37,7 +37,7 @@ class Ksample:
         self.single_burst_lc = single_burst_lc
         self.burst_i = burst_i
 
-        self.xlims = {'gs1826': (-10, 200),
+        self.xlims = {'gs1826': (-10, 170),
                       '4u1820': (-1, 20),
                       }.get(self.obs_source)
         if runs is None:
@@ -205,10 +205,10 @@ class Ksample:
 
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
-    def plot(self, residuals=True, shaded=False, alpha_lines=0.3,
+    def plot(self, residuals=True, shaded=False, alpha_lines=0.5,
              alpha_shaded=0.7, fontsize=12, xlims=None,
              k_color='C1', obs_color='black', errorbars=False,
-             sub_figsize=None):
+             sub_figsize=None, linewidth=1):
         """Plot lightcurve comparison between observed and sample models
         """
         subplot_cols = {True: 2, False: 1}.get(residuals)
@@ -253,7 +253,8 @@ class Ksample:
                 if shaded:
                     lc_ax[epoch_i].fill_between(m_x, m_y_lower, m_y_upper,
                                                 color='0.7', alpha=alpha_shaded)
-                lc_ax[epoch_i].plot(m_x, m_y, color=k_color, alpha=alpha_lines)
+                lc_ax[epoch_i].plot(m_x, m_y, color=k_color, alpha=alpha_lines,
+                                    linewidth=linewidth)
 
                 # ====== Plot residuals ======
                 if residuals:
@@ -267,7 +268,8 @@ class Ksample:
                                        (obs_x-t_shift)) / y_scale
 
                     res_ax[epoch_i].plot(obs_x, y_residuals, color=k_color,
-                                         alpha=alpha_lines, zorder=0)
+                                         alpha=alpha_lines, zorder=0,
+                                         linewidth=linewidth)
 
                     if shaded:
                         res_ax[epoch_i].fill_between(obs_x, y_residuals - y_residuals_err,
@@ -284,7 +286,7 @@ class Ksample:
             if residuals:
                 res_ax[epoch_i].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
                                          ls='none', capsize=3, color=obs_color,
-                                         zorder=10)
+                                         zorder=10, linewidth=0.5*linewidth)
 
         lc_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
         lc_ax[-1].set_xlim(xlims)
