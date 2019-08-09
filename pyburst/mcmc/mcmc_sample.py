@@ -38,7 +38,7 @@ class Ksample:
         self.burst_i = burst_i
 
         self.xlims = {'gs1826': (-10, 170),
-                      '4u1820': (-1, 20),
+                      '4u1820': (-2, 27),
                       }.get(self.obs_source)
         if runs is None:
             sub_batch = self.grid.get_params(self.batches[0])
