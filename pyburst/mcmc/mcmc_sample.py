@@ -207,15 +207,17 @@ class Ksample:
 
     def plot(self, residuals=True, shaded=False, alpha_lines=0.3,
              alpha_shaded=0.7, fontsize=12, xlims=None,
-             k_color='C1', obs_color='black',
-             errorbars=False):
+             k_color='C1', obs_color='black', errorbars=False,
+             sub_figsize=None):
         """Plot lightcurve comparison between observed and sample models
         """
+        subplot_cols = {True: 2, False: 1}.get(residuals)
         if xlims is None:
             xlims = self.xlims
-        subplot_cols = {True: 2, False: 1}.get(residuals)
+        if sub_figsize is None:
+            sub_figsize = (6 * subplot_cols, 3 * self.n_epochs)
         fig, ax = plt.subplots(self.n_epochs, subplot_cols, sharex=True,
-                               figsize=(7*subplot_cols, 10))
+                               figsize=sub_figsize)
         y_scale = 1e-8
 
         if residuals:
