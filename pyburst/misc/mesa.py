@@ -9,9 +9,14 @@ from pyburst.burst_analyser import burst_analyser
 from pyburst.physics import gravity
 from pyburst.plotting import plot_tools
 
+"""
+Module for comparing Kepler and Mesa models
 
-def plot(model_set, actual_mdot=True, qnuc=0.0,
-         bprops=('rate', 'fluence', 'peak')):
+Currently very hacky and roughshod
+"""
+
+def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True,
+         bprops=('rate', 'fluence', 'peak'), display=True):
     """Plot predefined set of mesa model comparisons
     """
     mesa_info = get_mesa_set(model_set)
@@ -23,16 +28,19 @@ def plot(model_set, actual_mdot=True, qnuc=0.0,
 
     mesa_info['params']['qnuc'] = qnuc
 
-    plot_compare(mesa_runs=mesa_info['runs'],
-                 mesa_mdots=mdots, bprops=bprops,
-                 params=mesa_info['params'])
+    fig, ax = plot_compare(mesa_runs=mesa_info['runs'], display=display,
+                           mesa_mdots=mdots, bprops=bprops,
+                           params=mesa_info['params'], verbose=verbose)
+
+    return fig, ax
 
 
-def plot_all_avg_lightcurves(mesa_set, grid_source='mesa'):
+def plot_all_avg_lightcurves(mesa_set, grid_source='mesa',
+                             display=True, verbose=True):
     """Plots all average lightcurve comparisons for a given set
     """
     mesa_info = get_mesa_set(mesa_set)
-    kgrid = grid_analyser.Kgrid(source=grid_source)
+    kgrid = grid_analyser.Kgrid(source=grid_source, verbose=verbose)
 
     # ===== Setup plotting =====
     n_models = len(mesa_info['runs'])
@@ -57,9 +65,12 @@ def plot_all_avg_lightcurves(mesa_set, grid_source='mesa'):
         plot_avg_lc(mesa_run=run, grid_run=kep_run,
                     grid_batch=kep_batch, grid_source='mesa',
                     ax=ax[row_i, col_i], display=False, kgrid=kgrid,
-                    legend=True if i == 0 else False)
+                    legend=True if i == 0 else False,
+                    verbose=verbose)
 
-    plt.show(block=False)
+    if display:
+        plt.show(block=False)
+    return fig, ax
 
 
 def get_mesa_set(mesa_set):
@@ -126,18 +137,19 @@ def get_mesa_set(mesa_set):
 
 def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
                 radius=10, mass=1.4, shaded=True, ax=None,
-                display=True, legend=True, kgrid=None):
+                display=True, legend=True, kgrid=None,
+                verbose=True):
     """Plots comparison of average lightcurves from mesa
     """
     xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
     lum_f = unit_factor('peak')
 
     if kgrid is None:
-        kgrid = grid_analyser.Kgrid(source=grid_source)
+        kgrid = grid_analyser.Kgrid(source=grid_source, verbose=verbose)
     if ax is None:
         fig, ax = plt.subplots(figsize=[6, 4])
 
-    mesa_model = setup_analyser(mesa_run)
+    mesa_model = setup_analyser(mesa_run, verbose=verbose)
     kgrid.load_mean_lightcurves(grid_batch)
 
     mesa_lc = mesa_model.average_lightcurve()
@@ -175,20 +187,21 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
 
 def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
                  params=None, bprops=('rate', 'fluence', 'peak'),
-                 mass=1.4, radius=10):
+                 mass=1.4, radius=10, verbose=True, display=True):
     """Plot comparison of mesa and kepler models
     """
     if params is None:
         print('Using default params')
         params = {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': 0.0}
 
-    kgrid = grid_analyser.Kgrid(source=grid_source)
+    kgrid = grid_analyser.Kgrid(source=grid_source, verbose=verbose)
     grid_summ = kgrid.get_summ(params=params)
     grid_params = kgrid.get_params(params=params)
 
     xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
 
-    mesa_models = extract_bprops(runs=mesa_runs, mesa_mdots=mesa_mdots)
+    mesa_models = extract_bprops(runs=mesa_runs, mesa_mdots=mesa_mdots,
+                                 verbose=verbose)
 
     n_bprops = len(bprops)
     figsize = (4.5, 2.5*n_bprops)
@@ -216,8 +229,12 @@ def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
 
     ax[0].legend()
     ax[-1].set_xlabel(plot_tools.full_label('mdot'))
+
     plt.tight_layout()
-    plt.show(block=False)
+    if display:
+        plt.show(block=False)
+
+    return fig, ax
 
 
 def unit_factor(bprop):
@@ -256,7 +273,7 @@ def load_model_lc(run):
     return np.loadtxt(filepath, skiprows=2)
 
 
-def setup_analyser(run):
+def setup_analyser(run, verbose=True):
     """Sets up burst_analyser with haxx
     """
     lc = load_model_lc(run)
@@ -264,7 +281,8 @@ def setup_analyser(run):
     model = burst_analyser.BurstRun(run=run, batch=1, source='meisel',
                                     load_lum=False, analyse=False,
                                     truncate_edd=False,
-                                    load_model_params=False)
+                                    load_model_params=False,
+                                    verbose=verbose)
 
     # inject lightcurve
     model.lum = lc
@@ -276,7 +294,7 @@ def setup_analyser(run):
     model.analyse()
     return model
 
-def extract_bprops(runs, mesa_mdots,
+def extract_bprops(runs, mesa_mdots, verbose=True,
                    bprops=('dt', 'rate', 'fluence', 'peak')):
     """Quick and dirty extraction of burst properties from Mesa models
     """
@@ -291,7 +309,7 @@ def extract_bprops(runs, mesa_mdots,
         summ[u_key] = np.full(n_models, np.nan)
 
     for i, run in enumerate(runs):
-        model = setup_analyser(run)
+        model = setup_analyser(run, verbose=verbose)
 
         for bprop in bprops:
             u_bprop = f'u_{bprop}'
