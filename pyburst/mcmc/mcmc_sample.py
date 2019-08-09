@@ -204,7 +204,8 @@ class Ksample:
 
     def plot(self, residuals=True, shaded=False, alpha_lines=0.3,
              alpha_shaded=0.7, fontsize=12, xlims=(-10, 200),
-             markersize=1, k_color='C1', obs_color='black'):
+             markersize=1, k_color='C1', obs_color='black',
+             errorbars=False):
         """Plot lightcurve comparison between observed and sample models
         """
         n_subplots = {True: 2, False: 1}.get(residuals)
@@ -215,6 +216,7 @@ class Ksample:
         if residuals:
             lc_ax = ax[:, 0]
             res_ax = ax[:, 1]
+            res_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
         else:
             lc_ax = ax[:]
             res_ax = None
@@ -227,7 +229,7 @@ class Ksample:
             obs_y_u = np.array(obs_burst.flux_err) / y_scale
 
             # ====== Labelling =====
-            lc_ax[epoch_i].set_ylabel(r'$F_\mathrm{b}$ ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
+            lc_ax[epoch_i].set_ylabel(r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
                                       fontsize=fontsize)
 
             for run_i, run in enumerate(self.runs):
@@ -266,18 +268,16 @@ class Ksample:
                                                      color='0.7', alpha=alpha_shaded)
 
             # ====== Plot observed lightcurves ======
-            # lc_ax[epoch_i].step(obs_burst.time, obs_y,
-            #                     where='post', color=obs_color)
+            lc_ax[epoch_i].step(obs_burst.time, obs_y,
+                                where='post', color=obs_color)
 
-            lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none',
-                                    capsize=3, color=obs_color,
-                                    markersize=markersize,
-                                    markeredgewidth=markersize)
+            if errorbars:
+                lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none',
+                                        capsize=3, color=obs_color)
             if residuals:
-                res_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
                 res_ax[epoch_i].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
                                          ls='none', capsize=3, color=obs_color,
-                                         markeredgewidth=markersize, zorder=10)
+                                         zorder=10)
 
         lc_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
         lc_ax[-1].set_xlim(xlims)
