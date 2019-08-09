@@ -28,6 +28,38 @@ def plot(model_set, actual_mdot=True, qnuc=0.0,
                  params=mesa_info['params'])
 
 
+def plot_all_avg_lightcurves(mesa_set):
+    """Plots all average lightcurve comparisons for a given set
+    """
+    mesa_info = get_mesa_set(mesa_set)
+
+    # ===== Setup plotting =====
+    n_models = len(mesa_info['runs'])
+    n_rows = int(np.ceil(n_models / 2))
+    subplot_width = 4
+    subplot_height = 2.5
+
+    fig, ax = plt.subplots(n_rows, 2,
+                           figsize=(2 * subplot_width, n_rows * subplot_height))
+
+    if n_models % 2 == 1:
+        ax[-1, -1].axis('off')
+
+    for i, run in enumerate(mesa_info['runs']):
+        row_i = int(np.floor(i / 2))
+        col_i = i % 2
+
+        kep_run = mesa_info['kep_runs'][i]
+        kep_batch = mesa_info['kep_batches'][i]
+
+        plot_avg_lc(mesa_run=run, grid_run=kep_run,
+                    grid_batch=kep_batch, grid_source='mesa',
+                    ax=ax[row_i, col_i], display=False,
+                    legend=True if i == 0 else False)
+
+    plt.show(block=False)
+
+
 def get_mesa_set(mesa_set):
     """Returns model info for a given mesa set
     """
@@ -63,17 +95,26 @@ def get_mesa_set(mesa_set):
         5: {'x': 0.75, 'z': 0.02, 'qb': 0.1},
         6: {'x': 0.75, 'z': 0.02, 'qb': 1.0},
     }
+    kep_runs = {
+        1: np.full(5, 4),
+    }
+    kep_batches = {
+        1: [2, 4, 8, 10, 12]
+    }
+
     return {
         'runs': mesa_runs[mesa_set],
         'mdots': mesa_mdots[mesa_set],
         'mdots_actual': mesa_mdots_actual[mesa_set],
         'params': params[mesa_set],
+        'kep_runs': kep_runs[mesa_set],
+        'kep_batches': kep_batches[mesa_set],
     }
 
 
 def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
                 radius=10, mass=1.4, shaded=True, ax=None,
-                display=True):
+                display=True, legend=True):
     """Plots comparison of average lightcurves from mesa
     """
     mesa_model = setup_analyser(mesa_run)
@@ -82,7 +123,6 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
 
     xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
     lum_f = unit_factor('peak')
-    time_f = unit_factor('dt')
 
     if ax is None:
         fig, ax = plt.subplots(figsize=[6, 4])
@@ -90,11 +130,11 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
     mesa_lc = mesa_model.average_lightcurve()
     kep_lc = kgrid.mean_lc[grid_batch][grid_run]
 
-    mesa_time = mesa_lc[:, 0] / time_f
+    mesa_time = mesa_lc[:, 0]
     mesa_lum = mesa_lc[:, 1] / lum_f
     mesa_u_lum = mesa_lc[:, 2] / lum_f
 
-    kep_time = kep_lc[:, 0] / time_f
+    kep_time = kep_lc[:, 0]
     kep_lum = kep_lc[:, 1] * xi**2 / lum_f
     kep_u_lum = kep_lc[:, 2] * xi**2 / lum_f
 
@@ -112,7 +152,8 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
 
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(plot_tools.full_label('lum'))
-    ax.legend()
+    if legend:
+        ax.legend()
 
     plt.tight_layout()
     if display:
