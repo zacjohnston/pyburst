@@ -171,14 +171,6 @@ class Ksample:
 
         Note: assumes epoch_i correspond to index of batches
         """
-        # TODO: Bug when model LC shorter than obs LC
-        # batch = self.batches[epoch_i]
-        # obs = self.bfit.obs[epoch_i]
-        # model = self.shifted_lc[batch][run]
-        # min_tshift = (obs.time[-1].value + 0.5*obs.dt[-1].value
-        #               - model[-1, 0])
-        # max_tshift = (obs.time[0].value + 0.5*obs.dt[0].value
-        #               - model[0, 0])
         min_tshift = -60
         max_tshift = 60
         t = np.linspace(min_tshift, max_tshift, n_points)
