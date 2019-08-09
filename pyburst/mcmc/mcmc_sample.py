@@ -225,9 +225,9 @@ class Ksample:
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
     def plot(self, residuals=True, shaded=False, alpha_lines=0.5,
-             alpha_shaded=0.7, fontsize=12, xlims=None,
+             alpha_shaded=0.7, xlims=None,
              k_color='C1', obs_color='black', errorbars=False,
-             sub_figsize=None, linewidth=1):
+             sub_figsize=None, linewidth=1, display=True):
         """Plot lightcurve comparison between observed and sample models
         """
         subplot_cols = {True: 2, False: 1}.get(residuals)
@@ -242,7 +242,7 @@ class Ksample:
         if residuals:
             lc_ax = ax[:, 0]
             res_ax = ax[:, 1]
-            res_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
+            res_ax[-1].set_xlabel('Time (s)')
         else:
             lc_ax = ax[:]
             res_ax = None
@@ -255,8 +255,7 @@ class Ksample:
             obs_y_u = np.array(obs_burst.flux_err) / y_scale
 
             # ====== Labelling =====
-            lc_ax[epoch_i].set_ylabel(r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
-                                      fontsize=fontsize)
+            lc_ax[epoch_i].set_ylabel(r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)')
 
             for i in range(self.n_bursts_batch):
                 burst = i + 1
@@ -279,8 +278,7 @@ class Ksample:
                 # ====== Plot residuals ======
                 if residuals:
                     res_ax[epoch_i].set_ylabel(r'Residuals '
-                                               r'($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
-                                               fontsize=fontsize)
+                                               r'($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)')
                     y_residuals = (self.interp_lc[batch][burst]['flux'](obs_x-t_shift)
                                    / y_scale - obs_y)
                     y_residuals_err = (self.interp_lc[batch][burst]['flux_err']
@@ -307,10 +305,12 @@ class Ksample:
                                          ls='none', capsize=3, color=obs_color,
                                          zorder=10, linewidth=0.5*linewidth)
 
-        lc_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
+        lc_ax[-1].set_xlabel('Time (s)')
         lc_ax[-1].set_xlim(xlims)
         plt.tight_layout()
-        plt.show(block=False)
+        if display:
+            plt.show(block=False)
+        return fig, ax
 
 
 def plot_batch(source, batch, error=False):
