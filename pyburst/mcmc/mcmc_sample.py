@@ -37,6 +37,9 @@ class Ksample:
         self.single_burst_lc = single_burst_lc
         self.burst_i = burst_i
 
+        self.xlims = {'gs1826': (-10, 200),
+                      '4u1820': (-1, 20),
+                      }.get(self.obs_source)
         if runs is None:
             sub_batch = self.grid.get_params(self.batches[0])
             self.runs = np.array(sub_batch['run'])
@@ -203,11 +206,13 @@ class Ksample:
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
     def plot(self, residuals=True, shaded=False, alpha_lines=0.3,
-             alpha_shaded=0.7, fontsize=12, xlims=(-10, 200),
-             markersize=1, k_color='C1', obs_color='black',
+             alpha_shaded=0.7, fontsize=12, xlims=None,
+             k_color='C1', obs_color='black',
              errorbars=False):
         """Plot lightcurve comparison between observed and sample models
         """
+        if xlims is None:
+            xlims = self.xlims
         n_subplots = {True: 2, False: 1}.get(residuals)
         fig, ax = plt.subplots(self.n_epochs, n_subplots, sharex=True,
                                figsize=(7*n_subplots, 10))
