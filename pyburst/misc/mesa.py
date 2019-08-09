@@ -14,6 +14,30 @@ def plot(model_set, actual_mdot=True, qnuc=0.0,
          bprops=('rate', 'fluence', 'peak')):
     """Plot predefined set of mesa model comparisons
     """
+    mesa_info = get_mesa_set(model_set)
+
+    params = {
+        1: {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': qnuc},
+        2: {'x': 0.7, 'z': 0.01, 'qb': 0.1, 'qnuc': qnuc},
+        3: {'x': 0.7, 'z': 0.01, 'qb': 1.0, 'qnuc': qnuc},
+        4: {'x': 0.7, 'z': 0.01, 'qb': 0.5, 'qnuc': qnuc},
+        5: {'x': 0.75, 'z': 0.02, 'qb': 0.1, 'qnuc': qnuc},
+        6: {'x': 0.75, 'z': 0.02, 'qb': 1.0, 'qnuc': qnuc},
+    }
+
+    if actual_mdot:
+        mdots = mesa_info['mdots_actual']
+    else:
+        mdots = mesa_info['mdots']
+
+    plot_compare(mesa_runs=mesa_info['runs'],
+                 mesa_mdots=mdots, bprops=bprops,
+                 params=params[model_set])
+
+
+def get_mesa_set(mesa_set):
+    """Returns model info for a given mesa set
+    """
     mesa_runs = {
         1: [1, 2, 4, 5, 6],
         2: np.arange(7, 12),
@@ -22,7 +46,6 @@ def plot(model_set, actual_mdot=True, qnuc=0.0,
         5: [73, 74, 78],
         6: np.arange(79, 85),
     }
-
     mesa_mdots = {
         1: [0.051, 0.069, 0.111, 0.15, 0.17],
         2: [0.051, 0.069, 0.079, 0.111, 0.15],
@@ -39,24 +62,11 @@ def plot(model_set, actual_mdot=True, qnuc=0.0,
         5: [0.061, 0.083, 0.186],
         6: [0.078, 0.084, 0.098, 0.129, 0.17, 0.192],
     }
-
-    params = {
-        1: {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': qnuc},
-        2: {'x': 0.7, 'z': 0.01, 'qb': 0.1, 'qnuc': qnuc},
-        3: {'x': 0.7, 'z': 0.01, 'qb': 1.0, 'qnuc': qnuc},
-        4: {'x': 0.7, 'z': 0.01, 'qb': 0.5, 'qnuc': qnuc},
-        5: {'x': 0.75, 'z': 0.02, 'qb': 0.1, 'qnuc': qnuc},
-        6: {'x': 0.75, 'z': 0.02, 'qb': 1.0, 'qnuc': qnuc},
+    return {
+        'runs': mesa_runs[mesa_set],
+        'mdots': mesa_mdots[mesa_set],
+        'mdots_actual': mesa_mdots_actual[mesa_set],
     }
-
-    if actual_mdot:
-        mdots = mesa_mdots_actual[model_set]
-    else:
-        mdots = mesa_mdots[model_set]
-
-    plot_compare(mesa_runs=mesa_runs[model_set],
-                 mesa_mdots=mdots, bprops=bprops,
-                 params=params[model_set])
 
 
 def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
@@ -82,7 +92,7 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
     mesa_lum = mesa_lc[:, 1] / lum_f
     mesa_u_lum = mesa_lc[:, 2] / lum_f
 
-    kep_time = kep_lc[:, 0] * redshift / time_f
+    kep_time = kep_lc[:, 0] / time_f
     kep_lum = kep_lc[:, 1] * xi**2 / lum_f
     kep_u_lum = kep_lc[:, 2] * xi**2 / lum_f
 
@@ -167,8 +177,8 @@ def gr_correction(bprop, xi, redshift):
     """Returns gr correction factor to convert from kepler to mesa frame
     """
     corrections = {
-        'rate': 1/redshift,  # mesa time in observer coordinate?
-        'dt': redshift,
+        'rate': 1,  # mesa time in observer coordinate?
+        'dt': 1,
         'fluence': xi**2,
         'peak': xi**2,
     }
