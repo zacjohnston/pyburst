@@ -375,6 +375,7 @@ class Kgrid:
                 lc = burst_tools.load_burst_lightcurve(burst_i, run=run, batch=batch,
                                                        source=self.source)
                 self.burst_lc[batch][run][burst_i] = lc
+        sys.stdout.write('\n')
 
     def load_mean_lightcurves(self, batch):
         """
