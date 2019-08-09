@@ -25,8 +25,10 @@ class Ksample:
     against observed LC
     """
     def __init__(self, source, mcmc_source, mcmc_version, batches, runs=None,
-                 verbose=True, single_burst_lc=False, burst_i=None):
+                 verbose=True, single_burst_lc=False, burst_i=None,
+                 fit_tail_only=False):
         self.source = source
+        self.n_epochs = len(batches)
         self.obs_source = obs_sources[source]
         self.grid = grid_analyser.Kgrid(self.source)
         self.bfit = burstfit.BurstFit(mcmc_source, version=mcmc_version, re_interp=False)
@@ -36,7 +38,6 @@ class Ksample:
         self.verbose = verbose
         self.single_burst_lc = single_burst_lc
         self.burst_i = burst_i
-
         self.xlims = {'gs1826': (-10, 170),
                       '4u1820': (-2, 27),
                       }.get(self.obs_source)
@@ -46,7 +47,10 @@ class Ksample:
         else:
             self.runs = runs
 
-        self.n_epochs = len(batches)
+        self.peak_i = np.zeros(self.n_epochs, dtype=int)
+        if fit_tail_only:
+            self.get_peak_indexes()
+
         self.loaded_lc = {}
         self.shifted_lc = {}
         self.interp_lc = {}
@@ -60,6 +64,12 @@ class Ksample:
     def printv(self, string):
         if self.verbose:
             print(string)
+
+    def get_peak_indexes(self):
+        """Get indexes for peak bins of each obs epoch
+        """
+        for epoch_i in range(self.n_epochs):
+            self.peak_i[epoch_i] = np.argmax(self.obs[epoch_i].flux)
 
     def interp_obs_lc(self):
         """Creates interpolated lightcurve of observed burst epochs
@@ -186,9 +196,10 @@ class Ksample:
         """Returns chi^2 of model vs. observed lightcurves
         """
         obs_burst = self.obs[epoch_i]
-        obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)
-        obs_flux = np.array(obs_burst.flux)
-        obs_flux_err = np.array(obs_burst.flux_err)
+        peak_i = int(self.peak_i[epoch_i])
+        obs_x = np.array(obs_burst.time + 0.5*obs_burst.dt)[peak_i:]
+        obs_flux = np.array(obs_burst.flux)[peak_i:]
+        obs_flux_err = np.array(obs_burst.flux_err)[peak_i:]
 
         batch = self.batches[epoch_i]
         model = self.interp_lc[batch][run]
@@ -274,7 +285,7 @@ class Ksample:
 
             if errorbars:
                 lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none',
-                                        capsize=3, color=obs_color)
+                                        capsize=3, color=obs_color, zorder=10)
             if residuals:
                 res_ax[epoch_i].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
                                          ls='none', capsize=3, color=obs_color,
