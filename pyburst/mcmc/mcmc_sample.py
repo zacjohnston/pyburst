@@ -213,9 +213,9 @@ class Ksample:
         """
         if xlims is None:
             xlims = self.xlims
-        n_subplots = {True: 2, False: 1}.get(residuals)
-        fig, ax = plt.subplots(self.n_epochs, n_subplots, sharex=True,
-                               figsize=(7*n_subplots, 10))
+        subplot_cols = {True: 2, False: 1}.get(residuals)
+        fig, ax = plt.subplots(self.n_epochs, subplot_cols, sharex=True,
+                               figsize=(7*subplot_cols, 10))
         y_scale = 1e-8
 
         if residuals:
