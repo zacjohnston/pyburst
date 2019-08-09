@@ -1344,7 +1344,7 @@ class BurstRun(object):
                         markersize=markersize, markeredgecolor=markeredgecolor, label='Short-wait')
 
         if burst_stages:
-            for stage in ('pre', 'start', 'tail_start', 'end'):
+            for stage in ('pre', 'start', 'end'):
                 x = self.bursts[f't_{stage}'] / timescale
                 y = self.bursts[f'lum_{stage}'] / yscale
                 label = {'pre': 'Burst stages'}.get(stage, None)
