@@ -370,7 +370,8 @@ class Kgrid:
                 bursts = [burst]
 
             for burst_i in bursts:
-                sys.stdout.write(f'\rLoading burst lc: run {run}, burst {burst_i+1}')
+                sys.stdout.write(f'\rLoading burst lc: run {run}, '
+                                 f'burst {burst_i+1}/{bursts[-1]}')
                 lc = burst_tools.load_burst_lightcurve(burst_i, run=run, batch=batch,
                                                        source=self.source)
                 self.burst_lc[batch][run][burst_i] = lc
