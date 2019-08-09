@@ -25,7 +25,7 @@ class Ksample:
     against observed LC
     """
     def __init__(self, source, mcmc_source, mcmc_version, batches, runs=None,
-                 verbose=True, single_burst_lc=False, burst_i=None,
+                 verbose=True, n_bursts=1,
                  fit_tail_only=False, n_points=None):
         self.source = source
         self.n_epochs = len(batches)
@@ -36,20 +36,24 @@ class Ksample:
         self.batches = batches
         self.params = load_param_sample(self.source, self.batches)
         self.verbose = verbose
-        self.single_burst_lc = single_burst_lc
-        self.burst_i = burst_i
+        self.n_bursts = n_bursts  # no. bursts to get from each model
+
         self.xlims = {'gs1826': (-10, 170),
                       '4u1820': (-2, 27),
                       }.get(self.obs_source)
-        if runs is None:
+
+        if runs is None:  # assume all batches have corresponding runs
             sub_batch = self.grid.get_params(self.batches[0])
             self.runs = np.array(sub_batch['run'])
         else:
             self.runs = runs
 
+        self.n_runs = len(self.runs)
+        self.n_bursts_batch = self.n_runs * self.n_bursts
+
         self.n_points = n_points
         if self.n_points is None:
-            self.n_points = {'gs1826': 150,
+            self.n_points = {'gs1826': 200,
                              '4u1820': 500}.get(self.obs_source)
 
         self.peak_i = np.zeros(self.n_epochs, dtype=int)
@@ -104,27 +108,31 @@ class Ksample:
         """Loads model burst lightcurves
         """
         self.printv('Loading model lightcurves')
-        # TODO: Use multiple burst LCs from each model (with discard)
-        if self.single_burst_lc:
-            if self.burst_i is None:
-                raise ValueError('Must supply burst_i if single_burst_lc=True')
-
-            for batch in self.batches:
-                self.loaded_lc[batch] = {}
-                self.grid.load_burst_lightcurves(batch, burst=self.burst_i)
-                lc_batch = self.grid.burst_lc[batch]
-
-                for run in lc_batch:
-                    burst_lc = lc_batch[run][self.burst_i]
-
-                    padded_lc = np.zeros([len(burst_lc), 3])
-                    padded_lc[:, :2] = burst_lc
-
-                    self.loaded_lc[batch][run] = padded_lc
-        else:
+        if self.n_bursts is 1:  # use mean lightcurves
             for batch in self.batches:
                 self.grid.load_mean_lightcurves(batch)
                 self.loaded_lc[batch] = self.grid.mean_lc[batch]
+        else:
+            for batch in self.batches:
+                burst_count = 1
+                self.loaded_lc[batch] = {}  # to contain every burst
+                self.grid.load_burst_lightcurves(batch)
+                lc_batch = self.grid.burst_lc[batch]
+
+                for run_n in lc_batch:
+                    n_bursts_run = int(self.grid.get_summ(batch, run_n).num)
+                    burst_start = n_bursts_run + 1 - self.n_bursts
+                    if burst_start < 1:
+                        raise ValueError(f'Fewer than n_bursts in model '
+                                         f'run={run_n}, batch={batch}')
+
+                    for burst in range(burst_start, n_bursts_run+1):
+                        burst_lc = lc_batch[run_n][burst-1]
+                        padded_lc = np.zeros([len(burst_lc), 3])
+                        padded_lc[:, :2] = burst_lc
+
+                        self.loaded_lc[batch][burst_count] = padded_lc
+                        burst_count += 1
 
     def extract_lc(self):
         """Extracts mean lightcurves from models and shifts to observer according to
@@ -134,17 +142,19 @@ class Ksample:
             self.shifted_lc[batch] = {}
             self.interp_lc[batch] = {}
 
-            for i, run in enumerate(self.runs):
+            for burst, burst_lc in self.loaded_lc[batch].items():
+                run = int(np.floor(burst / self.n_bursts))
                 if self.verbose:
                     sys.stdout.write('\rExtracting and shifting model lightcurves: '
-                                     f'Batch {batch} : run {run}/{len(self.runs)}')
-                self.shifted_lc[batch][run] = np.array(self.loaded_lc[batch][run])
+                                     f'Batch {batch} : '
+                                     f'burst {burst}/{self.n_bursts_batch}')
 
-                lc = self.shifted_lc[batch][run]
+                self.shifted_lc[batch][burst] = np.array(burst_lc)
+                lc = self.shifted_lc[batch][burst]
                 t = lc[:, 0]
                 lum = lc[:, 1:3]
 
-                params = self.params[i]
+                params = self.params[run-1]
                 params_dict = self.bfit.get_params_dict(params)
 
                 lc[:, 0] = 3600 * self.bfit.shift_to_observer(values=t, bprop='dt',
@@ -155,33 +165,34 @@ class Ksample:
                 flux = lum[:, 0]
                 flux_err = lum[:, 1]
 
-                self.interp_lc[batch][run] = {}
-                self.interp_lc[batch][run]['flux'] = interp1d(t, flux, bounds_error=False,
-                                                              fill_value=0)
-                self.interp_lc[batch][run]['flux_err'] = interp1d(t, flux_err,
-                                                                  bounds_error=False,
-                                                                  fill_value=0)
+                self.interp_lc[batch][burst] = {}
+                self.interp_lc[batch][burst]['flux'] = interp1d(t, flux, bounds_error=False,
+                                                                fill_value=0)
+                self.interp_lc[batch][burst]['flux_err'] = interp1d(t, flux_err,
+                                                                    bounds_error=False,
+                                                                    fill_value=0)
             if self.verbose:
                 sys.stdout.write('\n')
 
     def get_all_tshifts(self):
         """Gets best t_shift for all bursts
         """
-        t_shifts = np.full((self.n_epochs, len(self.runs)), np.nan)
+        t_shifts = np.full((self.n_epochs, self.n_bursts_batch), np.nan)
 
         for epoch_i in range(self.n_epochs):
-            for run_i, run in enumerate(self.runs):
+            for i in range(self.n_bursts_batch):
+                burst = i + 1
                 if self.verbose:
                     sys.stdout.write('\rOptimising time shifts: '
-                                     f'epoch {epoch_i + 1}, run {run}/{len(self.runs)}')
-                t_shifts[epoch_i, run_i] = self.fit_tshift(run=run, epoch_i=epoch_i)
+                                     f'epoch {epoch_i + 1}, burst {burst}/{self.n_bursts_batch}')
+                t_shifts[epoch_i, i] = self.fit_tshift(burst=burst, epoch_i=epoch_i)
 
             if self.verbose:
                 sys.stdout.write('\n')
 
         self.t_shifts = t_shifts
 
-    def fit_tshift(self, run, epoch_i):
+    def fit_tshift(self, burst, epoch_i):
         """Finds LC tshift that minimises chi^2
 
         Note: assumes epoch_i correspond to index of batches
@@ -192,12 +203,12 @@ class Ksample:
         chi2 = np.zeros_like(t)
 
         for i in range(self.n_points):
-            chi2[i] = self.chi_squared(t[i], epoch_i=epoch_i, run=run)
+            chi2[i] = self.chi_squared(t[i], epoch_i=epoch_i, burst=burst)
 
         min_idx = np.argmin(chi2)
         return t[min_idx]
 
-    def chi_squared(self, tshift, epoch_i, run):
+    def chi_squared(self, tshift, epoch_i, burst):
         """Returns chi^2 of model vs. observed lightcurves
         """
         obs_burst = self.obs[epoch_i]
@@ -207,9 +218,9 @@ class Ksample:
         obs_flux_err = np.array(obs_burst.flux_err)[peak_i:]
 
         batch = self.batches[epoch_i]
-        model = self.interp_lc[batch][run]
-        model_flux = model['flux'](obs_x - tshift)
-        model_flux_err = model['flux_err'](obs_x - tshift)
+        model_interp = self.interp_lc[batch][burst]
+        model_flux = model_interp['flux'](obs_x - tshift)
+        model_flux_err = model_interp['flux_err'](obs_x - tshift)
 
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
@@ -247,9 +258,10 @@ class Ksample:
             lc_ax[epoch_i].set_ylabel(r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
                                       fontsize=fontsize)
 
-            for run_i, run in enumerate(self.runs):
-                model = self.shifted_lc[batch][run]
-                t_shift = self.t_shifts[epoch_i, run_i]
+            for i in range(self.n_bursts_batch):
+                burst = i + 1
+                model = self.shifted_lc[batch][burst]
+                t_shift = self.t_shifts[epoch_i, i]
 
                 m_x = model[:, 0] + t_shift
                 m_y = model[:, 1] / y_scale
@@ -269,10 +281,9 @@ class Ksample:
                     res_ax[epoch_i].set_ylabel(r'Residuals '
                                                r'($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)',
                                                fontsize=fontsize)
-                    # y_residuals = m_y - self.interp_lc['obs'][epoch_i]['flux'](m_x)
-                    y_residuals = (self.interp_lc[batch][run]['flux'](obs_x-t_shift)
+                    y_residuals = (self.interp_lc[batch][burst]['flux'](obs_x-t_shift)
                                    / y_scale - obs_y)
-                    y_residuals_err = (self.interp_lc[batch][run]['flux_err']
+                    y_residuals_err = (self.interp_lc[batch][burst]['flux_err']
                                        (obs_x-t_shift)) / y_scale
 
                     res_ax[epoch_i].plot(obs_x, y_residuals, color=k_color,
