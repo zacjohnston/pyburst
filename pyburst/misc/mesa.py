@@ -16,23 +16,16 @@ def plot(model_set, actual_mdot=True, qnuc=0.0,
     """
     mesa_info = get_mesa_set(model_set)
 
-    params = {
-        1: {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': qnuc},
-        2: {'x': 0.7, 'z': 0.01, 'qb': 0.1, 'qnuc': qnuc},
-        3: {'x': 0.7, 'z': 0.01, 'qb': 1.0, 'qnuc': qnuc},
-        4: {'x': 0.7, 'z': 0.01, 'qb': 0.5, 'qnuc': qnuc},
-        5: {'x': 0.75, 'z': 0.02, 'qb': 0.1, 'qnuc': qnuc},
-        6: {'x': 0.75, 'z': 0.02, 'qb': 1.0, 'qnuc': qnuc},
-    }
-
     if actual_mdot:
         mdots = mesa_info['mdots_actual']
     else:
         mdots = mesa_info['mdots']
 
+    mesa_info['params']['qnuc'] = qnuc
+
     plot_compare(mesa_runs=mesa_info['runs'],
                  mesa_mdots=mdots, bprops=bprops,
-                 params=params[model_set])
+                 params=mesa_info['params'])
 
 
 def get_mesa_set(mesa_set):
@@ -62,10 +55,19 @@ def get_mesa_set(mesa_set):
         5: [0.061, 0.083, 0.186],
         6: [0.078, 0.084, 0.098, 0.129, 0.17, 0.192],
     }
+    params = {
+        1: {'x': 0.7, 'z': 0.02, 'qb': 0.1},
+        2: {'x': 0.7, 'z': 0.01, 'qb': 0.1},
+        3: {'x': 0.7, 'z': 0.01, 'qb': 1.0},
+        4: {'x': 0.7, 'z': 0.01, 'qb': 0.5},
+        5: {'x': 0.75, 'z': 0.02, 'qb': 0.1},
+        6: {'x': 0.75, 'z': 0.02, 'qb': 1.0},
+    }
     return {
         'runs': mesa_runs[mesa_set],
         'mdots': mesa_mdots[mesa_set],
         'mdots_actual': mesa_mdots_actual[mesa_set],
+        'params': params[mesa_set],
     }
 
 
