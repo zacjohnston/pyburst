@@ -28,19 +28,21 @@ def plot(model_set, actual_mdot=True, qnuc=0.0,
                  params=mesa_info['params'])
 
 
-def plot_all_avg_lightcurves(mesa_set):
+def plot_all_avg_lightcurves(mesa_set, grid_source='mesa'):
     """Plots all average lightcurve comparisons for a given set
     """
     mesa_info = get_mesa_set(mesa_set)
+    kgrid = grid_analyser.Kgrid(source=grid_source)
 
     # ===== Setup plotting =====
     n_models = len(mesa_info['runs'])
     n_rows = int(np.ceil(n_models / 2))
+
     subplot_width = 4
     subplot_height = 2.5
+    figsize = (2 * subplot_width, n_rows * subplot_height)
 
-    fig, ax = plt.subplots(n_rows, 2,
-                           figsize=(2 * subplot_width, n_rows * subplot_height))
+    fig, ax = plt.subplots(n_rows, 2, figsize=figsize)
 
     if n_models % 2 == 1:
         ax[-1, -1].axis('off')
@@ -54,7 +56,7 @@ def plot_all_avg_lightcurves(mesa_set):
 
         plot_avg_lc(mesa_run=run, grid_run=kep_run,
                     grid_batch=kep_batch, grid_source='mesa',
-                    ax=ax[row_i, col_i], display=False,
+                    ax=ax[row_i, col_i], display=False, kgrid=kgrid,
                     legend=True if i == 0 else False)
 
     plt.show(block=False)
@@ -114,18 +116,19 @@ def get_mesa_set(mesa_set):
 
 def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
                 radius=10, mass=1.4, shaded=True, ax=None,
-                display=True, legend=True):
+                display=True, legend=True, kgrid=None):
     """Plots comparison of average lightcurves from mesa
     """
-    mesa_model = setup_analyser(mesa_run)
-    kgrid = grid_analyser.Kgrid(source=grid_source)
-    kgrid.load_mean_lightcurves(grid_batch)
-
     xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
     lum_f = unit_factor('peak')
 
+    if kgrid is None:
+        kgrid = grid_analyser.Kgrid(source=grid_source)
     if ax is None:
         fig, ax = plt.subplots(figsize=[6, 4])
+
+    mesa_model = setup_analyser(mesa_run)
+    kgrid.load_mean_lightcurves(grid_batch)
 
     mesa_lc = mesa_model.average_lightcurve()
     kep_lc = kgrid.mean_lc[grid_batch][grid_run]
