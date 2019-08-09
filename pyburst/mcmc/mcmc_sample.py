@@ -202,8 +202,9 @@ class Ksample:
 
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
-    def plot(self, residuals=True, shaded=False, alpha_lines=0.3, alpha_shaded=0.7,
-             fontsize=12, xlims=(-10, 200), markersize=1):
+    def plot(self, residuals=True, shaded=False, alpha_lines=0.3,
+             alpha_shaded=0.7, fontsize=12, xlims=(-10, 200),
+             markersize=1, k_color='C1', obs_color='black'):
         """Plot lightcurve comparison between observed and sample models
         """
         n_subplots = {True: 2, False: 1}.get(residuals)
@@ -241,9 +242,9 @@ class Ksample:
 
                 # ====== Plot model lightcurves ======
                 if shaded:
-                    lc_ax[epoch_i].fill_between(m_x, m_y_lower, m_y_upper, color='0.7',
-                                                alpha=alpha_shaded)
-                lc_ax[epoch_i].plot(m_x, m_y, color='black', alpha=alpha_lines)
+                    lc_ax[epoch_i].fill_between(m_x, m_y_lower, m_y_upper,
+                                                color='0.7', alpha=alpha_shaded)
+                lc_ax[epoch_i].plot(m_x, m_y, color=k_color, alpha=alpha_lines)
 
                 # ====== Plot residuals ======
                 if residuals:
@@ -256,7 +257,7 @@ class Ksample:
                     y_residuals_err = (self.interp_lc[batch][run]['flux_err']
                                        (obs_x-t_shift)) / y_scale
 
-                    res_ax[epoch_i].plot(obs_x, y_residuals, color='black',
+                    res_ax[epoch_i].plot(obs_x, y_residuals, color=k_color,
                                          alpha=alpha_lines, zorder=0)
 
                     if shaded:
@@ -265,13 +266,17 @@ class Ksample:
                                                      color='0.7', alpha=alpha_shaded)
 
             # ====== Plot observed lightcurves ======
+            # lc_ax[epoch_i].step(obs_burst.time, obs_y,
+            #                     where='post', color=obs_color)
+
             lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none',
-                                    capsize=3, color='C1', markersize=markersize,
+                                    capsize=3, color=obs_color,
+                                    markersize=markersize,
                                     markeredgewidth=markersize)
             if residuals:
                 res_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
                 res_ax[epoch_i].errorbar(obs_x, np.zeros_like(obs_x), yerr=obs_y_u,
-                                         ls='none', capsize=3, color='C1',
+                                         ls='none', capsize=3, color=obs_color,
                                          markeredgewidth=markersize, zorder=10)
 
         lc_ax[-1].set_xlabel('Time (s)', fontsize=fontsize)
