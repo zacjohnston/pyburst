@@ -26,7 +26,7 @@ class Ksample:
     """
     def __init__(self, source, mcmc_source, mcmc_version, batches, runs=None,
                  verbose=True, single_burst_lc=False, burst_i=None,
-                 fit_tail_only=False):
+                 fit_tail_only=False, n_points=None):
         self.source = source
         self.n_epochs = len(batches)
         self.obs_source = obs_sources[source]
@@ -46,6 +46,11 @@ class Ksample:
             self.runs = np.array(sub_batch['run'])
         else:
             self.runs = runs
+
+        self.n_points = n_points
+        if self.n_points is None:
+            self.n_points = {'gs1826': 150,
+                             '4u1820': 500}.get(self.obs_source)
 
         self.peak_i = np.zeros(self.n_epochs, dtype=int)
         if fit_tail_only:
@@ -176,17 +181,17 @@ class Ksample:
 
         self.t_shifts = t_shifts
 
-    def fit_tshift(self, run, epoch_i, n_points=500):
+    def fit_tshift(self, run, epoch_i):
         """Finds LC tshift that minimises chi^2
 
         Note: assumes epoch_i correspond to index of batches
         """
         min_tshift = -60
         max_tshift = 60
-        t = np.linspace(min_tshift, max_tshift, n_points)
+        t = np.linspace(min_tshift, max_tshift, self.n_points)
         chi2 = np.zeros_like(t)
 
-        for i in range(n_points):
+        for i in range(self.n_points):
             chi2[i] = self.chi_squared(t[i], epoch_i=epoch_i, run=run)
 
         min_idx = np.argmin(chi2)
