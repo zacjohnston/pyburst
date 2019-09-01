@@ -28,6 +28,8 @@ def get_constant_masses(source, version):
 
 
 def get_mass_from_chain(chain_flat, mass_nw, mass_gr, source, version):
+    """Returns Newtonian and/or GR mass from MCMC chain
+    """
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
 
     if mass_nw is None:
@@ -114,6 +116,21 @@ def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
     _, redshift = gravity.gr_corrections(r=r_nw, m=mass_nw, phi=mass_ratio)
 
     return redshift.reshape((n_walkers, n_steps))
+
+
+def get_gravity_chain(chain, discard, source, version, cap=None, r_nw=10):
+    """Returns flat chain of surface gravity (g) samples for a given MCMC chain
+    """
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
+    n_walkers, n_steps, n_dimensions = chain.shape
+    chain_flat = chain.reshape((-1, n_dimensions))
+
+    mass_nw = chain_flat[:, pkeys.index('m_nw')]
+
+    g = gravity.get_acceleration_newtonian(r=r_nw, m=mass_nw)
+
+    return g.value
 
 
 def get_inclination_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
