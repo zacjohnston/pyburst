@@ -18,7 +18,7 @@ def save_plot(fig, label, path, extensions=('.pdf',)):
     for ext in extensions:
         filename = f'{label}{ext}'
         filepath = os.path.join(path, filename)
-        fig.savefig(filepath)
+        fig.savefig(filepath, bbox_inches="tight")
 
 
 def set_axes(ax, title='', xlabel='', ylabel='', yscale='linear', xscale='linear',
