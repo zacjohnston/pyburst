@@ -294,7 +294,7 @@ def plot_inclination(chain, discard, source, version, cap=None, display=True, sa
                                                           cap=cap, disc_model=disc_model)
 
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(inclination_chain.reshape(-1), parameters=['i'])
+    cc.add_chain(inclination_chain, parameters=['i'])
     cc.configure(kde=False, smooth=0)
 
     fig = cc.plotter.plot_distributions(figsize=[5, 5])

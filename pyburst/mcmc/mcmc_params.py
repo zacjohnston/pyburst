@@ -138,9 +138,7 @@ def get_inclination_chain(chain, discard, source, version, cap=None, disc_model=
     chain_flat = chain.reshape((-1, n_dimensions))
 
     xi_ratio = chain_flat[:, pkeys.index('xi_ratio')]
-    inc = anisotropy.inclination_ratio(xi_ratio, model=disc_model)
-
-    return inc.reshape((n_walkers, n_steps))
+    return anisotropy.inclination_ratio(xi_ratio, model=disc_model)
 
 
 def epoch_param_keys(source, version):
