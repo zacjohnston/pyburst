@@ -58,7 +58,7 @@ def save_plot(fig, prefix, save, source, version, display, chain=None, n_dimensi
 
 def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960,
                         walkers=True, posteriors=True, contours=False,
-                        display=False, max_lhood=False, mass_radius=True,
+                        display=False, mass_radius=True,
                         synth=True, compressed=False):
     """Save plots for multiple series in a synthetic data batch
     """
@@ -79,19 +79,19 @@ def save_multiple_synth(series, source, version, n_steps, discard, n_walkers=960
 
         if posteriors:
             plot_posteriors(chain, source=full_source, save=True, discard=discard,
-                            display=display, version=version, max_lhood=max_lhood)
+                            display=display, version=version)
 
         if contours:
             plot_contours(chain, source=full_source, save=True, discard=discard,
-                          display=display, version=version, max_lhood=max_lhood)
+                          display=display, version=version)
 
         if mass_radius:
             plot_mass_radius(chain, source=full_source, save=True, discard=discard,
-                             display=display, version=version, max_lhood=max_lhood)
+                             display=display, version=version)
 
 
 def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=False,
-                   save=True, cap=None, max_lhood=False, posteriors=True, contours=True,
+                   save=True, cap=None, posteriors=True, contours=True,
                    redshift=True, mass_radius=True, verbose=True, compressed=False):
     """Saves (and/or displays) main MCMC plots
     """
@@ -101,17 +101,17 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
     if posteriors:
         printv('Plotting posteriors', verbose=verbose)
         plot_posteriors(chain, source=source, save=save, discard=discard, cap=cap,
-                        display=display, version=version, max_lhood=max_lhood)
+                        display=display, version=version)
 
     if contours:
         printv('Plotting contours', verbose=verbose)
         plot_contours(chain, source=source, save=save, discard=discard, cap=cap,
-                      display=display, version=version, max_lhood=max_lhood)
+                      display=display, version=version)
 
     if mass_radius:
         printv('Plotting mass-radius', verbose=verbose)
         plot_mass_radius(chain, source=source, save=save, discard=discard, cap=cap,
-                         display=display, version=version, max_lhood=max_lhood)
+                         display=display, version=version)
 
     if redshift:
         printv('Plotting redshift', verbose=verbose)
@@ -119,8 +119,8 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
                       display=display, version=version)
 
 
-def plot_contours(chain, discard, source, version, cap=None, max_lhood=False,
-                  display=True, save=False, truth_values=None, verbose=True,
+def plot_contours(chain, discard, source, version, cap=None,
+                  display=True, save=False, truth_values=None,
                   sigmas=np.linspace(0, 2, 5), truth_summary=False):
     """Plots posterior contours of mcmc chain
     """
@@ -131,12 +131,7 @@ def plot_contours(chain, discard, source, version, cap=None, max_lhood=False,
     cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
                              cap=cap, sigmas=sigmas)
 
-    if max_lhood:
-        n_walkers, n_steps = chain[:, :, 0].shape
-        max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
-                                                     n_steps=n_steps, verbose=verbose)
-        fig = cc.plotter.plot(truth=max_params)
-    elif truth_values is not None:
+    if truth_values is not None:
         fig = cc.plotter.plot(truth=truth_values)
     elif truth_summary:
         truth_values = get_summary(chain, discard=discard, cap=cap,
@@ -151,16 +146,13 @@ def plot_contours(chain, discard, source, version, cap=None, max_lhood=False,
     return fig
 
 
-def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
-                    display=True, save=False, truth_values=None, verbose=True,
+def plot_posteriors(chain, discard, source, version, cap=None,
+                    display=True, save=False, truth_values=None,
                     cc=None):
     """Plots posterior distributions of mcmc chain
 
-    max_lhood : bool
-        plot location of the maximum likelihood point. Overrides truth_values if True.
     truth_values : list|dict
         Specify parameters of point (e.g. the true value) to draw on the distributions.
-        Will be overidden if max_lhood=True
     """
     default_plt_options()
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
@@ -169,15 +161,10 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
         cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
                                  cap=cap)
     height = 3 * ceil(len(pkeys) / 4)
+
     if truth_values is not None:
         fig = cc.plotter.plot_distributions(figsize=[10, height],
                                             truth=truth_values)
-    elif max_lhood:
-        n_walkers, n_steps = chain[:, :, 0].shape
-        max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
-                                                     n_steps=n_steps, verbose=verbose)
-        fig = cc.plotter.plot_distributions(figsize=[10, height],
-                                            truth=max_params)
     else:
         fig = cc.plotter.plot_distributions(figsize=[10, height])
 
@@ -188,9 +175,8 @@ def plot_posteriors(chain, discard, source, version, cap=None, max_lhood=False,
 
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
-                     display=True, save=False, max_lhood=False, verbose=True,
-                     cloud=False, sigmas=np.linspace(0, 2, 5), fontsize=18,
-                     figsize='column'):
+                     display=True, save=False, cloud=False,
+                     sigmas=np.linspace(0, 2, 5), fontsize=18, figsize='column'):
     """Plots contours of mass versus radius from a given chain
     """
     # TODO: combine and generalise with plot_xedd()
@@ -202,25 +188,10 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
                                                           source=source, version=version,
                                                           cap=cap, mass_nw=mass_nw,
                                                           mass_gr=mass_gr)
-
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(mass_radius_chain, parameters=['R', 'M'])
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
-
-    if max_lhood:
-        n_walkers, n_steps = chain[:, :, 0].shape
-        max_params = mcmc_tools.get_max_lhood_params(source, version=version, n_walkers=n_walkers,
-                                                     n_steps=n_steps, verbose=verbose)
-        if mass_nw is None:
-            mass_nw = max_params[pkeys.index('m_nw')]
-        if mass_gr is None:
-            mass_gr = max_params[pkeys.index('m_gr')]
-
-        radius = mcmc_params.get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
-        fig = cc.plotter.plot(figsize=figsize, truth=[mass_gr, radius])
-
-    else:
-        fig = cc.plotter.plot(figsize=figsize)
+    fig = cc.plotter.plot(figsize=figsize)
 
     # Manually set axis labels
     labels = plot_tools.convert_full_labels(['radius', 'mass'])
@@ -294,8 +265,7 @@ def plot_inclination(chain, discard, source, version, cap=None, display=True, sa
 
 
 def plot_xedd(chain, discard, source, version, cap=None,
-              display=True, save=False, max_lhood=False, verbose=True,
-              cloud=True, sigmas=np.linspace(0, 2, 10)):
+              display=True, save=False, cloud=True, sigmas=np.linspace(0, 2, 10)):
     """Plots posterior for Eddington hydrogen composition (X_Edd)
     """
     default_plt_options()
@@ -308,16 +278,7 @@ def plot_xedd(chain, discard, source, version, cap=None,
     cc.add_chain(xedd_chain, parameters=[label])
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
 
-    if max_lhood:
-        n_walkers, n_steps = chain[:, :, 0].shape
-        max_params = mcmc_tools.get_max_lhood_params(source, version=version,
-                                                     n_walkers=n_walkers, n_steps=n_steps,
-                                                     verbose=verbose)
-        xedd = (max_params[pkeys.index('xedd_ratio')]
-                * max_params[pkeys.index('xedd_ratio')])
-        fig = cc.plotter.plot(figsize=[6, 6], truth=[xedd])
-    else:
-        fig = cc.plotter.plot(figsize=[6, 6])
+    fig = cc.plotter.plot(figsize=[6, 6])
 
     save_plot(fig, prefix='xedd', chain=chain, save=save, source=source,
               version=version, display=display)
