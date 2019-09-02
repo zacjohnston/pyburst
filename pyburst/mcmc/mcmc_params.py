@@ -66,11 +66,7 @@ def get_mass_radius_chain(chain, discard, source, version, cap=None,
                                            source=source, version=version)
     radius_gr = get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
 
-    new_shape = (n_walkers, n_steps)
-    mass_reshape = mass_gr.reshape(new_shape)
-    radius_reshape = radius_gr.reshape(new_shape)
-
-    return np.dstack((radius_reshape, mass_reshape))
+    return np.column_stack((radius_gr, mass_gr))
 
 
 def get_radius(mass_nw, mass_gr):

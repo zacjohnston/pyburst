@@ -204,7 +204,7 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
                                                           mass_gr=mass_gr)
 
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(mass_radius_chain.reshape(-1, 2), parameters=['R', 'M'])
+    cc.add_chain(mass_radius_chain, parameters=['R', 'M'])
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
 
     if max_lhood:
@@ -278,11 +278,13 @@ def plot_gravitational(chain, discard, source, version, cap=None, display=True,
                                                     source=source, version=version,
                                                     cap=cap, mass_nw=mass_nw,
                                                     mass_gr=mass_gr)
-    chain_out = np.column_stack([mass_radius.reshape(-1, 2), grav/1e14, redshift])
+    chain_out = np.column_stack([mass_radius, grav/1e14, redshift])
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(chain_out, parameters=['R', 'M', 'g', '(1+z)'])
     cc.configure(kde=False, smooth=0)
-    cc.plotter.plot_distributions(display=True)
+    fig = cc.plotter.plot_distributions()
+    plt.tight_layout()
+    plt.show()
 
 
 def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False,
