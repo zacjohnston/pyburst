@@ -145,7 +145,6 @@ def plot_contours(chain, discard, source, version, cap=None,
     else:
         fig = cc.plotter.plot(parameters=parameters)
 
-    plt.tight_layout()  # TODO: remove
     save_plot(fig, prefix='contours', chain=chain, save=save, source=source,
               version=version, display=display)
     return fig
