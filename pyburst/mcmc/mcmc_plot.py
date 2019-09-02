@@ -261,7 +261,7 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
 
 
 def plot_gravitational(chain, discard, source, version, cap=None, display=True,
-                       save=False, r_nw=10):
+                       save=False, r_nw=10, sigmas=np.linspace(0, 2, 5)):
     """Plots contours of gravitational parameters
     """
     grav_chain = mcmc_params.get_gravitational_chain(chain=chain, discard=discard,
@@ -269,10 +269,9 @@ def plot_gravitational(chain, discard, source, version, cap=None, display=True,
                                                      cap=cap, r_nw=r_nw)
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(grav_chain, parameters=['R', 'M', 'g', '(1+z)'])
-    cc.configure(kde=False, smooth=0)
-    fig = cc.plotter.plot_distributions()
-    plt.tight_layout()
-    plt.show()
+    cc.configure(kde=False, smooth=0, sigmas=sigmas)
+    fig = cc.plotter.plot(display=display)
+    return fig
 
 
 def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False,
