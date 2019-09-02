@@ -120,27 +120,32 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
 
 
 def plot_contours(chain, discard, source, version, cap=None,
-                  display=True, save=False, truth_values=None,
+                  display=True, save=False, truth_values=None, parameters=None,
                   sigmas=np.linspace(0, 2, 5), truth_summary=False):
     """Plots posterior contours of mcmc chain
+
+    parameters : [str]
+        specify which parameters to plot
     """
     default_plt_options()
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
-    # TODO: re-use the loaded chainconsumer here instead of reloading
+    if parameters is not None:
+        parameters = plot_tools.convert_mcmc_labels(param_keys=parameters)
+
     cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
                              cap=cap, sigmas=sigmas)
 
     if truth_values is not None:
-        fig = cc.plotter.plot(truth=truth_values)
-    elif truth_summary:
+        fig = cc.plotter.plot(truth=truth_values, parameters=parameters)
+    elif truth_summary:  # TODO: deprecate (redundant)
         truth_values = get_summary(chain, discard=discard, cap=cap,
                                    source=source, version=version)[:, 1]
-        fig = cc.plotter.plot(truth=truth_values)
+        fig = cc.plotter.plot(truth=truth_values, parameters=parameters)
     else:
-        fig = cc.plotter.plot()
+        fig = cc.plotter.plot(parameters=parameters)
 
-    plt.tight_layout()
+    plt.tight_layout()  # TODO: remove
     save_plot(fig, prefix='contours', chain=chain, save=save, source=source,
               version=version, display=display)
     return fig
