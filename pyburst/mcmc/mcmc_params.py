@@ -93,12 +93,7 @@ def get_xedd_chain(chain, discard, source, version, cap=None):
     n_walkers, n_steps, n_dimensions = chain.shape
     chain_flat = chain.reshape((-1, n_dimensions))
 
-    xedd_flat = chain_flat[:, pkeys.index('xedd_ratio')] * chain_flat[:, pkeys.index('x')]
-
-    new_shape = (n_walkers, n_steps)
-    xedd_chain = xedd_flat.reshape(new_shape)
-
-    return xedd_chain
+    return chain_flat[:, pkeys.index('xedd_ratio')] * chain_flat[:, pkeys.index('x')]
 
 
 def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
