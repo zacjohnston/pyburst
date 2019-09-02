@@ -260,6 +260,32 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
     return fig
 
 
+def plot_gravitational(chain, discard, source, version, cap=None, display=True,
+                       save=False, r_nw=10):
+    """Plots contours of gravitational parameters
+    """
+    mass_nw, mass_gr = mcmc_params.get_constant_masses(source, version)
+    redshift = mcmc_params.get_redshift_chain(chain=chain, discard=discard,
+                                              source=source, version=version,
+                                              cap=cap, mass_nw=mass_nw,
+                                              mass_gr=mass_gr)
+
+    grav = mcmc_params.get_gravity_chain(chain=chain, discard=discard,
+                                         source=source, version=version,
+                                         cap=cap, r_nw=r_nw)
+
+    mass_radius = mcmc_params.get_mass_radius_chain(chain=chain, discard=discard,
+                                                    source=source, version=version,
+                                                    cap=cap, mass_nw=mass_nw,
+                                                    mass_gr=mass_gr)
+    chain_out = np.column_stack([mass_radius.reshape(-1, 2), grav/1e14,
+                                 redshift.reshape(-1)])
+    cc = chainconsumer.ChainConsumer()
+    cc.add_chain(chain_out, parameters=['R', 'M', 'g', '(1+z)'])
+    cc.configure(kde=False, smooth=0)
+    cc.plotter.plot_distributions(display=True)
+
+
 def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False,
                      disc_model='he16_a'):
     """Plots posterior distribution of redshift given a chain
