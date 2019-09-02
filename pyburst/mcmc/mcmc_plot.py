@@ -232,8 +232,8 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
     return fig
 
 
-def plot_gravitational(chain, discard, source, version, cap=None, display=True,
-                       save=False, r_nw=10, sigmas=np.linspace(0, 2, 5)):
+def plot_gravitational_contours(chain, discard, source, version, cap=None, display=True,
+                                save=False, r_nw=10, sigmas=np.linspace(0, 2, 5)):
     """Plots contours of gravitational parameters
     """
     grav_chain = mcmc_params.get_gravitational_chain(chain=chain, discard=discard,
