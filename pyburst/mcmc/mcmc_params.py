@@ -115,7 +115,7 @@ def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
     mass_ratio = mass_gr / mass_nw
     _, redshift = gravity.gr_corrections(r=r_nw, m=mass_nw, phi=mass_ratio)
 
-    return redshift.reshape((n_walkers, n_steps))
+    return redshift
 
 
 def get_gravity_chain(chain, discard, source, version, cap=None, r_nw=10):

@@ -249,7 +249,7 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
                                                     mass_gr=mass_gr)
 
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(redshift_chain.reshape(-1), parameters=['(1+z)'])
+    cc.add_chain(redshift_chain, parameters=['(1+z)'])
     cc.configure(kde=False, smooth=0)
 
     fig = cc.plotter.plot_distributions(figsize=[5, 5])
@@ -278,8 +278,7 @@ def plot_gravitational(chain, discard, source, version, cap=None, display=True,
                                                     source=source, version=version,
                                                     cap=cap, mass_nw=mass_nw,
                                                     mass_gr=mass_gr)
-    chain_out = np.column_stack([mass_radius.reshape(-1, 2), grav/1e14,
-                                 redshift.reshape(-1)])
+    chain_out = np.column_stack([mass_radius.reshape(-1, 2), grav/1e14, redshift])
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(chain_out, parameters=['R', 'M', 'g', '(1+z)'])
     cc.configure(kde=False, smooth=0)
