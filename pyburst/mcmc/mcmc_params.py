@@ -111,6 +111,7 @@ def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
 
 def get_gravity_chain(chain, discard, source, version, cap=None, r_nw=10):
     """Returns flat chain of surface gravity (g) samples for a given MCMC chain
+        Note: returns in units of 1e14 cm/s^2
     """
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
@@ -121,11 +122,11 @@ def get_gravity_chain(chain, discard, source, version, cap=None, r_nw=10):
 
     g = gravity.get_acceleration_newtonian(r=r_nw, m=mass_nw)
 
-    return g.value
+    return g.value/1e14
 
 
 def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10):
-    """Returns chain of gravitational parameters
+    """Returns chain of gravitational parameters: [M, R, g, 1+z]
     """
     mass_nw, mass_gr = get_constant_masses(source, version)
     redshift = get_redshift_chain(chain=chain, discard=discard,
