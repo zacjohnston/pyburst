@@ -268,7 +268,7 @@ def plot_gravitational(chain, discard, source, version, cap=None, display=True,
                                                      source=source, version=version,
                                                      cap=cap, r_nw=r_nw)
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(grav_chain, parameters=['R', 'M', 'g', '(1+z)'])
+    cc.add_chain(grav_chain, parameters=['R', 'M', 'g', '1+z'])
     cc.configure(kde=False, smooth=0, sigmas=sigmas)
     fig = cc.plotter.plot(display=display)
     return fig
