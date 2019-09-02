@@ -124,6 +124,27 @@ def get_gravity_chain(chain, discard, source, version, cap=None, r_nw=10):
     return g.value
 
 
+def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10):
+    """Returns chain of gravitational parameters
+    """
+    mass_nw, mass_gr = get_constant_masses(source, version)
+    redshift = get_redshift_chain(chain=chain, discard=discard,
+                                  source=source, version=version,
+                                  cap=cap, mass_nw=mass_nw,
+                                  mass_gr=mass_gr)
+
+    grav = get_gravity_chain(chain=chain, discard=discard,
+                             source=source, version=version,
+                             cap=cap, r_nw=r_nw)
+
+    mass_radius = get_mass_radius_chain(chain=chain, discard=discard,
+                                        source=source, version=version,
+                                        cap=cap, mass_nw=mass_nw,
+                                        mass_gr=mass_gr)
+
+    return np.column_stack([mass_radius, grav, redshift])
+
+
 def get_inclination_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
     """returns inclination chain for given chain of xi_ratio, using simple disc model
     """
