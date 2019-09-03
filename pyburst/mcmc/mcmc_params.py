@@ -178,9 +178,13 @@ def get_anisotropy_chain(chain, discard, source, version, cap=None, disc_model='
 def get_distance_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
     """Returns chain of absolute distance, derived from a disc anisotropy model
     """
+    d_b_chain = get_param_chain(chain, param='d_b', discard=discard,
+                                source=source, version=version, cap=cap)
+
     xi_b_chain, _ = get_anisotropy_chain(chain=chain, discard=discard,
                                          source=source, version=version,
                                          cap=cap, disc_model=disc_model)
+    return d_b_chain / np.sqrt(xi_b_chain)
 
 
 def get_param_chain(chain, param, discard, source, version, cap=None):
