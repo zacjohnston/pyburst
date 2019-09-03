@@ -252,7 +252,7 @@ def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
                                             source=source, version=version,
                                             disc_model=disc_model)
 
-    cc = setup_custom_chainconsumer(disc_chain, parameters=['i', 'xib', 'xip', 'd'],
+    cc = setup_custom_chainconsumer(disc_chain, parameters=['i', 'xi_b', 'xi_p', 'd'],
                                     sigmas=sigmas, summary=summary)
     fig = cc.plotter.plot()
     save_plot(fig, prefix='disc', chain=chain, save=save, source=source,
@@ -271,7 +271,7 @@ def plot_distance_anisotropy(chain, discard, source, version, cap=None, display=
                                                  source=source, version=version, cap=cap)
 
     flat_chain = np.column_stack([d_b_chain, xi_ratio_chain])
-    cc = setup_custom_chainconsumer(flat_chain, parameters=['db', 'xiratio'],
+    cc = setup_custom_chainconsumer(flat_chain, parameters=['d_b', 'xi_ratio'],
                                     sigmas=sigmas, summary=summary)
 
     fig = cc.plotter.plot(figsize=figsize)
