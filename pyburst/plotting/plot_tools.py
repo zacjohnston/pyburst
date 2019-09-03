@@ -81,6 +81,7 @@ def unit_label(quantity):
         'dt': 'h',
         'd': 'kpc',
         'fluence': '$10^{39}$ erg',
+        'g': '$10^{14}$ cm s$^{-2}$',
         'i': 'deg',
         'lum': '$10^{38}$ erg s$^{-1}$',
         'M': r'$\mathrm{M_\odot}$',
