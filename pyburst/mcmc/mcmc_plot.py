@@ -192,9 +192,9 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
                                     sigmas=sigmas, summary=summary)
     fig = cc.plotter.plot(figsize=figsize)
 
-    labels = plot_tools.convert_full_labels(['radius', 'mass'])
-    fig.axes[2].set_xlabel(labels[0], fontsize=fontsize)
-    fig.axes[2].set_ylabel(labels[1], fontsize=fontsize)
+    # labels = plot_tools.convert_full_labels(['R', 'M'])
+    # fig.axes[2].set_xlabel(labels[0], fontsize=fontsize)
+    # fig.axes[2].set_ylabel(labels[1], fontsize=fontsize)
 
     for tick in fig.axes[2].xaxis.get_major_ticks():
         tick.label.set_fontsize(fontsize)
@@ -228,7 +228,7 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
 
 def plot_gravitational_contours(chain, discard, source, version, cap=None, display=True,
                                 save=False, r_nw=10, sigmas=np.linspace(0, 2, 5),
-                                summary=False):
+                                summary=False, unit_labels=True):
     """Plots contours of gravitational parameters
     """
     grav_chain = mcmc_params.get_gravitational_chain(chain=chain, discard=discard,
@@ -236,7 +236,8 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
                                                      cap=cap, r_nw=r_nw)
 
     cc = setup_custom_chainconsumer(grav_chain, parameters=['R', 'M', 'g', '1+z'],
-                                    sigmas=sigmas, summary=summary)
+                                    sigmas=sigmas, summary=summary,
+                                    unit_labels=unit_labels)
     fig = cc.plotter.plot()
     save_plot(fig, prefix='gravitational', chain=chain, save=save, source=source,
               version=version, display=display)
@@ -245,7 +246,7 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
 
 def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
                        save=False, disc_model='he16_a', sigmas=np.linspace(0, 2, 5),
-                       summary=False):
+                       summary=False, unit_labels=True):
     """Plots contours of parameters derived using disc model
     """
     disc_chain = mcmc_params.get_disc_chain(chain=chain, discard=discard, cap=cap,
@@ -253,7 +254,8 @@ def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
                                             disc_model=disc_model)
 
     cc = setup_custom_chainconsumer(disc_chain, parameters=['i', 'xi_b', 'xi_p', 'd'],
-                                    sigmas=sigmas, summary=summary)
+                                    sigmas=sigmas, summary=summary,
+                                    unit_labels=unit_labels)
     fig = cc.plotter.plot()
     save_plot(fig, prefix='disc', chain=chain, save=save, source=source,
               version=version, display=display)
@@ -262,7 +264,7 @@ def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
 
 def plot_distance_anisotropy(chain, discard, source, version, cap=None, display=True,
                              save=False, sigmas=np.linspace(0, 2, 5), summary=False,
-                             figsize=(6, 6)):
+                             figsize=(6, 6), unit_labels=True):
     """Plots contours of MCMC parameters d_b, xi_ratio
     """
     d_b_chain = mcmc_params.get_param_chain(chain, param='d_b', discard=discard,
@@ -272,7 +274,8 @@ def plot_distance_anisotropy(chain, discard, source, version, cap=None, display=
 
     flat_chain = np.column_stack([d_b_chain, xi_ratio_chain])
     cc = setup_custom_chainconsumer(flat_chain, parameters=['d_b', 'xi_ratio'],
-                                    sigmas=sigmas, summary=summary)
+                                    sigmas=sigmas, summary=summary,
+                                    unit_labels=unit_labels)
 
     fig = cc.plotter.plot(figsize=figsize)
     plt.tight_layout()
@@ -532,13 +535,13 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
     return cc
 
 
-def setup_custom_chainconsumer(flat_chain, parameters, cloud=False,
+def setup_custom_chainconsumer(flat_chain, parameters, cloud=False, unit_labels=True,
                                sigmas=np.linspace(0, 2, 5), summary=False):
     """Returns ChainConsumer, with derived parameters
 
         Note: chain must already be flattened and  discarded/capped
     """
-    param_labels = plot_tools.convert_mcmc_labels(parameters)
+    param_labels = plot_tools.convert_mcmc_labels(parameters, unit_labels=unit_labels)
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(flat_chain, parameters=param_labels)
