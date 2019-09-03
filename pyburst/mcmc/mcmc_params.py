@@ -168,18 +168,32 @@ def get_inclination_chain(chain, discard, source, version, cap=None, disc_model=
     return anisotropy.inclination_ratio(xi_ratio, model=disc_model).value
 
 
-def get_anisotropy_chain(chain, discard, source, version, cap=None, disc_model='he16_a',
-                         inc_chain=None):
+def get_anisotropy_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
     """Returns chain of anisotropy parameters, derived with a disc model
     """
-    if inc_chain is None:
-        inc_chain = get_inclination_chain(chain=chain, discard=discard,
-                                          source=source, version=version,
-                                          cap=cap, disc_model=disc_model)
+    inc_chain = get_inclination_chain(chain=chain, discard=discard,
+                                      source=source, version=version,
+                                      cap=cap, disc_model=disc_model)
+
     xi_b_chain, xi_p_chain = anisotropy.anisotropy(inc_chain * units.deg,
                                                    model=disc_model)
-
     return np.column_stack([xi_b_chain, xi_p_chain])
+
+
+def get_distance_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
+    """Returns chain of absolute distance, derived from a disc anisotropy model
+    """
+    xi_b_chain, _ = get_anisotropy_chain(chain=chain, discard=discard,
+                                         source=source, version=version,
+                                         cap=cap, disc_model=disc_model)
+
+
+def get_param_chain(chain, param, discard, source, version, cap=None):
+    """Returns flat chain of given parameter, from given multi-param chain
+    """
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
+    return chain[:, :, pkeys.index(param)].reshape(-1)
 
 
 def epoch_param_keys(source, version):
