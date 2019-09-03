@@ -133,7 +133,7 @@ def convert_full_labels(quantities):
     return keys
 
 
-def convert_mcmc_labels(param_keys):
+def convert_mcmc_labels(param_keys, unit_labels=False):
     """Returns sequence of formatted MCMC parameter labels
     """
     keys = list(param_keys)
@@ -144,7 +144,10 @@ def convert_mcmc_labels(param_keys):
         elif 'mdot' in key:
             label_str = rf'$\dot{{M}}_{key[-1]}$'
         else:
-            label_str = quantity_label(key)
+            if unit_labels:
+                label_str = full_label(key)
+            else:
+                label_str = quantity_label(key)
 
         keys[i] = label_str
 
