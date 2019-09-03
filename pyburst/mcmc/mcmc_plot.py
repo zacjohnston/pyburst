@@ -275,7 +275,6 @@ def plot_xedd(chain, discard, source, version, cap=None,
     """Plots posterior for Eddington hydrogen composition (X_Edd)
     """
     default_plt_options()
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     xedd_chain = mcmc_params.get_xedd_chain(chain=chain, discard=discard, source=source,
                                             version=version, cap=cap)
 
