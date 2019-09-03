@@ -79,6 +79,8 @@ def unit_label(quantity):
     labels = {
         'rate': 'day$^{-1}$',
         'dt': 'h',
+        'd': 'kpc',
+        'i': 'deg',
         'fluence': '$10^{39}$ erg',
         'peak': '$10^{38}$ erg s$^{-1}$',
         'accrate': r'$\dot{M}_\mathrm{Edd}$',
