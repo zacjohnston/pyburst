@@ -80,6 +80,7 @@ def unit_label(quantity):
         'accrate': r'$\dot{M}_\mathrm{Edd}$',
         'dt': 'h',
         'd': 'kpc',
+        'd_b': 'kpc',
         'fluence': '$10^{39}$ erg',
         'g': '$10^{14}$ cm s$^{-2}$',
         'i': 'deg',
