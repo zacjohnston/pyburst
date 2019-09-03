@@ -241,11 +241,12 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
     grav_chain = mcmc_params.get_gravitational_chain(chain=chain, discard=discard,
                                                      source=source, version=version,
                                                      cap=cap, r_nw=r_nw)
+    # TODO: generalise new setup_chainconsumer for derived params
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(grav_chain, parameters=['R', 'M', 'g', '1+z'])
     cc.configure(kde=False, smooth=0, sigmas=sigmas, summary=summary)
 
-    fig = cc.plotter.plot(display=display)
+    fig = cc.plotter.plot()
     save_plot(fig, prefix='gravitational', chain=chain, save=save, source=source,
               version=version, display=display)
     return fig
@@ -254,7 +255,7 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
 def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
                        save=False, disc_model='he16_a', sigmas=np.linspace(0, 2, 5),
                        summary=False):
-    """Plots contours of gravitational parameters
+    """Plots contours of parameters derived using disc model
     """
     disc_chain = mcmc_params.get_disc_chain(chain=chain, discard=discard, cap=cap,
                                             source=source, version=version,
@@ -263,14 +264,35 @@ def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
     cc.add_chain(disc_chain, parameters=['i', 'xib', 'xip', 'd'])
     cc.configure(kde=False, smooth=0, sigmas=sigmas, summary=summary)
 
-    fig = cc.plotter.plot(display=display)
+    fig = cc.plotter.plot()
     save_plot(fig, prefix='disc', chain=chain, save=save, source=source,
               version=version, display=display)
     return fig
 
 
-def plot_xedd(chain, discard, source, version, cap=None,
-              display=True, save=False, cloud=True, sigmas=np.linspace(0, 2, 10)):
+def plot_distance_anisotropy(chain, discard, source, version, cap=None, display=True,
+                             save=False, sigmas=np.linspace(0, 2, 5), summary=False,
+                             figsize=(6, 6)):
+    """Plots contours of MCMC parameters d_b, xi_ratio
+    """
+    d_b_chain = mcmc_params.get_param_chain(chain, param='d_b', discard=discard,
+                                            source=source, version=version, cap=cap)
+    xi_ratio_chain = mcmc_params.get_param_chain(chain, param='xi_ratio', discard=discard,
+                                                 source=source, version=version, cap=cap)
+    cc = chainconsumer.ChainConsumer()
+    cc.add_chain(np.column_stack([d_b_chain, xi_ratio_chain]),
+                 parameters=['db', 'xiratio'])
+    cc.configure(kde=False, smooth=0, sigmas=sigmas, summary=summary)
+
+    fig = cc.plotter.plot(figsize=figsize)
+    plt.tight_layout()
+    save_plot(fig, prefix='distance', chain=chain, save=save, source=source,
+              version=version, display=display)
+    return fig
+
+
+def plot_xedd(chain, discard, source, version, cap=None, display=True,
+              save=False, cloud=True, sigmas=np.linspace(0, 2, 10), figsize=(6, 6)):
     """Plots posterior for Eddington hydrogen composition (X_Edd)
     """
     default_plt_options()
@@ -282,7 +304,7 @@ def plot_xedd(chain, discard, source, version, cap=None,
     cc.add_chain(xedd_chain, parameters=[label])
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
 
-    fig = cc.plotter.plot(figsize=[6, 6])
+    fig = cc.plotter.plot(figsize=figsize)
 
     save_plot(fig, prefix='xedd', chain=chain, save=save, source=source,
               version=version, display=display)
