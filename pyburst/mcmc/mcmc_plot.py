@@ -251,6 +251,24 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
     return fig
 
 
+def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
+                       save=False, disc_model='he16_a', sigmas=np.linspace(0, 2, 5),
+                       summary=False):
+    """Plots contours of gravitational parameters
+    """
+    disc_chain = mcmc_params.get_disc_chain(chain=chain, discard=discard, cap=cap,
+                                            source=source, version=version,
+                                            disc_model=disc_model)
+    cc = chainconsumer.ChainConsumer()
+    cc.add_chain(disc_chain, parameters=['i', 'xib', 'xip', 'd'])
+    cc.configure(kde=False, smooth=0, sigmas=sigmas, summary=summary)
+
+    fig = cc.plotter.plot(display=display)
+    save_plot(fig, prefix='disc', chain=chain, save=save, source=source,
+              version=version, display=display)
+    return fig
+
+
 def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False,
                      disc_model='he16_a'):
     """Plots posterior distribution of redshift given a chain
