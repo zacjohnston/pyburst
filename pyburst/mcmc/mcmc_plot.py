@@ -121,7 +121,7 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
 
 def plot_contours(chain, discard, source, version, cap=None,
                   display=True, save=False, truth_values=None, parameters=None,
-                  sigmas=np.linspace(0, 2, 5), cc=None):
+                  sigmas=np.linspace(0, 2, 5), cc=None, summary=False):
     """Plots posterior contours of mcmc chain
 
     parameters : [str]
@@ -133,7 +133,8 @@ def plot_contours(chain, discard, source, version, cap=None,
         pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
         pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
         cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels,
-                                 discard=discard, cap=cap, sigmas=sigmas)
+                                 discard=discard, cap=cap, sigmas=sigmas,
+                                 summary=summary)
     if parameters is not None:
         parameters = plot_tools.convert_mcmc_labels(param_keys=parameters)
 
@@ -503,7 +504,8 @@ def get_summary(chain, discard, source, version, cap=None):
 
 
 def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False,
-                        source=None, version=None, sigmas=np.linspace(0, 2, 5)):
+                        source=None, version=None, sigmas=np.linspace(0, 2, 5),
+                        summary=False):
     """Return ChainConsumer object set up with given chain and pkeys
     """
     if param_labels is None:
@@ -517,7 +519,7 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(chain_flat, parameters=param_labels, walkers=n_walkers)
-    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary)
     return cc
 
 
