@@ -177,25 +177,21 @@ def plot_posteriors(chain, discard, source, version, cap=None,
 
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
-                     display=True, save=False, cloud=False,
+                     display=True, save=False, cloud=False, summary=False,
                      sigmas=np.linspace(0, 2, 5), fontsize=18, figsize='column'):
     """Plots contours of mass versus radius from a given chain
     """
-    # TODO: combine and generalise with plot_xedd()
     default_plt_options()
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-
     mass_nw, mass_gr = mcmc_params.get_constant_masses(source, version)
     mass_radius_chain = mcmc_params.get_mass_radius_chain(chain=chain, discard=discard,
                                                           source=source, version=version,
                                                           cap=cap, mass_nw=mass_nw,
                                                           mass_gr=mass_gr)
-    cc = chainconsumer.ChainConsumer()
-    cc.add_chain(mass_radius_chain, parameters=['R', 'M'])
-    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
+
+    cc = setup_custom_chainconsumer(mass_radius_chain, parameters=['R', 'M'],
+                                    sigmas=sigmas, summary=summary)
     fig = cc.plotter.plot(figsize=figsize)
 
-    # Manually set axis labels
     labels = plot_tools.convert_full_labels(['radius', 'mass'])
     fig.axes[2].set_xlabel(labels[0], fontsize=fontsize)
     fig.axes[2].set_ylabel(labels[1], fontsize=fontsize)
@@ -221,10 +217,7 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
                                                     cap=cap, mass_nw=mass_nw,
                                                     mass_gr=mass_gr)
 
-    cc = chainconsumer.ChainConsumer()
-    cc.add_chain(redshift_chain, parameters=['(1+z)'])
-    cc.configure(kde=False, smooth=0)
-
+    cc = setup_custom_chainconsumer(redshift_chain, parameters=['1+z'])
     fig = cc.plotter.plot_distributions(figsize=[5, 5])
     plt.tight_layout()
 
@@ -241,11 +234,9 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
     grav_chain = mcmc_params.get_gravitational_chain(chain=chain, discard=discard,
                                                      source=source, version=version,
                                                      cap=cap, r_nw=r_nw)
-    # TODO: generalise new setup_chainconsumer for derived params
-    cc = chainconsumer.ChainConsumer()
-    cc.add_chain(grav_chain, parameters=['R', 'M', 'g', '1+z'])
-    cc.configure(kde=False, smooth=0, sigmas=sigmas, summary=summary)
 
+    cc = setup_custom_chainconsumer(grav_chain, parameters=['R', 'M', 'g', '1+z'],
+                                    sigmas=sigmas, summary=summary)
     fig = cc.plotter.plot()
     save_plot(fig, prefix='gravitational', chain=chain, save=save, source=source,
               version=version, display=display)
@@ -260,10 +251,9 @@ def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
     disc_chain = mcmc_params.get_disc_chain(chain=chain, discard=discard, cap=cap,
                                             source=source, version=version,
                                             disc_model=disc_model)
-    cc = chainconsumer.ChainConsumer()
-    cc.add_chain(disc_chain, parameters=['i', 'xib', 'xip', 'd'])
-    cc.configure(kde=False, smooth=0, sigmas=sigmas, summary=summary)
 
+    cc = setup_custom_chainconsumer(disc_chain, parameters=['i', 'xib', 'xip', 'd'],
+                                    sigmas=sigmas, summary=summary)
     fig = cc.plotter.plot()
     save_plot(fig, prefix='disc', chain=chain, save=save, source=source,
               version=version, display=display)
@@ -279,10 +269,10 @@ def plot_distance_anisotropy(chain, discard, source, version, cap=None, display=
                                             source=source, version=version, cap=cap)
     xi_ratio_chain = mcmc_params.get_param_chain(chain, param='xi_ratio', discard=discard,
                                                  source=source, version=version, cap=cap)
-    cc = chainconsumer.ChainConsumer()
-    cc.add_chain(np.column_stack([d_b_chain, xi_ratio_chain]),
-                 parameters=['db', 'xiratio'])
-    cc.configure(kde=False, smooth=0, sigmas=sigmas, summary=summary)
+
+    flat_chain = np.column_stack([d_b_chain, xi_ratio_chain])
+    cc = setup_custom_chainconsumer(flat_chain, parameters=['db', 'xiratio'],
+                                    sigmas=sigmas, summary=summary)
 
     fig = cc.plotter.plot(figsize=figsize)
     plt.tight_layout()
@@ -299,15 +289,14 @@ def plot_xedd(chain, discard, source, version, cap=None, display=True,
     xedd_chain = mcmc_params.get_xedd_chain(chain=chain, discard=discard, source=source,
                                             version=version, cap=cap)
 
-    cc = chainconsumer.ChainConsumer()
     label = plot_tools.quantity_label('xedd')
-    cc.add_chain(xedd_chain, parameters=[label])
-    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0)
-
+    cc = setup_custom_chainconsumer(xedd_chain, parameters=[label],
+                                    sigmas=sigmas, cloud=cloud)
     fig = cc.plotter.plot(figsize=figsize)
 
     save_plot(fig, prefix='xedd', chain=chain, save=save, source=source,
               version=version, display=display)
+    return fig
 
 
 def plot_walkers(chain, source, version, params=None, n_lines=30, xlim=-1,
@@ -543,18 +532,17 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
     return cc
 
 
-def setup_custom_chainconsumer(chain, parameters, cloud=False,
+def setup_custom_chainconsumer(flat_chain, parameters, cloud=False,
                                sigmas=np.linspace(0, 2, 5), summary=False):
     """Returns ChainConsumer, with derived parameters
 
-        Note: chain must already be flattened (and already discarded/capped)
+        Note: chain must already be flattened and  discarded/capped
     """
     param_labels = plot_tools.convert_mcmc_labels(parameters)
 
     cc = chainconsumer.ChainConsumer()
-    cc.add_chain(chain, parameters=param_labels)
+    cc.add_chain(flat_chain, parameters=param_labels)
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary)
-
     return cc
 
 
