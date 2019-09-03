@@ -146,7 +146,7 @@ def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10):
     return np.column_stack([mass_radius, grav, redshift])
 
 
-def get_disc_chains(chain, discard, source, version, cap=None, disc_model='he16_a'):
+def get_disc_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
     """Returns chain of [inc, xi_b, xi_p, d] derived with a disc model
     """
     inc_chain = get_inclination_chain(chain=chain, discard=discard,
