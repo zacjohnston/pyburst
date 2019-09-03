@@ -543,6 +543,21 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
     return cc
 
 
+def setup_custom_chainconsumer(chain, parameters, cloud=False,
+                               sigmas=np.linspace(0, 2, 5), summary=False):
+    """Returns ChainConsumer, with derived parameters
+
+        Note: chain must already be flattened (and already discarded/capped)
+    """
+    param_labels = plot_tools.convert_mcmc_labels(parameters)
+
+    cc = chainconsumer.ChainConsumer()
+    cc.add_chain(chain, parameters=param_labels)
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary)
+
+    return cc
+
+
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=False,
                    display=True, save=False):
     default_plt_options()
