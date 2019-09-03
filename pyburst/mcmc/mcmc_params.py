@@ -1,4 +1,5 @@
 import numpy as np
+from astropy import units
 
 # kepler_grids
 from . import mcmc_versions
@@ -146,6 +147,14 @@ def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10):
     return np.column_stack([mass_radius, grav, redshift])
 
 
+def get_disc_chains(chain, discard, source, version, cap=None, disc_model='he16_a'):
+    """Returns chain of anisotropy/inclination parameters derived with a disc model
+    """
+    inc_chain = get_inclination_chain(chain=chain, discard=discard,
+                                      source=source, version=version,
+                                      cap=cap, disc_model=disc_model)
+
+
 def get_inclination_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
     """returns inclination chain for given chain of xi_ratio, using simple disc model
     """
@@ -156,7 +165,21 @@ def get_inclination_chain(chain, discard, source, version, cap=None, disc_model=
     chain_flat = chain.reshape((-1, n_dimensions))
 
     xi_ratio = chain_flat[:, pkeys.index('xi_ratio')]
-    return anisotropy.inclination_ratio(xi_ratio, model=disc_model)
+    return anisotropy.inclination_ratio(xi_ratio, model=disc_model).value
+
+
+def get_anisotropy_chain(chain, discard, source, version, cap=None, disc_model='he16_a',
+                         inc_chain=None):
+    """Returns chain of anisotropy parameters, derived with a disc model
+    """
+    if inc_chain is None:
+        inc_chain = get_inclination_chain(chain=chain, discard=discard,
+                                          source=source, version=version,
+                                          cap=cap, disc_model=disc_model)
+    xi_b_chain, xi_p_chain = anisotropy.anisotropy(inc_chain * units.deg,
+                                                   model=disc_model)
+
+    return np.column_stack([xi_b_chain, xi_p_chain])
 
 
 def epoch_param_keys(source, version):
