@@ -147,11 +147,21 @@ def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10):
 
 
 def get_disc_chains(chain, discard, source, version, cap=None, disc_model='he16_a'):
-    """Returns chain of anisotropy/inclination parameters derived with a disc model
+    """Returns chain of [inc, xi_b, xi_p, d] derived with a disc model
     """
     inc_chain = get_inclination_chain(chain=chain, discard=discard,
                                       source=source, version=version,
                                       cap=cap, disc_model=disc_model)
+
+    xi_b_chain, xi_p_chain = get_anisotropy_chains(chain=chain, discard=discard,
+                                                   source=source, version=version,
+                                                   cap=cap, disc_model=disc_model)
+
+    d_chain = get_distance_chain(chain=chain, discard=discard,
+                                 source=source, version=version,
+                                 cap=cap, disc_model=disc_model)
+
+    return np.column_stack([inc_chain, xi_b_chain, xi_p_chain, d_chain])
 
 
 def get_inclination_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
@@ -163,8 +173,8 @@ def get_inclination_chain(chain, discard, source, version, cap=None, disc_model=
     return anisotropy.inclination_ratio(xi_ratio_chain, model=disc_model).value
 
 
-def get_anisotropy_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
-    """Returns chain of anisotropy parameters, derived with a disc model
+def get_anisotropy_chains(chain, discard, source, version, cap=None, disc_model='he16_a'):
+    """Returns chains for xi_b and xi_p, derived with a disc model
     """
     inc_chain = get_inclination_chain(chain=chain, discard=discard,
                                       source=source, version=version,
@@ -172,7 +182,7 @@ def get_anisotropy_chain(chain, discard, source, version, cap=None, disc_model='
 
     xi_b_chain, xi_p_chain = anisotropy.anisotropy(inc_chain * units.deg,
                                                    model=disc_model)
-    return np.column_stack([xi_b_chain, xi_p_chain])
+    return xi_b_chain, xi_p_chain
 
 
 def get_distance_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
@@ -181,9 +191,9 @@ def get_distance_chain(chain, discard, source, version, cap=None, disc_model='he
     d_b_chain = get_param_chain(chain, param='d_b', discard=discard,
                                 source=source, version=version, cap=cap)
 
-    xi_b_chain, _ = get_anisotropy_chain(chain=chain, discard=discard,
-                                         source=source, version=version,
-                                         cap=cap, disc_model=disc_model)
+    xi_b_chain, _ = get_anisotropy_chains(chain=chain, discard=discard,
+                                          source=source, version=version,
+                                          cap=cap, disc_model=disc_model)
     return d_b_chain / np.sqrt(xi_b_chain)
 
 
