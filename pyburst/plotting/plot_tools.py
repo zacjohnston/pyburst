@@ -104,19 +104,15 @@ def quantity_label(quantity):
         'd_b': r'$d \sqrt{\xi_\mathrm{b}}$',
         'dt': r'$\Delta t$',
         'fluence': r'$E_\mathrm{b}$',
-        'g': '$g$',
         'length': 'Burst length',
         'lum': r'$\mathit{L}$',
-        'M': '$M$',
         'm_gr': r'$M_\mathrm{GR}$',
         'm_nw': r'$M_\mathrm{NW}$',
         'mdot': r'$\dot{M}$',
         'peak': r'$L_\mathrm{peak}$',
         'qb': r'$Q_\mathrm{b}$',
-        'R': '$R$',
         'rate': r'Burst rate',
         'redshift': '$1+z$',
-        '1+z': '$1+z$',
         'x': r'$X_0$',
         'xedd': r'$X_\mathrm{Edd}$',
         'xedd_ratio': r'$X_\mathrm{Edd} / X_0$',
@@ -125,7 +121,7 @@ def quantity_label(quantity):
         'xi_p': r'$\xi_\mathrm{p}$',
         'z': r'$Z_\mathrm{CNO}$',
     }
-    return labels.get(quantity, quantity)
+    return labels.get(quantity, f'${quantity}$')
 
 
 def convert_full_labels(quantities):
