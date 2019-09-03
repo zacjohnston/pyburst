@@ -110,7 +110,7 @@ def get_masses(chain, discard, source, version, cap=None, mass_nw=None, mass_gr=
         mass_nw = get_param_chain(chain, param='m_nw', discard=discard,
                                   source=source, version=version, cap=cap)
     if mass_gr is None:
-        mass_nw = get_param_chain(chain, param='m_gr', discard=discard,
+        mass_gr = get_param_chain(chain, param='m_gr', discard=discard,
                                   source=source, version=version, cap=cap)
     return mass_nw, mass_gr
 
