@@ -269,25 +269,6 @@ def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
     return fig
 
 
-def plot_inclination(chain, discard, source, version, cap=None, display=True, save=False,
-                     disc_model='he16_a'):
-    """Plots posterior distribution of redshift given a chain
-    """
-    inclination_chain = mcmc_params.get_inclination_chain(chain=chain, discard=discard,
-                                                          source=source, version=version,
-                                                          cap=cap, disc_model=disc_model)
-
-    cc = chainconsumer.ChainConsumer()
-    cc.add_chain(inclination_chain, parameters=['i'])
-    cc.configure(kde=False, smooth=0)
-
-    fig = cc.plotter.plot_distributions(figsize=[5, 5])
-    plt.tight_layout()
-
-    save_plot(fig, prefix='inclination', chain=chain, save=save, source=source,
-              version=version, display=display)
-
-
 def plot_xedd(chain, discard, source, version, cap=None,
               display=True, save=False, cloud=True, sigmas=np.linspace(0, 2, 10)):
     """Plots posterior for Eddington hydrogen composition (X_Edd)
