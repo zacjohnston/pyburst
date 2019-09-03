@@ -100,6 +100,8 @@ def quantity_label(quantity):
         'redshift': r'$(1+z)$',
         'd_b': r'$d \sqrt{\xi_\mathrm{b}}$',
         'xi_ratio': r'$\xi_\mathrm{p} / \xi_\mathrm{b}$',
+        'xi_b': r'$\xi_\mathrm{b}$',
+        'xi_p': r'$\xi_\mathrm{p}$',
         'm_gr': r'$M_\mathrm{GR}$',
         'm_nw': r'$M_\mathrm{NW}$',
         'xedd_ratio': r'$X_\mathrm{Edd} / X_0$',
