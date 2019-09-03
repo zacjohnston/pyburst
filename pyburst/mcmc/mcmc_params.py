@@ -59,14 +59,10 @@ def get_mass_radius_chain(chain, discard, source, version, cap=None,
     mass_gr : flt (optional)
         specify a constant mass_gr. If None, assume it is in chain
     """
-    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
-    n_walkers, n_steps, n_dimensions = chain.shape
-    chain_flat = chain.reshape((-1, n_dimensions))
+    mass_nw, mass_gr = get_masses(chain, discard=discard, source=source, cap=cap,
+                                  version=version, mass_nw=mass_nw, mass_gr=mass_gr)
 
-    mass_nw, mass_gr = get_mass_from_chain(chain_flat, mass_nw=mass_nw, mass_gr=mass_gr,
-                                           source=source, version=version)
     radius_gr = get_radius(mass_nw=mass_nw, mass_gr=mass_gr)
-
     return np.column_stack((radius_gr, mass_gr))
 
 
@@ -84,25 +80,20 @@ def get_radius(mass_nw, mass_gr):
 def get_xedd_chain(chain, discard, source, version, cap=None):
     """Returns chain of X_edd, from a given chain with parameters xedd_ratio and x
     """
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+    xedd_ratio_chain = get_param_chain(chain, param='xedd_ratio', discard=discard,
+                                       source=source, version=version, cap=cap)
+    x_chain = get_param_chain(chain, param='x', discard=discard,
+                              source=source, version=version, cap=cap)
 
-    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
-    n_walkers, n_steps, n_dimensions = chain.shape
-    chain_flat = chain.reshape((-1, n_dimensions))
-
-    return chain_flat[:, pkeys.index('xedd_ratio')] * chain_flat[:, pkeys.index('x')]
+    return xedd_ratio_chain * x_chain
 
 
 def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
                        mass_nw=None, mass_gr=None):
     """Returns chain of redshift samples for given MCMC chain
     """
-    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
-    n_walkers, n_steps, n_dimensions = chain.shape
-    chain_flat = chain.reshape((-1, n_dimensions))
-
-    mass_nw, mass_gr = get_mass_from_chain(chain_flat, mass_nw=mass_nw, mass_gr=mass_gr,
-                                           source=source, version=version)
+    mass_nw, mass_gr = get_masses(chain, discard=discard, source=source, cap=cap,
+                                  version=version, mass_nw=mass_nw, mass_gr=mass_gr)
 
     mass_ratio = mass_gr / mass_nw
     _, redshift = gravity.gr_corrections(r=r_nw, m=mass_nw, phi=mass_ratio)
@@ -110,19 +101,27 @@ def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
     return redshift
 
 
+def get_masses(chain, discard, source, version, cap=None, mass_nw=None, mass_gr=None):
+    """Returns chain(s) of m_nw, m_gr from given chain
+
+        Note: if either mass is None, assumes it's in the chain, otherwise return as is
+    """
+    if mass_nw is None:
+        mass_nw = get_param_chain(chain, param='m_nw', discard=discard,
+                                  source=source, version=version, cap=cap)
+    if mass_gr is None:
+        mass_nw = get_param_chain(chain, param='m_gr', discard=discard,
+                                  source=source, version=version, cap=cap)
+    return mass_nw, mass_gr
+
+
 def get_gravity_chain(chain, discard, source, version, cap=None, r_nw=10):
     """Returns flat chain of surface gravity (g) samples for a given MCMC chain
         Note: returns in units of 1e14 cm/s^2
     """
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
-    n_walkers, n_steps, n_dimensions = chain.shape
-    chain_flat = chain.reshape((-1, n_dimensions))
-
-    mass_nw = chain_flat[:, pkeys.index('m_nw')]
-
-    g = gravity.get_acceleration_newtonian(r=r_nw, m=mass_nw)
-
+    mass_nw_chain = get_param_chain(chain, param='m_nw', discard=discard,
+                                    source=source, version=version, cap=cap)
+    g = gravity.get_acceleration_newtonian(r=r_nw, m=mass_nw_chain)
     return g.value/1e14
 
 
@@ -158,14 +157,10 @@ def get_disc_chains(chain, discard, source, version, cap=None, disc_model='he16_
 def get_inclination_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
     """returns inclination chain for given chain of xi_ratio, using simple disc model
     """
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+    xi_ratio_chain = get_param_chain(chain, param='xi_ratio', discard=discard,
+                                     source=source, version=version, cap=cap)
 
-    chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap)
-    n_walkers, n_steps, n_dimensions = chain.shape
-    chain_flat = chain.reshape((-1, n_dimensions))
-
-    xi_ratio = chain_flat[:, pkeys.index('xi_ratio')]
-    return anisotropy.inclination_ratio(xi_ratio, model=disc_model).value
+    return anisotropy.inclination_ratio(xi_ratio_chain, model=disc_model).value
 
 
 def get_anisotropy_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
