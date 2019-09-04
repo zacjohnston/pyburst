@@ -504,21 +504,6 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
     return cc
 
 
-def get_summary(chain, discard, source, version, cap=None):
-    """Return summary values from MCMC chain (mean, uncertainties)
-    """
-    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
-    n_dimensions = chain.shape[2]
-    summary = np.full((n_dimensions, 3), np.nan)
-    cc = mcmc_tools.setup_chainconsumer(chain=chain, param_labels=pkeys,
-                                        discard=discard, cap=cap)
-    summary_dict = cc.analysis.get_summary()
-
-    for i, key in enumerate(pkeys):
-        summary[i, :] = summary_dict[key]
-    return summary
-
-
 def setup_custom_chainconsumer(flat_chain, parameters, cloud=False, unit_labels=True,
                                sigmas=np.linspace(0, 2, 5), summary=False):
     """Returns ChainConsumer, with derived parameters

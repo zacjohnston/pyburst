@@ -103,6 +103,20 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
     return cc
 
 
+def get_summary(chain, discard, source, version, cap=None):
+    """Return summary values from MCMC chain (mean, uncertainties)
+    """
+    pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
+    n_dimensions = chain.shape[2]
+    summary = np.full((n_dimensions, 3), np.nan)
+    cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
+    summary_dict = cc.analysis.get_summary()
+
+    for i, key in enumerate(pkeys):
+        summary[i, :] = summary_dict[key]
+    return summary
+
+
 def load_multi_chains(source, versions, n_steps, n_walkers=1000, compressed=False):
     """Loads multiple chains of MCMC runs
 
