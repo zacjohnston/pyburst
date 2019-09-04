@@ -286,7 +286,7 @@ def plot_distance_anisotropy(chain, discard, source, version, cap=None, display=
 
 
 def plot_xedd(chain, discard, source, version, cap=None, display=True,
-              save=False, cloud=True, sigmas=np.linspace(0, 2, 10), figsize=(6, 6)):
+              save=False, cloud=True, sigmas=np.linspace(0, 2, 10), figsize=(5, 5)):
     """Plots posterior for Eddington hydrogen composition (X_Edd)
     """
     default_plt_options()
@@ -369,7 +369,8 @@ def plot_walkers(chain, source, version, params=None, n_lines=30, xlim=-1,
               label=label, extension='.png')
 
 
-def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=False):
+def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=False,
+                 figsize=(5, 5)):
     """Plots 2D contours of Qb versus Mdot for each epoch (from multi-epoch chain)
     """
     mv = mcmc_versions.McmcVersion(source=source, version=version)
@@ -391,7 +392,7 @@ def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=F
                      name=str(epoch))
 
     cc.configure(kde=False, smooth=0)
-    fig = cc.plotter.plot(display=False, figsize=(6, 6))
+    fig = cc.plotter.plot(display=False, figsize=figsize)
     plt.tight_layout()
     save_plot(fig, prefix='qb', save=save, source=source, version=version,
               display=display, chain=chain)
