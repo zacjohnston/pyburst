@@ -138,6 +138,7 @@ def plot_contours(chain, discard, source, version, cap=None,
     if parameters is not None:
         parameters = plot_tools.convert_mcmc_labels(param_keys=parameters)
 
+    # TODO: figsize
     if truth_values is not None:
         fig = cc.plotter.plot(truth=truth_values, parameters=parameters)
     else:
