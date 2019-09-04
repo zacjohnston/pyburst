@@ -85,7 +85,7 @@ def save_compressed_chain(chain, source, version, verbose=True):
 
 def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False,
                         source=None, version=None, sigmas=np.linspace(0, 2, 5),
-                        summary=False):
+                        summary=False, fontsize=14):
     """Return ChainConsumer object set up with given chain and pkeys
     """
     if param_labels is None:
@@ -99,7 +99,8 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(chain_flat, parameters=param_labels, walkers=n_walkers)
-    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary)
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary,
+                 label_font_size=fontsize, tick_font_size=fontsize-2)
     return cc
 
 
@@ -185,7 +186,7 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
 
 def setup_gravitational_chainconsumer(chain, discard, source, version, cap=None,
                                       r_nw=10, summary=False, unit_labels=True,
-                                      sigmas=np.linspace(0, 2, 5)):
+                                      sigmas=np.linspace(0, 2, 5), fontsize=16):
     """Returns ChainConsumer of gravitational parameters
     """
     grav_chain = mcmc_params.get_gravitational_chain(chain=chain, discard=discard,
@@ -194,7 +195,7 @@ def setup_gravitational_chainconsumer(chain, discard, source, version, cap=None,
 
     cc = setup_custom_chainconsumer(grav_chain, parameters=['R', 'M', 'g', '1+z'],
                                     sigmas=sigmas, summary=summary,
-                                    unit_labels=unit_labels)
+                                    unit_labels=unit_labels, fontsize=fontsize)
     return cc
 
 
