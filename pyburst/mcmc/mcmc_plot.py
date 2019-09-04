@@ -244,19 +244,20 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
     return fig
 
 
-def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
-                       save=False, disc_model='he16_a', sigmas=np.linspace(0, 2, 5),
-                       summary=False, unit_labels=True):
+def plot_inclination(chain, discard, source, version, cap=None, display=True,
+                     save=False, disc_model='he16_a', sigmas=np.linspace(0, 2, 5),
+                     summary=False, unit_labels=True, figsize=(5, 5)):
     """Plots contours of parameters derived using disc model
     """
     disc_chain = mcmc_params.get_disc_chain(chain=chain, discard=discard, cap=cap,
                                             source=source, version=version,
                                             disc_model=disc_model)
 
-    cc = setup_custom_chainconsumer(disc_chain, parameters=['i', 'xi_b', 'xi_p', 'd'],
+    cc = setup_custom_chainconsumer(disc_chain, parameters=['d', 'i'],
                                     sigmas=sigmas, summary=summary,
                                     unit_labels=unit_labels)
-    fig = cc.plotter.plot()
+    fig = cc.plotter.plot(figsize=figsize)
+    fig.subplots_adjust(left=0.15, bottom=0.15)
     save_plot(fig, prefix='disc', chain=chain, save=save, source=source,
               version=version, display=display)
     return fig
@@ -264,7 +265,7 @@ def plot_disc_contours(chain, discard, source, version, cap=None, display=True,
 
 def plot_distance_anisotropy(chain, discard, source, version, cap=None, display=True,
                              save=False, sigmas=np.linspace(0, 2, 5), summary=False,
-                             figsize=(6, 6), unit_labels=True):
+                             figsize=(5, 5), unit_labels=True):
     """Plots contours of MCMC parameters d_b, xi_ratio
     """
     d_b_chain = mcmc_params.get_param_chain(chain, param='d_b', discard=discard,
@@ -278,7 +279,7 @@ def plot_distance_anisotropy(chain, discard, source, version, cap=None, display=
                                     unit_labels=unit_labels)
 
     fig = cc.plotter.plot(figsize=figsize)
-    plt.tight_layout()
+    fig.subplots_adjust(left=0.15, bottom=0.15)
     save_plot(fig, prefix='distance', chain=chain, save=save, source=source,
               version=version, display=display)
     return fig
