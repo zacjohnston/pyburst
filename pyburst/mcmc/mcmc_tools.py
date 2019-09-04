@@ -104,7 +104,7 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
 
 
 def setup_custom_chainconsumer(flat_chain, parameters, cloud=False, unit_labels=True,
-                               sigmas=np.linspace(0, 2, 5), summary=False):
+                               sigmas=np.linspace(0, 2, 5), summary=False, fontsize=12):
     """Returns ChainConsumer, with derived parameters
 
         Note: chain must already be flattened and  discarded/capped
@@ -113,7 +113,8 @@ def setup_custom_chainconsumer(flat_chain, parameters, cloud=False, unit_labels=
 
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(flat_chain, parameters=param_labels)
-    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary)
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary,
+                 label_font_size=fontsize, tick_font_size=fontsize-2)
     return cc
 
 
@@ -209,6 +210,7 @@ def get_summary(chain, discard, source, version, cap=None):
     for i, key in enumerate(pkeys):
         summary[i, :] = summary_dict[key]
     return summary
+
 
 def load_multi_chains(source, versions, n_steps, n_walkers=1000, compressed=False):
     """Loads multiple chains of MCMC runs
