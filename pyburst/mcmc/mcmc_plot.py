@@ -121,7 +121,7 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
 
 def plot_contours(chain, discard, source, version, cap=None,
                   display=True, save=False, truth_values=None, parameters=None,
-                  sigmas=np.linspace(0, 2, 5), cc=None, summary=False):
+                  sigmas=np.linspace(0, 2, 5), cc=None, summary=False, fontsize=14):
     """Plots posterior contours of mcmc chain
 
     parameters : [str]
@@ -134,7 +134,7 @@ def plot_contours(chain, discard, source, version, cap=None,
         pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
         cc = mcmc_tools.setup_chainconsumer(chain=chain, param_labels=pkey_labels,
                                             discard=discard, cap=cap, sigmas=sigmas,
-                                            summary=summary)
+                                            summary=summary, fontsize=fontsize)
     if parameters is not None:
         parameters = plot_tools.convert_mcmc_labels(param_keys=parameters)
 
@@ -178,7 +178,7 @@ def plot_posteriors(chain, discard, source, version, cap=None,
 
 
 def plot_mass_radius(chain, discard, source, version, cap=None,
-                     display=True, save=False, cloud=False, summary=False,
+                     display=True, save=False, summary=False,
                      sigmas=np.linspace(0, 2, 5), fontsize=18, figsize='column'):
     """Plots contours of mass versus radius from a given chain
     """
@@ -190,7 +190,8 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
                                                           mass_gr=mass_gr)
 
     cc = mcmc_tools.setup_custom_chainconsumer(mass_radius_chain, parameters=['R', 'M'],
-                                               sigmas=sigmas, summary=summary)
+                                               sigmas=sigmas, summary=summary,
+                                               fontsize=fontsize)
     fig = cc.plotter.plot(figsize=figsize)
     fig.subplots_adjust(left=0.16, bottom=0.15)
 
@@ -219,7 +220,7 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
 
 def plot_gravitational_contours(chain, discard, source, version, cap=None, display=True,
                                 save=False, r_nw=10, sigmas=np.linspace(0, 2, 5),
-                                summary=False, unit_labels=True):
+                                summary=False, unit_labels=True, fontsize=16):
     """Plots contours of gravitational parameters
     """
     cc = mcmc_tools.setup_gravitational_chainconsumer(chain=chain, discard=discard,
@@ -227,7 +228,7 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
                                                       cap=cap, r_nw=r_nw,
                                                       summary=summary,
                                                       unit_labels=unit_labels,
-                                                      sigmas=sigmas)
+                                                      sigmas=sigmas, fontsize=fontsize)
     fig = cc.plotter.plot()
     save_plot(fig, prefix='gravitational', chain=chain, save=save, source=source,
               version=version, display=display)
