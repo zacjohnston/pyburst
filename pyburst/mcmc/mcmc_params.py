@@ -153,15 +153,11 @@ def get_disc_chain(chain, discard, source, version, cap=None, disc_model='he16_a
                                       source=source, version=version,
                                       cap=cap, disc_model=disc_model)
 
-    xi_b_chain, xi_p_chain = get_anisotropy_chains(chain=chain, discard=discard,
-                                                   source=source, version=version,
-                                                   cap=cap, disc_model=disc_model)
-
     d_chain = get_distance_chain(chain=chain, discard=discard,
                                  source=source, version=version,
                                  cap=cap, disc_model=disc_model)
 
-    return np.column_stack([inc_chain, xi_b_chain, xi_p_chain, d_chain])
+    return np.column_stack([d_chain, inc_chain])
 
 
 def get_inclination_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
