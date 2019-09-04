@@ -222,13 +222,12 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
                                 summary=False, unit_labels=True):
     """Plots contours of gravitational parameters
     """
-    grav_chain = mcmc_params.get_gravitational_chain(chain=chain, discard=discard,
-                                                     source=source, version=version,
-                                                     cap=cap, r_nw=r_nw)
-
-    cc = mcmc_tools.setup_custom_chainconsumer(grav_chain, parameters=['R', 'M', 'g', '1+z'],
-                                               sigmas=sigmas, summary=summary,
-                                               unit_labels=unit_labels)
+    cc = mcmc_tools.setup_gravitational_chainconsumer(chain=chain, discard=discard,
+                                                      source=source, version=version,
+                                                      cap=cap, r_nw=r_nw,
+                                                      summary=summary,
+                                                      unit_labels=unit_labels,
+                                                      sigmas=sigmas)
     fig = cc.plotter.plot()
     save_plot(fig, prefix='gravitational', chain=chain, save=save, source=source,
               version=version, display=display)
@@ -532,7 +531,7 @@ def update_axis_fontsize(fig, fontsize):
 
 def update_tick_fontsize(fig, fontsize):
     """Updates the fontize for all axes in given fig
-        """
+    """
     for ax in fig.axes:
         for tick in ax.xaxis.get_major_ticks():
             tick.label.set_fontsize(fontsize)

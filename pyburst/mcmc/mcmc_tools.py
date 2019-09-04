@@ -182,6 +182,21 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
     return cc
 
 
+def setup_gravitational_chainconsumer(chain, discard, source, version, cap=None,
+                                      r_nw=10, summary=False, unit_labels=True,
+                                      sigmas=np.linspace(0, 2, 5)):
+    """Returns ChainConsumer of gravitational parameters
+    """
+    grav_chain = mcmc_params.get_gravitational_chain(chain=chain, discard=discard,
+                                                     source=source, version=version,
+                                                     cap=cap, r_nw=r_nw)
+
+    cc = setup_custom_chainconsumer(grav_chain, parameters=['R', 'M', 'g', '1+z'],
+                                    sigmas=sigmas, summary=summary,
+                                    unit_labels=unit_labels)
+    return cc
+
+
 def get_summary(chain, discard, source, version, cap=None):
     """Return summary values from MCMC chain (mean, uncertainties)
     """
@@ -194,7 +209,6 @@ def get_summary(chain, discard, source, version, cap=None):
     for i, key in enumerate(pkeys):
         summary[i, :] = summary_dict[key]
     return summary
-
 
 def load_multi_chains(source, versions, n_steps, n_walkers=1000, compressed=False):
     """Loads multiple chains of MCMC runs
