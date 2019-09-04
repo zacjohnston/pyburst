@@ -132,9 +132,9 @@ def plot_contours(chain, discard, source, version, cap=None,
     if cc is None:
         pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
         pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
-        cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels,
-                                 discard=discard, cap=cap, sigmas=sigmas,
-                                 summary=summary)
+        cc = mcmc_tools.setup_chainconsumer(chain=chain, param_labels=pkey_labels,
+                                            discard=discard, cap=cap, sigmas=sigmas,
+                                            summary=summary)
     if parameters is not None:
         parameters = plot_tools.convert_mcmc_labels(param_keys=parameters)
 
@@ -161,8 +161,8 @@ def plot_posteriors(chain, discard, source, version, cap=None,
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
     if cc is None:
-        cc = setup_chainconsumer(chain=chain, param_labels=pkey_labels, discard=discard,
-                                 cap=cap)
+        cc = mcmc_tools.setup_chainconsumer(chain=chain, param_labels=pkey_labels,
+                                            discard=discard, cap=cap)
     height = 3 * ceil(len(pkeys) / 4)
 
     if truth_values is not None:
@@ -510,32 +510,13 @@ def get_summary(chain, discard, source, version, cap=None):
     pkeys = mcmc_versions.get_parameter(source, version, 'param_keys')
     n_dimensions = chain.shape[2]
     summary = np.full((n_dimensions, 3), np.nan)
-    cc = setup_chainconsumer(chain=chain, param_labels=pkeys, discard=discard, cap=cap)
+    cc = mcmc_tools.setup_chainconsumer(chain=chain, param_labels=pkeys,
+                                        discard=discard, cap=cap)
     summary_dict = cc.analysis.get_summary()
 
     for i, key in enumerate(pkeys):
         summary[i, :] = summary_dict[key]
     return summary
-
-
-def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False,
-                        source=None, version=None, sigmas=np.linspace(0, 2, 5),
-                        summary=False):
-    """Return ChainConsumer object set up with given chain and pkeys
-    """
-    if param_labels is None:
-        if (source is None) or (version is None):
-            raise ValueError('If param_labels not provided, must give source, version')
-        param_keys = mcmc_versions.get_parameter(source, version, 'param_keys')
-        param_labels = plot_tools.convert_mcmc_labels(param_keys)
-
-    n_walkers = chain.shape[0]
-    chain_flat = mcmc_tools.slice_chain(chain, discard=discard, cap=cap, flatten=True)
-
-    cc = chainconsumer.ChainConsumer()
-    cc.add_chain(chain_flat, parameters=param_labels, walkers=n_walkers)
-    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary)
-    return cc
 
 
 def setup_custom_chainconsumer(flat_chain, parameters, cloud=False, unit_labels=True,

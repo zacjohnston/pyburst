@@ -3,10 +3,12 @@ import os
 import sys
 import pickle
 import gzip
+import chainconsumer
 
 # kepler_grids
 from pyburst.misc import pyprint
 from pyburst.grids import grid_strings
+from pyburst.plotting import plot_tools
 from . import mcmc_versions, mcmc_params, burstfit
 
 
@@ -79,6 +81,26 @@ def save_compressed_chain(chain, source, version, verbose=True):
 
     with gzip.GzipFile(filepath, 'w') as f:
         np.save(f, chain)
+
+
+def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False,
+                        source=None, version=None, sigmas=np.linspace(0, 2, 5),
+                        summary=False):
+    """Return ChainConsumer object set up with given chain and pkeys
+    """
+    if param_labels is None:
+        if (source is None) or (version is None):
+            raise ValueError('If param_labels not provided, must give source, version')
+        param_keys = mcmc_versions.get_parameter(source, version, 'param_keys')
+        param_labels = plot_tools.convert_mcmc_labels(param_keys)
+
+    n_walkers = chain.shape[0]
+    chain_flat = slice_chain(chain, discard=discard, cap=cap, flatten=True)
+
+    cc = chainconsumer.ChainConsumer()
+    cc.add_chain(chain_flat, parameters=param_labels, walkers=n_walkers)
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary)
+    return cc
 
 
 def load_multi_chains(source, versions, n_steps, n_walkers=1000, compressed=False):
