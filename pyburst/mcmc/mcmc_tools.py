@@ -103,6 +103,20 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
     return cc
 
 
+def setup_custom_chainconsumer(flat_chain, parameters, cloud=False, unit_labels=True,
+                               sigmas=np.linspace(0, 2, 5), summary=False):
+    """Returns ChainConsumer, with derived parameters
+
+        Note: chain must already be flattened and  discarded/capped
+    """
+    param_labels = plot_tools.convert_mcmc_labels(parameters, unit_labels=unit_labels)
+
+    cc = chainconsumer.ChainConsumer()
+    cc.add_chain(flat_chain, parameters=param_labels)
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary)
+    return cc
+
+
 def get_summary(chain, discard, source, version, cap=None):
     """Return summary values from MCMC chain (mean, uncertainties)
     """

@@ -189,8 +189,8 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
                                                           cap=cap, mass_nw=mass_nw,
                                                           mass_gr=mass_gr)
 
-    cc = setup_custom_chainconsumer(mass_radius_chain, parameters=['R', 'M'],
-                                    sigmas=sigmas, summary=summary)
+    cc = mcmc_tools.setup_custom_chainconsumer(mass_radius_chain, parameters=['R', 'M'],
+                                               sigmas=sigmas, summary=summary)
     fig = cc.plotter.plot(figsize=figsize)
 
     # labels = plot_tools.convert_full_labels(['R', 'M'])
@@ -218,7 +218,7 @@ def plot_redshift(chain, discard, source, version, cap=None, display=True, save=
                                                     cap=cap, mass_nw=mass_nw,
                                                     mass_gr=mass_gr)
 
-    cc = setup_custom_chainconsumer(redshift_chain, parameters=['1+z'])
+    cc = mcmc_tools.setup_custom_chainconsumer(redshift_chain, parameters=['1+z'])
     fig = cc.plotter.plot_distributions(figsize=[5, 5])
     plt.tight_layout()
 
@@ -236,9 +236,9 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
                                                      source=source, version=version,
                                                      cap=cap, r_nw=r_nw)
 
-    cc = setup_custom_chainconsumer(grav_chain, parameters=['R', 'M', 'g', '1+z'],
-                                    sigmas=sigmas, summary=summary,
-                                    unit_labels=unit_labels)
+    cc = mcmc_tools.setup_custom_chainconsumer(grav_chain, parameters=['R', 'M', 'g', '1+z'],
+                                               sigmas=sigmas, summary=summary,
+                                               unit_labels=unit_labels)
     fig = cc.plotter.plot()
     save_plot(fig, prefix='gravitational', chain=chain, save=save, source=source,
               version=version, display=display)
@@ -254,9 +254,9 @@ def plot_inclination(chain, discard, source, version, cap=None, display=True,
                                             source=source, version=version,
                                             disc_model=disc_model)
 
-    cc = setup_custom_chainconsumer(disc_chain, parameters=['d', 'i'],
-                                    sigmas=sigmas, summary=summary,
-                                    unit_labels=unit_labels)
+    cc = mcmc_tools.setup_custom_chainconsumer(disc_chain, parameters=['d', 'i'],
+                                               sigmas=sigmas, summary=summary,
+                                               unit_labels=unit_labels)
     fig = cc.plotter.plot(figsize=figsize)
     fig.subplots_adjust(left=0.15, bottom=0.15)
     save_plot(fig, prefix='disc', chain=chain, save=save, source=source,
@@ -275,9 +275,9 @@ def plot_distance_anisotropy(chain, discard, source, version, cap=None, display=
                                                  source=source, version=version, cap=cap)
 
     flat_chain = np.column_stack([d_b_chain, xi_ratio_chain])
-    cc = setup_custom_chainconsumer(flat_chain, parameters=['d_b', 'xi_ratio'],
-                                    sigmas=sigmas, summary=summary,
-                                    unit_labels=unit_labels)
+    cc = mcmc_tools.setup_custom_chainconsumer(flat_chain, parameters=['d_b', 'xi_ratio'],
+                                               sigmas=sigmas, summary=summary,
+                                               unit_labels=unit_labels)
 
     fig = cc.plotter.plot(figsize=figsize)
     fig.subplots_adjust(left=0.2, bottom=0.2)
@@ -295,8 +295,8 @@ def plot_xedd(chain, discard, source, version, cap=None, display=True,
                                             version=version, cap=cap)
 
     label = plot_tools.quantity_label('xedd')
-    cc = setup_custom_chainconsumer(xedd_chain, parameters=[label],
-                                    sigmas=sigmas, cloud=cloud)
+    cc = mcmc_tools.setup_custom_chainconsumer(xedd_chain, parameters=[label],
+                                               sigmas=sigmas, cloud=cloud)
     fig = cc.plotter.plot(figsize=figsize)
 
     save_plot(fig, prefix='xedd', chain=chain, save=save, source=source,
@@ -334,7 +334,7 @@ def plot_walkers(chain, source, version, params=None, n_lines=30, xlim=-1,
         for i, param_split in enumerate((pkeys[:half], pkeys[half:])):
             plot_walkers(chain=chain, source=source, version=version,
                          params=param_split, n_lines=n_lines, xlim=xlim,
-                         display=display, save=save, label=f'P{i+1}')
+                         display=display, save=save, label=f'P{i + 1}')
         return
 
     n_walkers, n_steps, n_dim = chain.shape
@@ -504,20 +504,6 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
     return cc
 
 
-def setup_custom_chainconsumer(flat_chain, parameters, cloud=False, unit_labels=True,
-                               sigmas=np.linspace(0, 2, 5), summary=False):
-    """Returns ChainConsumer, with derived parameters
-
-        Note: chain must already be flattened and  discarded/capped
-    """
-    param_labels = plot_tools.convert_mcmc_labels(parameters, unit_labels=unit_labels)
-
-    cc = chainconsumer.ChainConsumer()
-    cc.add_chain(flat_chain, parameters=param_labels)
-    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary)
-    return cc
-
-
 def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=False,
                    display=True, save=False):
     default_plt_options()
@@ -553,7 +539,7 @@ def plot_bprop_sample(bprop_sample, source, version, subplot_figsize=(3, 2.5),
     figsize = (2 * subplot_figsize[0], n_rows * subplot_figsize[1])
     fig, ax = plt.subplots(n_rows, 2, sharex=True, figsize=figsize)
 
-    if n_bprops % 2 == 1:   # blank odd-numbered subplot
+    if n_bprops % 2 == 1:  # blank odd-numbered subplot
         ax[-1, -1].axis('off')
 
     for i, bprop in enumerate(bfit.mcmc_version.bprops):
@@ -591,7 +577,7 @@ def plot_autocorrelation(chain, source, version, n_steps=10):
         print(f'Calculating parameter: {param}')
 
         for j, n in enumerate(sample_steps):
-            sys.stdout.write(f'\r{j+1}/{n_steps}  (step size={n})')
+            sys.stdout.write(f'\r{j + 1}/{n_steps}  (step size={n})')
             autoc[i, j] = mcmc_tools.autocorrelation(chain[:, :n, i])
 
         ax.loglog(sample_steps, autoc[i], "o-", label=rf"{params_fmt[i]}")
