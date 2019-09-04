@@ -192,16 +192,6 @@ def plot_mass_radius(chain, discard, source, version, cap=None,
     cc = mcmc_tools.setup_custom_chainconsumer(mass_radius_chain, parameters=['R', 'M'],
                                                sigmas=sigmas, summary=summary)
     fig = cc.plotter.plot(figsize=figsize)
-
-    # labels = plot_tools.convert_full_labels(['R', 'M'])
-    # fig.axes[2].set_xlabel(labels[0], fontsize=fontsize)
-    # fig.axes[2].set_ylabel(labels[1], fontsize=fontsize)
-
-    for tick in fig.axes[2].xaxis.get_major_ticks():
-        tick.label.set_fontsize(fontsize)
-    for tick in fig.axes[2].yaxis.get_major_ticks():
-        tick.label.set_fontsize(fontsize)
-
     fig.subplots_adjust(left=0.16, bottom=0.15)
 
     save_plot(fig, prefix='mass-radius', chain=chain, save=save, source=source,
@@ -529,3 +519,23 @@ def plot_autocorrelation(chain, source, version, n_steps=10):
     plt.show(block=False)
 
     return sample_steps, autoc
+
+
+def update_axis_fontsize(fig, fontsize):
+    """Updates the fontize for all axes in given fig
+    """
+    for ax in fig.axes:
+        label = ax.get_xlabel()
+        ax.set_xlabel(label, fontsize=fontsize)
+        ax.set_ylabel(label, fontsize=fontsize)
+
+
+def update_tick_fontsize(fig, fontsize):
+    """Updates the fontize for all axes in given fig
+        """
+    for ax in fig.axes:
+        for tick in ax.xaxis.get_major_ticks():
+            tick.label.set_fontsize(fontsize)
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label.set_fontsize(fontsize)
+
