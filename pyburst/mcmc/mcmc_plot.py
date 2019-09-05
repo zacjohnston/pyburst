@@ -413,7 +413,7 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
     param_keys = param_order[source]
     formatted_params = plot_tools.convert_mcmc_labels(param_keys)
     n_epochs = len(master_cc.chains) - 1
-
+    # TODO: replace m_nw with g
     if col_wrap is None:
         col_wrap = n_epochs
 
