@@ -106,6 +106,7 @@ def get_acceleration_gr(r, m):
 def inverse_acceleration(g, m=None, r=None):
     """Returns R or M, given g and one of R or M
     """
+    # TODO: solve for m
     def root(r_root, m_root, g_root):
         return get_acceleration_gr(r=r_root, m=m_root).value - g_root.value
 
