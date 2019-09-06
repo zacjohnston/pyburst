@@ -122,7 +122,7 @@ def setup_custom_chainconsumer(flat_chain, parameters, cloud=False, unit_labels=
 def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, discard,
                                n_walkers=1000, epoch_discard=None, epoch_n_steps=None,
                                epoch_n_walkers=None, cap=None, sigmas=None, cloud=None,
-                               compressed=False):
+                               compressed=False, fontsize=14):
     """Setup multiple MCMC chains, including multi-epoch and single-epochs
     """
     if epoch_discard is None:
@@ -147,7 +147,8 @@ def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, 
     formatted_params = plot_tools.convert_mcmc_labels(master_mc_v.param_keys)
     cc.add_chain(master_chain_sliced, parameters=formatted_params, color='black',
                  name='Multi-epoch')
-    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=False)
+    cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=False,
+                 label_font_size=fontsize, tick_font_size=fontsize-2)
 
     return cc
 
