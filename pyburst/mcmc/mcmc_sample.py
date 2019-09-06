@@ -227,17 +227,19 @@ class Ksample:
     def plot(self, residuals=True, shaded=False, alpha_lines=0.5,
              alpha_shaded=0.7, xlims=None,
              k_color='C1', obs_color='black', errorbars=False,
-             sub_figsize=None, linewidth=1, display=True):
+             sub_figsize=None, linewidth=1, display=True,
+             all_ylabels=True):
         """Plot lightcurve comparison between observed and sample models
         """
         subplot_cols = {True: 2, False: 1}.get(residuals)
         if xlims is None:
             xlims = self.xlims
         if sub_figsize is None:
-            sub_figsize = (6 * subplot_cols, 3 * self.n_epochs)
+            sub_figsize = (6 * subplot_cols, 2.33 * self.n_epochs)
         fig, ax = plt.subplots(self.n_epochs, subplot_cols, sharex=True,
                                figsize=sub_figsize)
         y_scale = 1e-8
+        ylabel = r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)'
 
         if residuals:
             lc_ax = ax[:, 0]
@@ -255,7 +257,8 @@ class Ksample:
             obs_y_u = np.array(obs_burst.flux_err) / y_scale
 
             # ====== Labelling =====
-            lc_ax[epoch_i].set_ylabel(r'Flux ($10^{-8}$ erg cm$^{-2}$ s$^{-1}$)')
+            if all_ylabels:
+                lc_ax[epoch_i].set_ylabel(ylabel)
 
             for i in range(self.n_bursts_batch):
                 burst = i + 1
@@ -305,12 +308,15 @@ class Ksample:
                                          ls='none', capsize=3, color=obs_color,
                                          zorder=10, linewidth=0.5*linewidth)
 
+        if not all_ylabels:
+            lc_ax[1].set_ylabel(ylabel, labelpad=10)
+
         lc_ax[-1].set_xlabel('Time (s)')
         lc_ax[-1].set_xlim(xlims)
-        plt.tight_layout()
+        # plt.tight_layout()
         if display:
             plt.show(block=False)
-        return fig, ax
+        return fig
 
 
 def plot_batch(source, batch, error=False):
