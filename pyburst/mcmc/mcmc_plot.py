@@ -371,8 +371,9 @@ def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=F
     epochs = list(system_table.epoch)
     cc = chainconsumer.ChainConsumer()
 
-    param_labels = [r'$\dot{M} / \dot{M}_\mathrm{Edd}$',
-                    r'$Q_\mathrm{b}$ (MeV nucleon$^{-1}$)']
+    param_labels = []
+    for param in ['mdot', 'qb']:
+        param_labels += [plot_tools.full_label(param)]
 
     for i, epoch in enumerate(epochs):
         mdot_idx = mv.param_keys.index(f'mdot{i + 1}')
@@ -498,7 +499,7 @@ def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
                           bprop=bfit.mcmc_version.bprops[i], fontsize=fontsize,
                           ax=axis, display=False,
                           legend=True if (i == 0 and legend) else False,
-                          xlabel=True if (i in [n_bprops-1,]) else False)
+                          xlabel=True if (i in [n_bprops-1, ]) else False)
 
     fig.subplots_adjust(wspace=0.4)
     plt.show(block=False)
