@@ -243,6 +243,25 @@ def setup_gravitational_chainconsumer(chain, discard, source, version, cap=None,
     return cc
 
 
+def setup_gr_mdot_chainconsumer(chain, discard, source, version, n_epochs, cap=None,
+                                r_nw=10, summary=False, unit_labels=True,
+                                sigmas=np.linspace(0, 2, 5), fontsize=16):
+    """Returns ChainConsumer of GR-corrected global accretion rates
+    """
+    # TODO: generalise n_epochs, sources
+    mass_nw, mass_gr = mcmc_params.get_constant_masses(source, version)
+    gr_mdot_chain = mcmc_params.get_corrected_mdot_chain(chain, discard=discard,
+                                                         source=source, version=version,
+                                                         n_epochs=n_epochs, cap=cap,
+                                                         r_nw=r_nw, mass_gr=mass_gr,
+                                                         mass_nw=mass_nw)
+
+    cc = setup_custom_chainconsumer(gr_mdot_chain, parameters=['mdot1', 'mdot2', 'mdot3'],
+                                    sigmas=sigmas, summary=summary,
+                                    unit_labels=unit_labels, fontsize=fontsize)
+    return cc
+
+
 def get_summary(chain, discard, source, version, cap=None):
     """Return summary values from MCMC chain (mean, uncertainties)
     """
