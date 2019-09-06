@@ -481,7 +481,7 @@ def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
     n_cols = {False: 1, True: 2}.get(n_bprops > 1)
 
     figsize = (n_cols * subplot_figsize[0], n_rows * subplot_figsize[1])
-    fig, ax = plt.subplots(n_rows, n_cols, sharex=True, figsize=figsize)
+    fig, ax = plt.subplots(n_rows, n_cols, sharex=False, figsize=figsize)
 
     if n_bprops % 2 == 1 and n_bprops > 1:  # blank odd-numbered subplot
         ax[-1, -1].axis('off')
@@ -498,7 +498,7 @@ def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
                           bprop=bfit.mcmc_version.bprops[i], fontsize=fontsize,
                           ax=axis, display=False,
                           legend=True if (i == 0 and legend) else False,
-                          xlabel=True if (i in [n_bprops-2, n_bprops-1]) else False)
+                          xlabel=True if (i in [n_bprops-1,]) else False)
 
     fig.subplots_adjust(wspace=0.4)
     plt.show(block=False)
