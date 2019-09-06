@@ -412,7 +412,8 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
 
     param_keys = param_order[source]
 
-    #  quick and dirty patch!
+    #  TODO:
+    #       quick and dirty patch!
     if alt_params:
         param_keys = ['mdot1', 'mdot2', 'mdot3', 'qb1', 'qb2', 'qb3', 'x', 'z', 'g',
                       'M', 'd_b', 'xi_ratio']

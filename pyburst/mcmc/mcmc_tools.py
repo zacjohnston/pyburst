@@ -11,6 +11,8 @@ from pyburst.grids import grid_strings
 from pyburst.plotting import plot_tools
 from . import mcmc_versions, mcmc_params, burstfit
 
+from pyburst.physics import gravity
+
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
 
@@ -149,9 +151,19 @@ def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, 
                                       flatten=True)
 
     params = list(master_mc_v.param_keys)
-    if alt_params:  # quick and dirty patch
-        params[8] = 'g'
-        params[9] = 'M'
+
+    #  TODO: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    #       quick and dirty patch! To fix
+    ref_m = 1.4
+    ref_g = gravity.get_acceleration_newtonian(r=10, m=ref_m).value / 1e14
+    g_idx = 8
+    m_idx = 9
+
+    if alt_params:
+        master_chain_sliced[:, g_idx] *= ref_g / ref_m
+        params[g_idx] = 'g'
+        params[m_idx] = 'M'
+    #  TODO: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
     formatted_params = plot_tools.convert_mcmc_labels(params)
     cc.add_chain(master_chain_sliced, parameters=formatted_params, color='black',
@@ -180,15 +192,27 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
     chains = load_multi_chains(source, versions=versions, n_steps=n_steps,
                                n_walkers=n_walkers, compressed=compressed)
 
-    # quick and dirty patch
+    #  TODO: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    #       quick and dirty patch! To fix
+    ref_m = 1.4
+    ref_g = gravity.get_acceleration_newtonian(r=10, m=ref_m).value / 1e14
+    g_idx = 4
+    m_idx = 5
     if alt_params:
         for params in param_keys:
-            params[4] = 'g'
-            params[5] = 'M'
+            params[g_idx] = 'g'
+            params[m_idx] = 'M'
+    #  TODO: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
     chains_flat = []
     for chain in chains:
         sliced_flat = slice_chain(chain, discard=discard, cap=cap, flatten=True)
+
+        # TODO: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        if alt_params:
+            sliced_flat[:, g_idx] *= ref_g / ref_m
+        # TODO: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
         chains_flat += [sliced_flat]
 
     cc = chainconsumer.ChainConsumer()
