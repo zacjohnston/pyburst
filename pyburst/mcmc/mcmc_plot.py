@@ -391,7 +391,7 @@ def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=F
 
 
 def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
-                          col_wrap=None):
+                          col_wrap=None, alt_params=True):
     """Plot posteriors for multiiple epoch chains
 
     parameters
@@ -411,6 +411,12 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
     }
 
     param_keys = param_order[source]
+
+    #  quick and dirty patch!
+    if alt_params:
+        param_keys = ['mdot1', 'mdot2', 'mdot3', 'qb1', 'qb2', 'qb3', 'x', 'z', 'g',
+                      'M', 'd_b', 'xi_ratio']
+
     formatted_params = plot_tools.convert_mcmc_labels(param_keys)
     n_epochs = len(master_cc.chains) - 1
     # TODO: replace m_nw with g

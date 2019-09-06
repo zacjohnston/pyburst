@@ -122,8 +122,11 @@ def setup_custom_chainconsumer(flat_chain, parameters, cloud=False, unit_labels=
 def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, discard,
                                n_walkers=1000, epoch_discard=None, epoch_n_steps=None,
                                epoch_n_walkers=None, cap=None, sigmas=None, cloud=None,
-                               compressed=False, fontsize=14):
+                               compressed=False, fontsize=15, alt_params=True):
     """Setup multiple MCMC chains, including multi-epoch and single-epochs
+
+    alt_params : bool
+        Replace parameters with forms used in paper
     """
     if epoch_discard is None:
         epoch_discard = discard
@@ -134,7 +137,8 @@ def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, 
 
     cc = setup_epochs_chainconsumer(source, versions=epoch_versions, n_steps=epoch_n_steps,
                                     discard=epoch_discard, n_walkers=epoch_n_walkers,
-                                    cap=cap, sigmas=sigmas, cloud=cloud, compressed=False)
+                                    cap=cap, sigmas=sigmas, cloud=cloud, compressed=False,
+                                    alt_params=alt_params)
 
     # ===== Setup master chain =====
     master_mc_v = mcmc_versions.McmcVersion(source, version=master_version)
@@ -144,7 +148,12 @@ def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, 
     master_chain_sliced = slice_chain(master_chain, discard=discard, cap=cap,
                                       flatten=True)
 
-    formatted_params = plot_tools.convert_mcmc_labels(master_mc_v.param_keys)
+    params = list(master_mc_v.param_keys)
+    if alt_params:  # quick and dirty patch
+        params[8] = 'g'
+        params[9] = 'M'
+
+    formatted_params = plot_tools.convert_mcmc_labels(params)
     cc.add_chain(master_chain_sliced, parameters=formatted_params, color='black',
                  name='Multi-epoch')
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=False,
@@ -154,7 +163,8 @@ def setup_master_chainconsumer(source, master_version, epoch_versions, n_steps, 
 
 
 def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=1000,
-                               cap=None, sigmas=None, cloud=None, compressed=False):
+                               cap=None, sigmas=None, cloud=None, compressed=False,
+                               alt_params=True):
     """Setup multiple MCMC chains fit to individual epochs
 
     chains : [n_epochs]
@@ -169,6 +179,13 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
     param_keys = load_multi_param_keys(source, versions=versions)
     chains = load_multi_chains(source, versions=versions, n_steps=n_steps,
                                n_walkers=n_walkers, compressed=compressed)
+
+    # quick and dirty patch
+    if alt_params:
+        for params in param_keys:
+            params[4] = 'g'
+            params[5] = 'M'
+
     chains_flat = []
     for chain in chains:
         sliced_flat = slice_chain(chain, discard=discard, cap=cap, flatten=True)
