@@ -92,13 +92,25 @@ def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
                        mass_nw=None, mass_gr=None):
     """Returns chain of redshift samples for given MCMC chain
     """
+    xi_chain, redshift_chain = get_xi_redshift_chain(chain, discard=discard,
+                                                     source=source, version=version,
+                                                     cap=cap, r_nw=r_nw, mass_nw=mass_nw,
+                                                     mass_gr=mass_gr)
+    return redshift_chain
+
+
+def get_xi_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
+                          mass_nw=None, mass_gr=None):
+    """Returns chain of the xi and redshift
+        Note: xi is the radius ratio (R_gr / R_nw), not anisotropy
+    """
     mass_nw, mass_gr = get_masses(chain, discard=discard, source=source, cap=cap,
                                   version=version, mass_nw=mass_nw, mass_gr=mass_gr)
 
     mass_ratio = mass_gr / mass_nw
-    _, redshift = gravity.gr_corrections(r=r_nw, m=mass_nw, phi=mass_ratio)
+    xi_chain, redshift_chain = gravity.gr_corrections(r=r_nw, m=mass_nw, phi=mass_ratio)
 
-    return redshift
+    return xi_chain, redshift_chain
 
 
 def get_masses(chain, discard, source, version, cap=None, mass_nw=None, mass_gr=None):
@@ -144,6 +156,16 @@ def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10):
                                         mass_gr=mass_gr)
 
     return np.column_stack([mass_radius, grav, redshift])
+
+
+def get_corrected_mdot_chain(chain, discard, source, version, cap=None, r_nw=10):
+    """Returns chain of GR-corrected accretion rate
+    """
+    mass_nw, mass_gr = get_constant_masses(source, version)
+    mass_radius_chain = get_mass_radius_chain(chain=chain, discard=discard,
+                                              source=source, version=version,
+                                              cap=cap, mass_nw=mass_nw,
+                                              mass_gr=mass_gr)
 
 
 def get_disc_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
