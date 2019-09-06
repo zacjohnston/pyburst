@@ -463,33 +463,44 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
               version=version, display=display)
 
 
-def plot_bprop_sample(bprop_sample, source, version, subplot_figsize=(3, 2.5),
-                      bfit=None, fontsize=14):
+def plot_bprop_sample(bprop_sample, source, version, bprops=None,
+                      subplot_figsize=(3, 2.5), bfit=None, fontsize=14):
     """Plot burst properties from large sample against observations
     """
     if bfit is None:
         bfit = burstfit.BurstFit(source=source, version=version, verbose=False)
 
-    n_bprops = bprop_sample.shape[1]
+    if bprops is None:
+        bprops = bfit.mcmc_version.bprops
+
+    n_bprops = len(bprops)
     bprop_mean = np.mean(bprop_sample, axis=2)
     bprop_std = np.std(bprop_sample, axis=2)
 
     n_rows = int(np.ceil(n_bprops / 2))
-    figsize = (2 * subplot_figsize[0], n_rows * subplot_figsize[1])
-    fig, ax = plt.subplots(n_rows, 2, sharex=True, figsize=figsize)
+    n_cols = {False: 1, True: 2}.get(n_bprops > 1)
 
-    if n_bprops % 2 == 1:  # blank odd-numbered subplot
+    figsize = (n_cols * subplot_figsize[0], n_rows * subplot_figsize[1])
+    fig, ax = plt.subplots(n_rows, n_cols, sharex=True, figsize=figsize)
+
+    if n_bprops % 2 == 1 and n_bprops > 1:  # blank odd-numbered subplot
         ax[-1, -1].axis('off')
 
-    for i, bprop in enumerate(bfit.mcmc_version.bprops):
+    for i, bprop in enumerate(bprops):
         subplot_row = int(np.floor(i / 2))
         subplot_col = i % 2
+        if n_cols > 1:
+            axis = ax[subplot_row, subplot_col]
+        else:
+            axis = ax
+
         bfit.plot_compare(model=bprop_mean[:, i], u_model=bprop_std[:, i],
                           bprop=bfit.mcmc_version.bprops[i], fontsize=fontsize,
-                          ax=ax[subplot_row, subplot_col], display=False,
+                          ax=axis, display=False,
                           legend=True if i == 0 else False,
-                          xlabel=True if (i in [3, 4]) else False)
+                          xlabel=True if (i in [n_bprops-2, n_bprops-1]) else False)
 
+    fig.subplots_adjust(wspace=0.4)
     plt.show(block=False)
     return fig
 
