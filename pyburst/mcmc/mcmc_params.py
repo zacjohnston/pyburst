@@ -169,7 +169,7 @@ def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10):
     return np.column_stack([mass_radius, grav, redshift])
 
 
-def get_corrected_mdot_chain(chain, discard, source, version, n_epochs, cap=None, r_nw=10,
+def get_gr_mdot_chain(chain, discard, source, version, n_epochs, cap=None, r_nw=10,
                              mass_nw=None, mass_gr=None):
     """Returns chain of GR-corrected accretion rate
     """

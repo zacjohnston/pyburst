@@ -250,11 +250,11 @@ def setup_gr_mdot_chainconsumer(chain, discard, source, version, n_epochs, cap=N
     """
     # TODO: generalise n_epochs, sources
     mass_nw, mass_gr = mcmc_params.get_constant_masses(source, version)
-    gr_mdot_chain = mcmc_params.get_corrected_mdot_chain(chain, discard=discard,
-                                                         source=source, version=version,
-                                                         n_epochs=n_epochs, cap=cap,
-                                                         r_nw=r_nw, mass_gr=mass_gr,
-                                                         mass_nw=mass_nw)
+    gr_mdot_chain = mcmc_params.get_gr_mdot_chain(chain, discard=discard,
+                                                  source=source, version=version,
+                                                  n_epochs=n_epochs, cap=cap,
+                                                  r_nw=r_nw, mass_gr=mass_gr,
+                                                  mass_nw=mass_nw)
 
     cc = setup_custom_chainconsumer(gr_mdot_chain, parameters=['mdot1', 'mdot2', 'mdot3'],
                                     sigmas=sigmas, summary=summary,
