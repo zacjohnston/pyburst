@@ -169,14 +169,24 @@ def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10):
     return np.column_stack([mass_radius, grav, redshift])
 
 
-def get_corrected_mdot_chain(chain, discard, source, version, cap=None, r_nw=10):
+def get_corrected_mdot_chain(chain, discard, source, version, cap=None, r_nw=10,
+                             mass_nw=None, mass_gr=None):
     """Returns chain of GR-corrected accretion rate
     """
-    mass_nw, mass_gr = get_constant_masses(source, version)
-    mass_radius_chain = get_mass_radius_chain(chain=chain, discard=discard,
-                                              source=source, version=version,
-                                              cap=cap, mass_nw=mass_nw,
-                                              mass_gr=mass_gr)
+    xi_chain, redshift_chain = get_xi_redshift_chain(chain, discard=discard,
+                                                     source=source, version=version,
+                                                     cap=cap, r_nw=r_nw, mass_nw=mass_nw,
+                                                     mass_gr=mass_gr)
+    # TODO ...
+
+
+def get_mdot_chain(chain, discard, cap=None, n_epochs=3):
+    """Returns chain of mdots
+        Note: currently assumes mdots are the first [n_epochs] parameters in chain
+    """
+    # TODO: generalise to other sources
+    flat_chain = mcmc_tools.slice_chain(chain, discard=discard, cap=cap, flatten=True)
+    return flat_chain[:, :n_epochs]
 
 
 def get_disc_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
