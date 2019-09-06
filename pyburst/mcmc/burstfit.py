@@ -607,11 +607,9 @@ class BurstFit:
 
         ax.set_ylabel(f'{ylabel} ({y_units})', fontsize=fontsize)
 
+        ax.set_xticklabels([f'{year}' for year in epochs])
         if xlabel:
-            ax.set_xticklabels([f'{year}' for year in epochs])
             ax.set_xlabel('Epoch', fontsize=fontsize)
-        else:
-            ax.set_xticklabels([])
 
         if title:
             ax.set_title(ylabel, fontsize=fontsize)
