@@ -77,7 +77,7 @@ def unit_label(quantity):
     """Returns units as a string, for given quantity
     """
     labels = {
-        'accrate': r'$\dot{M}_\mathrm{Edd}$',
+        'accrate': r'$\dot{m}_\mathrm{Edd}$',
         'dt': 'h',
         'd': 'kpc',
         'd_b': 'kpc',
@@ -99,7 +99,7 @@ def quantity_label(quantity):
     """Returns formatted string of parameter label
     """
     labels = {
-        'accrate': r'$\dot{M}$',
+        'accrate': r'$\dot{m}$',
         'alpha': r'$\alpha$',
         'd_b': r'$d \sqrt{\xi_\mathrm{b}}$',
         'dt': r'$\Delta t$',
