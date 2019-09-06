@@ -99,6 +99,17 @@ def get_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
     return redshift_chain
 
 
+def get_xi_chain(chain, discard, source, version, cap=None, r_nw=10,
+                 mass_nw=None, mass_gr=None):
+    """Returns chain of redshift samples for given MCMC chain
+    """
+    xi_chain, redshift_chain = get_xi_redshift_chain(chain, discard=discard,
+                                                     source=source, version=version,
+                                                     cap=cap, r_nw=r_nw, mass_nw=mass_nw,
+                                                     mass_gr=mass_gr)
+    return xi_chain
+
+
 def get_xi_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
                           mass_nw=None, mass_gr=None):
     """Returns chain of the xi and redshift
