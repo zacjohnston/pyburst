@@ -86,7 +86,7 @@ def unit_label(quantity):
         'i': 'deg',
         'lum': '$10^{38}$ erg s$^{-1}$',
         'M': r'$\mathrm{M_\odot}$',
-        'mdot': r'$\dot{M}_\mathrm{Edd}$',
+        'mdot': r'$\dot{m}_\mathrm{Edd}$',
         'peak': '$10^{38}$ erg s$^{-1}$',
         'qb': r'MeV $\mathrm{nucleon}^{-1}$',
         'rate': 'day$^{-1}$',
@@ -108,7 +108,7 @@ def quantity_label(quantity):
         'lum': r'$\mathit{L}$',
         'm_gr': r'$M_\mathrm{GR}$',
         'm_nw': r'$M_\mathrm{NW}$',
-        'mdot': r'$\dot{M}$',
+        'mdot': r'$\dot{m}$',
         'peak': r'$L_\mathrm{peak}$',
         'qb': r'$Q_\mathrm{b}$',
         'rate': r'Burst rate',
@@ -142,7 +142,7 @@ def convert_mcmc_labels(param_keys, unit_labels=False):
         if 'qb' in key:
             label_str = r'$Q_\mathrm{b,' + f'{key[-1]}' + '}$'
         elif 'mdot' in key:
-            label_str = rf'$\dot{{M}}_{key[-1]}$'
+            label_str = rf'$\dot{{m}}_{key[-1]}$'
         else:
             if unit_labels:
                 label_str = full_label(key)
