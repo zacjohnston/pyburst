@@ -361,7 +361,7 @@ def plot_walkers(chain, source, version, params=None, n_lines=30, xlim=-1,
 
 
 def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=False,
-                 figsize=(5, 5)):
+                 figsize=(5, 5), fontsize=16):
     """Plots 2D contours of Qb versus Mdot for each epoch (from multi-epoch chain)
     """
     mv = mcmc_versions.McmcVersion(source=source, version=version)
@@ -382,9 +382,11 @@ def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=F
         cc.add_chain(chain_flat[:, param_idxs], parameters=param_labels,
                      name=str(epoch))
 
-    cc.configure(kde=False, smooth=0)
+    cc.configure(kde=False, smooth=0, label_font_size=fontsize,
+                 tick_font_size=fontsize-2)
     fig = cc.plotter.plot(display=False, figsize=figsize)
-    plt.tight_layout()
+    fig.subplots_adjust(left=0.2, bottom=0.2)
+
     save_plot(fig, prefix='qb', save=save, source=source, version=version,
               display=display, chain=chain)
     return fig
