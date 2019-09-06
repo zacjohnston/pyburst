@@ -391,7 +391,8 @@ def plot_qb_mdot(chain, source, version, discard, cap=None, display=True, save=F
 
 
 def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
-                          col_wrap=None, alt_params=True):
+                          col_wrap=None, alt_params=True, unit_labels=True,
+                          add_text=True, fontsize=16):
     """Plot posteriors for multiiple epoch chains
 
     parameters
@@ -412,15 +413,16 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
 
     param_keys = param_order[source]
 
-    #  TODO:
+    #  TODO: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     #       quick and dirty patch!
     if alt_params:
         param_keys = ['mdot1', 'mdot2', 'mdot3', 'qb1', 'qb2', 'qb3', 'x', 'z', 'g',
                       'M', 'd_b', 'xi_ratio']
+    #  TODO: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-    formatted_params = plot_tools.convert_mcmc_labels(param_keys)
+    formatted_params = plot_tools.convert_mcmc_labels(param_keys, unit_labels=unit_labels)
     n_epochs = len(master_cc.chains) - 1
-    # TODO: replace m_nw with g
+
     if col_wrap is None:
         col_wrap = n_epochs
 
@@ -429,6 +431,9 @@ def plot_epoch_posteriors(master_cc, source, version, display=True, save=False,
                                                col_wrap=col_wrap,
                                                figsize=[8, height],
                                                display=False)
+    if add_text:
+        add_epoch_text(fig, fontsize=fontsize)
+
     plt.tight_layout()
 
     save_plot(fig, prefix='multi_posteriors', save=save, source=source, version=version,
@@ -526,6 +531,16 @@ def plot_autocorrelation(chain, source, version, n_steps=10):
     plt.show(block=False)
 
     return sample_steps, autoc
+
+
+def add_epoch_text(fig, fontsize, epochs=(1998, 2000, 2007),
+                   colours=('C0', 'C2', 'C3')):
+    """Adds text of epoch to figure subplots
+    """
+    for i, epoch in enumerate(epochs):
+        ax = fig.axes[i]
+        ax.text(0.95, 0.95, str(epoch), color=colours[i], fontsize=fontsize,
+                transform=ax.transAxes, va='top', ha='right')
 
 
 def update_axis_fontsize(fig, fontsize):
