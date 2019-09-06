@@ -42,6 +42,9 @@ class Ksample:
                       '4u1820': (-2, 27),
                       }.get(self.obs_source)
 
+        self.epochs = {'gs1826': (1998, 2000, 2007),
+                       }.get(self.obs_source)
+
         if runs is None:  # assume all batches have corresponding runs
             sub_batch = self.grid.get_params(self.batches[0])
             self.runs = np.array(sub_batch['run'])
@@ -228,7 +231,7 @@ class Ksample:
              alpha_shaded=0.7, xlims=None,
              k_color='C1', obs_color='black', errorbars=False,
              sub_figsize=None, linewidth=1, display=True,
-             all_ylabels=True):
+             all_ylabels=True, epoch_text=True):
         """Plot lightcurve comparison between observed and sample models
         """
         subplot_cols = {True: 2, False: 1}.get(residuals)
@@ -260,6 +263,10 @@ class Ksample:
             if all_ylabels:
                 lc_ax[epoch_i].set_ylabel(ylabel)
 
+            if epoch_text:
+                lc_ax[epoch_i].text(0.95, 0.9, str(self.epochs[epoch_i]),
+                                    transform=lc_ax[epoch_i].transAxes,
+                                    fontsize=16, va='top', ha='right')
             for i in range(self.n_bursts_batch):
                 burst = i + 1
                 model = self.shifted_lc[batch][burst]
