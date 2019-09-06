@@ -552,7 +552,7 @@ class BurstFit:
         return lh.sum()
 
     def plot_compare(self, model, u_model, bprop, ax=None, title=False,
-                     display=True, xlabel=False, legend=False):
+                     display=True, xlabel=False, legend=False, fontsize=12):
         """Plots comparison of modelled and observed burst property
 
         Parameters
@@ -562,7 +562,6 @@ class BurstFit:
             burst property being compared
         """
         # TODO: move to mcmc_plot?
-        fontsize = 12
         markersize = 6
         capsize = 3
         n_sigma = 3
@@ -572,9 +571,9 @@ class BurstFit:
                   'tail_index': 1.0}.get(bprop)
         ylabel = {'dt': r'$\Delta t$',
                   'rate': 'Burst rate',
-                  'fluence': r'$E_b$',
-                  'peak': r'$F_{peak}$',
-                  'fper': r'$F_p$',
+                  'fluence': r'$f_\mathrm{b}$',
+                  'peak': r'$F_\mathrm{peak}$',
+                  'fper': r'$F_\mathrm{p}$',
                   'tail_50': r'$t_{50}$',
                   'fedd': r'$F_\mathrm{Edd}$',
                   'tail_index': 'Power index',
@@ -601,7 +600,7 @@ class BurstFit:
         ax.set_xticks(x)
 
         ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
-                    capsize=capsize, color='C3', label='Model', markersize=markersize)
+                    capsize=capsize, color='C1', label='Model', markersize=markersize)
         ax.errorbar(x=x + dx, y=obs / yscale, yerr=n_sigma * u_obs / yscale, ls='none',
                     marker='o', capsize=capsize, color='C0', label='Observed',
                     markersize=markersize)
