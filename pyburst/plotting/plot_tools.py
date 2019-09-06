@@ -143,6 +143,8 @@ def convert_mcmc_labels(param_keys, unit_labels=False):
             label_str = r'$Q_\mathrm{b,' + f'{key[-1]}' + '}$'
         elif 'mdot' in key:
             label_str = rf'$\dot{{m}}_{key[-1]}$'
+        elif 'Mdot' in key:
+            label_str = rf'$\dot{{M}}_{key[-1]}$'
         else:
             if unit_labels:
                 label_str = full_label(key)
