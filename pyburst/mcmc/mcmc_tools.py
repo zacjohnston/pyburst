@@ -507,12 +507,19 @@ def save_autocorrelation(sample_steps, autoc, source, version):
 
 def load_autocorrelation(source, version, n_steps):
     """Loads array of calculated autocorrelation time estimates (tau) from file
+
+    returns: sample_steps, autoc
     """
     path = get_mcmc_path(source=source)
     filename = get_mcmc_string(source, version=version, n_steps=n_steps,
                                prefix='tau', extension='.npy')
+
     filepath = os.path.join(path, filename)
-    return np.load(filepath)
+    array = np.load(filepath)
+    sample_steps = array[:, 0]
+    autoc = array[:, 1:].transpose()
+
+    return sample_steps, autoc
 
 
 # ===================================================
