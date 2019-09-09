@@ -506,7 +506,8 @@ def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
     return fig
 
 
-def plot_autocorrelation(chain, source, version, n_points=10, load=True, save_tau=True):
+def plot_autocorrelation(chain, source, version, n_points=10, load=True, save_tau=True,
+                         ylims=None):
     """Plots estimated integrated autocorrelation time
 
         Note: Adapted from https://dfm.io/posts/autocorr/
@@ -529,11 +530,14 @@ def plot_autocorrelation(chain, source, version, n_points=10, load=True, save_ta
 
     ax.plot(sample_steps, sample_steps / 10.0, "--k", label=r"$\tau = N/10$")
 
-    xlim = ax.get_xlim()
-    ax.set_ylim([8, xlim[1] / 10])
+    if ylims is None:
+        xlim = ax.get_xlim()
+        ylims = [5, xlim[1] / 10]
+
+    ax.set_ylim(ylims)
     ax.set_xlabel("N steps")
     ax.set_ylabel(r"$\tau$ estimate (N)")
-    ax.legend(fontsize=14, ncol=2)
+    ax.legend(fontsize=14, ncol=2, labelspacing=0.3)
     plt.show(block=False)
 
     return fig
