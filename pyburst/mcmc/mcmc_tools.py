@@ -469,6 +469,17 @@ def check_array(x, n):
         return np.full(n, x)
 
 
+def save_tau(sample_steps, tau, source, version):
+    """Saves array of calculated autocorrelation time estimates (tau)
+    """
+    path = get_mcmc_path(source=source)
+    filename = get_mcmc_string(source, version=version, n_steps=sample_steps[-1],
+                               prefix='tau', extension='.npy')
+    filepath = os.path.join(path, filename)
+    array_out = np.concatenate([sample_steps[np.newaxis, :], tau]).transpose()
+    np.save(filepath, array_out)
+
+
 # ===================================================
 # The following functions adapted from: https://dfm.io/posts/autocorr/
 # ===================================================
