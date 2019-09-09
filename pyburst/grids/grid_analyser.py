@@ -440,12 +440,12 @@ class Kgrid:
                 title += f'{p}={pv:.{precision}f}, '
             ax[0].set_title(title, fontsize=14)
 
-        ax[-1].set_xlabel(xlabel, fontsize=fontsize)
+        ax[-1].set_xlabel(xlabel)
 
         for i, bprop in enumerate(bprops):
             y_factor = self.config['y_factors'].get(bprop, 1.0)
             y_label = plot_tools.full_label(bprop)
-            ax[i].set_ylabel(y_label, fontsize=fontsize)
+            ax[i].set_ylabel(y_label)
 
             for j, v in enumerate(var_unique[::var_skip]):
                 # ===== check if any models exist =====
