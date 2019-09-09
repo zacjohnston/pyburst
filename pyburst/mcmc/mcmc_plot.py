@@ -532,7 +532,7 @@ def plot_autocorrelation(chain, source, version, n_points=10, load=True, save_ta
     xlim = ax.get_xlim()
     ax.set_ylim([8, xlim[1] / 10])
     ax.set_xlabel("N steps")
-    ax.set_ylabel(r"$\tau$ estimate")
+    ax.set_ylabel(r"$\tau$ estimate (N)")
     ax.legend(fontsize=14, ncol=2)
     plt.show(block=False)
 
