@@ -506,29 +506,29 @@ def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
     return fig
 
 
-def plot_autocorrelation(chain, source, version, n_steps=10):
+def plot_autocorrelation(chain, source, version, n_points=10):
     """Plots estimated integrated autocorrelation time
 
         Note: Adapted from https://dfm.io/posts/autocorr/
     """
     # TODO: use save_plot()
     #   - save estimate values for re-use
-    if n_steps < 2:
-        raise ValueError('n_steps must be greater than 1')
+    if n_points < 2:
+        raise ValueError('n_points must be greater than 1')
 
     mv = mcmc_versions.McmcVersion(source=source, version=version)
     params_fmt = plot_tools.convert_mcmc_labels(mv.param_keys)
 
     sample_steps = np.exp(np.linspace(np.log(100), np.log(chain.shape[1]),
-                                      n_steps)).astype(int)
+                                      n_points)).astype(int)
     fig, ax = plt.subplots()
-    autoc = np.empty([len(mv.param_keys), n_steps])
+    autoc = np.empty([len(mv.param_keys), n_points])
 
     for i, param in enumerate(mv.param_keys):
         print(f'Calculating parameter: {param}')
 
         for j, n in enumerate(sample_steps):
-            sys.stdout.write(f'\r{j + 1}/{n_steps}  (step size={n})')
+            sys.stdout.write(f'\r{j + 1}/{n_points}  (step size={n})')
             autoc[i, j] = mcmc_tools.autocorrelation(chain[:, :n, i])
 
         ax.loglog(sample_steps, autoc[i], "o-", label=rf"{params_fmt[i]}")
