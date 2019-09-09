@@ -516,7 +516,7 @@ class Kgrid:
 
             self.printv(f'Saving {filepath}')
             plt.savefig(filepath)
-        return fig, ax
+        return fig
 
     def plot_summ(self, var='num', batch=None, vlines=True, hline=None):
         """Plot any column from summ stable, versus batch/run
