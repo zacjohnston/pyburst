@@ -506,18 +506,22 @@ def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
     return fig
 
 
-def plot_autocorrelation(chain, source, version, n_points=10):
+def plot_autocorrelation(chain, source, version, n_points=10, load=True, save_tau=True):
     """Plots estimated integrated autocorrelation time
 
         Note: Adapted from https://dfm.io/posts/autocorr/
     """
-    # TODO: use save_plot()
-    #   - save estimate values for re-use
     mv = mcmc_versions.McmcVersion(source=source, version=version)
     params_fmt = plot_tools.convert_mcmc_labels(mv.param_keys)
 
-    sample_steps, autoc = mcmc_tools.get_autocorrelation(
-                                chain, source=source, version=version, n_points=n_points)
+    if load:
+        sample_steps, autoc = mcmc_tools.load_autocorrelation(source, version=version,
+                                                              n_steps=chain.shape[1])
+    else:
+        sample_steps, autoc = mcmc_tools.get_autocorrelation(chain, source=source,
+                                                             version=version,
+                                                             n_points=n_points,
+                                                             save=save_tau)
     fig, ax = plt.subplots()
 
     for i, param in enumerate(mv.param_keys):
