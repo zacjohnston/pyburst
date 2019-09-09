@@ -492,7 +492,7 @@ def get_autocorrelation(chain, source, version, n_points):
     return sample_steps, autoc
 
 
-def save_tau(sample_steps, tau, source, version):
+def save_autocorrelation(sample_steps, tau, source, version):
     """Saves array of calculated autocorrelation time estimates (tau)
     """
     path = get_mcmc_path(source=source)
@@ -503,7 +503,7 @@ def save_tau(sample_steps, tau, source, version):
     np.save(filepath, array_out)
 
 
-def load_tau(source, version, n_steps):
+def load_autocorrelation(source, version, n_steps):
     """Loads array of calculated autocorrelation time estimates (tau) from file
     """
     path = get_mcmc_path(source=source)
