@@ -538,8 +538,8 @@ def plot_autocorrelation(chain, source, version, n_steps=10):
     ax.set_ylim([8, xlim[1] / 10])
 
     ax.plot(sample_steps, sample_steps / 10.0, "--k", label=r"$\tau = N/10$")
-    ax.set_xlabel("number of samples, $N$")
-    ax.set_ylabel(r"$\tau$ estimates")
+    ax.set_xlabel("N steps")
+    ax.set_ylabel(r"$\tau$ estimate")
     ax.legend(fontsize=14, ncol=2)
 
     plt.show(block=False)
