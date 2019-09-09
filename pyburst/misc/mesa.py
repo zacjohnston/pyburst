@@ -18,6 +18,9 @@ Currently very hacky and roughshod
 def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True,
          bprops=('rate', 'fluence', 'peak'), display=True):
     """Plot predefined set of mesa model comparisons
+
+    model_set : int
+        ID for set of models (defined below)
     """
     mesa_info = get_mesa_set(model_set)
 
