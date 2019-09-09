@@ -469,7 +469,7 @@ def check_array(x, n):
         return np.full(n, x)
 
 
-def get_autocorrelation(chain, source, version, n_points):
+def get_autocorrelation(chain, source, version, n_points, save=True):
     """Calculates autocorrelation time (tau) for several steps in a chain
     """
     if n_points < 2:
@@ -489,6 +489,8 @@ def get_autocorrelation(chain, source, version, n_points):
 
         sys.stdout.write('\n')
 
+    if save:
+        save_autocorrelation(sample_steps, tau=autoc, source=source, version=version)
     return sample_steps, autoc
 
 
