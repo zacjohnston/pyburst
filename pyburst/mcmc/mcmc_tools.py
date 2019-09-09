@@ -490,18 +490,18 @@ def get_autocorrelation(chain, source, version, n_points, save=True):
         sys.stdout.write('\n')
 
     if save:
-        save_autocorrelation(sample_steps, tau=autoc, source=source, version=version)
+        save_autocorrelation(sample_steps, autoc=autoc, source=source, version=version)
     return sample_steps, autoc
 
 
-def save_autocorrelation(sample_steps, tau, source, version):
+def save_autocorrelation(sample_steps, autoc, source, version):
     """Saves array of calculated autocorrelation time estimates (tau)
     """
     path = get_mcmc_path(source=source)
     filename = get_mcmc_string(source, version=version, n_steps=sample_steps[-1],
                                prefix='tau', extension='.npy')
     filepath = os.path.join(path, filename)
-    array_out = np.concatenate([sample_steps[np.newaxis, :], tau]).transpose()
+    array_out = np.concatenate([sample_steps[np.newaxis, :], autoc]).transpose()
     np.save(filepath, array_out)
 
 
