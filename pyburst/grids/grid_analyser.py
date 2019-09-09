@@ -407,7 +407,7 @@ class Kgrid:
                             show=True, linear_rates=False, interpolate=True,
                             shaded=True, exclude_stable=False, legend=True,
                             fix_ylims=True, title=True, subplot_figsize=(6, 3),
-                            leg_ncol=2, var_skip=1):
+                            leg_ncol=2, var_0=0, var_skip=1):
         """Plots given burst property against accretion rate
         
         bprop : [str]
@@ -416,6 +416,9 @@ class Kgrid:
             variable to iterate over (e.g. plot all available 'Qb')
         fixed : dict
             variables to hold fixed (e.g. 'z':0.01)
+        var_0 : int
+            index of var grid points to start from (i.e. var_0=2 skips first two points)
+        var_skip : int
         """
         precisions = {'z': 4, 'x': 2, 'qb': 3, 'mass': 1}
         var, fixed = check_var_fixed(var=var, fixed=fixed)
@@ -447,7 +450,7 @@ class Kgrid:
             y_label = plot_tools.full_label(bprop)
             ax[i].set_ylabel(y_label)
 
-            for j, v in enumerate(var_unique[::var_skip]):
+            for j, v in enumerate(var_unique[var_0::var_skip]):
                 # ===== check if any models exist =====
                 params[var] = v
                 subset = self.get_params(params=params)
