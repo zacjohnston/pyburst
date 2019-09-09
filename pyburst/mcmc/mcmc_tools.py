@@ -469,6 +469,29 @@ def check_array(x, n):
         return np.full(n, x)
 
 
+def get_autocorrelation(chain, source, version, n_points):
+    """Calculates autocorrelation time (tau) for several steps in a chain
+    """
+    if n_points < 2:
+        raise ValueError('n_points must be greater than 1')
+
+    mv = mcmc_versions.McmcVersion(source=source, version=version)
+    sample_steps = np.exp(np.linspace(np.log(100), np.log(chain.shape[1]),
+                                      n_points)).astype(int)
+    autoc = np.empty([len(mv.param_keys), n_points])
+
+    for i, param in enumerate(mv.param_keys):
+        print(f'Calculating parameter: {param}')
+
+        for j, n in enumerate(sample_steps):
+            sys.stdout.write(f'\r{j + 1}/{n_points}  (step size={n})')
+            autoc[i, j] = autocorrelation(chain[:, :n, i])
+
+        sys.stdout.write('\n')
+
+    return sample_steps, autoc
+
+
 def save_tau(sample_steps, tau, source, version):
     """Saves array of calculated autocorrelation time estimates (tau)
     """
