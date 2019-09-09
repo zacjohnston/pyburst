@@ -408,7 +408,7 @@ class Kgrid:
                             shaded=True, exclude_stable=False, legend=True,
                             fix_ylims=True, title=True, fontsize=14,
                             subplot_figsize=(8, 4), legend_fontsize=12,
-                            leg_ncol=2):
+                            leg_ncol=2, var_skip=1):
         """Plots given burst property against accretion rate
         
         bprop : [str]
@@ -448,7 +448,7 @@ class Kgrid:
             y_label = plot_tools.full_label(bprop)
             ax[i].set_ylabel(y_label, fontsize=fontsize)
 
-            for j, v in enumerate(var_unique):
+            for j, v in enumerate(var_unique[::var_skip]):
                 # ===== check if any models exist =====
                 params[var] = v
                 subset = self.get_params(params=params)
