@@ -513,35 +513,23 @@ def plot_autocorrelation(chain, source, version, n_points=10):
     """
     # TODO: use save_plot()
     #   - save estimate values for re-use
-    if n_points < 2:
-        raise ValueError('n_points must be greater than 1')
-
     mv = mcmc_versions.McmcVersion(source=source, version=version)
     params_fmt = plot_tools.convert_mcmc_labels(mv.param_keys)
 
-    sample_steps = np.exp(np.linspace(np.log(100), np.log(chain.shape[1]),
-                                      n_points)).astype(int)
+    sample_steps, autoc = mcmc_tools.get_autocorrelation(
+                                chain, source=source, version=version, n_points=n_points)
     fig, ax = plt.subplots()
-    autoc = np.empty([len(mv.param_keys), n_points])
 
     for i, param in enumerate(mv.param_keys):
-        print(f'Calculating parameter: {param}')
-
-        for j, n in enumerate(sample_steps):
-            sys.stdout.write(f'\r{j + 1}/{n_points}  (step size={n})')
-            autoc[i, j] = mcmc_tools.autocorrelation(chain[:, :n, i])
-
         ax.loglog(sample_steps, autoc[i], "o-", label=rf"{params_fmt[i]}")
-        sys.stdout.write('\n')
+
+    ax.plot(sample_steps, sample_steps / 10.0, "--k", label=r"$\tau = N/10$")
 
     xlim = ax.get_xlim()
     ax.set_ylim([8, xlim[1] / 10])
-
-    ax.plot(sample_steps, sample_steps / 10.0, "--k", label=r"$\tau = N/10$")
     ax.set_xlabel("N steps")
     ax.set_ylabel(r"$\tau$ estimate")
     ax.legend(fontsize=14, ncol=2)
-
     plt.show(block=False)
 
     return sample_steps, autoc
