@@ -480,6 +480,16 @@ def save_tau(sample_steps, tau, source, version):
     np.save(filepath, array_out)
 
 
+def load_tau(source, version, n_steps):
+    """Loads array of calculated autocorrelation time estimates (tau) from file
+    """
+    path = get_mcmc_path(source=source)
+    filename = get_mcmc_string(source, version=version, n_steps=n_steps,
+                               prefix='tau', extension='.npy')
+    filepath = os.path.join(path, filename)
+    return np.load(filepath)
+
+
 # ===================================================
 # The following functions adapted from: https://dfm.io/posts/autocorr/
 # ===================================================
