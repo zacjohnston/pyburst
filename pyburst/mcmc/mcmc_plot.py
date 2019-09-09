@@ -536,7 +536,7 @@ def plot_autocorrelation(chain, source, version, n_points=10, load=True, save_ta
     ax.legend(fontsize=14, ncol=2)
     plt.show(block=False)
 
-    return sample_steps, autoc
+    return fig
 
 
 def add_epoch_text(fig, fontsize, epochs=(1998, 2000, 2007),
