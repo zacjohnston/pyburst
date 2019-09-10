@@ -121,7 +121,8 @@ def save_all_plots(source, version, discard, n_steps, n_walkers=1000, display=Fa
 
 def plot_contours(chain, discard, source, version, cap=None,
                   display=True, save=False, truth_values=None, parameters=None,
-                  sigmas=np.linspace(0, 2, 5), cc=None, summary=False, fontsize=14):
+                  sigmas=np.linspace(0, 2, 5), cc=None, summary=False, fontsize=14,
+                  max_ticks=4):
     """Plots posterior contours of mcmc chain
 
     parameters : [str]
@@ -134,7 +135,8 @@ def plot_contours(chain, discard, source, version, cap=None,
         pkey_labels = plot_tools.convert_mcmc_labels(param_keys=pkeys)
         cc = mcmc_tools.setup_chainconsumer(chain=chain, param_labels=pkey_labels,
                                             discard=discard, cap=cap, sigmas=sigmas,
-                                            summary=summary, fontsize=fontsize)
+                                            summary=summary, fontsize=fontsize,
+                                            max_ticks=max_ticks)
     if parameters is not None:
         parameters = plot_tools.convert_mcmc_labels(param_keys=parameters)
 

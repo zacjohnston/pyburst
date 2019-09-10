@@ -87,7 +87,7 @@ def save_compressed_chain(chain, source, version, verbose=True):
 
 def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False,
                         source=None, version=None, sigmas=np.linspace(0, 2, 5),
-                        summary=False, fontsize=14):
+                        summary=False, fontsize=14, max_ticks=4):
     """Return ChainConsumer object set up with given chain and pkeys
     """
     if param_labels is None:
@@ -102,7 +102,7 @@ def setup_chainconsumer(chain, discard, cap=None, param_labels=None, cloud=False
     cc = chainconsumer.ChainConsumer()
     cc.add_chain(chain_flat, parameters=param_labels, walkers=n_walkers)
     cc.configure(sigmas=sigmas, cloud=cloud, kde=False, smooth=0, summary=summary,
-                 label_font_size=fontsize, tick_font_size=fontsize-2)
+                 label_font_size=fontsize, tick_font_size=fontsize-3, max_ticks=max_ticks)
     return cc
 
 
