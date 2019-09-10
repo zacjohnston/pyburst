@@ -148,29 +148,33 @@ def get_gravity_chain(chain, discard, source, version, cap=None, r_nw=10):
     return g.value/1e14
 
 
-def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10):
-    """Returns chain of gravitational parameters: [M, R, g, 1+z]
+def get_gravitational_chain(chain, discard, source, version, cap=None, r_nw=10,
+                            fixed_grav=False):
+    """Returns chain of gravitational parameters: [M, R, g, 1+z], or [M, R, 1+z]
     """
+    chains = []
     mass_nw, mass_gr = get_constant_masses(source, version)
-    redshift = get_redshift_chain(chain=chain, discard=discard,
+
+    chains += [get_mass_radius_chain(chain=chain, discard=discard,
+                                     source=source, version=version,
+                                     cap=cap, mass_nw=mass_nw,
+                                     mass_gr=mass_gr)]
+
+    if not fixed_grav:
+        chains += [get_gravity_chain(chain=chain, discard=discard,
+                                     source=source, version=version,
+                                     cap=cap, r_nw=r_nw)]
+
+    chains += [get_redshift_chain(chain=chain, discard=discard,
                                   source=source, version=version,
                                   cap=cap, mass_nw=mass_nw,
-                                  mass_gr=mass_gr)
+                                  mass_gr=mass_gr)]
 
-    grav = get_gravity_chain(chain=chain, discard=discard,
-                             source=source, version=version,
-                             cap=cap, r_nw=r_nw)
-
-    mass_radius = get_mass_radius_chain(chain=chain, discard=discard,
-                                        source=source, version=version,
-                                        cap=cap, mass_nw=mass_nw,
-                                        mass_gr=mass_gr)
-
-    return np.column_stack([mass_radius, grav, redshift])
+    return np.column_stack(chains)
 
 
 def get_gr_mdot_chain(chain, discard, source, version, n_epochs, cap=None, r_nw=10,
-                             mass_nw=None, mass_gr=None):
+                      mass_nw=None, mass_gr=None):
     """Returns chain of GR-corrected accretion rate
     """
     xi_chain, redshift_chain = get_xi_redshift_chain(chain, discard=discard,
