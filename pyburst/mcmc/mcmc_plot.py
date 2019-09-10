@@ -237,7 +237,7 @@ def plot_gravitational_contours(chain, discard, source, version, cap=None, displ
         plt.tight_layout()
     else:
         fig = cc.plotter.plot()
-        
+
     save_plot(fig, prefix='gravitational', chain=chain, save=save, source=source,
               version=version, display=display)
     return fig

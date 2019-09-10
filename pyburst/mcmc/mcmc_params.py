@@ -198,6 +198,7 @@ def get_mdot_chain(chain, discard, n_epochs, cap=None):
 def get_disc_chain(chain, discard, source, version, cap=None, disc_model='he16_a'):
     """Returns chain of [inc, xi_b, xi_p, d] derived with a disc model
     """
+    # TODO: reuse xi chains more efficiently
     inc_chain = get_inclination_chain(chain=chain, discard=discard,
                                       source=source, version=version,
                                       cap=cap, disc_model=disc_model)
