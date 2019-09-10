@@ -230,14 +230,17 @@ def setup_epochs_chainconsumer(source, versions, n_steps, discard, n_walkers=100
 
 def setup_gravitational_chainconsumer(chain, discard, source, version, cap=None,
                                       r_nw=10, summary=False, unit_labels=True,
-                                      sigmas=np.linspace(0, 2, 5), fontsize=16):
+                                      sigmas=np.linspace(0, 2, 5), fontsize=16,
+                                      fixed_grav=False):
     """Returns ChainConsumer of gravitational parameters
     """
     grav_chain = mcmc_params.get_gravitational_chain(chain=chain, discard=discard,
                                                      source=source, version=version,
-                                                     cap=cap, r_nw=r_nw)
+                                                     cap=cap, r_nw=r_nw,
+                                                     fixed_grav=fixed_grav)
 
-    cc = setup_custom_chainconsumer(grav_chain, parameters=['R', 'M', 'g', '1+z'],
+    params = {True: ['R', 'M', '1+z'], False: ['R', 'M', 'g', '1+z']}.get(fixed_grav)
+    cc = setup_custom_chainconsumer(grav_chain, parameters=params,
                                     sigmas=sigmas, summary=summary,
                                     unit_labels=unit_labels, fontsize=fontsize)
     return cc
