@@ -501,7 +501,8 @@ class Kgrid:
 
         if legend:
             loc = self.config['legend_loc'].get(bprops[0], 'upper right')
-            ax[0].legend(loc=loc, ncol=leg_ncol, title=f'{var_label}')
+            ax[0].legend(loc=loc, ncol=leg_ncol, title=f'{var_label}',
+                         handletextpad=0.5, columnspacing=0.5)
 
         plt.tight_layout()
 
