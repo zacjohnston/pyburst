@@ -472,8 +472,9 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
               version=version, display=display)
 
 
-def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
-                      subplot_figsize=(3, 2.5), bfit=None, fontsize=14):
+def plot_bprop_sample(bp_sample, source, version, bprops=None, legend=True,
+                      subplot_figsize=(3, 2.5), bfit=None, fontsize=14,
+                      vlines=True):
     """Plot burst properties from large sample against observations
 
     bprop_sample : np.array
@@ -485,10 +486,12 @@ def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
     if bprops is None:
         bprops = bfit.mcmc_version.bprops
 
-    n_bprops = len(bprops)
-    bprop_mean = np.mean(bprop_sample, axis=2)
-    bprop_std = np.std(bprop_sample, axis=2)
+    cc = mcmc_tools.setup_bprop_chainconsumer(chain=None, n=None, discard=None,
+                                              source=source, version=version,
+                                              bp_sample=bp_sample)
+    bp_summary = mcmc_tools.extract_bprop_summary(cc, source=source, version=version)
 
+    n_bprops = len(bprops)
     n_rows = int(np.ceil(n_bprops / 2))
     n_cols = {False: 1, True: 2}.get(n_bprops > 1)
 
@@ -505,10 +508,10 @@ def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
             axis = ax[subplot_row, subplot_col]
         else:
             axis = ax
-
-        bfit.plot_compare(model=bprop_mean[:, i], u_model=bprop_std[:, i],
-                          bprop=bfit.mcmc_version.bprops[i], fontsize=fontsize,
-                          ax=axis, display=False,
+        u_model = np.diff(bp_summary[:, :, i], axis=0)
+        bfit.plot_compare(model=bp_summary[1, :, i], u_model=u_model,
+                          bprop=bprop, fontsize=fontsize,
+                          ax=axis, display=False, vlines=vlines,
                           legend=True if (i == 0 and legend) else False,
                           xlabel=True if (i in [n_bprops-1, ]) else False)
 
