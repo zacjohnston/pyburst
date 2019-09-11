@@ -475,6 +475,9 @@ def plot_max_lhood(source, version, n_walkers, n_steps, verbose=True, re_interp=
 def plot_bprop_sample(bprop_sample, source, version, bprops=None, legend=True,
                       subplot_figsize=(3, 2.5), bfit=None, fontsize=14):
     """Plot burst properties from large sample against observations
+
+    bprop_sample : np.array
+        obtained using mcmc_tools.bprop_sample()
     """
     if bfit is None:
         bfit = burstfit.BurstFit(source=source, version=version, verbose=False)
