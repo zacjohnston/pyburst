@@ -113,7 +113,7 @@ def quantity_label(quantity):
         'peak': r'$L_\mathrm{peak}$',
         'qb': r'$Q_\mathrm{b}$',
         'rate': r'Burst rate',
-        'redshift': '$1+z$',
+        'redshift': '$z$',
         'x': r'$X_0$',
         'xedd': r'$X_\mathrm{Edd}$',
         'xedd_ratio': r'$X_\mathrm{Edd} / X_0$',
