@@ -552,7 +552,8 @@ class BurstFit:
         return lh.sum()
 
     def plot_compare(self, model, u_model, bprop, ax=None, title=False,
-                     display=True, xlabel=False, legend=False, fontsize=12):
+                     display=True, xlabel=False, legend=False, fontsize=12,
+                     vlines=True):
         """Plots comparison of modelled and observed burst property
 
         Parameters
@@ -595,10 +596,14 @@ class BurstFit:
         if ax is None:
             fig, ax = plt.subplots(figsize=(5, 4))
 
+        # === x-axis stuff ===
         epochs = np.array(self.obs.index)
         x = np.arange(self.n_epochs)
+        xlims = [-0.5, self.n_epochs - 0.5]
+        ax.set_xlim(xlims)
         ax.set_xticks(x)
-
+        ax.tick_params(axis='both', which='both', length=0)
+        
         ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
                     capsize=capsize, color='C1', label='Model', markersize=markersize)
         ax.errorbar(x=x + dx, y=obs / yscale, yerr=n_sigma * u_obs / yscale, ls='none',
@@ -610,11 +615,16 @@ class BurstFit:
         ax.set_xticklabels([f'{year}' for year in epochs])
         if xlabel:
             ax.set_xlabel('Epoch', fontsize=fontsize)
-
+        if vlines:
+            ylims = ax.get_ylim()
+            x_vline = x[:-1] + 0.5
+            ax.vlines(x_vline, ymin=0, ymax=10, colors='0.5', linestyles='--',
+                      linewidth=1.)
+            ax.set_ylim(ylims)
         if title:
             ax.set_title(ylabel, fontsize=fontsize)
         if legend:
-            ax.legend(loc='upper left')
+            ax.legend(loc='upper left', framealpha=1)
         plt.tight_layout()
         if display:
             plt.show(block=False)
