@@ -239,7 +239,9 @@ def setup_gravitational_chainconsumer(chain, discard, source, version, cap=None,
                                                      cap=cap, r_nw=r_nw,
                                                      fixed_grav=fixed_grav)
 
-    params = {True: ['R', 'M', '1+z'], False: ['R', 'M', 'g', '1+z']}.get(fixed_grav)
+    params = {True: ['R', 'M', 'redshift'],
+              False: ['R', 'M', 'g', 'redshift']
+              }.get(fixed_grav)
     cc = setup_custom_chainconsumer(grav_chain, parameters=params,
                                     sigmas=sigmas, summary=summary,
                                     unit_labels=unit_labels, fontsize=fontsize)
