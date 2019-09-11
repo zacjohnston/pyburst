@@ -441,23 +441,25 @@ def bprop_sample(chain, n, source, version, discard, cap=None):
     return bprops_full
 
 
+def get_bprop_sample_filepath(source, version, n):
+    path = get_mcmc_path(source=source)
+    filename = get_mcmc_string(source, version=version, n_steps=n,
+                               prefix='bprops', extension='.npy')
+    return os.path.join(path, filename)
+
+
 def save_bprop_sample(bp_sample, source, version):
     """Saves bprop sample array to file
     """
-    path = get_mcmc_path(source=source)
-    filename = get_mcmc_string(source, version=version, n_steps=bp_sample.shape[2],
-                               prefix='bprops', extension='.npy')
-    filepath = os.path.join(path, filename)
+    filepath = get_bprop_sample_filepath(source=source, version=version,
+                                         n=bp_sample.shape[2])
     np.save(filepath, bp_sample)
 
 
 def load_bprop_sample(source, version, n):
     """Loads bprop sample array from file (see save_bprop_sample)
     """
-    path = get_mcmc_path(source=source)
-    filename = get_mcmc_string(source, version=version, n_steps=n,
-                               prefix='bprops', extension='.npy')
-    filepath = os.path.join(path, filename)
+    filepath = get_bprop_sample_filepath(source=source, version=version, n=n)
     return np.load(filepath)
 
 
