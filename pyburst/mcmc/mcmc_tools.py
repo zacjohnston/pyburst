@@ -441,6 +441,37 @@ def bprop_sample(chain, n, source, version, discard, cap=None):
     return bprops_full
 
 
+def save_bprop_sample(bp_sample, source, version):
+    """Saves bprop sample array to file
+    """
+    path = get_mcmc_path(source=source)
+    filename = get_mcmc_string(source, version=version, n_steps=bp_sample.shape[2],
+                               prefix='bprops', extension='.npy')
+    filepath = os.path.join(path, filename)
+    np.save(filepath, bp_sample)
+
+
+def setup_bprop_chainconsumer(chain, n, source, version, discard, cap=None,
+                              summary=False, max_ticks=4, bp_sample=None,
+                              sigmas=np.linspace(0, 2, 5), fontsize=16):
+    """Returns ChainConsumer object for bprop sample (posterior predictive distribution)
+    """
+    if bp_sample is None:
+        bp_sample = bprop_sample(chain=chain, n=n, source=source, version=version,
+                                 discard=discard, cap=cap)
+
+    mv = mcmc_versions.McmcVersion(source=source, version=version)
+    cc = chainconsumer.ChainConsumer()
+
+    for i, epoch in enumerate(bp_sample):
+        cc.add_chain(epoch.transpose(), name=f"Epoch {i+1}", parameters=mv.bprops)
+
+    cc.configure(sigmas=sigmas, kde=False, smooth=0, summary=summary,
+                 label_font_size=fontsize, tick_font_size=fontsize - 3,
+                 max_ticks=max_ticks)
+    return cc
+
+
 def get_sampler_state(sampler):
     """Returns sampler as a dictionary so its properties can be saved
     """
