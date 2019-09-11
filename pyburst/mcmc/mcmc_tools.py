@@ -451,6 +451,16 @@ def save_bprop_sample(bp_sample, source, version):
     np.save(filepath, bp_sample)
 
 
+def load_bprop_sample(source, version, n):
+    """Loads bprop sample array from file (see save_bprop_sample)
+    """
+    path = get_mcmc_path(source=source)
+    filename = get_mcmc_string(source, version=version, n_steps=n,
+                               prefix='bprops', extension='.npy')
+    filepath = os.path.join(path, filename)
+    return np.load(filepath)
+
+
 def setup_bprop_chainconsumer(chain, n, source, version, discard, cap=None,
                               summary=False, max_ticks=4, bp_sample=None,
                               sigmas=np.linspace(0, 2, 5), fontsize=16):
