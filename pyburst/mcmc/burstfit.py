@@ -566,7 +566,7 @@ class BurstFit:
         markersize = 6
         capsize = 3
         n_sigma = 3
-        dx = 0.08  # horizontal offset of plot points
+        dx = 0.1  # horizontal offset of plot points
         yscale = {'dt': 1.0, 'rate': 1.0, 'tail_50': 1.0, 'fedd': 1e-8,
                   'fluence': 1e-6, 'peak': 1e-8, 'fper': 1e-9,
                   'tail_index': 1.0}.get(bprop)
@@ -603,7 +603,7 @@ class BurstFit:
         ax.set_xlim(xlims)
         ax.set_xticks(x)
         ax.tick_params(axis='both', which='both', length=0)
-        
+
         ax.errorbar(x=x - dx, y=model / yscale, yerr=n_sigma * u_model / yscale, ls='none', marker='o',
                     capsize=capsize, color='C1', label='Model', markersize=markersize)
         ax.errorbar(x=x + dx, y=obs / yscale, yerr=n_sigma * u_obs / yscale, ls='none',
