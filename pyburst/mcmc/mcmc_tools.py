@@ -463,12 +463,14 @@ def load_bprop_sample(source, version, n):
     return np.load(filepath)
 
 
-def setup_bprop_chainconsumer(chain, n, source, version, discard, cap=None,
+def setup_bprop_chainconsumer(chain, source, version, n=None, discard=None, cap=None,
                               summary=False, max_ticks=4, bp_sample=None,
                               sigmas=np.linspace(0, 2, 5), fontsize=16):
     """Returns ChainConsumer object for bprop sample (posterior predictive distribution)
     """
     if bp_sample is None:
+        if (n is None) or (discard is None):
+            raise ValueError('If bp_sample not provided, must give discard and n')
         bp_sample = bprop_sample(chain=chain, n=n, source=source, version=version,
                                  discard=discard, cap=cap)
 
@@ -482,6 +484,23 @@ def setup_bprop_chainconsumer(chain, n, source, version, discard, cap=None,
                  label_font_size=fontsize, tick_font_size=fontsize - 3,
                  max_ticks=max_ticks)
     return cc
+
+
+def extract_bprop_summary(cc, source, version):
+    """Returns bprop sample summary statistics as an array
+    """
+    mv = mcmc_versions.McmcVersion(source=source, version=version)
+    summ = cc.analysis.get_summary()
+
+    n_bprops = len(mv.bprops)
+    n_epochs = len(cc.chains)
+    array_out = np.full([3, n_epochs, n_bprops], np.nan, dtype=float)
+
+    for i, epoch in enumerate(summ):
+        for j, bprop in enumerate(mv.bprops):
+            array_out[:, i, j] = epoch[bprop]
+
+    return array_out
 
 
 def get_sampler_state(sampler):
