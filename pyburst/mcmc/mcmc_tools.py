@@ -261,7 +261,8 @@ def setup_gr_mdot_chainconsumer(chain, discard, source, version, n_epochs, cap=N
                                                   r_nw=r_nw, mass_gr=mass_gr,
                                                   mass_nw=mass_nw)
 
-    cc = setup_custom_chainconsumer(gr_mdot_chain, parameters=['Mdot1', 'Mdot2', 'Mdot3'],
+    cc = setup_custom_chainconsumer(gr_mdot_chain,
+                                    parameters=['Mdot1', 'Mdot2', 'Mdot3'][:n_epochs],
                                     sigmas=sigmas, summary=summary,
                                     unit_labels=unit_labels, fontsize=fontsize)
     return cc
