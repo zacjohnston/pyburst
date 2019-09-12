@@ -618,7 +618,7 @@ class BurstFit:
         if vlines:
             ylims = ax.get_ylim()
             x_vline = x[:-1] + 0.5
-            ax.vlines(x_vline, ymin=0, ymax=10, colors='0.5', linestyles='--',
+            ax.vlines(x_vline, ymin=0, ymax=100, colors='0.5', linestyles='--',
                       linewidth=1.)
             ax.set_ylim(ylims)
         if title:
