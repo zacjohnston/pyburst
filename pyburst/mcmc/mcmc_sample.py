@@ -229,7 +229,7 @@ class Ksample:
 
     def plot(self, residuals=True, shaded=False, alpha_lines=0.5,
              alpha_shaded=0.7, xlims=None,
-             k_color='C1', obs_color='black', errorbars=False,
+             k_color='C9', obs_color='black', errorbars=False,
              sub_figsize=None, linewidth=1, display=True,
              all_ylabels=True, epoch_text=True):
         """Plot lightcurve comparison between observed and sample models
