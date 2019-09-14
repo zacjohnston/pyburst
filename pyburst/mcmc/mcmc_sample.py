@@ -231,7 +231,7 @@ class Ksample:
              alpha_shaded=0.7, xlims=None,
              k_color='C9', obs_color='black', errorbars=False,
              sub_figsize=None, linewidth=1, display=True,
-             all_ylabels=True, epoch_text=True):
+             all_ylabels=True, epoch_text=True, bounds=False):
         """Plot lightcurve comparison between observed and sample models
         """
         subplot_cols = {True: 2, False: 1}.get(residuals)
@@ -282,6 +282,12 @@ class Ksample:
                 if shaded:
                     lc_ax[epoch_i].fill_between(m_x, m_y_lower, m_y_upper,
                                                 color='0.7', alpha=alpha_shaded)
+                if bounds:
+                    lc_ax[epoch_i].plot(m_x, m_y_lower, ls='-', color='0.',
+                                        alpha=alpha_shaded, linewidth=0.5)
+                    lc_ax[epoch_i].plot(m_x, m_y_upper, ls='-', color='0.',
+                                        alpha=alpha_shaded, linewidth=0.5)
+
                 lc_ax[epoch_i].plot(m_x, m_y, color=k_color, alpha=alpha_lines,
                                     linewidth=linewidth)
 
