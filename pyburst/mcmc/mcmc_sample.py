@@ -43,6 +43,7 @@ class Ksample:
                       }.get(self.obs_source)
 
         self.epochs = {'gs1826': (1998, 2000, 2007),
+                       '4u1820': (1997, 2009),
                        }.get(self.obs_source)
 
         if runs is None:  # assume all batches have corresponding runs
@@ -227,7 +228,7 @@ class Ksample:
 
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
-    def plot(self, residuals=True, shaded=False, alpha_lines=0.5,
+    def plot(self, residuals=False, shaded=False, alpha_lines=0.5,
              alpha_shaded=0.7, xlims=None,
              k_color='C9', obs_color='black', errorbars=False,
              sub_figsize=None, linewidth=1, display=True,
