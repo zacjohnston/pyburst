@@ -131,7 +131,7 @@ def load_grid_table(tablename, source, verbose=True, lampe_analyser=False):
     filepath = os.path.join(table_path, filename)
 
     printv(f'Loading {tablename} table: {filepath}', verbose)
-    table = pd.read_table(filepath, delim_whitespace=True)
+    table = pd.read_csv(filepath, delim_whitespace=True)
     return table
 
 
@@ -198,7 +198,7 @@ def load_model_table(batch, source, filename='MODELS.txt', verbose=True):
     source = grid_strings.source_shorthand(source=source)
     filepath = grid_strings.get_model_table_filepath(batch, source, filename)
     printv(f'Loading: {filepath}', verbose)
-    model_table = pd.read_table(filepath, delim_whitespace=True)
+    model_table = pd.read_csv(filepath, delim_whitespace=True)
     return model_table
 
 
@@ -441,7 +441,7 @@ def get_unique_param(param, source):
     """
     source = grid_strings.source_shorthand(source=source)
     params_filepath = grid_strings.get_table_filepath(source, 'params')
-    param_table = pd.read_table(params_filepath, delim_whitespace=True)
+    param_table = pd.read_csv(params_filepath, delim_whitespace=True)
     return np.unique(param_table[param])
 
 
