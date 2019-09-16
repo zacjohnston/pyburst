@@ -229,7 +229,7 @@ class Ksample:
         return np.sum((obs_flux - model_flux)**2 / np.sqrt(obs_flux_err**2 + model_flux_err**2))
 
     def plot(self, residuals=False, shaded=False, alpha_lines=0.5,
-             alpha_shaded=0.7, xlims=None,
+             alpha_shaded=0.7, xlims=None, title=None,
              k_color='C9', obs_color='black', errorbars=False,
              sub_figsize=None, linewidth=1, display=True,
              all_ylabels=True, epoch_text=True, bounds=False):
@@ -325,6 +325,7 @@ class Ksample:
         if not all_ylabels:
             lc_ax[1].set_ylabel(ylabel, labelpad=10, y=1.1)
 
+        lc_ax[0].set_title(title)
         lc_ax[-1].set_xlabel('Time (s)')
         lc_ax[-1].set_xlim(xlims)
         # plt.tight_layout()
