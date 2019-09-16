@@ -323,7 +323,7 @@ class Ksample:
                                          zorder=10, linewidth=0.5*linewidth)
 
         if not all_ylabels:
-            lc_ax[1].set_ylabel(ylabel, labelpad=10)
+            lc_ax[1].set_ylabel(ylabel, labelpad=10, y=1.1)
 
         lc_ax[-1].set_xlabel('Time (s)')
         lc_ax[-1].set_xlim(xlims)
