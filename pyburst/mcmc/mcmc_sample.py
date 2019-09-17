@@ -232,7 +232,8 @@ class Ksample:
              alpha_shaded=0.7, xlims=None, title=None,
              k_color='C9', obs_color='black', errorbars=False,
              sub_figsize=None, linewidth=1, display=True,
-             all_ylabels=True, epoch_text=True, bounds=False):
+             all_ylabels=True, epoch_text=True, bounds=False,
+             legend=False):
         """Plot lightcurve comparison between observed and sample models
         """
         subplot_cols = {True: 2, False: 1}.get(residuals)
@@ -290,7 +291,8 @@ class Ksample:
                                         alpha=alpha_shaded, linewidth=0.5)
 
                 lc_ax[epoch_i].plot(m_x, m_y, color=k_color, alpha=alpha_lines,
-                                    linewidth=linewidth)
+                                    linewidth=linewidth,
+                                    label='Modelled' if i is 0 else None)
 
                 # ====== Plot residuals ======
                 if residuals:
@@ -311,8 +313,8 @@ class Ksample:
                                                      color='0.7', alpha=alpha_shaded)
 
             # ====== Plot observed lightcurves ======
-            lc_ax[epoch_i].step(obs_burst.time, obs_y,
-                                where='post', color=obs_color)
+            lc_ax[epoch_i].step(obs_burst.time, obs_y, label='Observed',
+                                where='post', color=obs_color, linewidth=linewidth)
 
             if errorbars:
                 lc_ax[epoch_i].errorbar(obs_x, obs_y, yerr=obs_y_u, ls='none',
@@ -324,6 +326,8 @@ class Ksample:
 
         if not all_ylabels:
             lc_ax[1].set_ylabel(ylabel, labelpad=10, y=1.1)
+        if legend:
+            lc_ax[0].legend(loc='center right')
 
         lc_ax[0].set_title(title)
         lc_ax[-1].set_xlabel('Time (s)')
