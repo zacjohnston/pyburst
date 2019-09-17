@@ -565,23 +565,3 @@ def add_epoch_text(fig, fontsize, epochs=(1998, 2000, 2007),
         ax = fig.axes[i]
         ax.text(0.95, 0.95, str(epoch), color=colours[i], fontsize=fontsize,
                 transform=ax.transAxes, va='top', ha='right')
-
-
-def update_axis_fontsize(fig, fontsize):
-    """Updates the fontize for all axes in given fig
-    """
-    for ax in fig.axes:
-        label = ax.get_xlabel()
-        ax.set_xlabel(label, fontsize=fontsize)
-        ax.set_ylabel(label, fontsize=fontsize)
-
-
-def update_tick_fontsize(fig, fontsize):
-    """Updates the fontize for all axes in given fig
-    """
-    for ax in fig.axes:
-        for tick in ax.xaxis.get_major_ticks():
-            tick.label.set_fontsize(fontsize)
-        for tick in ax.yaxis.get_major_ticks():
-            tick.label.set_fontsize(fontsize)
-
