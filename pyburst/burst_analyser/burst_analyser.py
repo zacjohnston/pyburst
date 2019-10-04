@@ -1229,7 +1229,7 @@ class BurstRun(object):
         last_dump_index = self.dump_table.index[-1]
         t_offset = self.parameters['dump_time_offset']
         for burst in self.bursts.itertuples():
-            idx = np.searchsorted(self.dump_table['time'], burst.t_start + t_offset)[0]
+            idx = np.searchsorted(self.dump_table['time'], burst.t_start + t_offset)
             if idx > last_dump_index:
                 return
             cycle, time = self.dump_table.iloc[idx]
