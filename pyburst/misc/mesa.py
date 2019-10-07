@@ -50,6 +50,8 @@ def plot_all_avg_lightcurves(mesa_set, grid_source='mesa',
     # ===== Setup plotting =====
     n_models = len(mesa_info['runs'])
     n_rows = int(np.ceil(n_models / 2))
+    xmin = -20
+    xlims = ([xmin, 50], [xmin, 75], [xmin, 120], [xmin, 140], [xmin, 140])
 
     subplot_width = 4
     subplot_height = 2.5
@@ -70,8 +72,8 @@ def plot_all_avg_lightcurves(mesa_set, grid_source='mesa',
         plot_avg_lc(mesa_run=run, grid_run=kep_run,
                     grid_batch=kep_batch, grid_source='mesa',
                     ax=ax[row_i, col_i], display=False, kgrid=kgrid,
-                    legend=True if i == 0 else False,
-                    verbose=verbose)
+                    legend=True if i == 1 else False,
+                    verbose=verbose, xlims=xlims[i])
 
     if display:
         plt.show(block=False)
@@ -114,7 +116,8 @@ def get_mesa_set(mesa_set):
         6: {'x': 0.75, 'z': 0.02, 'qb': 1.0},
     }
     kep_runs = {
-        1: np.full(5, 4),
+        # 1: np.full(5, 4),
+        1: np.array([1, 3, 5, 7, 9]),
         2: np.full(5, 1),
         3: np.full(3, 3),
         4: np.full(5, 2),
@@ -122,7 +125,8 @@ def get_mesa_set(mesa_set):
         6: np.full(6, 12),
     }
     kep_batches = {
-        1: [2, 4, 8, 10, 12],
+        # 1: [2, 4, 8, 10, 12],
+        1: np.full(5, 13),
         2: [2, 4, 6, 8, 10],
         3: [8, 10, 12],
         4: [2, 4, 6, 8, 12],
@@ -143,7 +147,7 @@ def get_mesa_set(mesa_set):
 def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
                 radius=10, mass=1.4, shaded=True, ax=None,
                 display=True, legend=True, kgrid=None,
-                verbose=True):
+                verbose=True, xlims=None):
     """Plots comparison of average lightcurves from mesa
     """
     xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
@@ -180,6 +184,7 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
     ax.plot(kep_time, kep_lum, label='kepler', color='C0')
     ax.plot(mesa_time, mesa_lum, label='mesa', color='C1')
 
+    ax.set_xlim(xlims)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel(plot_tools.full_label('lum'))
     if legend:
