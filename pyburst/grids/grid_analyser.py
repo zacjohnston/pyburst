@@ -32,9 +32,6 @@ def default_plt_options():
     plt.rcParams.update(params)
 
 
-default_plt_options()
-
-
 class Kgrid:
     """
     An object for interracting with large model grids
@@ -50,7 +47,6 @@ class Kgrid:
         mass     =  flt  : mass of neutron star in M_sun (may become deprecated)
         (path    = str   : path to dir of grids)
         """
-        default_plt_options()
         source = grid_strings.source_shorthand(source=source)
         self.path = kwargs.get('path', GRIDS_PATH)
         self.models_path = kwargs.get('models_path', MODELS_PATH)
