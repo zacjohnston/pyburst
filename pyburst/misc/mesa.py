@@ -36,7 +36,6 @@ def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True, ls='-', offset=0.0
                            mesa_mdots=mdots, bprops=bprops,
                            params=mesa_info['params'], verbose=verbose,
                            grid_version=grid_version, ls=ls, offset=offset)
-
     return fig, ax
 
 
@@ -58,7 +57,6 @@ def plot_all_avg_lightcurves(mesa_set, grid_source='mesa',
     figsize = (2 * subplot_width, n_rows * subplot_height)
 
     fig, ax = plt.subplots(n_rows, 2, figsize=figsize)
-
     if n_models % 2 == 1:
         ax[-1, -1].axis('off')
 
@@ -73,7 +71,9 @@ def plot_all_avg_lightcurves(mesa_set, grid_source='mesa',
                     grid_batch=kep_batch, grid_source='mesa',
                     ax=ax[row_i, col_i], display=False, kgrid=kgrid,
                     legend=True if i == 1 else False,
-                    verbose=verbose, xlims=xlims[i])
+                    verbose=verbose, xlims=xlims[i],
+                    ylabel_on=True if i % 2 == 0 else False,
+                    xlabel_on=True if i in [n_models-1, n_models-2] else False)
 
     if display:
         plt.show(block=False)
@@ -147,7 +147,7 @@ def get_mesa_set(mesa_set):
 def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
                 radius=10, mass=1.4, shaded=True, ax=None,
                 display=True, legend=True, kgrid=None,
-                verbose=True, xlims=None):
+                verbose=True, xlims=None, ylabel_on=True, xlabel_on=True):
     """Plots comparison of average lightcurves from mesa
     """
     xi, redshift = gravity.gr_corrections(r=radius, m=mass, phi=1)
@@ -185,8 +185,10 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
     ax.plot(mesa_time, mesa_lum, label='mesa', color='C1')
 
     ax.set_xlim(xlims)
-    ax.set_xlabel('Time (s)')
-    ax.set_ylabel(plot_tools.full_label('lum'))
+    if xlabel_on:
+        ax.set_xlabel('Time (s)')
+    if ylabel_on:
+        ax.set_ylabel(plot_tools.full_label('lum'))
     if legend:
         ax.legend()
 
