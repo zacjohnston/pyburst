@@ -16,7 +16,7 @@ Currently very hacky and roughshod
 """
 
 def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True,
-         bprops=('rate', 'fluence', 'peak'), display=True):
+         bprops=('rate', 'fluence', 'peak'), display=True, grid_version=0):
     """Plot predefined set of mesa model comparisons
 
     model_set : int
@@ -33,7 +33,8 @@ def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True,
 
     fig, ax = plot_compare(mesa_runs=mesa_info['runs'], display=display,
                            mesa_mdots=mdots, bprops=bprops,
-                           params=mesa_info['params'], verbose=verbose)
+                           params=mesa_info['params'], verbose=verbose,
+                           grid_version=grid_version)
 
     return fig, ax
 
@@ -190,14 +191,16 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
 
 def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
                  params=None, bprops=('rate', 'fluence', 'peak'),
-                 mass=1.4, radius=10, verbose=True, display=True):
+                 mass=1.4, radius=10, verbose=True, display=True,
+                 grid_version=0):
     """Plot comparison of mesa and kepler models
     """
     if params is None:
         print('Using default params')
         params = {'x': 0.7, 'z': 0.02, 'qb': 0.1, 'qnuc': 0.0}
 
-    kgrid = grid_analyser.Kgrid(source=grid_source, verbose=verbose)
+    kgrid = grid_analyser.Kgrid(source=grid_source, verbose=verbose,
+                                grid_version=grid_version)
     grid_summ = kgrid.get_summ(params=params)
     grid_params = kgrid.get_params(params=params)
 
