@@ -1,15 +1,6 @@
 import os
 import matplotlib.pyplot as plt
 
-def default_plt_options():
-    """Initialise default plot parameters"""
-    params = {'mathtext.default': 'regular',
-              'font.family': 'serif',
-              'text.usetex': False}
-    plt.rcParams.update(params)
-
-
-default_plt_options()
 
 
 def save_plot(fig, label, path, extensions=('.pdf',)):
