@@ -169,7 +169,10 @@ version_definitions = {
             'alpha1': {},
             'heger07': {},
             'alpha2': {},
-            'mesa': {},
+            'mesa': {
+                1: {'batch': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    },
+            },
             'preheat': {},
             'ks1': {},
         },
