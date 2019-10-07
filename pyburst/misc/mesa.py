@@ -15,7 +15,8 @@ Module for comparing Kepler and Mesa models
 Currently very hacky and roughshod
 """
 
-def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True,
+
+def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True, ls='-', offset=0.005,
          bprops=('rate', 'fluence', 'peak'), display=True, grid_version=0):
     """Plot predefined set of mesa model comparisons
 
@@ -34,7 +35,7 @@ def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True,
     fig, ax = plot_compare(mesa_runs=mesa_info['runs'], display=display,
                            mesa_mdots=mdots, bprops=bprops,
                            params=mesa_info['params'], verbose=verbose,
-                           grid_version=grid_version)
+                           grid_version=grid_version, ls=ls, offset=offset)
 
     return fig, ax
 
@@ -192,7 +193,7 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
 def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
                  params=None, bprops=('rate', 'fluence', 'peak'),
                  mass=1.4, radius=10, verbose=True, display=True,
-                 grid_version=0):
+                 grid_version=0, ls='-', offset=0.005):
     """Plot comparison of mesa and kepler models
     """
     if params is None:
@@ -220,15 +221,15 @@ def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
         gr_f = gr_correction(bprop, xi=xi, redshift=redshift)
 
         # === kepler model ===
-        ax[i].errorbar(grid_params['accrate']*xi**2,
-                       grid_summ[bprop]*gr_f/unit_f,
+        ax[i].errorbar(grid_params['accrate']*xi**2 - offset,
+                       grid_summ[bprop]*gr_f/unit_f, ls=ls,
                        yerr=grid_summ[u_bprop]*gr_f/unit_f, marker='o',
                        capsize=3, label='kepler')
 
         # === mesa model ===
         ax[i].errorbar(mesa_models['accrate'], mesa_models[bprop]/unit_f,
                        yerr=mesa_models[u_bprop]/unit_f, marker='o',
-                       capsize=3, label='mesa')
+                       capsize=3, label='mesa', ls=ls)
 
         ylabel = plot_tools.full_label(bprop)
         ax[i].set_ylabel(ylabel)
