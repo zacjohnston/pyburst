@@ -16,7 +16,7 @@ Currently very hacky and roughshod
 """
 
 
-def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True, ls='-', offset=0.005,
+def plot(model_set, actual_mdot=True, qnuc=0.0, verbose=True, ls='-', offset=True,
          bprops=('rate', 'fluence', 'peak'), display=True, grid_version=0):
     """Plot predefined set of mesa model comparisons
 
@@ -49,9 +49,8 @@ def plot_all_avg_lightcurves(mesa_set, grid_source='mesa',
     # ===== Setup plotting =====
     n_models = len(mesa_info['runs'])
     n_rows = int(np.ceil(n_models / 2))
-    xmin = -20
+    xmin = -22
     xlims = ([xmin, 50], [xmin, 75], [xmin, 120], [xmin, 140], [xmin, 140])
-
     subplot_width = 4
     subplot_height = 2.5
     figsize = (2 * subplot_width, n_rows * subplot_height)
@@ -63,7 +62,7 @@ def plot_all_avg_lightcurves(mesa_set, grid_source='mesa',
     for i, run in enumerate(mesa_info['runs']):
         row_i = int(np.floor(i / 2))
         col_i = i % 2
-
+        mdot = mesa_info['mdots_actual'][i]
         kep_run = mesa_info['kep_runs'][i]
         kep_batch = mesa_info['kep_batches'][i]
 
@@ -73,7 +72,8 @@ def plot_all_avg_lightcurves(mesa_set, grid_source='mesa',
                     legend=True if i == 1 else False,
                     verbose=verbose, xlims=xlims[i],
                     ylabel_on=True if i % 2 == 0 else False,
-                    xlabel_on=True if i in [n_models-1, n_models-2] else False)
+                    xlabel_on=True if i in [n_models-1, n_models-2] else False,
+                    title=r'$\dot{M} = ' + f'{mdot:.3f}' + r'\, \dot{M}_\mathrm{Edd}$')
 
     if display:
         plt.show(block=False)
@@ -146,7 +146,7 @@ def get_mesa_set(mesa_set):
 
 def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
                 radius=10, mass=1.4, shaded=True, ax=None,
-                display=True, legend=True, kgrid=None,
+                display=True, legend=True, kgrid=None, title=None,
                 verbose=True, xlims=None, ylabel_on=True, xlabel_on=True):
     """Plots comparison of average lightcurves from mesa
     """
@@ -181,8 +181,8 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
                         y2=mesa_lum - mesa_u_lum,
                         color='C1', alpha=0.5)
 
-    ax.plot(kep_time, kep_lum, label='kepler', color='C0')
-    ax.plot(mesa_time, mesa_lum, label='mesa', color='C1')
+    ax.plot(kep_time, kep_lum, label=r'\textsc{Kepler}', color='C0')
+    ax.plot(mesa_time, mesa_lum, label=r'\textsc{MESA}', color='C1')
 
     ax.set_xlim(xlims)
     if xlabel_on:
@@ -191,6 +191,7 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
         ax.set_ylabel(plot_tools.full_label('lum'))
     if legend:
         ax.legend()
+    ax.set_title(title)
 
     plt.tight_layout()
     if display:
@@ -200,7 +201,7 @@ def plot_avg_lc(mesa_run, grid_run, grid_batch, grid_source='mesa',
 def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
                  params=None, bprops=('rate', 'fluence', 'peak'),
                  mass=1.4, radius=10, verbose=True, display=True,
-                 grid_version=0, ls='-', offset=0.005):
+                 grid_version=0, ls='-', offset=True):
     """Plot comparison of mesa and kepler models
     """
     if params is None:
@@ -228,15 +229,19 @@ def plot_compare(mesa_runs, mesa_mdots, grid_source='mesa',
         gr_f = gr_correction(bprop, xi=xi, redshift=redshift)
 
         # === kepler model ===
-        ax[i].errorbar(grid_params['accrate']*xi**2 - offset,
+        # TODO: fix hack
+        offset_x = 0.0
+        if i > 0:
+            offset_x = 0.003
+        ax[i].errorbar(grid_params['accrate']*xi**2 - offset_x,
                        grid_summ[bprop]*gr_f/unit_f, ls=ls,
                        yerr=grid_summ[u_bprop]*gr_f/unit_f, marker='o',
-                       capsize=3, label='kepler')
+                       capsize=3, label=r'\textsc{Kepler}')
 
         # === mesa model ===
         ax[i].errorbar(mesa_models['accrate'], mesa_models[bprop]/unit_f,
                        yerr=mesa_models[u_bprop]/unit_f, marker='o',
-                       capsize=3, label='mesa', ls=ls)
+                       capsize=3, label=r'\textsc{MESA}', ls=ls)
 
         ylabel = plot_tools.full_label(bprop)
         ax[i].set_ylabel(ylabel)
