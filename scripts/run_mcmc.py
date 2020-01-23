@@ -9,8 +9,9 @@ from pyburst.misc import pyprint
 
 # =============================================================================
 # Usage:
-# python run_concord.py [version] [source] [n_walkers] [n_steps] [n_threads] [dump_step]
+# python run_mcmc.py [version] [source] [n_walkers] [n_steps] [n_threads] [dump_step]
 # =============================================================================
+
 
 def main(source, version, n_steps, dump_step=None, n_walkers=1000, n_threads=8,
          restart_step=None):
