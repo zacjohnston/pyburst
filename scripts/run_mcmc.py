@@ -9,7 +9,7 @@ from pyburst.misc import pyprint
 
 # =============================================================================
 # Usage:
-# python run_mcmc.py [version] [source] [n_walkers] [n_steps] [n_threads] [dump_step]
+# python run_mcmc.py [source] [version] [n_steps] [n_threads] [dump_step]
 # =============================================================================
 
 
