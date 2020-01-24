@@ -1,7 +1,5 @@
-# standard
 import numpy as np
 import os
-import sys
 import time
 import emcee
 from scipy.optimize import fmin
@@ -9,9 +7,7 @@ from scipy.optimize import fmin
 # kepler_grids
 from . import burstfit
 from . import mcmc_versions
-from . import mcmc_plot
 from . import mcmc_tools
-from pyburst.grids import grid_tools
 from pyburst.misc.pyprint import check_params_length
 
 GRIDS_PATH = os.environ['KEPLER_GRIDS']
@@ -65,12 +61,9 @@ def run_sampler(sampler, pos, n_steps, verbose=True):
     """
     t0 = time.time()
     result = None
-
-    for i, result in enumerate(sampler.sample(pos, iterations=n_steps)):
-        if verbose:
-            progress = (float(i + 1) / n_steps) * 100
-            sys.stdout.write(f"\r{progress:.1f}%")
-    sys.stdout.write("\n")
+    # TODO: update to use pool
+    for i, result in enumerate(sampler.sample(pos, iterations=n_steps, progress=True)):
+        pass
 
     t1 = time.time()
     dtime = t1 - t0
@@ -100,7 +93,7 @@ def get_acceptance_fraction(source=None, version=None, n_walkers=None,
             raise ValueError('Must provide source, version, n_steps, '
                              + 'and n_walkers (or directly provide sampler object)')
         sampler = mcmc_tools.load_sampler_state(source=source, version=version,
-                                     n_steps=n_steps, n_walkers=n_walkers)
+                                                n_steps=n_steps, n_walkers=n_walkers)
     else:
         n_steps = sampler['iterations']
 
@@ -113,7 +106,7 @@ def optimise(source, version, x0=None):
 
     Parameters
     ----------
-    params0 : ndarray
+    x0 : ndarray
         Initial guess of parameters
     """
     bfit = burstfit.BurstFit(source=source, version=version, verbose=False,
