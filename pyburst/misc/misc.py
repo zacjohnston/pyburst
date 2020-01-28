@@ -87,7 +87,7 @@ def plot_posteriors(chain=None, discard=10000):
 
 
 def check_n_bursts(batches, source, kgrid):
-    """Compares n_bursts detected with kepler_analyser against burstfit_1808
+    """Compares n_bursts detected with lampe_analyser against burstfit_1808
     """
     mismatch = np.zeros(4)
     filename = f'mismatch_{source}_{batches[0]}-{batches[-1]}.txt'

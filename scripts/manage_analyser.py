@@ -2,7 +2,7 @@ import numpy as np
 import sys
 
 # kepler grids
-from pyburst.kepler_analyser import kepler_analyser_tools
+from pyburst.lampe_analyser import lampe_analyser_tools
 from pyburst.grids import grid_tools, grid_strings
 
 # =================================================================
@@ -36,11 +36,11 @@ batches = np.arange(batch_first, batch_last + 1)
 source = grid_strings.source_shorthand(source=source)
 
 if option == 'setup':
-    kepler_analyser_tools.multi_setup_analyser(batches=batches, source=source,
-                                               basename=basename)
+    lampe_analyser_tools.multi_setup_analyser(batches=batches, source=source,
+                                              basename=basename)
 elif option == 'collect':
-    kepler_analyser_tools.collect_output(runs=nruns, batches=batches, source=source,
-                                         basename=basename)
+    lampe_analyser_tools.collect_output(runs=nruns, batches=batches, source=source,
+                                        basename=basename)
 
     grid_tools.copy_paramfiles(batches=batches, source=source)
 

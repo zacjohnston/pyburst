@@ -20,7 +20,7 @@ from pyburst.misc.pyprint import print_title, print_dashes
 # Author: Zac Johnston (2017)
 # zac.johnston@monash.edu
 #
-# Tools for using Nathanael Lampe's kepler_analyser.py
+# Tools for using Nathanael Lampe's lampe_analyser.py
 # https://github.com/natl/kepler-analyser
 # ============================================
 
@@ -47,7 +47,7 @@ def multi_setup_analyser(batches, source, multithread=True, basename='xrb'):
 
 def setup_analyser(batch, source, runs=None, basename='xrb', multithread=True):
     """
-    Sets up directories and files for kepler_analyser
+    Sets up directories and files for lampe_analyser
     --------------------------------------------------------------------------
      runs          = [int]  : list of model IDs
      batch         = int    : batch ID
@@ -101,7 +101,7 @@ def setup_analyser(batch, source, runs=None, basename='xrb', multithread=True):
 
 def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
     """========================================================
-    Loads Kepler .lum binaries and saves txt file of [time, luminosity, radius] for input to kepler_analyser
+    Loads Kepler .lum binaries and saves txt file of [time, luminosity, radius] for input to lampe_analyser
     Returns No. of cycles for each run
     ========================================================
     runs = []         : list of run numbers, eg. [324,325,340]
@@ -110,7 +110,7 @@ def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
     in_name = str     : base filename of input, eg. 'run' for run324
     out_name = str    : base filename of output, eg. 'xrb' for xrb324
 
-    NOTE: kepler_analyser overwrites summ.csv and db.csv, should put path_target as new directory
+    NOTE: lampe_analyser overwrites summ.csv and db.csv, should put path_target as new directory
     ========================================================"""
 
     print_title()
@@ -140,7 +140,7 @@ def extract_lightcurves(runs, path_data, path_target, basename='xrb'):
 
 def write_model_table(table, basename, batch_name, path):
     """
-    Writes MODELS.txt file for kepler_analyser input
+    Writes MODELS.txt file for lampe_analyser input
     """
     # --------------------------------------------------------------------------
     # Input Parameters
@@ -292,7 +292,7 @@ def plot_analyser(runs,
                   labels=True,
                   legend=True,
                   **kwargs):
-    """Plots all bursts after first 4 on a single axis, from kepler_analyser output"""
+    """Plots all bursts after first 4 on a single axis, from lampe_analyser output"""
     # runs    = [int] : which run to plot
     # name    = str   : base filename of runs, eg. 'xrb'
     # skip    = int   : exclude this many bursts from start
@@ -301,7 +301,7 @@ def plot_analyser(runs,
     # mean    = bool  : Plot mean lightcurve too
     # gr      = bool  : use GR corrections
     # path    = str   : path to working directory
-    # output  = str   : name of folder containing kepler_analyser output
+    # output  = str   : name of folder containing lampe_analyser output
     source = grid_strings.source_shorthand(source=source)
     path = kwargs.get('path', GRIDS_PATH)
     analyser_path = os.path.join(path, 'analyser', source)
