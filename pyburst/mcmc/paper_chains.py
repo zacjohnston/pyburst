@@ -47,7 +47,7 @@ def get_radius(flat):
     return mcmc_params.get_radius(mass_nw=flat['m_nw'], mass_gr=flat['m_gr'])
 
 
-def get_flat(chain, version):
+def get_flat(chain, version, discard):
     """Return flattened arrys of each param in full chain
     """
     print('flattening chain')
@@ -55,21 +55,22 @@ def get_flat(chain, version):
 
     flat = {}
     for key in param_keys:
-        flat[key] = mcmc_params.get_param_chain(chain, param=key, discard=0,
+        flat[key] = mcmc_params.get_param_chain(chain, param=key, discard=discard,
                                                 source=source, version=version)
     return flat
 
 
-def get_gravity(chain, version):
+def get_gravity(chain, version, discard):
     """Get flattened surface gravity (g, 10^14 cm/s^2) from full chain
     """
     print('getting gravity')
-    return mcmc_params.get_gravity_chain(chain, discard=0, source=source, version=version)
+    return mcmc_params.get_gravity_chain(chain, discard=discard, source=source, version=version)
 
 
-def get_redshift(chain, flat, version):
+def get_redshift(chain, flat, version, discard):
     """Get redshift (z) from full chain
     """
     print('getting redshift')
-    return mcmc_params.get_redshift_chain(chain, discard=0, source=source, version=version,
-                                          mass_nw=flat['m_nw'], mass_gr=flat['m_gr'])
+    return mcmc_params.get_redshift_chain(chain, discard=discard, source=source,
+                                          version=version, mass_nw=flat['m_nw'],
+                                          mass_gr=flat['m_gr'])
