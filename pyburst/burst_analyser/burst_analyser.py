@@ -26,6 +26,7 @@ plt.rc('font', family='serif')
 #   - Generalise to non-batch organised models
 #   - param description docstring
 #   - Add print statements to functions
+#   - rename source to grid
 
 class NoBursts(Exception):
     pass
