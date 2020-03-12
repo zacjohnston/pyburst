@@ -5,14 +5,14 @@ from . import mcmc_tools, mcmc_params, mcmc_versions
 source = 'grid5'
 
 
-def assemble_full_flat(version):
+def assemble_full_flat(version, discard):
     """Asseble full flat chains with additional params
     """
     chain = load_chain(version)
-    flat = get_flat(chain, version)
+    flat = get_flat(chain, version, discard=discard)
     flat['R'] = get_radius(flat)
-    flat['g'] = get_gravity(chain, version)
-    flat['redshift'] = get_redshift(chain, flat, version)
+    flat['g'] = get_gravity(chain, version, discard=discard)
+    flat['redshift'] = get_redshift(chain, flat, version, discard=discard)
     return flat
 
 
