@@ -1,3 +1,5 @@
+import numpy as np
+
 from . import mcmc_tools, mcmc_params, mcmc_versions
 
 source = 'grid5'
@@ -8,10 +10,24 @@ def assemble_full_flat(version):
     """
     chain = load_chain(version)
     flat = get_flat(chain, version)
-    flat['r'] = get_radius(flat)
+    flat['R'] = get_radius(flat)
     flat['g'] = get_gravity(chain, version)
-    flat['z'] = get_redshift(chain, flat, version)
+    flat['redshift'] = get_redshift(chain, flat, version)
     return flat
+
+
+def setup_chainconsumer(flat):
+    params = list(flat.keys())
+    flat_chain = stack_flat(flat)
+    return mcmc_tools.setup_custom_chainconsumer(flat_chain, parameters=params)
+
+
+def stack_flat(flat):
+    chains = []
+    for key, chain in flat.items():
+        chains += [chain]
+
+    return np.column_stack(chains)
 
 
 def load_chain(version):
