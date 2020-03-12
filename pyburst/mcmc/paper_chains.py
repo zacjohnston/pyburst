@@ -21,3 +21,9 @@ def get_radius(chain, version):
 
     return mcmc_params.get_radius(mass_nw=flat['m_nw'], mass_gr=flat['m_gr'])
 
+
+def get_gravity(chain, version):
+    """Get flattened surface gravity (g, 10^14 cm/s^2) from full chain
+    """
+    return mcmc_params.get_gravity_chain(chain, discard=0, source='grid5', version=version)
+
