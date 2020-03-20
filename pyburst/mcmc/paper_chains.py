@@ -56,23 +56,33 @@ def unflatten(flat_chain):
 # ===============================================================
 #                      Load/Save
 # ===============================================================
-def save_chain(chain, version, compress=False):
+def save_chain(chain, version, compressed=False):
     """Save chain to file
     """
-    chain_id = version - 5
-    filename = f'mcmc_chain_{chain_id}.npy'
-
-    if compress:
-        filename += '.gz'
-
-    filepath = os.path.join(path, filename)
+    filepath = chain_filepath(version, compressed=compressed)
     print(f'Saving chain: {filepath}')
 
-    if compress:
+    if compressed:
         with gzip.GzipFile(filepath, 'w') as f:
             np.save(f, chain)
     else:
         np.save(filepath, chain)
+
+
+def load_chain2(version, compressed=False):
+    """Load saved chain from file
+    """
+    pass
+
+
+def chain_filepath(version, compressed):
+    chain_id = version - 5
+    filename = f'mcmc_chain_{chain_id}.npy'
+
+    if compressed:
+        filename += '.gz'
+
+    return os.path.join(path, filename)
 
 
 # ===============================================================
