@@ -1,6 +1,7 @@
 import numpy as np
 
 from . import mcmc_tools, mcmc_params, mcmc_versions
+from pyburst.physics import gravity
 
 source = 'grid5'
 
@@ -24,18 +25,16 @@ def load_chain(version):
 
 
 def replace_mass_with_grav(chain, version):
-    """Convert m_nw from main chain to g
+    """Convert m_nw from main chain to g (1e14 cm/s^2)
     """
     mv = get_mcmc_version(version)
     m_nw_idx = mv.param_keys.index('m_nw')
 
-    grav = get_gravity(chain, version=version, discard=0)
-
-    n_steps = chain.shape[1]
-    grav_unflat = grav.reshape((-1, n_steps))
+    grav_factor = gravity.get_acceleration_newtonian(r=10, m=1.0)
+    grav_factor = grav_factor.value / 1e14
 
     chain_out = chain.copy()
-    chain_out[:, :, m_nw_idx] = grav_unflat
+    chain_out[:, :, m_nw_idx] *= grav_factor
 
     return chain_out
 
