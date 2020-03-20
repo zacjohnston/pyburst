@@ -5,6 +5,33 @@ from . import mcmc_tools, mcmc_params, mcmc_versions
 source = 'grid5'
 
 
+# ===============================================================
+#                      Baseline chains
+# ===============================================================
+def load_chain(version):
+    """Load chain used in paper
+    """
+    n_steps = {6: 20000}.get(version, 10000)
+    compressed = {6: True}.get(version, False)
+
+    return mcmc_tools.load_chain(source=source, version=version, n_steps=n_steps,
+                                 n_walkers=1000, compressed=compressed)
+
+# TODO: convert m_nw --> g in baseline chain
+
+
+def unflatten(flat_chain):
+    """Unflatten chain into shape [walkers, steps, params]
+
+    flat_chain: shape [samples, params]
+    """
+    n_params = flat_chain.shape[-1]
+    return flat_chain.reshape((1000, -1, n_params))
+
+
+# ===============================================================
+#                      Derived chains
+# ===============================================================
 def assemble_full_flat(version, discard):
     """Asseble full flat chains with additional params
     """
@@ -28,16 +55,6 @@ def stack_flat(flat):
         chains += [chain]
 
     return np.column_stack(chains)
-
-
-def load_chain(version):
-    """Load chain used in paper
-    """
-    n_steps = {6: 20000}.get(version, 10000)
-    compressed = {6: True}.get(version, False)
-
-    return mcmc_tools.load_chain(source=source, version=version, n_steps=n_steps,
-                                 n_walkers=1000, compressed=compressed)
 
 
 def get_radius(flat):
