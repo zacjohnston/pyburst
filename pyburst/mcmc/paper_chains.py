@@ -72,9 +72,18 @@ def save_chain(chain, version, compressed=False):
 def load_chain2(version, compressed=False):
     """Load saved chain from file
     """
-    pass
+    filepath = chain_filepath(version, compressed=compressed)
+    print(f'Loading chain: {filepath}')
 
+    if compressed:
+        f = gzip.GzipFile(filepath, 'r')
+        chain = np.load(f)
+    else:
+        chain = np.load(filepath)
 
+    return chain
+
+    
 def chain_filepath(version, compressed):
     chain_id = version - 5
     filename = f'mcmc_chain_{chain_id}.npy'
