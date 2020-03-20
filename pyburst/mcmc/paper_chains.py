@@ -5,6 +5,11 @@ from . import mcmc_tools, mcmc_params, mcmc_versions
 source = 'grid5'
 
 
+# TODO:
+#   - convert m_nw --> g in baseline chain
+#   - Resave, compress
+
+
 # ===============================================================
 #                      Baseline chains
 # ===============================================================
@@ -17,7 +22,26 @@ def load_chain(version):
     return mcmc_tools.load_chain(source=source, version=version, n_steps=n_steps,
                                  n_walkers=1000, compressed=compressed)
 
-# TODO: convert m_nw --> g in baseline chain
+
+def replace_mass_with_grav(chain, version):
+    """Convert m_nw from main chain to g
+    """
+    mv = get_mcmc_version(version)
+    m_nw_idx = mv.param_keys.index('m_nw')
+
+    grav = get_gravity(chain, version=version, discard=0)
+
+    n_steps = chain.shape[1]
+    grav_unflat = grav.reshape((-1, n_steps))
+
+    chain_out = chain.copy()
+    chain_out[:, :, m_nw_idx] = grav_unflat
+
+    return chain_out
+
+
+def get_mcmc_version(version):
+    return mcmc_versions.McmcVersion(source=source, version=version)
 
 
 def unflatten(flat_chain):
