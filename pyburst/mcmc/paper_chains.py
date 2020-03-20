@@ -1,13 +1,14 @@
 import numpy as np
+import os
+import gzip
 
 from . import mcmc_tools, mcmc_params, mcmc_versions
 from pyburst.physics import gravity
 
 source = 'grid5'
-
+path = '/home/zac/projects/papers/mcmc/data'
 
 # TODO:
-#   - convert m_nw --> g in baseline chain
 #   - Resave, compress
 
 
@@ -50,6 +51,28 @@ def unflatten(flat_chain):
     """
     n_params = flat_chain.shape[-1]
     return flat_chain.reshape((1000, -1, n_params))
+
+
+# ===============================================================
+#                      Load/Save
+# ===============================================================
+def save_chain(chain, version, compress=False):
+    """Save chain to file
+    """
+    chain_id = version - 5
+    filename = f'mcmc_chain_{chain_id}.npy'
+
+    if compress:
+        filename += '.gz'
+
+    filepath = os.path.join(path, filename)
+    print(f'Saving chain: {filepath}')
+
+    if compress:
+        with gzip.GzipFile(filepath, 'w') as f:
+            np.save(f, chain)
+    else:
+        np.save(filepath, chain)
 
 
 # ===============================================================
