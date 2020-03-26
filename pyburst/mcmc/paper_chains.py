@@ -28,6 +28,7 @@ def load_chain(version):
 def replace_mass_with_grav(chain, version):
     """Convert m_nw from main chain to g (1e14 cm/s^2)
     """
+    print('Converting m_nw to g')
     mv = get_mcmc_version(version)
     m_nw_idx = mv.param_keys.index('m_nw')
 
@@ -53,10 +54,34 @@ def unflatten(flat_chain):
     return flat_chain.reshape((1000, -1, n_params))
 
 
+def reorder_chain(chain, version):
+    """Reorder param columns of chain, to be consistent with paper
+        i.e. move qb_i before 'x'
+    """
+    print('Reordering chain params')
+    mv = get_mcmc_version(version=version)
+    params = mv.param_keys
+
+    idx_map = {
+        'qb1': 3,
+        'qb2': 4,
+        'qb3': 5,
+        'x': 6,
+        'z': 7,
+    }
+
+    chain_out = chain.copy()
+    for param, new_idx in idx_map.items():
+        old_idx = params.index(param)
+        chain_out[:, :, new_idx] = chain[:, :, old_idx]
+
+    return chain_out
+
+
 # ===============================================================
 #                      Load/Save
 # ===============================================================
-def save_chain(chain, version, compressed=False):
+def save_chain(chain, version, compressed=True):
     """Save chain to file
     """
     filepath = chain_filepath(version, compressed=compressed)
