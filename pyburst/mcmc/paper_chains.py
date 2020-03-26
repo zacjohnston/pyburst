@@ -8,13 +8,19 @@ from pyburst.physics import gravity
 source = 'grid5'
 path = '/home/zac/projects/papers/mcmc/data'
 
-# TODO:
-#   - Resave, compress
-
 
 # ===============================================================
 #                      Baseline chains
 # ===============================================================
+def pipeline(version, compressed=True):
+    """Extract, reorder, and save chain
+    """
+    chain = load_chain(version)
+    chain = replace_mass_with_grav(chain, version=version)
+    chain = reorder_chain(chain, version=version)
+    save_chain(chain, version=version, compressed=compressed)
+
+
 def load_chain(version):
     """Load chain used in paper
     """
