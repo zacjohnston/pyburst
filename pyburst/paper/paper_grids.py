@@ -25,7 +25,11 @@ def save_table(table):
     with open(filepath, 'w') as f:
         f.write(table_str)
 
-    # table.to_csv(filepath, delim_whitespace=True)
+
+def load_table():
+    filename = 'burst_model_grid.pd'
+    filepath = os.path.join(path, filename)
+    return pd.read_csv(filepath, delim_whitespace=True)
 
 
 def assemble_table():
