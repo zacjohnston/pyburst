@@ -8,7 +8,7 @@ path = '/home/zac/projects/papers/mcmc/data'
 source = 'grid5'
 
 
-def pipeline():
+def assemble_table():
     """Creates single pandas table for paper model grid
     """
     param_cols = {
@@ -31,20 +31,21 @@ def pipeline():
         'u_peak': 'u_peak',
     }
 
-    new_grid = pd.DataFrame()
+    table = pd.DataFrame()
     kgrid = load_grid()
 
     # copy parameters
     for col_new, col_old in param_cols.items():
-        new_grid[col_new] = kgrid.params[col_old]
+        table[col_new] = kgrid.params[col_old]
 
     # copy burst output
     for col_new, col_old in summ_cols.items():
-        new_grid[col_new] = kgrid.summ[col_old]
+        table[col_new] = kgrid.summ[col_old]
 
-    replace_mass_with_g(new_grid)
+    replace_mass_with_g(table)
+    table.reset_index(inplace=True, drop=True)
 
-    return new_grid
+    return table
 
 
 def replace_mass_with_g(grid):
