@@ -2,7 +2,7 @@ import numpy as np
 import os
 import gzip
 
-from . import mcmc_tools, mcmc_params, mcmc_versions
+from pyburst.mcmc import mcmc_tools, mcmc_params, mcmc_versions
 from pyburst.physics import gravity
 
 source = 'grid5'
