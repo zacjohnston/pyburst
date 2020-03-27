@@ -20,7 +20,12 @@ def save_table(table):
     """
     filename = 'burst_model_grid.pd'
     filepath = os.path.join(path, filename)
-    table.to_csv(filepath)
+    table_str = table.to_string(index=False, justify='left')
+
+    with open(filepath, 'w') as f:
+        f.write(table_str)
+
+    # table.to_csv(filepath, delim_whitespace=True)
 
 
 def assemble_table():
