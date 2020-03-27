@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 
 # pyburst
 from pyburst.grids import grid_analyser
@@ -6,6 +7,15 @@ from pyburst.physics import gravity
 
 path = '/home/zac/projects/papers/mcmc/data'
 source = 'grid5'
+
+
+def save_table(table):
+    """
+    table: pd.DataFrame
+    """
+    filename = 'burst_model_grid.pd'
+    filepath = os.path.join(path, filename)
+    table.to_csv(filepath)
 
 
 def assemble_table():
