@@ -68,13 +68,16 @@ def reorder_chain(chain, version):
     mv = get_mcmc_version(version=version)
     params = mv.param_keys
 
-    idx_map = {
-        'qb1': 3,
-        'qb2': 4,
-        'qb3': 5,
-        'x': 6,
-        'z': 7,
-    }
+    if version == 6:
+        idx_map = {'qb1': 3,
+                   'qb2': 4,
+                   'qb3': 5,
+                   'x': 6,
+                   'z': 7}
+    else:
+        idx_map = {'qb1': 1,
+                   'x': 2,
+                   'z': 3}
 
     chain_out = chain.copy()
     for param, new_idx in idx_map.items():
