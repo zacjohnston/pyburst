@@ -9,6 +9,11 @@ path = '/home/zac/projects/papers/mcmc/data'
 source = 'grid5'
 
 
+def pipeline():
+    table = assemble_table()
+    save_table(table)
+
+
 def save_table(table):
     """
     table: pd.DataFrame
