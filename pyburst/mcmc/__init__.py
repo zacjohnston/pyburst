@@ -7,7 +7,6 @@ from . import mcmc_versions
 from . import mcmc_sample
 from . import mcmc_params
 from . import zcno_tools
-from . import paper_chains
 
 __all__ = ['burstfit',
            'mcmc',
@@ -18,5 +17,4 @@ __all__ = ['burstfit',
            'mcmc_sample',
            'zcno_tools',
            'mcmc_params',
-           'paper_chains',
            ]
