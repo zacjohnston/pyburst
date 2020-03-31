@@ -120,7 +120,10 @@ def load_chain2(version, compressed=False):
     
 def chain_filepath(version, compressed):
     chain_id = version - 5
-    filename = f'mcmc_chain_{chain_id}.npy'
+    if chain_id == 1:
+        filename = f'mcmc_chain_main.npy'
+    else:
+        filename = f'mcmc_chain_single_epoch_{chain_id-1}.npy'
 
     if compressed:
         filename += '.gz'
