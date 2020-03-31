@@ -56,7 +56,7 @@ def assemble_table():
     }
 
     table = pd.DataFrame()
-    kgrid = load_grid()
+    kgrid = load_original_grid()
 
     # copy parameters
     for col_new, col_old in param_cols.items():
@@ -86,7 +86,7 @@ def convert_dt_to_hr(table):
     table['u_dt'] *= 1 / 3600
 
 
-def load_grid():
+def load_original_grid():
     """Load kepler model grid
     """
     return grid_analyser.Kgrid(source=source)
