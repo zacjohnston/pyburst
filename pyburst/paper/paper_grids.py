@@ -18,7 +18,7 @@ def save_table(table):
     """
     table: pd.DataFrame
     """
-    filename = 'burst_model_grid.pd'
+    filename = 'burst_model_grid.txt'
     filepath = os.path.join(path, filename)
     table_str = table.to_string(index=False, justify='left')
 
@@ -67,6 +67,7 @@ def assemble_table():
         table[col_new] = kgrid.summ[col_old]
 
     replace_mass_with_g(table)
+    convert_dt_to_hr(table)
     table.reset_index(inplace=True, drop=True)
 
     return table
@@ -77,6 +78,12 @@ def replace_mass_with_g(grid):
     grav_factor = grav_factor.value / 1e14
 
     grid['g'] *= grav_factor
+    grid['g'] = grid['g'].round(2)  # round to 3 decimal places
+
+
+def convert_dt_to_hr(table):
+    table['dt'] *= 1 / 3600
+    table['u_dt'] *= 1 / 3600
 
 
 def load_grid():
