@@ -2,7 +2,6 @@ import os
 import matplotlib.pyplot as plt
 
 
-
 def save_plot(fig, label, path, extensions=('.pdf',)):
     """Saves a figure passed to it
     """
@@ -104,7 +103,7 @@ def quantity_label(quantity):
         'peak': r'$L_\mathrm{peak}$',
         'qb': r'$Q_\mathrm{b}$',
         'rate': r'Burst rate',
-        'redshift': '$z$',
+        'redshift': '$1+z$',
         'x': r'$X_0$',
         'xedd': r'$X_\mathrm{Edd}$',
         'xedd_ratio': r'$X_\mathrm{Edd} / X_0$',

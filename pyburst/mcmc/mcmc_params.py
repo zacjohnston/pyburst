@@ -121,7 +121,7 @@ def get_xi_redshift_chain(chain, discard, source, version, cap=None, r_nw=10,
     mass_ratio = mass_gr / mass_nw
     xi_chain, redshift_chain = gravity.gr_corrections(r=r_nw, m=mass_nw, phi=mass_ratio)
 
-    return xi_chain, redshift_chain-1
+    return xi_chain, redshift_chain
 
 
 def get_masses(chain, discard, source, version, cap=None, mass_nw=None, mass_gr=None):
